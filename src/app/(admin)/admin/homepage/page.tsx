@@ -1985,6 +1985,20 @@ export default function AdminHomepageBuilderPage() {
                                             <option value="16px">Standard (16px)</option>
                                             <option value="18px">Grand (18px)</option>
                                             <option value="20px">Très Grand (20px)</option>
+                                             <option value="22px">Extra Grand (22px)</option>
+                                             <option value="24px">Énorme (24px)</option>
+                                             <option value="28px">Géant (28px)</option>
+                                             <option value="32px">XXL (32px)</option>
+                                             <option value="36px">Maximum (36px)</option>
+                                             <option value="40px">Ultra (40px)</option>
+                                             <option value="48px">Héroïque (48px)</option>
+                                             <option value="22px">Extra Grand (22px)</option>
+                                             <option value="24px">Énorme (24px)</option>
+                                             <option value="28px">Géant (28px)</option>
+                                             <option value="32px">XXL (32px)</option>
+                                             <option value="36px">Maximum (36px)</option>
+                                             <option value="40px">Ultra (40px)</option>
+                                             <option value="48px">Héroïque (48px)</option>
                                           </select>
                                         </div>
 
@@ -2088,6 +2102,13 @@ export default function AdminHomepageBuilderPage() {
                                             <option value="15px">Standard (15px)</option>
                                             <option value="18px">Grand (18px)</option>
                                             <option value="20px">Très Grand (20px)</option>
+                                             <option value="22px">Extra Grand (22px)</option>
+                                             <option value="24px">Énorme (24px)</option>
+                                             <option value="28px">Géant (28px)</option>
+                                             <option value="32px">XXL (32px)</option>
+                                             <option value="36px">Maximum (36px)</option>
+                                             <option value="40px">Ultra (40px)</option>
+                                             <option value="48px">Héroïque (48px)</option>
                                           </select>
                                         </div>
 
