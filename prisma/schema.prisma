@@ -293,7 +293,7 @@ model MenuItem {
 
 model HomepageSection {
   id         String   @id @default(uuid())
-  sectionKey String   @unique // HERO, CATEGORIES, ARTICLES, RESOURCES, PRODUCTS, NEWSLETTER, CTA
+  sectionKey String   // HERO, CATEGORIES, ARTICLES, RESOURCES, PRODUCTS, NEWSLETTER, CTA, DARK_FEATURE, etc.
   title      String
   subtitle   String?
   isEnabled  Boolean  @default(true)

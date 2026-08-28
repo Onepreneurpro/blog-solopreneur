@@ -374,11 +374,14 @@ async function main() {
   ];
 
   for (const sec of sections) {
-    await prisma.homepageSection.upsert({
+    const existing = await prisma.homepageSection.findFirst({
       where: { sectionKey: sec.sectionKey },
-      update: sec,
-      create: sec,
     });
+    if (!existing) {
+      await prisma.homepageSection.create({
+        data: sec,
+      });
+    }
   }
 
   // 11. Site Settings

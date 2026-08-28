@@ -37,8 +37,8 @@ export function FreeEbookOptinPixel({
   const [liveSection, setLiveSection] = useState<any>(null);
 
   useEffect(() => {
-    // Only fetch homepage section settings when rendered as the homepage hero block
-    if (!isEmbedded) {
+    // Only fetch homepage section settings when rendered as standalone without props
+    if (!isEmbedded && !settings) {
       async function fetchLiveSection() {
         try {
           const res = await fetch('/api/admin/homepage');
@@ -55,7 +55,7 @@ export function FreeEbookOptinPixel({
       }
       fetchLiveSection();
     }
-  }, [isEmbedded]);
+  }, [isEmbedded, settings]);
 
   // Parse custom settings
   const parsedPropSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
@@ -67,8 +67,8 @@ export function FreeEbookOptinPixel({
     } catch (e) {}
   }
 
-  // Merged settings: embedded blocks remain completely independent from homepage DB settings
-  const mergedSettings = isEmbedded ? parsedPropSettings : { ...liveParsedSettings, ...parsedPropSettings };
+  // Merged settings: prop settings take precedence so multiple blocks on the same page keep their distinct configurations
+  const mergedSettings = { ...liveParsedSettings, ...parsedPropSettings };
 
   // 5-element font/size/color styling from mergedSettings
   const badgeBgHex = mergedSettings.badgeBgColor;

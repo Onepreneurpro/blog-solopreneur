@@ -141,12 +141,9 @@ const DEFAULT_SECTIONS = [
 
 export async function GET() {
   try {
-    // Check missing sections and auto-seed them
-    for (const sec of DEFAULT_SECTIONS) {
-      const existing = await prisma.homepageSection.findUnique({
-        where: { sectionKey: sec.sectionKey },
-      });
-      if (!existing) {
+    const count = await prisma.homepageSection.count();
+    if (count === 0) {
+      for (const sec of DEFAULT_SECTIONS) {
         await prisma.homepageSection.create({
           data: sec,
         });
@@ -175,17 +172,10 @@ export async function PUT(request: Request) {
 
     // Check if reset action requested
     if (body.resetDefaults) {
+      await prisma.homepageSection.deleteMany({});
       for (const sec of DEFAULT_SECTIONS) {
-        await prisma.homepageSection.upsert({
-          where: { sectionKey: sec.sectionKey },
-          update: {
-            title: sec.title,
-            subtitle: sec.subtitle,
-            isEnabled: sec.isEnabled,
-            order: sec.order,
-            settings: sec.settings,
-          },
-          create: sec,
+        await prisma.homepageSection.create({
+          data: sec,
         });
       }
 
@@ -219,29 +209,49 @@ export async function PUT(request: Request) {
 
     // 2. Bulk Section Array Update
     if (body.sections && Array.isArray(body.sections)) {
+      const dbSections = await prisma.homepageSection.findMany({ select: { id: true } });
+      const existingDbIds = dbSections.map((s) => s.id);
+      const incomingIds = body.sections.map((s: any) => s.id).filter(Boolean);
+
+      // Remove deleted sections from DB
+      const idsToDelete = existingDbIds.filter((id) => !incomingIds.includes(id));
+      if (idsToDelete.length > 0) {
+        await prisma.homepageSection.deleteMany({
+          where: { id: { in: idsToDelete } },
+        });
+      }
+
+      // Upsert/Create each section using ID
       for (let i = 0; i < body.sections.length; i++) {
         const sec = body.sections[i];
         const serializedSettings =
           typeof sec.settings === 'object' ? JSON.stringify(sec.settings) : sec.settings || '{}';
 
-        await prisma.homepageSection.upsert({
-          where: { sectionKey: sec.sectionKey },
-          update: {
-            isEnabled: sec.isEnabled,
-            title: sec.title,
-            subtitle: sec.subtitle,
-            order: i,
-            settings: serializedSettings,
-          },
-          create: {
-            sectionKey: sec.sectionKey,
-            title: sec.title,
-            subtitle: sec.subtitle,
-            isEnabled: sec.isEnabled,
-            order: i,
-            settings: serializedSettings,
-          },
-        });
+        if (sec.id && existingDbIds.includes(sec.id)) {
+          await prisma.homepageSection.update({
+            where: { id: sec.id },
+            data: {
+              sectionKey: sec.sectionKey,
+              isEnabled: sec.isEnabled,
+              title: sec.title,
+              subtitle: sec.subtitle,
+              order: i,
+              settings: serializedSettings,
+            },
+          });
+        } else {
+          await prisma.homepageSection.create({
+            data: {
+              ...(sec.id ? { id: sec.id } : {}),
+              sectionKey: sec.sectionKey,
+              title: sec.title,
+              subtitle: sec.subtitle,
+              isEnabled: sec.isEnabled,
+              order: i,
+              settings: serializedSettings,
+            },
+          });
+        }
       }
 
       const updatedSections = await prisma.homepageSection.findMany({
