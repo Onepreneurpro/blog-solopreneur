@@ -72,10 +72,15 @@ export default async function BoutiqueDynamicSlugPage({ params, searchParams }: 
       },
     });
 
+    if (product && product.status === 'PUBLISHED') {
+      redirect(`/checkout?productId=${product.id}`);
+    }
+
     if (!product || product.status !== 'PUBLISHED') {
       notFound();
     }
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.digest?.startsWith('NEXT_REDIRECT')) throw err;
     if (!product) notFound();
   }
 

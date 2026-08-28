@@ -136,7 +136,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                 >
                   <div>
                     {/* 1:1 SQUARE PRODUCT MOCKUP BOX */}
-                    <Link href={`/boutique/${prod.slug}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
+                    <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
                       {prod.coverImage ? (
                         <img
                           src={prod.coverImage}
@@ -172,7 +172,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                         {prod.category?.name || 'OUTILS & TEMPLATES'}
                       </div>
 
-                      <Link href={`/boutique/${prod.slug}`}>
+                      <Link href={`/checkout?productId=${prod.id}`}>
                         <h3 className="font-heading font-black text-base text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
                           {prod.name}
                         </h3>
@@ -200,7 +200,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                       </div>
                     </div>
 
-                    <Link href={`/boutique/${prod.slug}`}>
+                    <Link href={`/checkout?productId=${prod.id}`}>
                       <button
                         type="button"
                         className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
