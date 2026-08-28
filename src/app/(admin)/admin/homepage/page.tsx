@@ -842,24 +842,7 @@ export default function AdminHomepageBuilderPage() {
           {/* TAB 1: BADGE FLOTTANT */}
           {activeHeroTab === 'badge' && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-extrabold text-purple-950 mb-1">
-                  Contenu du Texte du Badge Flottant / Ticker
-                </label>
-                <input
-                  type="text"
-                  value={heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés'}
-                  onChange={(e) => {
-                    if (heroSection) {
-                      handleSettingChange(heroSection.id, 'topTickerText', e.target.value);
-                      handleSettingChange(heroSection.id, 'floatingBadge', e.target.value);
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Texte du badge..."
-                />
-              </div>
-
+              {/* 1. POLICE / TAILLE / COULEUR DU BADGE (HAUT) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
@@ -912,126 +895,32 @@ export default function AdminHomepageBuilderPage() {
                   </div>
                 </div>
               </div>
+
+              {/* 2. CONTENU DU TEXTE DU BADGE (BAS) */}
+              <div>
+                <label className="block text-xs font-extrabold text-purple-950 mb-1">
+                  Contenu du Texte du Badge Flottant / Ticker
+                </label>
+                <input
+                  type="text"
+                  value={heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés'}
+                  onChange={(e) => {
+                    if (heroSection) {
+                      handleSettingChange(heroSection.id, 'topTickerText', e.target.value);
+                      handleSettingChange(heroSection.id, 'floatingBadge', e.target.value);
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Texte du badge..."
+                />
+              </div>
             </div>
           )}
 
           {/* TAB 2: TITRE PRINCIPAL H1 HERO */}
           {activeHeroTab === 'title' && (
             <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-extrabold text-purple-950">
-                    Contenu du Titre Principal H1
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'mark')}
-                      className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
-                    >
-                      + Surligner Néon (&lt;mark&gt;)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'color', uColor)}
-                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
-                    >
-                      + Couleur Texte (&lt;color&gt;)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u')}
-                      className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
-                    >
-                      + Souligner (&lt;u&gt;)
-                    </button>
-                  </div>
-                </div>
-                <input
-                  type="text"
-                  value={heroSection?.title || ''}
-                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'title', e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Titre H1..."
-                />
-
-                {/* PERSONNALISATION AVANCÉE DU SOULIGNEMENT <u> */}
-                <div className="mt-3 p-3 bg-white border border-purple-200 rounded-xl space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
-                      <Underline className="w-3.5 h-3.5 text-purple-700" />
-                      Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u', uColor, uThickness, uOffset)}
-                      className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1"
-                    >
-                      + Insérer &lt;u&gt; réglé
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
-                      <select
-                        value={uThickness}
-                        onChange={(e) => setUThickness(e.target.value)}
-                        className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                      >
-                        <option value="1px">Très fine (1px)</option>
-                        <option value="2px">Fine (2px)</option>
-                        <option value="4px">Moyenne - Standard (4px)</option>
-                        <option value="6px">Épaisse (6px)</option>
-                        <option value="8px">Très épaisse (8px)</option>
-                        <option value="12px">Ultra épaisse (12px)</option>
-                        <option value="35%">Socle partiel (35% hauteur)</option>
-                        <option value="50%">Surlignage bas (50% hauteur)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
-                      <select
-                        value={uOffset}
-                        onChange={(e) => setUOffset(e.target.value)}
-                        className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                      >
-                        <option value="0px">Collé au texte (0px)</option>
-                        <option value="2px">Proche (2px)</option>
-                        <option value="4px">Standard (4px)</option>
-                        <option value="6px">Éloigné (6px)</option>
-                        <option value="9px">Très éloigné (9px)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={uColor}
-                          onChange={(e) => setUColor(e.target.value)}
-                          className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
-                        />
-                        <div className="flex items-center gap-1 overflow-x-auto">
-                          {COLOR_PALETTE.slice(0, 5).map((c) => (
-                            <button
-                              key={c.hex}
-                              type="button"
-                              onClick={() => setUColor(c.hex)}
-                              style={{ backgroundColor: c.hex }}
-                              className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
-                              title={c.name}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+              {/* 1. POLICE / TAILLE / COULEUR DU TITRE H1 (HAUT) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre H1</label>
@@ -1084,112 +973,128 @@ export default function AdminHomepageBuilderPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* TAB 3: SOUS-TITRE / DESCRIPTION */}
-          {activeHeroTab === 'subtitle' && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-extrabold text-purple-950">
-                    Contenu du Sous-titre / Description (Modifiable librement)
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'subtitle', 'color', uColor)}
-                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
-                    >
-                      + Couleur Texte (&lt;color&gt;)
-                    </button>
-                  </div>
+              {/* 2. PERSONNALISATION AVANCÉE DU SOULIGNEMENT <u> (MILIEU) */}
+              <div className="p-3 bg-white border border-purple-200 rounded-xl space-y-2 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
+                    <Underline className="w-3.5 h-3.5 text-purple-700" />
+                    Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u', uColor, uThickness, uOffset)}
+                    className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1"
+                  >
+                    + Insérer &lt;u&gt; réglé
+                  </button>
                 </div>
-                <textarea
-                  rows={2}
-                  value={heroSection?.subtitle || ''}
-                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'subtitle', e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Description..."
-                />
 
-                {/* PERSONNALISATION AVANCÉE DU SOULIGNEMENT <u> DANS LE SOUS-TITRE */}
-                <div className="mt-3 p-3 bg-white border border-purple-200 rounded-xl space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
-                      <Underline className="w-3.5 h-3.5 text-purple-700" />
-                      Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
-                      className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1"
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
+                    <select
+                      value={uThickness}
+                      onChange={(e) => setUThickness(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
                     >
-                      + Insérer &lt;u&gt; réglé
-                    </button>
+                      <option value="1px">Très fine (1px)</option>
+                      <option value="2px">Fine (2px)</option>
+                      <option value="4px">Moyenne - Standard (4px)</option>
+                      <option value="6px">Épaisse (6px)</option>
+                      <option value="8px">Très épaisse (8px)</option>
+                      <option value="12px">Ultra épaisse (12px)</option>
+                      <option value="35%">Socle partiel (35% hauteur)</option>
+                      <option value="50%">Surlignage bas (50% hauteur)</option>
+                    </select>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
-                      <select
-                        value={uThickness}
-                        onChange={(e) => setUThickness(e.target.value)}
-                        className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                      >
-                        <option value="1px">Très fine (1px)</option>
-                        <option value="2px">Fine (2px)</option>
-                        <option value="4px">Moyenne - Standard (4px)</option>
-                        <option value="6px">Épaisse (6px)</option>
-                        <option value="8px">Très épaisse (8px)</option>
-                        <option value="12px">Ultra épaisse (12px)</option>
-                        <option value="35%">Socle partiel (35% hauteur)</option>
-                        <option value="50%">Surlignage bas (50% hauteur)</option>
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
+                    <select
+                      value={uOffset}
+                      onChange={(e) => setUOffset(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
+                    >
+                      <option value="0px">Collé au texte (0px)</option>
+                      <option value="2px">Proche (2px)</option>
+                      <option value="4px">Standard (4px)</option>
+                      <option value="6px">Éloigné (6px)</option>
+                      <option value="9px">Très éloigné (9px)</option>
+                    </select>
+                  </div>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
-                      <select
-                        value={uOffset}
-                        onChange={(e) => setUOffset(e.target.value)}
-                        className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                      >
-                        <option value="0px">Collé au texte (0px)</option>
-                        <option value="2px">Proche (2px)</option>
-                        <option value="4px">Standard (4px)</option>
-                        <option value="6px">Éloigné (6px)</option>
-                        <option value="9px">Très éloigné (9px)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={uColor}
-                          onChange={(e) => setUColor(e.target.value)}
-                          className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
-                        />
-                        <div className="flex items-center gap-1 overflow-x-auto">
-                          {COLOR_PALETTE.slice(0, 5).map((c) => (
-                            <button
-                              key={c.hex}
-                              type="button"
-                              onClick={() => setUColor(c.hex)}
-                              style={{ backgroundColor: c.hex }}
-                              className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
-                              title={c.name}
-                            />
-                          ))}
-                        </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={uColor}
+                        onChange={(e) => setUColor(e.target.value)}
+                        className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
+                      />
+                      <div className="flex items-center gap-1 overflow-x-auto">
+                        {COLOR_PALETTE.slice(0, 5).map((c) => (
+                          <button
+                            key={c.hex}
+                            type="button"
+                            onClick={() => setUColor(c.hex)}
+                            style={{ backgroundColor: c.hex }}
+                            className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
+                            title={c.name}
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* 3. CONTENU DU TITRE PRINCIPAL H1 (BAS) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-extrabold text-purple-950">
+                    Contenu du Titre Principal H1
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'mark')}
+                      className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
+                    >
+                      + Surligner Néon (&lt;mark&gt;)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'color', uColor)}
+                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Couleur Texte (&lt;color&gt;)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u')}
+                      className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Souligner (&lt;u&gt;)
+                    </button>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  value={heroSection?.title || ''}
+                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'title', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Titre H1..."
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: SOUS-TITRE / DESCRIPTION */}
+          {activeHeroTab === 'subtitle' && (
+            <div className="space-y-4">
+              {/* 1. POLICE / TAILLE / COULEUR DU SOUS-TITRE (HAUT) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
@@ -1241,6 +1146,107 @@ export default function AdminHomepageBuilderPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* 2. PERSONNALISATION AVANCÉE DU SOULIGNEMENT <u> (MILIEU) */}
+              <div className="p-3 bg-white border border-purple-200 rounded-xl space-y-2 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
+                    <Underline className="w-3.5 h-3.5 text-purple-700" />
+                    Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => heroSection && insertFormattedTag(heroSection.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
+                    className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1"
+                  >
+                    + Insérer &lt;u&gt; réglé
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
+                    <select
+                      value={uThickness}
+                      onChange={(e) => setUThickness(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
+                    >
+                      <option value="1px">Très fine (1px)</option>
+                      <option value="2px">Fine (2px)</option>
+                      <option value="4px">Moyenne - Standard (4px)</option>
+                      <option value="6px">Épaisse (6px)</option>
+                      <option value="8px">Très épaisse (8px)</option>
+                      <option value="12px">Ultra épaisse (12px)</option>
+                      <option value="35%">Socle partiel (35% hauteur)</option>
+                      <option value="50%">Surlignage bas (50% hauteur)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
+                    <select
+                      value={uOffset}
+                      onChange={(e) => setUOffset(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
+                    >
+                      <option value="0px">Collé au texte (0px)</option>
+                      <option value="2px">Proche (2px)</option>
+                      <option value="4px">Standard (4px)</option>
+                      <option value="6px">Éloigné (6px)</option>
+                      <option value="9px">Très éloigné (9px)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={uColor}
+                        onChange={(e) => setUColor(e.target.value)}
+                        className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
+                      />
+                      <div className="flex items-center gap-1 overflow-x-auto">
+                        {COLOR_PALETTE.slice(0, 5).map((c) => (
+                          <button
+                            key={c.hex}
+                            type="button"
+                            onClick={() => setUColor(c.hex)}
+                            style={{ backgroundColor: c.hex }}
+                            className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
+                            title={c.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. CONTENU DU SOUS-TITRE / DESCRIPTION (BAS) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-extrabold text-purple-950">
+                    Contenu du Sous-titre / Description (Modifiable librement)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'subtitle', 'color', uColor)}
+                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Couleur Texte (&lt;color&gt;)
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  rows={2}
+                  value={heroSection?.subtitle || ''}
+                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'subtitle', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Description..."
+                />
               </div>
             </div>
           )}
