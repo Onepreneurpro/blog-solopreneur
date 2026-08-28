@@ -334,24 +334,24 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
-                          <Sparkles className="w-10 h-10 text-[#a3e635]" />
+                          <Sparkles className="img-cover-icon w-10 h-10 text-[#a3e635]" />
                           <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{prod.name}</span>
                         </div>
                       )}
 
                       {/* CIRCULAR ACTION BUTTON TOP LEFT */}
-                      <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#0f172a] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
+                      <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
                         <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
 
                       {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
-                      <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#0f172a] text-white border border-white/20 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                      <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
                         {prod.category?.name || category.name || 'TEMPLATES'}
                       </span>
 
                       <div className="absolute top-2.5 right-2.5 z-10">
                         <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
-                          <Star className="w-2.5 h-2.5 text-[#a3e635] fill-[#a3e635]" />
+                          <Star className="img-cover-icon w-2.5 h-2.5 text-[#a3e635] fill-[#a3e635]" />
                           <span>VÉRIFIÉ</span>
                         </span>
                       </div>

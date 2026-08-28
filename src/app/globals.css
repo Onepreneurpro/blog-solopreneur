@@ -348,23 +348,30 @@ body.theme-blusky button.bg-\[\#a3e635\]:hover {
   color: #ffffff !important;
 }
 
-/* Cover Image Overlay Elements (Light Button Background & Dark Text) */
+/* Cover Image Overlay Elements (Lime Green #A3E635) */
 .img-overlay-arrow,
 .img-overlay-badge,
 body.theme-blusky .img-overlay-arrow,
 body.theme-blusky .img-overlay-badge {
-  background-color: #ffffff !important;
+  background-color: #a3e635 !important;
   color: #0f172a !important;
-  border: 1px solid rgba(15, 23, 42, 0.15) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(163, 230, 53, 0.5) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
   font-weight: 900 !important;
 }
 
 body.theme-blusky .img-overlay-arrow:hover,
 .img-overlay-arrow:hover {
-  background-color: #f8fafc !important;
-  color: #00A0FF !important;
-  border-color: #00A0FF !important;
+  background-color: #b8f542 !important;
+  border-color: #b8f542 !important;
+  color: #0f172a !important;
+}
+
+.img-cover-icon,
+body.theme-blusky .img-cover-icon,
+body.theme-blusky svg.img-cover-icon {
+  color: #a3e635 !important;
+  fill: none !important;
 }
 
 /* Distinct Vibrant Collection Icon Boxes */
