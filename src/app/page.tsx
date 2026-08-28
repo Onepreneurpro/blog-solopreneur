@@ -147,12 +147,27 @@ export default async function HomePage() {
     'Inter': 'Inter:wght@800;900',
   };
 
+  const sectionFontNames: string[] = [];
+  activeSections.forEach((sec) => {
+    if (sec.settings) {
+      try {
+        const s = typeof sec.settings === 'string' ? JSON.parse(sec.settings) : sec.settings;
+        if (s.badgeFont) sectionFontNames.push(s.badgeFont);
+        if (s.titleFont) sectionFontNames.push(s.titleFont);
+        if (s.subtitleFont) sectionFontNames.push(s.subtitleFont);
+        if (s.btnFont) sectionFontNames.push(s.btnFont);
+        if (s.reassuranceFont) sectionFontNames.push(s.reassuranceFont);
+      } catch (e) {}
+    }
+  });
+
   const fontsToLoad = Array.from(new Set([
     heroStyles.fontFamily,
     heroStyles.badgeFont,
     heroStyles.titleFont,
     heroStyles.accentFont,
     heroStyles.subtitleFont,
+    ...sectionFontNames,
   ])).filter(Boolean);
 
   const sectionsToRender = activeSections.length > 0

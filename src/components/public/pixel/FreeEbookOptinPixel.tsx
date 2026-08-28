@@ -54,6 +54,37 @@ export function FreeEbookOptinPixel({
   // Merged settings: embedded blocks remain completely independent from homepage DB settings
   const mergedSettings = isEmbedded ? parsedPropSettings : { ...liveParsedSettings, ...parsedPropSettings };
 
+  // 5-element font/size/color styling from mergedSettings
+  const badgeStyle: React.CSSProperties = {
+    fontFamily: mergedSettings.badgeFont ? `'${mergedSettings.badgeFont}', sans-serif` : undefined,
+    fontSize: mergedSettings.badgeSize || undefined,
+    color: mergedSettings.badgeColor || undefined,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontFamily: mergedSettings.titleFont ? `'${mergedSettings.titleFont}', sans-serif` : undefined,
+    fontSize: mergedSettings.titleSize || undefined,
+    color: mergedSettings.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: mergedSettings.subtitleFont ? `'${mergedSettings.subtitleFont}', sans-serif` : undefined,
+    fontSize: mergedSettings.subtitleSize || undefined,
+    color: mergedSettings.subtitleColor || undefined,
+  };
+
+  const btnStyle: React.CSSProperties = {
+    fontFamily: mergedSettings.btnFont ? `'${mergedSettings.btnFont}', sans-serif` : undefined,
+    fontSize: mergedSettings.btnSize || undefined,
+    backgroundColor: mergedSettings.btnColor || undefined,
+  };
+
+  const reassuranceStyle: React.CSSProperties = {
+    fontFamily: mergedSettings.reassuranceFont ? `'${mergedSettings.reassuranceFont}', sans-serif` : undefined,
+    fontSize: mergedSettings.reassuranceSize || undefined,
+    color: mergedSettings.reassuranceColor || undefined,
+  };
+
   const defaultEmbeddedTitle = "Tout ce dont vous avez besoin pour structurer et faire <mark color='#a3e635'>décoller votre activité</mark>";
   const defaultEmbeddedSubtitle = "Ne perdez plus des heures à configurer des outils bancales. Accédez à nos systèmes complets.";
 
@@ -171,18 +202,18 @@ export function FreeEbookOptinPixel({
           <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
                   <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
                 </div>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-heading font-black text-white tracking-tight leading-snug text-center max-w-lg mx-auto">
+              <h3 className="text-xl sm:text-2xl font-heading font-black text-white tracking-tight leading-snug text-center max-w-lg mx-auto" style={titleStyle}>
                 <FormattedText text={finalTitle} />
               </h3>
 
               {finalSubtitle && (
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium text-center max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium text-center max-w-md mx-auto" style={subtitleStyle}>
                   <FormattedText text={finalSubtitle} />
                 </p>
               )}
@@ -243,13 +274,14 @@ export function FreeEbookOptinPixel({
                     type="submit"
                     disabled={loading}
                     size="lg"
+                    style={btnStyle}
                     className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base sm:text-lg py-3.5 rounded-xl shadow-xl shadow-[#a3e635]/20 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
 
                   {/* REASSURANCE TEXTS ON THE EXACT SAME LINE */}
-                  <div className="flex flex-row items-center justify-center gap-4 text-[11px] text-slate-400 pt-0.5 font-medium whitespace-nowrap">
+                  <div className="flex flex-row items-center justify-center gap-4 text-[11px] text-slate-400 pt-0.5 font-medium whitespace-nowrap" style={reassuranceStyle}>
                     <span className="flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#a3e635] shrink-0" />
                       <span>{reassuranceText1}</span>
@@ -383,18 +415,18 @@ export function FreeEbookOptinPixel({
           <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
             <div className="space-y-4 text-center">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
                   <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
                 </div>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-white tracking-tight leading-tight text-center max-w-xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-white tracking-tight leading-tight text-center max-w-xl mx-auto" style={titleStyle}>
                 <FormattedText text={finalTitle} />
               </h2>
 
               {finalSubtitle && (
-                <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal text-center max-w-lg mx-auto">
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal text-center max-w-lg mx-auto" style={subtitleStyle}>
                   <FormattedText text={finalSubtitle} />
                 </p>
               )}
@@ -458,13 +490,14 @@ export function FreeEbookOptinPixel({
                     type="submit"
                     disabled={loading}
                     size="lg"
+                    style={btnStyle}
                     className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-lg sm:text-xl py-3.5 sm:py-4 rounded-xl shadow-xl shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
 
                   {/* REASSURANCE TEXTS ON THE EXACT SAME LINE */}
-                  <div className="flex flex-row items-center justify-center gap-6 text-xs text-slate-400 pt-1 font-semibold whitespace-nowrap">
+                  <div className="flex flex-row items-center justify-center gap-6 text-xs text-slate-400 pt-1 font-semibold whitespace-nowrap" style={reassuranceStyle}>
                     <span className="flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-[#a3e635] shrink-0" />
                       <span>{reassuranceText1}</span>
