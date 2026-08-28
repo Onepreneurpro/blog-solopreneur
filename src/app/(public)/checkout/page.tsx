@@ -692,30 +692,30 @@ function CheckoutContent() {
                     <Button
                       type="submit"
                       disabled={processing || sendingCode}
-                      className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-md shadow-xl transition-all gap-2 ${
+                      className={`w-full py-3 px-4 text-sm sm:text-base font-heading font-black tracking-tight rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] ${
                         isDark
-                          ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
+                          ? 'bg-[#a3e635] text-slate-950 hover:bg-[#b8f542]'
                           : 'bg-purple-700 text-white hover:bg-purple-800'
                       }`}
                     >
                       {sendingCode ? (
-                        <span>Envoi du code...</span>
+                        <span className="whitespace-nowrap">Envoi du code...</span>
                       ) : processing ? (
-                        <span>Validation en cours...</span>
+                        <span className="whitespace-nowrap">Validation en cours...</span>
                       ) : codeSent ? (
                         <>
-                          <Lock className="w-5 h-5 shrink-0" />
-                          <span>Valider mon code et finaliser</span>
+                          <CheckCircle2 className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                          <span className="whitespace-nowrap">{isFree ? 'Valider & Télécharger' : `Valider & Payer (${product.price.toFixed(2)} €)`}</span>
                         </>
                       ) : isFree ? (
                         <>
-                          <Gift className="w-5 h-5 shrink-0" />
-                          <span>Obtenir mon accès gratuit</span>
+                          <Gift className="w-4 h-4 shrink-0" />
+                          <span className="whitespace-nowrap">Obtenir mon accès gratuit</span>
                         </>
                       ) : (
                         <>
-                          <Lock className="w-5 h-5 shrink-0" />
-                          <span>Payer ({product.price.toFixed(2)} €)</span>
+                          <Lock className="w-4 h-4 shrink-0" />
+                          <span className="whitespace-nowrap">Payer ({product.price.toFixed(2)} €)</span>
                         </>
                       )}
                     </Button>
