@@ -261,12 +261,26 @@ body.theme-blusky .bg-slate-900\/50,
 body.theme-blusky .bg-slate-950\/90,
 body.theme-blusky .bg-slate-950\/80,
 body.theme-blusky .bg-slate-950\/60,
+body.theme-blusky .bg-\[\#0e1424\]\/95,
 body.theme-blusky .bg-\[\#0e1424\]\/90,
-body.theme-blusky .bg-\[\#0d1322\]\/90 {
+body.theme-blusky .bg-\[\#0d1322\]\/90,
+body.theme-blusky .creator-bio-card {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 160, 255, 0.08) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 160, 255, 0.12) !important;
+}
+
+body.theme-blusky .creator-quote-box,
+body.theme-blusky .creator-skill-pill {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.theme-blusky .creator-quote-box p,
+body.theme-blusky .creator-skill-pill span {
+  color: #334155 !important;
 }
 
 body.theme-blusky .border-slate-800,
