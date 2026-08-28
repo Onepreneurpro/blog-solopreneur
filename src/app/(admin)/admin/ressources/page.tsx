@@ -36,6 +36,7 @@ export default function AdminRessourcesPage() {
   const [editUploading, setEditUploading] = useState(false);
   const [editImageUploading, setEditImageUploading] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState('');
 
   const fetchResources = async () => {
     try {
@@ -197,6 +198,7 @@ export default function AdminRessourcesPage() {
 
   const handleStartEdit = (resItem: any) => {
     setEditingId(resItem.id);
+    setEditError('');
     setEditName(resItem.name);
     setEditSlug(resItem.slug);
     setEditShortDesc(resItem.shortDescription || '');
@@ -218,6 +220,7 @@ export default function AdminRessourcesPage() {
 
   const handleSaveEdit = async (id: string) => {
     setSavingEdit(true);
+    setEditError('');
     try {
       const res = await fetch('/api/admin/ressources', {
         method: 'PUT',
@@ -240,7 +243,7 @@ export default function AdminRessourcesPage() {
       setEditingId(null);
       fetchResources();
     } catch (err: any) {
-      alert(err.message);
+      setEditError(err.message || 'Erreur lors de la sauvegarde.');
     } finally {
       setSavingEdit(false);
     }
@@ -462,6 +465,12 @@ export default function AdminRessourcesPage() {
                                   <X className="w-4 h-4 text-slate-500" />
                                 </Button>
                               </div>
+
+                              {editError && (
+                                <div className="p-2 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-lg">
+                                  {editError}
+                                </div>
+                              )}
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
