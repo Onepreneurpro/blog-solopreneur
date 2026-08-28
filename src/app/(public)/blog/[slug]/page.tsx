@@ -266,37 +266,37 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-around gap-3">
+                <div className="flex-1 flex flex-col justify-between gap-3.5 h-full">
                   {headerFeaturedArticles.slice(0, 2).map((featArt) => (
                     <Link
                       key={featArt.id}
                       href={`/blog/${featArt.slug}`}
-                      className={`group flex items-center gap-3 p-2.5 rounded-md transition-all border shadow-sm ${
+                      className={`group flex items-center gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl transition-all border shadow-md flex-1 ${
                         isDark
-                          ? 'bg-[#0e1424] border-white/10 hover:border-purple-500/50 hover:bg-white/5'
+                          ? 'bg-[#0e1424] border-white/10 hover:border-[#a3e635]/60 hover:bg-white/5'
                           : 'bg-white border-slate-200 hover:border-purple-500 hover:bg-slate-50'
                       }`}
                     >
                       {featArt.coverImage ? (
-                        <div className="relative w-24 h-20 rounded-md overflow-hidden flex-shrink-0 bg-slate-950 border border-white/10">
-                          <Image src={featArt.coverImage} alt={featArt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <div className="relative w-32 h-24 sm:w-36 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 bg-slate-950 border border-white/10 shadow-md">
+                          <Image src={featArt.coverImage} alt={featArt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                       ) : (
-                        <div className="w-24 h-20 rounded-md bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-[10px]">
+                        <div className="w-32 h-24 sm:w-36 sm:h-28 rounded-xl bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-xs">
                           ARTICLE
                         </div>
                       )}
 
-                      <div className="min-w-0 flex-1 space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1.5">
                         {featArt.category && (
-                          <span className="text-[9px] font-black uppercase text-[#ccff00] truncate block">
+                          <span className="text-[10px] font-heading font-black uppercase text-[#a3e635] tracking-wider truncate block">
                             {featArt.category.name}
                           </span>
                         )}
-                        <h4 className="font-heading font-bold text-xs leading-snug text-white group-hover:text-[#ccff00] transition-colors line-clamp-2">
+                        <h4 className="font-heading font-black text-xs sm:text-sm leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-2">
                           {featArt.title}
                         </h4>
-                        <p className="text-[10px] text-slate-400 line-clamp-1">
+                        <p className="text-xs text-slate-300 font-normal line-clamp-2 leading-relaxed">
                           {featArt.excerpt || 'Découvrir cet article...'}
                         </p>
                       </div>
