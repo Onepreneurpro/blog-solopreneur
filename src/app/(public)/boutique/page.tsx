@@ -31,6 +31,9 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   let storeHeroTitle = 'Templates Notion & Dashboards Excel';
   let storeHeroTitleAccent = 'Haute Performance';
   let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
+  let storeHeroFontFamily = 'Plus Jakarta Sans';
+  let storeHeroTitleSize = 'large';
+  let storeHeroAlign = 'center';
 
   try {
     activeTheme = await getActiveTheme();
@@ -64,6 +67,9 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
     if (settings.storeHeroTitle) storeHeroTitle = settings.storeHeroTitle;
     if (settings.storeHeroTitleAccent !== undefined) storeHeroTitleAccent = settings.storeHeroTitleAccent;
     if (settings.storeHeroSubtitle) storeHeroSubtitle = settings.storeHeroSubtitle;
+    if (settings.storeHeroFontFamily) storeHeroFontFamily = settings.storeHeroFontFamily;
+    if (settings.storeHeroTitleSize) storeHeroTitleSize = settings.storeHeroTitleSize;
+    if (settings.storeHeroAlign) storeHeroAlign = settings.storeHeroAlign;
 
     products = await prisma.product.findMany({
       where: whereCondition,
@@ -77,10 +83,30 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   }
 
   const isDark = isDarkTheme(activeTheme);
+  const fontImportMap: Record<string, string> = {
+    'Plus Jakarta Sans': 'Plus+Jakarta+Sans:wght@700;800;900',
+    'Outfit': 'Outfit:wght@700;800;900',
+    'Syne': 'Syne:wght@700;800',
+    'Space Grotesk': 'Space+Grotesk:wght@700',
+    'Poppins': 'Poppins:wght@700;800;900',
+    'Montserrat': 'Montserrat:wght@800;900',
+    'Playfair Display': 'Playfair+Display:ital,wght@0,800;1,700',
+    'Bricolage Grotesque': 'Bricolage+Grotesque:opsz,wght@12..96,800',
+    'Inter': 'Inter:wght@800;900',
+  };
+  const fontImportName = fontImportMap[storeHeroFontFamily] || fontImportMap['Plus Jakarta Sans'];
 
   return (
     <div className="min-h-screen bg-[#050811] text-white relative overflow-hidden font-sans pb-20">
       
+      {/* DYNAMIC GOOGLE FONT LINK */}
+      {fontImportName && (
+        <link
+          rel="stylesheet"
+          href={`https://fonts.googleapis.com/css2?family=${fontImportName}&display=swap`}
+        />
+      )}
+
       {/* TOP NEON PROMO TICKER BAR */}
       <div className="bg-[#a3e635] text-slate-950 font-heading font-black text-xs sm:text-sm py-2.5 px-4 shadow-xl text-center flex items-center justify-center gap-3 uppercase tracking-wider relative z-20">
         <Sparkles className="w-4 h-4 shrink-0 animate-pulse" />
@@ -95,13 +121,24 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-10 sm:pt-14">
         
         {/* HERO SECTION */}
-        <div className="mb-10 text-center max-w-3xl mx-auto space-y-4">
+        <div className={`mb-10 max-w-3xl mx-auto space-y-4 ${
+          storeHeroAlign === 'left' ? 'text-left' : storeHeroAlign === 'right' ? 'text-right' : 'text-center'
+        }`}>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>{storeHeroBadge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight leading-tight text-white">
+          <h1
+            style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
+            className={`font-black tracking-tight leading-tight text-white ${
+              storeHeroTitleSize === 'normal'
+                ? 'text-2xl sm:text-4xl lg:text-5xl'
+                : storeHeroTitleSize === 'giant'
+                ? 'text-4xl sm:text-6xl lg:text-7xl'
+                : 'text-3xl sm:text-5xl lg:text-6xl'
+            }`}
+          >
             {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
           </h1>
 

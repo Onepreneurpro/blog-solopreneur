@@ -18,6 +18,9 @@ const DEFAULT_SETTINGS = {
   storeHeroTitle: 'Templates Notion & Dashboards Excel',
   storeHeroTitleAccent: 'Haute Performance',
   storeHeroSubtitle: 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.',
+  storeHeroFontFamily: 'Plus Jakarta Sans',
+  storeHeroTitleSize: 'large',
+  storeHeroAlign: 'center',
 };
 
 export async function GET() {
