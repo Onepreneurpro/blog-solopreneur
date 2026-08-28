@@ -151,9 +151,9 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
         <div className="flex items-center justify-between px-2 pt-2 pb-1 border-b border-slate-100">
           <Link href="/admin" className="flex items-center gap-2 font-heading font-extrabold text-base text-slate-900">
             <span className="w-7 h-7 bg-[#00A0FF] flex items-center justify-center text-white text-xs font-extrabold shadow-sm rounded-md">
-              S
+              O
             </span>
-            <span className="font-extrabold text-slate-900">CMS Admin</span>
+            <span className="font-extrabold text-slate-900">Onepreneur Admin</span>
           </Link>
           
           <div className="flex items-center gap-1">

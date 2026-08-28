@@ -116,10 +116,10 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
             
             {/* LOGO */}
             <Link href="/" className="flex items-center gap-2 font-heading font-extrabold text-lg sm:text-xl tracking-tight text-white">
-              <span className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-md bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-500 flex items-center justify-center text-white font-black text-base sm:text-lg shadow-lg shadow-purple-500/30">
-                S
+              <span className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-md bg-[#00A0FF] flex items-center justify-center text-white font-black text-base sm:text-lg shadow-lg shadow-sky-500/30">
+                O
               </span>
-              <span>Solopreneur<span className="text-violet-500">&Co</span></span>
+              <span>Onepreneur<span className="text-[#00A0FF]">&Co</span></span>
             </Link>
 
             {/* DESKTOP NAVIGATION WITH 100% DYNAMIC DROPDOWNS */}

@@ -82,10 +82,10 @@ export function Footer({ footerMenus: initialFooterMenus = {} }: FooterProps) {
           {/* COL 1: BRAND & NEWSLETTER */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 font-heading font-extrabold text-xl tracking-tight text-white">
-              <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-lg shadow-md shadow-emerald-500/20">
-                S
+              <span className="w-8 h-8 rounded-md bg-[#00A0FF] flex items-center justify-center text-white font-black text-lg shadow-md">
+                O
               </span>
-              <span>Solopreneur<span className="text-emerald-400">&Co</span></span>
+              <span>Onepreneur<span className="text-[#00A0FF]">&Co</span></span>
             </Link>
 
             <p className="text-slate-400 text-sm max-w-sm leading-relaxed">

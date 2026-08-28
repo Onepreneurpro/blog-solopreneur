@@ -8,7 +8,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 const DEFAULT_SETTINGS = {
-  siteTitle: 'Solopreneur&Co',
+  siteTitle: 'Onepreneur',
   tagline: 'Plateforme & Ressources pour Freelances et Indépendants',
   contactEmail: 'contact@solopreneur.io',
   adminEmail: 'admin@solopreneur.io',
@@ -16,7 +16,7 @@ const DEFAULT_SETTINGS = {
   activeTheme: 'makers-purple',
   bannerTickerText: 'Nouveau : Formations & Templates IA pour Solopreneurs 2026',
   bannerTickerLink: '/boutique',
-  footerCopyright: '© 2026 Solopreneur&Co. Tous droits réservés.',
+  footerCopyright: '© 2026 Onepreneur. Tous droits réservés.',
 
   // Store Hero Settings
   storeHeroBadge: 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES',
