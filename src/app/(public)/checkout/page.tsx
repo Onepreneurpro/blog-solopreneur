@@ -29,6 +29,12 @@ function CheckoutContent() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
 
+  // Email Verification Code State
+  const [verificationCode, setVerificationCode] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [infoMsg, setInfoMsg] = useState('');
+
   // Payment Method State
   const [paymentMethod, setPaymentMethod] = useState<'DEMO' | 'CARD'>('DEMO');
 
@@ -110,13 +116,63 @@ function CheckoutContent() {
     initCheckout();
   }, [productId]);
 
+  const handleSendVerificationCode = async () => {
+    if (!email || !email.includes('@')) {
+      setError('Veuillez remplir une adresse e-mail valide.');
+      return false;
+    }
+    if (!firstName || firstName.trim() === '') {
+      setError('Veuillez remplir votre prénom.');
+      return false;
+    }
+
+    setSendingCode(true);
+    setError('');
+    setInfoMsg('');
+
+    try {
+      const res = await fetch('/api/leads/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), firstName }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setCodeSent(true);
+        setInfoMsg(`📩 Un code de confirmation à 4 chiffres a été envoyé à ${email}.`);
+        return true;
+      } else {
+        setError(data.error || 'Erreur lors de l envoi du code de vérification par e-mail.');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error sending verification code:', err);
+      setError('Erreur réseau lors de l envoi du code. Veuillez réessayer.');
+      return false;
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
 
-    if (!currentUser && (!email || !firstName)) {
-      setError('Veuillez remplir votre prénom et votre adresse e-mail.');
+    const isSessionVerified = Boolean(currentUser && currentUser.email?.toLowerCase() === email.trim().toLowerCase());
+
+    // STEP 1: UNAUTHENTICATED OR NEW EMAIL -> SEND CODE FIRST IF NOT SENT
+    if (!isSessionVerified && !codeSent) {
+      await handleSendVerificationCode();
       return;
+    }
+
+    // STEP 2: IF CODE HAS BEEN SENT, ENSURE CODE IS FILLED
+    if (!isSessionVerified && codeSent) {
+      if (!verificationCode || verificationCode.trim().length !== 4) {
+        setError('Veuillez saisir le code de vérification à 4 chiffres reçu par e-mail.');
+        return;
+      }
     }
 
     setProcessing(true);
@@ -128,10 +184,11 @@ function CheckoutContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          email,
+          email: email.trim().toLowerCase(),
           firstName,
           lastName,
           paymentMethod: product.isFreeResource ? 'FREE' : paymentMethod,
+          code: isSessionVerified ? undefined : verificationCode.trim(),
         }),
       });
 
@@ -373,262 +430,329 @@ function CheckoutContent() {
               </div>
 
             </Card>
-
           </div>
 
           {/* RIGHT COLUMN: SINGLE MERGED CARD */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-8">
             <Card className={`p-5 space-y-4 rounded-md shadow-xl ${
-              isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-purple-200 text-slate-900'
-            }`}>
-              
-              {/* SECTION 1: RÉCAPITULATIF DE LA RESSOURCE */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
-                  <h3 className="text-sm font-heading font-black">Récapitulatif</h3>
-                  {isFree && (
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
-                      isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
-                    }`}>
-                      100% Offert
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-start gap-3">
-                  {product.icon ? (
-                    <img
-                      src={product.icon}
-                      alt={product.name}
-                      className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
-                    />
-                  ) : product.coverImage ? (
-                    <img
-                      src={product.coverImage}
-                      alt={product.name}
-                      className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-md bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
-                      <Download className="w-6 h-6" />
-                    </div>
-                  )}
-                  <div>
-                    <h4 className="font-heading font-black text-xs leading-snug">{product.name}</h4>
-                    <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {isFree ? `Ressource offerte (${getFileTypeLabel(product.fileType)})` : `Format : ${getFileTypeLabel(product.fileType)}`}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-1 text-xs font-medium pt-1">
-                  <div className="flex justify-between">
-                    <span className="opacity-75">Prix public</span>
-                    <span className="line-through opacity-60">
-                      {product.compareAtPrice ? `${product.compareAtPrice.toFixed(2)} €` : `${(product.price > 0 ? product.price * 1.5 : 19).toFixed(2)} €`}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center text-base font-heading font-black pt-1">
-                    <span>Total</span>
-                    <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
-                      {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 2: 1. DESTINATAIRE DE LA RESSOURCE */}
-              <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/10">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[11px] font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire</h3>
-                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
-                    isDark ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-purple-100 text-purple-900'
-                  }`}>
-                    Accès Instantané
-                  </span>
-                </div>
-
-                {currentUser ? (
-                  <div className={`p-3 rounded-md flex items-center justify-between ${
-                    isDark ? 'bg-slate-950 border border-white/10' : 'bg-purple-50/80 border border-purple-200'
-                  }`}>
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-xs shadow-sm ${
+                isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-purple-200 text-slate-900'
+              }`}>
+                
+                {/* SECTION 1: RÉCAPITULATIF DE LA RESSOURCE */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
+                    <h3 className="text-sm font-heading font-black">Récapitulatif</h3>
+                    {isFree && (
+                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
                         isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
                       }`}>
-                        <UserCheck className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-heading font-black text-xs flex items-center gap-1">
-                          <span>Compte Connecté</span>
-                        </div>
-                        <p className={`text-[11px] font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                          {currentUser.name || 'Client'} (<code className="font-bold">{currentUser.email}</code>)
-                        </p>
-                      </div>
-                    </div>
+                        100% Offert
+                      </span>
+                    )}
                   </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    
-                    {/* NOM & PRÉNOM */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div>
-                        <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Prénom</label>
-                        <input
-                          type="text"
-                          placeholder="ex. Alex"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
-                            isDark
-                              ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                              : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
-                          }`}
-                        />
-                      </div>
 
-                      <div>
-                        <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Nom</label>
-                        <input
-                          type="text"
-                          placeholder="ex. Morel"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
-                            isDark
-                              ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                              : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
-                          }`}
-                        />
-                      </div>
-                    </div>
-
-                    {/* EMAIL */}
-                    <div>
-                      <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre e-mail *</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="votre.email@exemple.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
-                          isDark
-                            ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                            : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
-                        }`}
+                  <div className="flex items-start gap-3">
+                    {product.icon ? (
+                      <img
+                        src={product.icon}
+                        alt={product.name}
+                        className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
                       />
+                    ) : product.coverImage ? (
+                      <img
+                        src={product.coverImage}
+                        alt={product.name}
+                        className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-md bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
+                        <Download className="w-6 h-6" />
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-heading font-black text-xs leading-snug">{product.name}</h4>
+                      <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        {isFree ? `Ressource offerte (${getFileTypeLabel(product.fileType)})` : `Format : ${getFileTypeLabel(product.fileType)}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-xs font-medium pt-1">
+                    <div className="flex justify-between">
+                      <span className="opacity-75">Prix public</span>
+                      <span className="line-through opacity-60">
+                        {product.compareAtPrice ? `${product.compareAtPrice.toFixed(2)} €` : `${(product.price > 0 ? product.price * 1.5 : 19).toFixed(2)} €`}
+                      </span>
                     </div>
 
+                    <div className="flex justify-between items-center text-base font-heading font-black pt-1">
+                      <span>Total</span>
+                      <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
+                        {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                {/* PAYMENT METHOD (ONLY FOR PAID PRODUCTS) */}
-                {!isFree && (
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/10">
-                    <h4 className="text-xs font-heading font-black">2. Mode de paiement</h4>
-                    
-                    <div
-                      onClick={() => setPaymentMethod('DEMO')}
-                      className={`p-2.5 rounded-md border cursor-pointer transition-all ${
-                        paymentMethod === 'DEMO'
-                          ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
-                          : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
+                {/* SECTION 2: 1. DESTINATAIRE DE LA RESSOURCE */}
+                <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/10">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[11px] font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire</h3>
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
+                      isDark ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-purple-100 text-purple-900'
+                    }`}>
+                      Accès Instantané
+                    </span>
+                  </div>
+
+                  {currentUser ? (
+                    <div className={`p-3 rounded-md flex items-center justify-between ${
+                      isDark ? 'bg-slate-950 border border-white/10' : 'bg-purple-50/80 border border-purple-200'
+                    }`}>
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-xs shadow-sm ${
+                          isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                        }`}>
+                          <UserCheck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-heading font-black text-xs flex items-center gap-1">
+                            <span>Compte Connecté</span>
+                          </div>
+                          <p className={`text-[11px] font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                            {currentUser.name || 'Client'} (<code className="font-bold">{currentUser.email}</code>)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      
+                      {/* NOM & PRÉNOM */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Prénom *</label>
+                          <input
+                            type="text"
+                            required
+                            disabled={codeSent}
+                            placeholder="ex. Alex"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
+                              isDark
+                                ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
+                                : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                            }`}
+                          />
+                        </div>
+
+                        <div>
+                          <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Nom</label>
+                          <input
+                            type="text"
+                            disabled={codeSent}
+                            placeholder="ex. Morel"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
+                              isDark
+                                ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
+                                : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* EMAIL */}
+                      <div>
+                        <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre e-mail *</label>
+                        <input
+                          type="email"
+                          required
+                          disabled={codeSent}
+                          placeholder="votre.email@exemple.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
+                            isDark
+                              ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
+                              : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                          }`}
+                        />
+                      </div>
+
+                    </div>
+                  )}
+
+                  {/* PAYMENT METHOD (ONLY FOR PAID PRODUCTS) */}
+                  {!isFree && (
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/10">
+                      <h4 className="text-xs font-heading font-black">2. Mode de paiement</h4>
+                      
+                      <div
+                        onClick={() => setPaymentMethod('DEMO')}
+                        className={`p-2.5 rounded-md border cursor-pointer transition-all ${
+                          paymentMethod === 'DEMO'
+                            ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
+                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <input type="radio" checked={paymentMethod === 'DEMO'} readOnly className="text-purple-600" />
+                            <span className="font-heading font-black text-xs flex items-center gap-1">
+                              <Sparkles className="w-3.5 h-3.5 text-[#a3e635]" />
+                              <span>Paiement Démo / Test</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        onClick={() => setPaymentMethod('CARD')}
+                        className={`p-2.5 rounded-md border cursor-pointer transition-all ${
+                          paymentMethod === 'CARD'
+                            ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
+                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
-                          <input type="radio" checked={paymentMethod === 'DEMO'} readOnly className="text-purple-600" />
-                          <span className="font-heading font-black text-xs flex items-center gap-1">
-                            <Sparkles className="w-3.5 h-3.5 text-[#a3e635]" />
-                            <span>Paiement Démo / Test</span>
+                          <input type="radio" checked={paymentMethod === 'CARD'} readOnly className="text-purple-600" />
+                          <span className="font-heading font-black text-xs flex items-center gap-1.5">
+                            <CreditCard className="w-3.5 h-3.5 text-purple-500" />
+                            <span>Carte Bancaire (Stripe)</span>
                           </span>
                         </div>
                       </div>
                     </div>
+                  )}
 
-                    <div
-                      onClick={() => setPaymentMethod('CARD')}
-                      className={`p-2.5 rounded-md border cursor-pointer transition-all ${
-                        paymentMethod === 'CARD'
-                          ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
-                          : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <input type="radio" checked={paymentMethod === 'CARD'} readOnly className="text-purple-600" />
-                        <span className="font-heading font-black text-xs flex items-center gap-1.5">
-                          <CreditCard className="w-3.5 h-3.5 text-purple-500" />
-                          <span>Carte Bancaire (Stripe)</span>
-                        </span>
+                  {/* INFO MESSAGE & CODE VERIFICATION BOX */}
+                  {infoMsg && (
+                    <div className="p-3 rounded-md bg-[#a3e635]/20 border border-[#a3e635]/50 text-[#a3e635] text-xs font-bold flex items-center gap-2">
+                      <Lock className="w-4 h-4 shrink-0" />
+                      <span>{infoMsg}</span>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="p-3 rounded-md bg-rose-500/20 border border-rose-500/50 text-rose-300 text-xs font-bold">
+                      {error}
+                    </div>
+                  )}
+
+                  {/* 4-DIGIT VERIFICATION CODE INPUT STEP */}
+                  {!currentUser && codeSent && (
+                    <div className="p-4 rounded-xl bg-[#a3e635]/15 border-2 border-[#a3e635]/60 space-y-3 my-2 shadow-xl animate-in fade-in duration-300">
+                      <div className="flex items-center gap-2 text-[#a3e635] text-xs font-heading font-black uppercase">
+                        <Lock className="w-4 h-4" />
+                        <span>Code de confirmation requis</span>
+                      </div>
+                      
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Un code à 4 chiffres a été envoyé par e-mail à <strong className="text-white">{email}</strong>.
+                      </p>
+
+                      <div className="flex justify-center">
+                        <input
+                          type="text"
+                          maxLength={4}
+                          autoFocus
+                          placeholder="1234"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                          className="w-full text-center tracking-[12px] font-mono text-2xl font-black py-2.5 px-3 bg-slate-950 border border-white/20 rounded-lg text-[#a3e635] focus:outline-none focus:border-[#a3e635]"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <button
+                          type="button"
+                          onClick={handleSendVerificationCode}
+                          disabled={sendingCode}
+                          className="text-[#a3e635] hover:underline font-bold"
+                        >
+                          {sendingCode ? 'Envoi...' : 'Renvoyer le code'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => { setCodeSent(false); setVerificationCode(''); setInfoMsg(''); setError(''); }}
+                          className="text-slate-400 hover:text-white underline"
+                        >
+                          Modifier l e-mail
+                        </button>
                       </div>
                     </div>
+                  )}
+
+                  {/* HIGH IMPACT CTA BUTTON */}
+                  <div className="pt-1">
+                    <Button
+                      type="submit"
+                      disabled={processing || sendingCode}
+                      className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-md shadow-xl transition-all gap-2 ${
+                        isDark
+                          ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
+                          : 'bg-purple-700 text-white hover:bg-purple-800'
+                      }`}
+                    >
+                      {sendingCode ? (
+                        <span>Envoi du code...</span>
+                      ) : processing ? (
+                        <span>Validation en cours...</span>
+                      ) : codeSent ? (
+                        <>
+                          <Lock className="w-5 h-5 shrink-0" />
+                          <span>Valider mon code et finaliser</span>
+                        </>
+                      ) : isFree ? (
+                        <>
+                          <Gift className="w-5 h-5 shrink-0" />
+                          <span>Obtenir mon accès gratuit</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-5 h-5 shrink-0" />
+                          <span>Payer ({product.price.toFixed(2)} €)</span>
+                        </>
+                      )}
+                    </Button>
                   </div>
-                )}
 
-                {/* HIGH IMPACT CTA BUTTON (BIGGER TEXT, TIGHT PADDING) */}
-                <div className="pt-1">
-                  <Button
-                    type="submit"
-                    disabled={processing}
-                    className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-md shadow-xl transition-all gap-2 ${
-                      isDark
-                        ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
-                        : 'bg-purple-700 text-white hover:bg-purple-800'
-                    }`}
-                  >
-                    {processing ? (
-                      <span>Validation...</span>
-                    ) : isFree ? (
-                      <>
-                        <Gift className="w-5 h-5 shrink-0" />
-                        <span>Obtenir mon accès gratuit</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-5 h-5 shrink-0" />
-                        <span>Payer ({product.price.toFixed(2)} €)</span>
-                      </>
-                    )}
-                  </Button>
+                  {/* SECTION 4: BÉNÉFICES & CONCEPTS INCLUS AVEC LA RESSOURCE */}
+                  <div className={`mt-4 p-4 rounded-md space-y-3 pt-4 border-t ${
+                    isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
+                  }`}>
+                    <h4 className="text-[11px] font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Inclus avec votre ressource</span>
+                    </h4>
+
+                    <ul className="space-y-2 text-xs font-medium leading-relaxed">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
+                        <span><strong>Accès direct & illimité</strong> : Téléchargement instantané au format PDF & Modèle dupliquable.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Zap className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                        <span><strong>100% Prêt à l emploi</strong> : Méthode clé en main pensée pour les solopreneurs & freelances.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <span><strong>Mises à jour à vie</strong> : Accès garanti aux futures versions enrichies.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Star className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
+                        <span><strong>Sans abonnement ni CB</strong> : Téléchargement totalement gratuit et sécurisé.</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-
-              {/* SECTION 4: BÉNÉFICES & CONCEPTS INCLUS AVEC LA RESSOURCE */}
-              <div className={`mt-4 p-4 rounded-md space-y-3 pt-4 border-t ${
-                isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
-              }`}>
-                <h4 className="text-[11px] font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Inclus avec votre ressource</span>
-                </h4>
-
-                <ul className="space-y-2 text-xs font-medium leading-relaxed">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
-                    <span><strong>Accès direct & illimité</strong> : Téléchargement instantané au format PDF & Modèle dupliquable.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Zap className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
-                    <span><strong>100% Prêt à l emploi</strong> : Méthode clé en main pensée pour les solopreneurs & freelances.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span><strong>Mises à jour à vie</strong> : Accès garanti aux futures versions enrichies.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Star className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
-                    <span><strong>Sans abonnement ni CB</strong> : Téléchargement totalement gratuit et sécurisé.</span>
-                  </li>
-                </ul>
-              </div>
-
-            </Card>
-          </div>
-
-        </form>
+              </Card>
+            </div>
+          </form>
 
         {/* RECOMMENDED PRODUCTS CROSS-SELL SECTION */}
         {recommendedProducts.filter((p) => p.id !== product.id).length > 0 && (

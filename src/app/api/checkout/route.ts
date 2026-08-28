@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { productId, email, firstName, lastName, paymentMethod } = body;
+    const { productId, email, firstName, lastName, paymentMethod, code } = body;
 
     if (!productId || !email) {
       return NextResponse.json({ error: 'Produit et e-mail requis.' }, { status: 400 });
@@ -25,6 +25,33 @@ export async function POST(request: Request) {
 
     const user = await getCurrentUser();
     const cleanEmail = email.trim().toLowerCase();
+
+    // REQUIRE 4-DIGIT EMAIL VERIFICATION CODE FOR UNAUTHENTICATED OR NEW EMAIL CHECKOUTS
+    const isSessionVerified = user && user.email?.toLowerCase() === cleanEmail;
+
+    if (!isSessionVerified) {
+      const cleanCode = code ? String(code).trim() : null;
+      if (!cleanCode || cleanCode.length !== 4) {
+        return NextResponse.json({ error: 'Veuillez saisir le code de vérification à 4 chiffres reçu par e-mail.' }, { status: 400 });
+      }
+
+      const validCode = await prisma.verificationCode.findFirst({
+        where: {
+          email: cleanEmail,
+          code: cleanCode,
+          expiresAt: { gte: new Date() },
+        },
+      });
+
+      if (!validCode) {
+        return NextResponse.json({ error: 'Code de vérification invalide ou expiré. Veuillez en demander un nouveau.' }, { status: 400 });
+      }
+
+      // Delete used code
+      await prisma.verificationCode.deleteMany({
+        where: { email: cleanEmail },
+      }).catch(() => {});
+    }
     let cleanFirstName = firstName && typeof firstName === 'string' && firstName.trim() !== ''
       ? firstName.trim()
       : (user?.name ? user.name.split(' ')[0] : null);
