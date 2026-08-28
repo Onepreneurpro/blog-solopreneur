@@ -317,8 +317,8 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                   className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
                 >
                   <div>
-                    {/* 1:1 SQUARE PRODUCT MOCKUP BOX */}
-                    <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
+                    {/* RECTANGULAR COMPACT PRODUCT MOCKUP BOX */}
+                    <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
                       {prod.coverImage ? (
                         <img
                           src={prod.coverImage}

@@ -73,8 +73,8 @@ export default async function FreeResourcesPage() {
                 className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
               >
                 <div>
-                  {/* 1:1 SQUARE COVER / ICON MOCKUP BOX */}
-                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
+                  {/* RECTANGULAR COMPACT COVER / ICON MOCKUP BOX */}
+                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
                     {res.coverImage ? (
                       <img
                         src={res.coverImage}
@@ -82,8 +82,8 @@ export default async function FreeResourcesPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : res.icon ? (
-                      <div className="w-full h-full bg-slate-900 flex items-center justify-center p-8">
-                        <img src={res.icon} alt={res.name} className="w-24 h-24 object-contain rounded-lg shadow-xl" />
+                      <div className="w-full h-full bg-slate-900 flex items-center justify-center p-4">
+                        <img src={res.icon} alt={res.name} className="w-16 h-16 object-contain rounded-lg shadow-xl" />
                       </div>
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">

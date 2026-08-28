@@ -663,7 +663,7 @@ function CheckoutContent() {
                     >
                       <div>
                         {/* 1:1 SQUARE COVER BOX */}
-                        <Link href={`/checkout?productId=${recProd.id}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
+                        <Link href={`/checkout?productId=${recProd.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
                           {recProd.coverImage ? (
                             <img
                               src={recProd.coverImage}
