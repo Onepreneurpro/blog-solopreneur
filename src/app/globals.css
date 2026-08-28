@@ -245,26 +245,34 @@ body.theme-blusky mark[color="#a3e635"] {
   color: #ffffff !important;
 }
 
-/* Cards & Component Containers */
+/* Cards & Component Containers for BluSky */
 body.theme-blusky .bg-slate-900,
 body.theme-blusky .bg-slate-950,
 body.theme-blusky .bg-\[\#0d1322\],
 body.theme-blusky .bg-\[\#0e1424\],
 body.theme-blusky .bg-\[\#0b0f19\],
+body.theme-blusky .bg-\[\#050811\],
+body.theme-blusky .bg-\[\#090d16\],
+body.theme-blusky .bg-\[\#0a0915\],
 body.theme-blusky .bg-slate-900\/90,
-body.theme-blusky .bg-slate-900\/95,
+body.theme-blusky .bg-slate-900\/80,
 body.theme-blusky .bg-slate-900\/70,
 body.theme-blusky .bg-slate-900\/50,
+body.theme-blusky .bg-slate-950\/90,
 body.theme-blusky .bg-slate-950\/80,
-body.theme-blusky .bg-slate-950\/60 {
+body.theme-blusky .bg-slate-950\/60,
+body.theme-blusky .bg-\[\#0e1424\]\/90,
+body.theme-blusky .bg-\[\#0d1322\]\/90 {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 160, 255, 0.08) !important;
 }
 
 body.theme-blusky .border-slate-800,
 body.theme-blusky .border-slate-700,
-body.theme-blusky .border-slate-800\/80 {
+body.theme-blusky .border-slate-800\/80,
+body.theme-blusky .border-white\/10 {
   border-color: #e2e8f0 !important;
 }
 
@@ -274,7 +282,6 @@ body.theme-blusky .text-slate-400 {
   color: #475569 !important;
 }
 
-body.theme-blusky .text-slate-100,
 body.theme-blusky .text-white {
   color: #0f172a !important;
 }
