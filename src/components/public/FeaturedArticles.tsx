@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { FormattedText } from '@/components/ui/FormattedText';
 
@@ -22,6 +22,20 @@ interface FeaturedArticlesProps {
   settings?: any;
 }
 
+const BADGE_ICONS_MAP: Record<string, any> = {
+  Sparkles,
+  Rocket,
+  Flame,
+  Star,
+  Diamond,
+  Gift,
+  Zap,
+  Crown,
+  Target,
+  Check,
+  BookOpen,
+};
+
 export function FeaturedArticles({
   articles = [],
   title = "Conseils & Guides pour Solopreneurs",
@@ -30,9 +44,50 @@ export function FeaturedArticles({
 }: FeaturedArticlesProps) {
   if (!articles || articles.length === 0) return null;
 
-  const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
-  const linkText = btnSettings.btn1Text || 'Voir tous les articles';
-  const linkUrl = btnSettings.btn1Url || '/blog';
+  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const linkText = s.btnText || s.btn1Text || 'Voir tous les articles';
+  const linkUrl = s.btn1Url || '/blog';
+
+  const badgeText = s.badgeText || 'Derniers Articles';
+  const badgeBgHex = s.badgeBgColor;
+  const badgeColorHex = s.badgeColor;
+  const badgeIconColor = s.badgeIconColor || badgeColorHex || undefined;
+
+  const badgeStyle: React.CSSProperties = {
+    fontFamily: s.badgeFont ? `'${s.badgeFont}', sans-serif` : undefined,
+    fontSize: s.badgeSize || undefined,
+    color: badgeColorHex || undefined,
+    backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
+    borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
+  };
+
+  const SelectedBadgeIcon = s.badgeIcon && s.badgeIcon !== 'None'
+    ? (BADGE_ICONS_MAP[s.badgeIcon] || BookOpen)
+    : (s.badgeIcon === 'None' ? null : BookOpen);
+
+  const iconStyle: React.CSSProperties = {
+    color: badgeIconColor,
+    width: s.badgeIconSize || undefined,
+    height: s.badgeIconSize || undefined,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontFamily: s.titleFont ? `'${s.titleFont}', sans-serif` : undefined,
+    fontSize: s.titleSize || undefined,
+    color: s.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: s.subtitleFont ? `'${s.subtitleFont}', sans-serif` : undefined,
+    fontSize: s.subtitleSize || undefined,
+    color: s.subtitleColor || undefined,
+  };
+
+  const btnStyle: React.CSSProperties = {
+    fontFamily: s.btnFont ? `'${s.btnFont}', sans-serif` : undefined,
+    fontSize: s.btnSize || undefined,
+    color: s.btnColor || undefined,
+  };
 
   return (
     <section className="py-16 bg-white border-y border-slate-200/80">
@@ -41,20 +96,33 @@ export function FeaturedArticles({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-heading font-extrabold bg-purple-100 text-purple-900 border border-purple-200 mb-2">
-              <BookOpen className="w-3.5 h-3.5 text-purple-700" />
-              <span>Derniers Articles</span>
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-heading font-extrabold bg-purple-100 text-purple-900 border border-purple-200 mb-2"
+              style={badgeStyle}
+            >
+              {SelectedBadgeIcon && <SelectedBadgeIcon className="w-3.5 h-3.5 text-purple-700" style={iconStyle} />}
+              <span>{badgeText}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+            <h2
+              className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight"
+              style={titleStyle}
+            >
               <FormattedText text={title} />
             </h2>
             {subtitle && (
-              <p className="text-slate-600 mt-1 text-sm font-semibold">
+              <p
+                className="text-slate-600 mt-1 text-sm font-semibold"
+                style={subtitleStyle}
+              >
                 <FormattedText text={subtitle} />
               </p>
             )}
           </div>
-          <Link href={linkUrl} className="text-xs font-heading font-extrabold text-purple-700 hover:text-purple-900 inline-flex items-center gap-1">
+          <Link
+            href={linkUrl}
+            className="text-xs font-heading font-extrabold text-purple-700 hover:text-purple-900 inline-flex items-center gap-1"
+            style={btnStyle}
+          >
             <span>{linkText}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>

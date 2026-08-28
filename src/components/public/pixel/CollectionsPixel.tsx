@@ -26,6 +26,18 @@ export function CollectionsPixel({
 }: CollectionsPixelProps) {
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
 
+  const titleStyle: React.CSSProperties = {
+    fontFamily: s.titleFont ? `'${s.titleFont}', sans-serif` : undefined,
+    fontSize: s.titleSize || undefined,
+    color: s.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: s.subtitleFont ? `'${s.subtitleFont}', sans-serif` : undefined,
+    fontSize: s.subtitleSize || undefined,
+    color: s.subtitleColor || undefined,
+  };
+
   const collections = [
     { name: s.col1Name || 'Sales Funnels', url: s.col1Url || '/boutique', icon: Layers, color: 'bg-emerald-500/20 text-[#a3e635] border-[#a3e635]/40' },
     { name: s.col2Name || 'Email Swipes', url: s.col2Url || '/boutique', icon: Mail, color: 'bg-blue-500/20 text-blue-400 border-blue-400/40' },
@@ -38,11 +50,11 @@ export function CollectionsPixel({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="mb-6 space-y-1">
-          <h2 className="text-2xl font-heading font-black text-white tracking-tight">
+          <h2 className="text-2xl font-heading font-black text-white tracking-tight" style={titleStyle}>
             <FormattedText text={title} />
           </h2>
           {subtitle && (
-            <p className="text-xs text-slate-300 font-medium">
+            <p className="text-xs text-slate-300 font-medium" style={subtitleStyle}>
               <FormattedText text={subtitle} />
             </p>
           )}

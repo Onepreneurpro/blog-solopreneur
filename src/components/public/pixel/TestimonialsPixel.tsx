@@ -18,6 +18,28 @@ export function TestimonialsPixel({
 }: TestimonialsPixelProps) {
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
   const badgeText = s.badgeText || '★★★★★ RECOMMANDÉ PAR +500 SOLOPRENEURS';
+  const badgeBgHex = s.badgeBgColor;
+  const badgeColorHex = s.badgeColor;
+
+  const badgeStyle: React.CSSProperties = {
+    fontFamily: s.badgeFont ? `'${s.badgeFont}', sans-serif` : undefined,
+    fontSize: s.badgeSize || undefined,
+    color: badgeColorHex || undefined,
+    backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
+    borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontFamily: s.titleFont ? `'${s.titleFont}', sans-serif` : undefined,
+    fontSize: s.titleSize || undefined,
+    color: s.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: s.subtitleFont ? `'${s.subtitleFont}', sans-serif` : undefined,
+    fontSize: s.subtitleSize || undefined,
+    color: s.subtitleColor || undefined,
+  };
 
   const defaultTestimonials = [
     {
@@ -72,14 +94,14 @@ export function TestimonialsPixel({
         
         {/* HEADER */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1 text-[#a3e635] text-xs font-heading font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1 text-[#a3e635] text-xs font-heading font-black uppercase tracking-wider" style={badgeStyle}>
             {badgeText}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-heading font-black text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-heading font-black text-white tracking-tight" style={titleStyle}>
             <FormattedText text={title} />
           </h2>
           {subtitle && (
-            <p className="text-slate-300 text-sm font-normal">
+            <p className="text-slate-300 text-sm font-normal" style={subtitleStyle}>
               <FormattedText text={subtitle} />
             </p>
           )}

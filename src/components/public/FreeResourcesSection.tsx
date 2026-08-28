@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Download, FileText, Gift, ArrowRight } from 'lucide-react';
+import { Download, FileText, Gift, ArrowRight, Sparkles, Rocket, Flame, Star, Diamond, Zap, Crown, Target, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
@@ -22,6 +22,19 @@ interface FreeResourcesSectionProps {
   isDark?: boolean;
 }
 
+const BADGE_ICONS_MAP: Record<string, any> = {
+  Sparkles,
+  Rocket,
+  Flame,
+  Star,
+  Diamond,
+  Gift,
+  Zap,
+  Crown,
+  Target,
+  Check,
+};
+
 export function FreeResourcesSection({
   resources = [],
   title = "Guides, Checklists & Modèles 100% Gratuits",
@@ -31,9 +44,50 @@ export function FreeResourcesSection({
 }: FreeResourcesSectionProps) {
   if (!resources || resources.length === 0) return null;
 
-  const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
-  const linkText = btnSettings.btn1Text || 'Découvrir toutes les ressources';
-  const linkUrl = btnSettings.btn1Url || '/ressources';
+  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const linkText = s.btnText || s.btn1Text || 'Découvrir toutes les ressources';
+  const linkUrl = s.btn1Url || '/ressources';
+
+  const badgeText = s.badgeText || 'Ressources Offertes';
+  const badgeBgHex = s.badgeBgColor;
+  const badgeColorHex = s.badgeColor;
+  const badgeIconColor = s.badgeIconColor || badgeColorHex || '#a3e635';
+
+  const badgeStyle: React.CSSProperties = {
+    fontFamily: s.badgeFont ? `'${s.badgeFont}', sans-serif` : undefined,
+    fontSize: s.badgeSize || undefined,
+    color: badgeColorHex || undefined,
+    backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
+    borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
+  };
+
+  const SelectedBadgeIcon = s.badgeIcon && s.badgeIcon !== 'None'
+    ? (BADGE_ICONS_MAP[s.badgeIcon] || Gift)
+    : (s.badgeIcon === 'None' ? null : Gift);
+
+  const iconStyle: React.CSSProperties = {
+    color: badgeIconColor,
+    width: s.badgeIconSize || undefined,
+    height: s.badgeIconSize || undefined,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontFamily: s.titleFont ? `'${s.titleFont}', sans-serif` : undefined,
+    fontSize: s.titleSize || undefined,
+    color: s.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: s.subtitleFont ? `'${s.subtitleFont}', sans-serif` : undefined,
+    fontSize: s.subtitleSize || undefined,
+    color: s.subtitleColor || undefined,
+  };
+
+  const btnStyle: React.CSSProperties = {
+    fontFamily: s.btnFont ? `'${s.btnFont}', sans-serif` : undefined,
+    fontSize: s.btnSize || undefined,
+    color: s.btnColor || undefined,
+  };
 
   return (
     <section className={`py-16 sm:py-24 border-b ${
@@ -44,31 +98,44 @@ export function FreeResourcesSection({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-sm text-xs font-heading font-black mb-2 shadow-xs ${
-              isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-[#ccff00] text-slate-950'
-            }`}>
-              <Gift className="w-3.5 h-3.5" />
-              <span>Ressources Offertes</span>
+            <div
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-sm text-xs font-heading font-black mb-2 shadow-xs ${
+                isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-[#ccff00] text-slate-950'
+              }`}
+              style={badgeStyle}
+            >
+              {SelectedBadgeIcon && <SelectedBadgeIcon className="w-3.5 h-3.5" style={iconStyle} />}
+              <span>{badgeText}</span>
             </div>
 
-            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight ${
-              isDark ? 'text-white' : 'text-slate-950'
-            }`}>
+            <h2
+              className={`text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight ${
+                isDark ? 'text-white' : 'text-slate-950'
+              }`}
+              style={titleStyle}
+            >
               <FormattedText text={title} />
             </h2>
 
             {subtitle && (
-              <p className={`mt-1 text-sm sm:text-base font-medium ${
-                isDark ? 'text-slate-300' : 'text-slate-600'
-              }`}>
+              <p
+                className={`mt-1 text-sm sm:text-base font-medium ${
+                  isDark ? 'text-slate-300' : 'text-slate-600'
+                }`}
+                style={subtitleStyle}
+              >
                 <FormattedText text={subtitle} />
               </p>
             )}
           </div>
 
-          <Link href={linkUrl} className={`text-xs sm:text-sm font-heading font-black inline-flex items-center gap-1 transition-colors ${
-            isDark ? 'text-[#a3e635] hover:underline' : 'text-purple-700 hover:text-purple-900'
-          }`}>
+          <Link
+            href={linkUrl}
+            className={`text-xs sm:text-sm font-heading font-black inline-flex items-center gap-1 transition-colors ${
+              isDark ? 'text-[#a3e635] hover:underline' : 'text-purple-700 hover:text-purple-900'
+            }`}
+            style={btnStyle}
+          >
             <span>{linkText}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>

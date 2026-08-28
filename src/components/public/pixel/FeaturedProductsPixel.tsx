@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
@@ -27,6 +27,19 @@ interface FeaturedProductsPixelProps {
   settings?: any;
 }
 
+const BADGE_ICONS_MAP: Record<string, any> = {
+  Sparkles,
+  Rocket,
+  Flame,
+  Star,
+  Diamond,
+  Gift,
+  Zap,
+  Crown,
+  Target,
+  Check,
+};
+
 export function FeaturedProductsPixel({
   products = [],
   title = "Boutique Digitale : Nos Meilleurs <mark color='#a3e635'>Outillages & Templates</mark>",
@@ -35,9 +48,51 @@ export function FeaturedProductsPixel({
 }: FeaturedProductsPixelProps) {
   if (!products || products.length === 0) return null;
 
-  const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
-  const linkText = btnSettings.btn1Text || 'Voir toute la boutique →';
-  const linkUrl = btnSettings.btn1Url || '/boutique';
+  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const linkText = s.btnText || s.btn1Text || 'Voir toute la boutique →';
+  const linkUrl = s.btn1Url || '/boutique';
+
+  const badgeText = s.badgeText || 'OUTILS HAUTE CONVERSION';
+  const badgeBgHex = s.badgeBgColor;
+  const badgeColorHex = s.badgeColor;
+  const badgeIconColor = s.badgeIconColor || badgeColorHex || '#a3e635';
+
+  const badgeStyle: React.CSSProperties = {
+    fontFamily: s.badgeFont ? `'${s.badgeFont}', sans-serif` : undefined,
+    fontSize: s.badgeSize || undefined,
+    color: badgeColorHex || undefined,
+    backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
+    borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
+  };
+
+  const SelectedBadgeIcon = s.badgeIcon && s.badgeIcon !== 'None'
+    ? (BADGE_ICONS_MAP[s.badgeIcon] || Sparkles)
+    : (s.badgeIcon === 'None' ? null : Sparkles);
+
+  const iconStyle: React.CSSProperties = {
+    color: badgeIconColor,
+    width: s.badgeIconSize || undefined,
+    height: s.badgeIconSize || undefined,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontFamily: s.titleFont ? `'${s.titleFont}', sans-serif` : undefined,
+    fontSize: s.titleSize || undefined,
+    color: s.titleColor || undefined,
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontFamily: s.subtitleFont ? `'${s.subtitleFont}', sans-serif` : undefined,
+    fontSize: s.subtitleSize || undefined,
+    color: s.subtitleColor || undefined,
+  };
+
+  const btnStyle: React.CSSProperties = {
+    fontFamily: s.btnFont ? `'${s.btnFont}', sans-serif` : undefined,
+    fontSize: s.btnSize || undefined,
+    color: s.btnColor || undefined,
+    backgroundColor: s.btnBgColor || undefined,
+  };
 
   const badgeLabels = [
     'SALE • 5 SALES FUNNELS & 1 WEBSITE',
@@ -53,22 +108,31 @@ export function FeaturedProductsPixel({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm text-xs font-heading font-black bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30 mb-3 shadow-md">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>OUTILS HAUTE CONVERSION</span>
+            <div
+              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm text-xs font-heading font-black bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30 mb-3 shadow-md"
+              style={badgeStyle}
+            >
+              {SelectedBadgeIcon && <SelectedBadgeIcon className="w-3.5 h-3.5" style={iconStyle} />}
+              <span>{badgeText}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-heading font-black text-white tracking-tight leading-tight">
+            <h2
+              className="text-3xl sm:text-4xl font-heading font-black text-white tracking-tight leading-tight"
+              style={titleStyle}
+            >
               <FormattedText text={title} />
             </h2>
             {subtitle && (
-              <p className="text-slate-300 mt-2 text-base font-normal max-w-2xl">
+              <p
+                className="text-slate-300 mt-2 text-sm sm:text-base font-medium max-w-2xl"
+                style={subtitleStyle}
+              >
                 <FormattedText text={subtitle} />
               </p>
             )}
           </div>
 
           <Link href={linkUrl}>
-            <Button size="lg" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-md px-6 py-4 shadow-xl border-0">
+            <Button size="lg" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-md px-6 py-4 shadow-xl border-0" style={btnStyle}>
               <span>{linkText}</span>
             </Button>
           </Link>
