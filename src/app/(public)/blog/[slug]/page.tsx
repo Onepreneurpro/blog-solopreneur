@@ -140,99 +140,105 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       {isDark && <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[160px] pointer-events-none" />}
 
       {/* FULL BLOG CONTAINER MAX-W-7XL MATCHING /BLOG */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
         
-        {/* BREADCRUMB */}
-        <nav className={`flex items-center gap-2 text-xs mb-8 overflow-x-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          <Link href="/" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Accueil</Link>
-          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
-          <Link href="/blog" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Blog</Link>
-          {article.category && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
-              <Link href={`/blog/categorie/${article.category.slug}`} className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>
-                {article.category.name}
-              </Link>
-            </>
-          )}
-        </nav>
-
-        {/* 2-COLUMN LAYOUT: MAIN CONTENT (8 COLS) + RIGHT SIDEBAR (4 COLS) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* TOP HEADER & COVER IMAGE (PROMINENT AT TOP) */}
+        <div className="space-y-6">
           
-          {/* MAIN ARTICLE READING COLUMN (8 COLS) */}
-          <div className="lg:col-span-8 space-y-8">
-            
-            {/* HEADER AREA */}
-            <div className="space-y-4">
-              {article.category && (
-                <Link href={`/blog/categorie/${article.category.slug}`} className="inline-block">
-                  <span className={`px-3.5 py-1 text-xs font-heading font-black rounded-sm shadow-md ${
-                    isDark ? 'bg-slate-900 border border-[#ccff00]/40 text-[#ccff00]' : 'bg-purple-100 text-purple-700 border border-purple-200'
-                  }`}>
-                    {article.category.name}
-                  </span>
+          {/* BREADCRUMB */}
+          <nav className={`flex items-center gap-2 text-xs overflow-x-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            <Link href="/" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Accueil</Link>
+            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
+            <Link href="/blog" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Blog</Link>
+            {article.category && (
+              <>
+                <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
+                <Link href={`/blog/categorie/${article.category.slug}`} className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>
+                  {article.category.name}
                 </Link>
-              )}
-              <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight leading-tight ${
-                isDark ? 'text-white' : 'text-slate-950'
-              }`}>
-                {article.title}
-              </h1>
+              </>
+            )}
+          </nav>
 
-              {article.excerpt && (
-                <p className={`text-lg leading-relaxed font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  {article.excerpt}
-                </p>
-              )}
+          {/* ARTICLE TITLE & EXCERPT */}
+          <div className="space-y-4">
+            {article.category && (
+              <Link href={`/blog/categorie/${article.category.slug}`} className="inline-block">
+                <span className={`px-3.5 py-1 text-xs font-heading font-black rounded-sm shadow-md ${
+                  isDark ? 'bg-slate-900 border border-[#ccff00]/40 text-[#ccff00]' : 'bg-purple-100 text-purple-700 border border-purple-200'
+                }`}>
+                  {article.category.name}
+                </span>
+              </Link>
+            )}
+            
+            <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight leading-tight ${
+              isDark ? 'text-white' : 'text-slate-950'
+            }`}>
+              {article.title}
+            </h1>
 
-              {/* AUTHOR & METADATA BAR */}
-              <div className={`flex items-center justify-between border-y py-4 text-xs ${
-                isDark ? 'border-slate-800 text-slate-300' : 'border-slate-200 text-slate-600'
-              }`}>
-                <div className="flex items-center gap-3">
-                  {article.author?.avatar ? (
-                    <Image src={article.author.avatar} alt={article.author.name || ''} width={40} height={40} className="rounded-sm border border-slate-300" />
-                  ) : (
-                    <div className={`w-10 h-10 rounded-sm font-black flex items-center justify-center text-sm shadow-md ${
-                      isDark ? 'bg-[#ccff00] text-slate-950' : 'bg-purple-700 text-white'
-                    }`}>
-                      {(article.author?.name || 'A')[0]}
-                    </div>
-                  )}
-                  <div>
-                    <div className={`font-heading font-extrabold text-sm ${isDark ? 'text-white' : 'text-slate-950'}`}>
-                      {article.author?.name || 'Rédaction'}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs opacity-80 mt-0.5 font-medium">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Récemment'}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {article.readingTime} min de lecture
-                      </span>
-                    </div>
+            {article.excerpt && (
+              <p className={`text-lg leading-relaxed font-medium max-w-3xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                {article.excerpt}
+              </p>
+            )}
+
+            {/* AUTHOR & METADATA BAR */}
+            <div className={`flex items-center justify-between border-y py-4 text-xs ${
+              isDark ? 'border-slate-800 text-slate-300' : 'border-slate-200 text-slate-600'
+            }`}>
+              <div className="flex items-center gap-3">
+                {article.author?.avatar ? (
+                  <Image src={article.author.avatar} alt={article.author.name || ''} width={40} height={40} className="rounded-sm border border-slate-300" />
+                ) : (
+                  <div className={`w-10 h-10 rounded-sm font-black flex items-center justify-center text-sm shadow-md ${
+                    isDark ? 'bg-[#ccff00] text-slate-950' : 'bg-purple-700 text-white'
+                  }`}>
+                    {(article.author?.name || 'A')[0]}
+                  </div>
+                )}
+                <div>
+                  <div className={`font-heading font-extrabold text-sm ${isDark ? 'text-white' : 'text-slate-950'}`}>
+                    {article.author?.name || 'Rédaction'}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs opacity-80 mt-0.5 font-medium">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Récemment'}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {article.readingTime} min de lecture
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* COVER IMAGE */}
-            {article.coverImage && (
-              <div className={`relative aspect-[16/9] w-full rounded-md overflow-hidden shadow-2xl border ${
-                isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
-              }`}>
-                <Image src={article.coverImage} alt={article.title} fill className="object-cover" priority />
-              </div>
-            )}
+          {/* MAIN ARTICLE COVER IMAGE (PROMINENT AT TOP) */}
+          {article.coverImage && (
+            <div className={`relative aspect-[16/9] w-full rounded-md overflow-hidden shadow-2xl border ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
+            }`}>
+              <Image src={article.coverImage} alt={article.title} fill className="object-cover" priority />
+            </div>
+          )}
 
-            {/* ARTICLE CONTENT WITH LIVE EMBEDDED OPT-IN EBOOK BLOCKS */}
+        </div>
+
+        {/* 2-COLUMN LAYOUT BELOW COVER IMAGE: TEXT CONTENT (8 COLS) + SIDEBAR (4 COLS STICKY) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4">
+          
+          {/* MAIN READING TEXT COLUMN (8 COLS) */}
+          <div className="lg:col-span-8 space-y-8">
+            
+            {/* ARTICLE BODY */}
             <ArticleBody content={article.content} isDark={isDark} />
 
-            {/* CTA TO BOUTIQUE / TEMPLATES */}
+            {/* CTA BANNER TO BOUTIQUE */}
             <div className={`p-6 sm:p-8 rounded-md border flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl ${
               isDark ? 'bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 border-purple-500/30 text-white' : 'bg-gradient-to-r from-purple-900 to-indigo-950 border-purple-800 text-white'
             }`}>
@@ -253,7 +259,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
               </Link>
             </div>
 
-            {/* SIMILAR / RECOMMENDED ARTICLES SECTION AT BOTTOM */}
+            {/* RELATED CATEGORY ARTICLES AT BOTTOM */}
             {similarArticles.length > 0 && (
               <div className="pt-8 border-t border-slate-200 dark:border-white/10 space-y-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -352,7 +358,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
 
           </div>
 
-          {/* RIGHT SIDEBAR COLUMN (4 COLUMNS - STICKY) */}
+          {/* RIGHT SIDEBAR COLUMN (4 COLUMNS STICKY BELOW COVER IMAGE) */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
             
             {/* SIDEBAR BLOCK 1: 5 STORE PRODUCTS */}
