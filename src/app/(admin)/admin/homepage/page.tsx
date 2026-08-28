@@ -787,7 +787,7 @@ export default function AdminHomepageBuilderPage() {
           <button
             type="button"
             onClick={() => setActiveHeroTab('badge')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-md text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'badge'
                 ? 'bg-purple-700 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -800,7 +800,7 @@ export default function AdminHomepageBuilderPage() {
           <button
             type="button"
             onClick={() => setActiveHeroTab('title')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-md text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'title'
                 ? 'bg-purple-700 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -813,7 +813,7 @@ export default function AdminHomepageBuilderPage() {
           <button
             type="button"
             onClick={() => setActiveHeroTab('subtitle')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-md text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'subtitle'
                 ? 'bg-purple-700 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -826,7 +826,7 @@ export default function AdminHomepageBuilderPage() {
           <button
             type="button"
             onClick={() => setActiveHeroTab('cta')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-md text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'cta'
                 ? 'bg-purple-700 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -838,7 +838,7 @@ export default function AdminHomepageBuilderPage() {
         </div>
 
         {/* CONTENU DE L'ONGLET SÉLECTIONNÉ */}
-        <div className="p-5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-4">
+        <div className="p-5 bg-purple-50/70 border border-purple-200 rounded-md space-y-4">
 
           {/* TAB 1: BADGE FLOTTANT */}
           {activeHeroTab === 'badge' && (

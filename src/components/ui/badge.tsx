@@ -17,7 +17,7 @@ export function Badge({ variant = 'emerald', children, className = '', ...props 
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs transition-colors shadow-xs ${badgeVariants[variant]} ${className}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs transition-colors shadow-xs ${badgeVariants[variant]} ${className}`}
       {...props}
     >
       {children}
