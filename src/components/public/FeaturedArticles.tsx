@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BookOpen, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check, Bot, Book } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { FormattedText } from '@/components/ui/FormattedText';
 
@@ -34,6 +34,8 @@ const BADGE_ICONS_MAP: Record<string, any> = {
   Target,
   Check,
   BookOpen,
+  Bot,
+  Book,
 };
 
 export function FeaturedArticles({

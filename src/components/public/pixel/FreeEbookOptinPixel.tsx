@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Send, Gift, ShieldCheck, CheckCircle, Check, Lock, ArrowLeft, RefreshCw, Sparkles, Rocket, Flame, Star, Diamond, Zap, Crown, Target, User, Mail } from 'lucide-react';
+import { Send, Gift, ShieldCheck, CheckCircle, Check, Lock, ArrowLeft, RefreshCw, Sparkles, Rocket, Flame, Star, Diamond, Zap, Crown, Target, User, Mail, Bot, BookOpen, Book } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
 
@@ -23,6 +23,9 @@ const BADGE_ICONS_MAP: Record<string, any> = {
   Crown,
   Target,
   Check,
+  Bot,
+  BookOpen,
+  Book,
 };
 
 export function FreeEbookOptinPixel({

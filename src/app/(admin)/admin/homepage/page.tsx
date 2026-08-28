@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Save, Eye, EyeOff, MoveUp, MoveDown, ExternalLink, Check, Sparkles, Highlighter, Underline, Palette, LayoutGrid, Megaphone, RotateCcw, Zap, Layers, ShoppingBag, Gift, Star, BookOpen, User, Award, MessageSquare, TrendingUp, DollarSign, Repeat, Link as LinkIcon, Plus, Trash2, GripVertical, Type, AlignLeft, AlignCenter, AlignRight, Globe, MousePointerClick } from 'lucide-react';
+import { Save, Eye, EyeOff, MoveUp, MoveDown, ExternalLink, Check, Sparkles, Highlighter, Underline, Palette, LayoutGrid, Megaphone, RotateCcw, Zap, Layers, ShoppingBag, Gift, Star, BookOpen, User, Award, MessageSquare, TrendingUp, DollarSign, Repeat, Link as LinkIcon, Plus, Trash2, GripVertical, Type, AlignLeft, AlignCenter, AlignRight, Globe, MousePointerClick, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -1713,6 +1713,8 @@ export default function AdminHomepageBuilderPage() {
                                             <option value="Crown">👑 Couronne (Crown)</option>
                                             <option value="Target">🎯 Cible (Target)</option>
                                             <option value="Check">✓ Coché (Check)</option>
+                                            <option value="Bot">🤖 Bot IA (Bot)</option>
+                                            <option value="BookOpen">📚 eBook / Livre (BookOpen)</option>
                                             <option value="None">🚫 Sans icône</option>
                                           </select>
                                         </div>

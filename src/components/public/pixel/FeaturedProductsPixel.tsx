@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check } from 'lucide-react';
+import { ArrowRight, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check, Bot, BookOpen, Book } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
@@ -38,6 +38,9 @@ const BADGE_ICONS_MAP: Record<string, any> = {
   Crown,
   Target,
   Check,
+  Bot,
+  BookOpen,
+  Book,
 };
 
 export function FeaturedProductsPixel({
