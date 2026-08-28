@@ -120,6 +120,7 @@ model Product {
   compareAtPrice    Float?
   coverImage        String?
   images            String?          // JSON array string for multiple gallery images
+  icon              String?          // Custom icon/logo URL for resource cards and checkout recap
   fileUrl           String?          // File link (ZIP, PDF, Notion template)
   fileType          String?          @default("NOTION") // NOTION, EXCEL, PDF, ZIP
   categoryId        String?

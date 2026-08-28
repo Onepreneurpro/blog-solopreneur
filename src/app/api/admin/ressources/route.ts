@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, slug, shortDescription, longDescription, coverImage, images, fileUrl } = body;
+    const { name, slug, shortDescription, longDescription, coverImage, images, icon, fileUrl } = body;
 
     if (!name || !slug) {
       return NextResponse.json({ error: 'Nom et slug requis.' }, { status: 400 });
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
         longDescription: longDescription || '',
         coverImage: primaryCover,
         images: imagesJson,
+        icon: icon || null,
         fileUrl: fileUrl || null,
         price: 0,
         compareAtPrice: null,
@@ -73,7 +74,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, name, slug, shortDescription, longDescription, coverImage, images, fileUrl } = body;
+    const { id, name, slug, shortDescription, longDescription, coverImage, images, icon, fileUrl } = body;
 
     if (!id || !name || !slug) {
       return NextResponse.json({ error: 'ID, nom et slug requis.' }, { status: 400 });
@@ -92,6 +93,7 @@ export async function PUT(request: Request) {
         longDescription: longDescription || '',
         coverImage: primaryCover,
         images: imagesJson,
+        icon: icon || null,
         fileUrl: fileUrl || null,
         price: 0,
         isFreeResource: true,

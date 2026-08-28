@@ -345,11 +345,17 @@ function CheckoutContent() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  {product.coverImage ? (
+                  {product.icon ? (
+                    <img
+                      src={product.icon}
+                      alt={product.name}
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 shadow-sm"
+                    />
+                  ) : product.coverImage ? (
                     <img
                       src={product.coverImage}
                       alt={product.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 shadow-sm"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">

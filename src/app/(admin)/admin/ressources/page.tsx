@@ -18,9 +18,11 @@ export default function AdminRessourcesPage() {
   const [longDescription, setLongDescription] = useState('');
   const [coverImage, setCoverImage] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [icon, setIcon] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [iconUploading, setIconUploading] = useState(false);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,9 +34,11 @@ export default function AdminRessourcesPage() {
   const [editLongDesc, setEditLongDesc] = useState('');
   const [editCoverImage, setEditCoverImage] = useState('');
   const [editImages, setEditImages] = useState<string[]>([]);
+  const [editIcon, setEditIcon] = useState('');
   const [editFileUrl, setEditFileUrl] = useState('');
   const [editUploading, setEditUploading] = useState(false);
   const [editImageUploading, setEditImageUploading] = useState(false);
+  const [editIconUploading, setEditIconUploading] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
   const [editError, setEditError] = useState('');
 
@@ -139,6 +143,35 @@ export default function AdminRessourcesPage() {
     }
   };
 
+  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isEdit) setEditIconUploading(true);
+    else setIconUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/medias', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur d upload de l icône.');
+
+      if (isEdit) setEditIcon(data.media.url);
+      else setIcon(data.media.url);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      if (isEdit) setEditIconUploading(false);
+      else setIconUploading(false);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -184,6 +217,7 @@ export default function AdminRessourcesPage() {
           longDescription,
           coverImage: coverImage || (images[0] || ''),
           images,
+          icon,
           fileUrl,
         }),
       });
@@ -197,6 +231,7 @@ export default function AdminRessourcesPage() {
       setLongDescription('');
       setCoverImage('');
       setImages([]);
+      setIcon('');
       setFileUrl('');
       fetchResources();
     } catch (err: any) {
@@ -225,6 +260,7 @@ export default function AdminRessourcesPage() {
       parsedImages = [resItem.coverImage];
     }
     setEditImages(parsedImages);
+    setEditIcon(resItem.icon || '');
     setEditFileUrl(resItem.fileUrl || '');
   };
 
@@ -243,6 +279,7 @@ export default function AdminRessourcesPage() {
           longDescription: editLongDesc,
           coverImage: editCoverImage || (editImages[0] || ''),
           images: editImages,
+          icon: editIcon,
           fileUrl: editFileUrl,
         }),
       });
@@ -385,6 +422,31 @@ export default function AdminRessourcesPage() {
                         );
                       })}
                     </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Icône / Logo du Récapitulatif (Optionnel)</label>
+                <input
+                  type="text"
+                  placeholder="https://... ou téléverser l icône"
+                  value={icon}
+                  onChange={(e) => setIcon(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleIconUpload(e, false)}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200"
+                />
+                {iconUploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement de l icône...</div>}
+                {icon && (
+                  <div className="p-2 bg-purple-50 border border-purple-200 rounded-lg text-[11px] text-purple-950 flex items-center gap-2.5 mt-2 font-bold">
+                    <img src={icon} alt="Icône" className="w-9 h-9 rounded-lg object-cover border border-purple-300 shadow-sm" />
+                    <span className="truncate">Icône définie : <code className="font-mono text-[10px] text-purple-700">{icon}</code></span>
                   </div>
                 )}
               </div>
@@ -552,6 +614,30 @@ export default function AdminRessourcesPage() {
                                         );
                                       })}
                                     </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-700 mb-1">Icône / Logo du Récapitulatif (Optionnel)</label>
+                                <input
+                                  type="text"
+                                  value={editIcon}
+                                  onChange={(e) => setEditIcon(e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white mb-1.5"
+                                  placeholder="https://... ou uploader l icône"
+                                />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleIconUpload(e, true)}
+                                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800"
+                                />
+                                {editIconUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement de l icône...</div>}
+                                {editIcon && (
+                                  <div className="mt-1.5 p-1.5 bg-white border border-purple-200 rounded flex items-center gap-2">
+                                    <img src={editIcon} alt="Icône" className="w-7 h-7 rounded object-cover border border-purple-300" />
+                                    <span className="text-[10px] font-mono text-purple-700 truncate">{editIcon}</span>
                                   </div>
                                 )}
                               </div>
