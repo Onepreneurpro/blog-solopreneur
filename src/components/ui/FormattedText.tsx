@@ -4,9 +4,17 @@ interface FormattedTextProps {
   text?: string | null;
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
+  style?: React.CSSProperties;
+  defaultMarkColor?: string;
 }
 
-export function FormattedText({ text, className = '', as: Component = 'span' }: FormattedTextProps) {
+export function FormattedText({
+  text,
+  className = '',
+  as: Component = 'span',
+  style,
+  defaultMarkColor = '#a3e635',
+}: FormattedTextProps) {
   if (!text) return null;
 
   // Transform tags to styled html:
@@ -15,14 +23,14 @@ export function FormattedText({ text, className = '', as: Component = 'span' }: 
   const transformed = text
     // Replace <mark ...>
     .replace(/<mark(?:\s+color=["']([^"']+)["'])?>(.*?)<\/mark>/gi, (match, color, content) => {
-      const bgColor = color || '#ccff00';
-      const isLight = ['#ccff00', '#facc15', '#fef08a', '#ffff00'].includes(bgColor.toLowerCase());
+      const bgColor = color || defaultMarkColor;
+      const isLight = ['#ccff00', '#a3e635', '#facc15', '#fef08a', '#ffff00'].includes(bgColor.toLowerCase());
       const textColor = isLight ? '#0f172a' : '#ffffff';
       return `<span style="background-color: ${bgColor}; color: ${textColor};" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">${content}</span>`;
     })
     // Replace <u>...</u> or <u color="..." thickness="...">...</u>
     .replace(/<u(?:\s+color=["']([^"']+)["'])?(?:\s+thickness=["']([^"']+)["'])?>(.*?)<\/u>/gi, (match, color, thickness, content) => {
-      const colorVal = color || '#ccff00';
+      const colorVal = color || defaultMarkColor;
       let gradientPercent = '64%'; // Default medium (~36% height pedestal)
       
       if (thickness === 'thin') gradientPercent = '78%';
@@ -36,12 +44,13 @@ export function FormattedText({ text, className = '', as: Component = 'span' }: 
       return `<u style="text-decoration: none !important; background: linear-gradient(180deg, transparent ${gradientPercent}, ${colorVal} ${gradientPercent}, ${colorVal} 92%) !important; color: inherit; padding: 0 4px; border-radius: 4px; display: inline; font-weight: inherit;">${content}</u>`;
     })
     // Fallback replace for simple markdown syntax ==word== and [yellow]word[/yellow]
-    .replace(/==(.*?)==/gi, '<span style="background-color: #ccff00; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>')
-    .replace(/\[yellow\](.*?)\[\/yellow\]/gi, '<span style="background-color: #ccff00; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>');
+    .replace(/==(.*?)==/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`)
+    .replace(/\[yellow\](.*?)\[\/yellow\]/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`);
 
   return (
     <Component
       className={className}
+      style={style}
       dangerouslySetInnerHTML={{ __html: transformed }}
     />
   );

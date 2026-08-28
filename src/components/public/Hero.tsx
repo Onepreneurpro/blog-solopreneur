@@ -8,12 +8,14 @@ interface HeroProps {
   title?: string;
   subtitle?: string | null;
   settings?: any;
+  heroStyles?: any;
 }
 
 export function Hero({
   title = "Les formations & templates qui te font <mark>gagner plus</mark> en freelance.",
   subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d affaires.",
   settings = {},
+  heroStyles = {},
 }: HeroProps) {
 
   // Parse settings if passed as JSON string
@@ -26,6 +28,26 @@ export function Hero({
   const btn2Text = btnSettings.btn2Text || 'Ressources Gratuites';
   const btn2Url = btnSettings.btn2Url || '/ressources';
   const btn2Style = btnSettings.btn2Style || 'purple';
+
+  const fontGlobal = heroStyles?.fontGlobal ?? true;
+  const globalFont = heroStyles?.fontFamily || 'Plus Jakarta Sans';
+
+  const badgeFont = fontGlobal ? globalFont : (heroStyles?.badgeFont || globalFont);
+  const badgeSize = heroStyles?.badgeSize || '12px';
+  const badgeColor = heroStyles?.badgeColor || '#7e22ce';
+
+  const titleFont = fontGlobal ? globalFont : (heroStyles?.titleFont || globalFont);
+  const titleSize = heroStyles?.titleSize || '48px';
+  const titleColor = heroStyles?.titleColor || '#090d16';
+
+  const accentFont = fontGlobal ? globalFont : (heroStyles?.accentFont || globalFont);
+  const accentColor = heroStyles?.accentColor || '#a3e635';
+
+  const subtitleFont = fontGlobal ? globalFont : (heroStyles?.subtitleFont || globalFont);
+  const subtitleSize = heroStyles?.subtitleSize || '18px';
+  const subtitleColor = heroStyles?.subtitleColor || '#475569';
+
+  const align = heroStyles?.align || 'left';
 
   const getButtonStyle = (style: string) => {
     switch (style) {
@@ -51,25 +73,48 @@ export function Hero({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center lg:items-stretch">
           
           {/* LEFT COLUMN: HERO CONTENT */}
-          <div className="lg:col-span-7 text-center lg:text-left space-y-6 flex flex-col justify-center">
+          <div className={`lg:col-span-7 space-y-6 flex flex-col justify-center ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
             
             {/* BADGE */}
-            <div className="inline-flex items-center gap-2 justify-center lg:justify-start">
-              <span className="px-4 py-1.5 text-xs font-heading font-black tracking-wider uppercase rounded-full shadow-xs !bg-purple-100 !text-purple-900 border border-purple-300">
-                <Sparkles className="w-3.5 h-3.5 mr-1.5 inline text-purple-700 animate-pulse" />
+            <div className={`inline-flex items-center gap-2 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+              <span
+                style={{
+                  fontFamily: `'${badgeFont}', sans-serif`,
+                  fontSize: badgeSize,
+                  color: badgeColor,
+                  borderColor: `${badgeColor}40`,
+                  backgroundColor: `${badgeColor}15`,
+                }}
+                className="px-4 py-1.5 font-heading font-black tracking-wider uppercase rounded-full shadow-xs border"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1.5 inline animate-pulse" style={{ color: badgeColor }} />
                 ⚡ Académie & Outillages 100% Solopreneurs 2026
               </span>
             </div>
 
             {/* DYNAMIC MAIN HEADING WITH FORMATTED TEXT EFFECTS */}
-            <h1 className="text-3xl sm:text-5xl lg:text-5xl font-heading font-black !text-slate-950 tracking-tight leading-[1.18]">
-              <FormattedText text={title} />
+            <h1
+              style={{
+                fontFamily: `'${titleFont}', sans-serif`,
+                fontSize: titleSize,
+                color: titleColor,
+              }}
+              className="font-heading font-black tracking-tight leading-[1.18]"
+            >
+              <FormattedText text={title} defaultMarkColor={accentColor} />
             </h1>
 
             {/* DYNAMIC SUBTITLE WITH FORMATTED TEXT EFFECTS */}
             {subtitle && (
-              <p className="text-base sm:text-lg !text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-semibold">
-                <FormattedText text={subtitle} />
+              <p
+                style={{
+                  fontFamily: `'${subtitleFont}', sans-serif`,
+                  fontSize: subtitleSize,
+                  color: subtitleColor,
+                }}
+                className={`max-w-2xl leading-relaxed font-semibold ${align === 'center' ? 'mx-auto' : align === 'right' ? 'ml-auto' : 'mx-auto lg:mx-0'}`}
+              >
+                <FormattedText text={subtitle} defaultMarkColor={accentColor} />
               </p>
             )}
 

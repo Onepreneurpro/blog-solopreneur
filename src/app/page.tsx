@@ -42,6 +42,8 @@ export default async function HomePage() {
   let activeSections: any[] = [];
   let activeTheme = 'pixel-funnel';
 
+  let heroStyles: any = {};
+
   try {
     activeTheme = await getActiveTheme();
 
@@ -50,6 +52,32 @@ export default async function HomePage() {
     });
 
     activeSections = dbSections.filter((s) => s.isEnabled);
+
+    const generalSettingsRecord = await prisma.siteSetting.findUnique({
+      where: { key: 'general_settings' },
+    });
+
+    if (generalSettingsRecord) {
+      try {
+        const s = JSON.parse(generalSettingsRecord.value);
+        heroStyles = {
+          fontGlobal: s.homeHeroFontGlobal !== undefined ? Boolean(s.homeHeroFontGlobal) : true,
+          fontFamily: s.homeHeroFontFamily || 'Plus Jakarta Sans',
+          badgeFont: s.homeHeroBadgeFont || 'Plus Jakarta Sans',
+          badgeSize: s.homeHeroBadgeSize || '12px',
+          badgeColor: s.homeHeroBadgeColor || '#a3e635',
+          titleFont: s.homeHeroTitleFont || 'Plus Jakarta Sans',
+          titleSize: s.homeHeroTitleSize || '48px',
+          titleColor: s.homeHeroTitleColor || '#ffffff',
+          accentFont: s.homeHeroAccentFont || 'Plus Jakarta Sans',
+          accentColor: s.homeHeroAccentColor || '#a3e635',
+          subtitleFont: s.homeHeroSubtitleFont || 'Plus Jakarta Sans',
+          subtitleSize: s.homeHeroSubtitleSize || '18px',
+          subtitleColor: s.homeHeroSubtitleColor || '#cbd5e1',
+          align: s.homeHeroAlign || 'left',
+        };
+      } catch (e) {}
+    }
 
     articles = await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
@@ -78,6 +106,26 @@ export default async function HomePage() {
     console.error('Error loading homepage data:', error);
   }
 
+  const fontImportMap: Record<string, string> = {
+    'Plus Jakarta Sans': 'Plus+Jakarta+Sans:wght@700;800;900',
+    'Outfit': 'Outfit:wght@700;800;900',
+    'Syne': 'Syne:wght@700;800',
+    'Space Grotesk': 'Space+Grotesk:wght@700',
+    'Poppins': 'Poppins:wght@700;800;900',
+    'Montserrat': 'Montserrat:wght@800;900',
+    'Playfair Display': 'Playfair+Display:ital,wght@0,800;1,700',
+    'Bricolage Grotesque': 'Bricolage+Grotesque:opsz,wght@12..96,800',
+    'Inter': 'Inter:wght@800;900',
+  };
+
+  const fontsToLoad = Array.from(new Set([
+    heroStyles.fontFamily,
+    heroStyles.badgeFont,
+    heroStyles.titleFont,
+    heroStyles.accentFont,
+    heroStyles.subtitleFont,
+  ])).filter(Boolean);
+
   const sectionsToRender = activeSections.length > 0
     ? activeSections
     : DEFAULT_SECTIONS_ORDER.map((key, i) => ({ sectionKey: key, title: '', subtitle: '', isEnabled: true, order: i, settings: {} }));
@@ -87,12 +135,25 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* DYNAMIC GOOGLE FONTS LINKS */}
+      {fontsToLoad.map((fName) => {
+        const importStr = fontImportMap[fName as string];
+        if (!importStr) return null;
+        return (
+          <link
+            key={fName as string}
+            rel="stylesheet"
+            href={`https://fonts.googleapis.com/css2?family=${importStr}&display=swap`}
+          />
+        );
+      })}
+
       {sectionsToRender.map((sec) => {
         switch (sec.sectionKey) {
           case 'HERO':
-            if (isPixelFunnel) return <HeroPixelFunnel key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} />;
-            if (isClassic) return <Hero key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} />;
-            return <HeroModernBento key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} />;
+            if (isPixelFunnel) return <HeroPixelFunnel key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} heroStyles={heroStyles} />;
+            if (isClassic) return <Hero key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} heroStyles={heroStyles} />;
+            return <HeroModernBento key={sec.id || 'HERO'} title={sec.title} subtitle={sec.subtitle} settings={sec.settings} heroStyles={heroStyles} />;
 
           case 'TICKER':
             return <TickerBanner key={sec.id || 'TICKER'} settings={sec.settings} isDark={!isClassic} />;

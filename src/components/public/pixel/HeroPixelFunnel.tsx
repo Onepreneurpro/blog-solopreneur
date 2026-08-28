@@ -11,12 +11,14 @@ interface HeroPixelFunnelProps {
   title?: string;
   subtitle?: string | null;
   settings?: any;
+  heroStyles?: any;
 }
 
 export function HeroPixelFunnel({
   title = "Les formations & templates qui te font <mark color='#a3e635'>gagner plus</mark> en freelance.",
   subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour découpler ton chiffre d affaires.",
   settings = {},
+  heroStyles = {},
 }: HeroPixelFunnelProps) {
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
   const btn1Text = s.btn1Text || 'Voir la boutique & les templates';
@@ -45,8 +47,28 @@ export function HeroPixelFunnel({
   const stat3Val = s.stat3Val || '60-80%';
   const stat3Label = s.stat3Label || 'Clients Récurrents';
 
+  const fontGlobal = heroStyles?.fontGlobal ?? true;
+  const globalFont = heroStyles?.fontFamily || 'Plus Jakarta Sans';
+
+  const badgeFont = fontGlobal ? globalFont : (heroStyles?.badgeFont || globalFont);
+  const badgeSize = heroStyles?.badgeSize || '12px';
+  const badgeColor = heroStyles?.badgeColor || '#a3e635';
+
+  const titleFont = fontGlobal ? globalFont : (heroStyles?.titleFont || globalFont);
+  const titleSize = heroStyles?.titleSize || '48px';
+  const titleColor = heroStyles?.titleColor || '#ffffff';
+
+  const accentFont = fontGlobal ? globalFont : (heroStyles?.accentFont || globalFont);
+  const accentColor = heroStyles?.accentColor || '#a3e635';
+
+  const subtitleFont = fontGlobal ? globalFont : (heroStyles?.subtitleFont || globalFont);
+  const subtitleSize = heroStyles?.subtitleSize || '18px';
+  const subtitleColor = heroStyles?.subtitleColor || '#cbd5e1';
+
+  const align = heroStyles?.align || 'left';
+
   return (
-    <section className="relative overflow-hidden bg-[#0b0f19] text-white pt-12 sm:pt-20 pb-16 sm:pb-24 border-b border-white/10">
+    <section className="relative overflow-hidden bg-[#050811] text-white pt-16 sm:pt-20 pb-20 sm:pb-24 border-b border-slate-800">
       
       {/* AMBIENT GLOW ORBS */}
       <div className="absolute top-0 right-1/3 w-[500px] h-[500px] bg-[#a3e635]/15 rounded-full blur-[180px] pointer-events-none" />
@@ -55,9 +77,18 @@ export function HeroPixelFunnel({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* TOP TICKER/ALERT BADGE */}
-        <div className="flex justify-center lg:justify-start mb-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm bg-[#a3e635]/15 border border-[#a3e635]/30 text-xs font-heading font-black text-[#a3e635] shadow-lg">
-            <Zap className="w-3.5 h-3.5 fill-[#a3e635] text-[#a3e635]" />
+        <div className={`flex mb-6 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            style={{
+              fontFamily: `'${badgeFont}', sans-serif`,
+              fontSize: badgeSize,
+              color: badgeColor,
+              borderColor: `${badgeColor}40`,
+              backgroundColor: `${badgeColor}15`,
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm border shadow-lg font-heading font-black"
+          >
+            <Zap className="w-3.5 h-3.5" style={{ fill: badgeColor, color: badgeColor }} />
             <span>{topTickerText}</span>
           </div>
         </div>
@@ -66,15 +97,29 @@ export function HeroPixelFunnel({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
           
           {/* LEFT: PUNCHY COPYWRITING */}
-          <div className="lg:col-span-7 flex flex-col justify-between text-center lg:text-left space-y-6">
+          <div className={`lg:col-span-7 flex flex-col justify-between space-y-6 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
             <div className="space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white tracking-tight leading-[1.12]">
-                <FormattedText text={title} />
+              <h1
+                style={{
+                  fontFamily: `'${titleFont}', sans-serif`,
+                  fontSize: titleSize,
+                  color: titleColor,
+                }}
+                className="font-heading font-black tracking-tight leading-[1.12]"
+              >
+                <FormattedText text={title} defaultMarkColor={accentColor} />
               </h1>
 
               {subtitle && (
-                <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                  <FormattedText text={subtitle} />
+                <p
+                  style={{
+                    fontFamily: `'${subtitleFont}', sans-serif`,
+                    fontSize: subtitleSize,
+                    color: subtitleColor,
+                  }}
+                  className={`leading-relaxed font-normal max-w-2xl ${align === 'center' ? 'mx-auto' : align === 'right' ? 'ml-auto' : 'mx-auto lg:mx-0'}`}
+                >
+                  <FormattedText text={subtitle} defaultMarkColor={accentColor} />
                 </p>
               )}
             </div>

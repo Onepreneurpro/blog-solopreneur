@@ -8,12 +8,14 @@ interface HeroModernBentoProps {
   title?: string;
   subtitle?: string | null;
   settings?: any;
+  heroStyles?: any;
 }
 
 export function HeroModernBento({
   title = "Le système tout-en-un pour <mark color='#ccff00'>multiplier tes revenus</mark> et automatiser ton activité.",
   subtitle = "Arrête de perdre du temps avec des outils éparpillés. Accède à nos espaces Notion avancés, tableaux de trésorerie Excel et méthodes de vente validées.",
   settings = {},
+  heroStyles = {},
 }: HeroModernBentoProps) {
   const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
 
@@ -24,6 +26,26 @@ export function HeroModernBento({
   const btn2Text = btnSettings.btn2Text || 'Ressources Gratuites & Guides';
   const btn2Url = btnSettings.btn2Url || '/ressources';
   const btn2Style = btnSettings.btn2Style || 'white';
+
+  const fontGlobal = heroStyles?.fontGlobal ?? true;
+  const globalFont = heroStyles?.fontFamily || 'Plus Jakarta Sans';
+
+  const badgeFont = fontGlobal ? globalFont : (heroStyles?.badgeFont || globalFont);
+  const badgeSize = heroStyles?.badgeSize || '12px';
+  const badgeColor = heroStyles?.badgeColor || '#a3e635';
+
+  const titleFont = fontGlobal ? globalFont : (heroStyles?.titleFont || globalFont);
+  const titleSize = heroStyles?.titleSize || '48px';
+  const titleColor = heroStyles?.titleColor || '#ffffff';
+
+  const accentFont = fontGlobal ? globalFont : (heroStyles?.accentFont || globalFont);
+  const accentColor = heroStyles?.accentColor || '#a3e635';
+
+  const subtitleFont = fontGlobal ? globalFont : (heroStyles?.subtitleFont || globalFont);
+  const subtitleSize = heroStyles?.subtitleSize || '18px';
+  const subtitleColor = heroStyles?.subtitleColor || '#cbd5e1';
+
+  const align = heroStyles?.align || 'left';
 
   const getButtonStyle = (style: string) => {
     switch (style) {
@@ -49,10 +71,19 @@ export function HeroModernBento({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* TOP BADGE */}
-        <div className="flex justify-center lg:justify-start mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm bg-white/10 backdrop-blur-md border border-white/15 text-xs font-heading font-extrabold text-white shadow-xl">
-            <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-ping" />
-            <span className="!text-[#ccff00] font-black">Nouveau Système 2026</span>
+        <div className={`flex mb-6 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            style={{
+              fontFamily: `'${badgeFont}', sans-serif`,
+              fontSize: badgeSize,
+              color: badgeColor,
+              borderColor: `${badgeColor}40`,
+              backgroundColor: `${badgeColor}15`,
+            }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm backdrop-blur-md border text-xs font-heading font-extrabold shadow-xl"
+          >
+            <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: badgeColor }} />
+            <span className="font-black" style={{ color: badgeColor }}>Nouveau Système 2026</span>
             <span className="text-white/40">•</span>
             <span>+5,400 Solopreneurs Équipés</span>
           </div>
@@ -62,15 +93,29 @@ export function HeroModernBento({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* LEFT COLUMN: PUNCHY TYPOGRAPHY & CALL TO ACTIONS */}
-          <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+          <div className={`lg:col-span-7 space-y-8 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white tracking-tight leading-[1.12]">
-              <FormattedText text={title} />
+            <h1
+              style={{
+                fontFamily: `'${titleFont}', sans-serif`,
+                fontSize: titleSize,
+                color: titleColor,
+              }}
+              className="font-heading font-black tracking-tight leading-[1.12]"
+            >
+              <FormattedText text={title} defaultMarkColor={accentColor} />
             </h1>
 
             {subtitle && (
-              <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                <FormattedText text={subtitle} />
+              <p
+                style={{
+                  fontFamily: `'${subtitleFont}', sans-serif`,
+                  fontSize: subtitleSize,
+                  color: subtitleColor,
+                }}
+                className={`leading-relaxed font-normal max-w-2xl ${align === 'center' ? 'mx-auto' : align === 'right' ? 'ml-auto' : 'mx-auto lg:mx-0'}`}
+              >
+                <FormattedText text={subtitle} defaultMarkColor={accentColor} />
               </p>
             )}
 
