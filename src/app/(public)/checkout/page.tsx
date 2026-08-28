@@ -171,12 +171,137 @@ function CheckoutContent() {
 
         <form onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT FORM COLUMN */}
+          {/* LEFT COLUMN: PRODUCT NAME, COVER IMAGE & FULL DETAILS (EN HAUT À GAUCHE) */}
           <div className="lg:col-span-7 space-y-6">
+
+            <Card className={`p-6 sm:p-8 space-y-6 rounded-3xl shadow-xl ${
+              isDark ? 'bg-[#0e1424]/90 border-2 border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
+            }`}>
+              
+              {/* RESOURCE TITLE & COVER IMAGE */}
+              <div className="space-y-4 border-b pb-6 border-inherit">
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full ${
+                    isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                  }`}>
+                    {isFree ? 'Ressource Offerte' : 'Produit Numérique'}
+                  </span>
+                  <span className="text-[10px] font-bold opacity-75">
+                    Format : {product.fileType || 'PDF / Modèle Notion'}
+                  </span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-heading font-black leading-snug tracking-tight">
+                  {product.name}
+                </h2>
+
+                {product.coverImage && (
+                  <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-slate-200 shadow-md">
+                    <img
+                      src={product.coverImage}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* SHORT & LONG DESCRIPTION */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-heading font-black uppercase text-slate-400 tracking-wider">
+                  ✨ Contenu & Détails de la ressource
+                </h3>
+
+                <div className="space-y-4 text-sm leading-relaxed font-medium">
+                  {product.shortDescription ? (
+                    <p className="text-base font-semibold opacity-90">{product.shortDescription}</p>
+                  ) : (
+                    <p className="text-base font-semibold opacity-90">Capturez l attention de vos lecteurs dès la première ligne de vos posts LinkedIn.</p>
+                  )}
+
+                  {product.longDescription && (
+                    <div
+                      className="pt-4 border-t border-inherit opacity-90 text-sm leading-relaxed space-y-3 [&_h3]:font-heading [&_h3]:font-black [&_h3]:text-base [&_h3]:mt-4 [&_h3]:mb-1 [&_p]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1.5"
+                      dangerouslySetInnerHTML={{ __html: product.longDescription }}
+                    />
+                  )}
+                </div>
+              </div>
+
+            </Card>
+
+          </div>
+
+          {/* RIGHT COLUMN: RÉCAPITULATIF EN HAUT, DESTINATAIRE JUSTE EN DESSOUS (À DROITE) */}
+          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
             
-            {/* STEP 1: CONTACT INFO */}
+            {/* 1. RÉCAPITULATIF DE LA RESSOURCE (EN HAUT À DROITE) */}
             <Card className={`p-6 space-y-5 rounded-3xl shadow-xl ${
-              isDark ? 'bg-[#0e1424]/90 border border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
+              isDark ? 'bg-[#0e1424] border-2 border-white/15 text-white' : 'bg-white border-2 border-purple-200 text-slate-900'
+            }`}>
+              <div className="flex items-center justify-between border-b pb-3 border-inherit">
+                <h3 className="text-lg font-heading font-black">Récapitulatif de la ressource</h3>
+                {isFree && (
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                    isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                  }`}>
+                    100% Offert
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-start gap-4">
+                {product.coverImage ? (
+                  <img
+                    src={product.coverImage}
+                    alt={product.name}
+                    className="w-14 h-14 rounded-2xl object-cover border border-slate-200 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0">
+                    <Download className="w-7 h-7" />
+                  </div>
+                )}
+                <div>
+                  <h4 className="font-heading font-black text-sm leading-snug">{product.name}</h4>
+                  <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    {isFree ? 'Ressource offerte (PDF / Modèle)' : `Format : ${product.fileType || 'DIGITAL'}`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2 border-t pt-4 border-inherit text-xs font-medium">
+                <div className="flex justify-between">
+                  <span className="opacity-75">Prix public</span>
+                  <span className="line-through opacity-60">
+                    {product.compareAtPrice ? `${product.compareAtPrice.toFixed(2)} €` : `${(product.price > 0 ? product.price * 1.5 : 19).toFixed(2)} €`}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center text-lg font-heading font-black pt-2 border-t border-inherit">
+                  <span>Total</span>
+                  <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
+                    {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
+                  </span>
+                </div>
+              </div>
+
+              <div className={`p-3.5 rounded-2xl text-xs space-y-1 ${
+                isDark ? 'bg-slate-950/80 text-slate-300 border border-white/10' : 'bg-purple-50 text-purple-950 border border-purple-200'
+              }`}>
+                <div className="font-bold flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#a3e635]" />
+                  <span>Accès gratuit & direct sans CB</span>
+                </div>
+                <p className="text-[11px] opacity-80 leading-relaxed">
+                  Aucune carte bancaire requise. Téléchargement ou accès instantané à la validation.
+                </p>
+              </div>
+            </Card>
+
+            {/* 2. DESTINATAIRE DE LA RESSOURCE (PLACÉ SOUS RÉCAPITULATIF À DROITE) */}
+            <Card className={`p-6 space-y-5 rounded-3xl shadow-xl ${
+              isDark ? 'bg-[#0e1424] border-2 border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
             }`}>
               <div className="flex items-center justify-between border-b pb-3 border-inherit">
                 <h3 className="text-base font-heading font-black">1. Destinataire de la ressource</h3>
@@ -213,7 +338,7 @@ function CheckoutContent() {
               ) : (
                 <div className="space-y-4">
                   
-                  {/* ROW 1: NOM ET PRÉNOM EN HAUT */}
+                  {/* NOM & PRÉNOM */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className={`block text-xs font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Prénom</label>
@@ -246,7 +371,7 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {/* ROW 2: ADRESSE EMAIL EN DESSOUS */}
+                  {/* EMAIL */}
                   <div>
                     <label className={`block text-xs font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre adresse e-mail *</label>
                     <input
@@ -269,61 +394,30 @@ function CheckoutContent() {
                 </div>
               )}
 
-              {/* 🚀 BUTTON DIRECTLY IN LEFT COLUMN FOR FREE RESOURCES */}
-              {isFree && (
-                <div className="pt-3 border-t border-inherit">
-                  <Button
-                    type="submit"
-                    disabled={processing}
-                    className={`w-full py-4 text-sm font-heading font-black rounded-2xl shadow-xl transition-all gap-2 ${
-                      isDark
-                        ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
-                        : 'bg-purple-700 text-white hover:bg-purple-800'
-                    }`}
-                  >
-                    {processing ? (
-                      <span>Validation en cours...</span>
-                    ) : (
-                      <>
-                        <Gift className="w-4 h-4" />
-                        <span>Obtenir mon accès gratuit immédiat</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </Card>
-
-            {/* PAYMENT METHOD SELECTION */}
-            {!isFree && (
-              <Card className={`p-6 space-y-5 rounded-3xl shadow-xl ${
-                isDark ? 'bg-[#0e1424]/90 border border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
-              }`}>
-                <h3 className="text-base font-heading font-black">2. Choisir le mode de paiement</h3>
-
-                <div className="space-y-3">
+              {/* PAYMENT METHOD (ONLY FOR PAID PRODUCTS) */}
+              {!isFree && (
+                <div className="space-y-3 pt-3 border-t border-inherit">
+                  <h4 className="text-xs font-heading font-black">2. Mode de paiement</h4>
                   
-                  {/* DEMO TEST PAYMENT */}
                   <div
                     onClick={() => setPaymentMethod('DEMO')}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                       paymentMethod === 'DEMO'
                         ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15 ring-2 ring-[#a3e635]/30' : 'border-purple-600 bg-purple-50/70 ring-2 ring-purple-500/20')
                         : (isDark ? 'border-white/10 bg-slate-950/60 hover:border-white/20' : 'border-slate-200 hover:border-slate-300')
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5">
                         <input type="radio" checked={paymentMethod === 'DEMO'} readOnly className="text-purple-600" />
                         <div>
-                          <div className="font-heading font-black text-sm flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-[#a3e635]" />
-                            <span>Paiement Démo / Test (Instantané)</span>
+                          <div className="font-heading font-black text-xs flex items-center gap-1">
+                            <Sparkles className="w-3.5 h-3.5 text-[#a3e635]" />
+                            <span>Paiement Démo / Test</span>
                           </div>
-                          <p className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>Carte fictive de test pré-remplie (Sans débit réel)</p>
                         </div>
                       </div>
-                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
                         isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-amber-300 text-amber-950'
                       }`}>
                         Démo
@@ -331,130 +425,45 @@ function CheckoutContent() {
                     </div>
 
                     {paymentMethod === 'DEMO' && (
-                      <div className={`mt-4 pt-3 border-t space-y-3 text-xs ${isDark ? 'border-white/10' : 'border-purple-200/60'}`}>
+                      <div className={`mt-3 pt-2 border-t space-y-2 text-xs ${isDark ? 'border-white/10' : 'border-purple-200/60'}`}>
                         <div className="grid grid-cols-3 gap-2">
                           <div className="col-span-3">
-                            <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Numéro de Carte de Test</label>
+                            <label className={`block text-[10px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Carte Test</label>
                             <input
                               type="text"
                               value={cardNumber}
                               onChange={(e) => setCardNumber(e.target.value)}
-                              className={`w-full px-3 py-2 rounded font-mono text-xs font-bold ${
+                              className={`w-full px-2.5 py-1.5 rounded font-mono text-xs font-bold ${
                                 isDark ? 'bg-slate-950 border border-white/15 text-white' : 'bg-white border border-slate-200 text-slate-700'
                               }`}
                             />
-                          </div>
-                          <div>
-                            <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Expire</label>
-                            <input type="text" value={expiry} onChange={(e) => setExpiry(e.target.value)} className={`w-full px-3 py-2 rounded font-mono text-xs text-center ${isDark ? 'bg-slate-950 border border-white/15 text-white' : 'bg-white border border-slate-200'}`} />
-                          </div>
-                          <div>
-                            <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>CVC</label>
-                            <input type="text" value={cvc} onChange={(e) => setCvc(e.target.value)} className={`w-full px-3 py-2 rounded font-mono text-xs text-center ${isDark ? 'bg-slate-950 border border-white/15 text-white' : 'bg-white border border-slate-200'}`} />
                           </div>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* REAL CREDIT CARD */}
                   <div
                     onClick={() => setPaymentMethod('CARD')}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                       paymentMethod === 'CARD'
                         ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15 ring-2 ring-[#a3e635]/30' : 'border-purple-600 bg-purple-50/70 ring-2 ring-purple-500/20')
                         : (isDark ? 'border-white/10 bg-slate-950/60 hover:border-white/20' : 'border-slate-200 hover:border-slate-300')
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <input type="radio" checked={paymentMethod === 'CARD'} readOnly className="text-purple-600" />
-                      <div>
-                        <div className="font-heading font-black text-sm flex items-center gap-1.5">
-                          <CreditCard className="w-4 h-4 text-purple-500" />
-                          <span>Carte Bancaire (Stripe Sécurisé)</span>
-                        </div>
-                        <p className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>Visa, MasterCard, American Express</p>
+                      <div className="font-heading font-black text-xs flex items-center gap-1.5">
+                        <CreditCard className="w-3.5 h-3.5 text-purple-500" />
+                        <span>Carte Bancaire (Stripe)</span>
                       </div>
                     </div>
                   </div>
-
                 </div>
-              </Card>
-            )}
+              )}
 
-            {/* PRODUCT DETAILS BOX */}
-            <Card className={`p-6 space-y-4 rounded-3xl ${
-              isDark ? 'bg-[#0e1424]/90 border border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
-            }`}>
-              <h3 className="text-xs font-heading font-black uppercase text-slate-400 tracking-wider">
-                ✨ Contenu & Détails de la ressource
-              </h3>
-
-              <div className="space-y-3 text-xs leading-relaxed font-medium">
-                {product.shortDescription ? (
-                  <p>{product.shortDescription}</p>
-                ) : (
-                  <p>Découvrez notre ressource conçue pour booster l activité des solopreneurs et freelances.</p>
-                )}
-
-                {product.longDescription && (
-                  <div
-                    className="pt-3 border-t border-inherit opacity-90 text-xs leading-relaxed space-y-2 [&_h3]:font-heading [&_h3]:font-black [&_h3]:text-sm [&_h3]:mt-3 [&_h3]:mb-1 [&_p]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1"
-                    dangerouslySetInnerHTML={{ __html: product.longDescription }}
-                  />
-                )}
-              </div>
-            </Card>
-
-          </div>
-
-          {/* RIGHT SUMMARY COLUMN */}
-          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
-            <Card className={`p-6 space-y-6 rounded-3xl shadow-2xl ${
-              isDark ? 'bg-[#0e1424] border-2 border-white/15 text-white' : 'bg-white border-2 border-purple-200 text-slate-900'
-            }`}>
-              <h3 className="text-lg font-heading font-black border-b pb-3 border-inherit">
-                Récapitulatif de la ressource
-              </h3>
-
-              <div className="flex items-start gap-4">
-                {product.coverImage ? (
-                  <img
-                    src={product.coverImage}
-                    alt={product.name}
-                    className="w-16 h-16 rounded-2xl object-cover border border-slate-200 flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0">
-                    <Download className="w-8 h-8" />
-                  </div>
-                )}
-                <div>
-                  <h4 className="font-heading font-black text-sm leading-snug">{product.name}</h4>
-                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {isFree ? 'Ressource offerte (PDF / Modèle)' : `Format : ${product.fileType || 'DIGITAL'}`}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 border-t pt-4 border-inherit text-xs font-medium">
-                <div className="flex justify-between">
-                  <span className="opacity-75">Prix public</span>
-                  <span className="line-through opacity-60">
-                    {product.compareAtPrice ? `${product.compareAtPrice.toFixed(2)} €` : `${(product.price > 0 ? product.price * 1.5 : 19).toFixed(2)} €`}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center text-lg font-heading font-black pt-2 border-t border-inherit">
-                  <span>Total</span>
-                  <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
-                    {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
-                  </span>
-                </div>
-              </div>
-
-              {/* SUBMIT BUTTON IN RIGHT COLUMN (FOR PAID PRODUCTS) */}
-              {!isFree && (
+              {/* ACTION BUTTON */}
+              <div className="pt-2">
                 <Button
                   type="submit"
                   disabled={processing}
@@ -466,28 +475,21 @@ function CheckoutContent() {
                 >
                   {processing ? (
                     <span>Validation en cours...</span>
+                  ) : isFree ? (
+                    <>
+                      <Gift className="w-4 h-4" />
+                      <span>Obtenir mon accès gratuit immédiat</span>
+                    </>
                   ) : (
                     <>
                       <Lock className="w-4 h-4" />
-                      <span>Payer & Valider ma commande ({product.price.toFixed(2)} €)</span>
+                      <span>Payer & Valider ({product.price.toFixed(2)} €)</span>
                     </>
                   )}
                 </Button>
-              )}
-
-              <div className={`p-4 rounded-2xl text-xs space-y-1.5 ${
-                isDark ? 'bg-slate-950/80 text-slate-300 border border-white/10' : 'bg-purple-50 text-purple-950 border border-purple-200'
-              }`}>
-                <div className="font-bold flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#a3e635]" />
-                  <span>Accès gratuit & direct sans CB</span>
-                </div>
-                <p className="text-[11px] opacity-80 leading-relaxed">
-                  Aucune carte bancaire requise. Téléchargement ou accès instantané à la validation.
-                </p>
               </div>
-
             </Card>
+
           </div>
 
         </form>
