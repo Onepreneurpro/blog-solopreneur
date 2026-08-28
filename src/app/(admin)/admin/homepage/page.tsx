@@ -1367,50 +1367,60 @@ export default function AdminHomepageBuilderPage() {
             Aperçu interactif Hero (Police : {homeHeroFontGlobal ? homeHeroFontFamily : 'Individuelle par élément'})
           </span>
 
-          <div
-            onClick={() => setActiveHeroTab('badge')}
-            style={{
-              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont}', sans-serif`,
-              fontSize: homeHeroBadgeSize,
-              color: homeHeroBadgeColor,
-              borderColor: `${homeHeroBadgeColor}40`,
-              backgroundColor: `${homeHeroBadgeColor}15`,
-            }}
-            className={`inline-block px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border cursor-pointer hover:ring-2 hover:ring-white transition-all ${
-              activeHeroTab === 'badge' ? 'ring-2 ring-purple-400' : ''
-            }`}
-          >
-            {heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés'}
-          </div>
+          {loading ? (
+            <div className="py-6 space-y-3 animate-pulse">
+              <div className="h-5 bg-slate-800 rounded-full w-56 mx-auto" />
+              <div className="h-9 bg-slate-800 rounded-xl w-3/4 mx-auto" />
+              <div className="h-4 bg-slate-800 rounded-lg w-1/2 mx-auto" />
+            </div>
+          ) : (
+            <>
+              <div
+                onClick={() => setActiveHeroTab('badge')}
+                style={{
+                  fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont}', sans-serif`,
+                  fontSize: homeHeroBadgeSize,
+                  color: homeHeroBadgeColor,
+                  borderColor: `${homeHeroBadgeColor}40`,
+                  backgroundColor: `${homeHeroBadgeColor}15`,
+                }}
+                className={`inline-block px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border cursor-pointer hover:ring-2 hover:ring-white transition-all ${
+                  activeHeroTab === 'badge' ? 'ring-2 ring-purple-400' : ''
+                }`}
+              >
+                {heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '⚡ Badge Hero'}
+              </div>
 
-          <h3
-            onClick={() => setActiveHeroTab('title')}
-            style={{
-              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
-              fontSize: homeHeroTitleSize,
-              color: homeHeroTitleColor,
-            }}
-            className={`font-black tracking-tight leading-tight cursor-pointer hover:opacity-90 transition-all ${
-              activeHeroTab === 'title' ? 'ring-1 ring-purple-400 p-1 rounded' : ''
-            }`}
-          >
-            <FormattedText text={heroSection?.title || 'Les formations & templates qui te font <mark>gagner plus</mark> en freelance'} defaultMarkColor={homeHeroAccentColor} />
-          </h3>
+              <h3
+                onClick={() => setActiveHeroTab('title')}
+                style={{
+                  fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
+                  fontSize: homeHeroTitleSize,
+                  color: homeHeroTitleColor,
+                }}
+                className={`font-black tracking-tight leading-tight cursor-pointer hover:opacity-90 transition-all ${
+                  activeHeroTab === 'title' ? 'ring-1 ring-purple-400 p-1 rounded' : ''
+                }`}
+              >
+                <FormattedText text={heroSection?.title || 'Titre Hero'} defaultMarkColor={homeHeroAccentColor} />
+              </h3>
 
-          {heroSection?.subtitle && (
-            <p
-              onClick={() => setActiveHeroTab('subtitle')}
-              style={{
-                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont}', sans-serif`,
-                fontSize: homeHeroSubtitleSize,
-                color: homeHeroSubtitleColor,
-              }}
-              className={`max-w-2xl leading-relaxed cursor-pointer hover:opacity-90 transition-all ${
-                homeHeroAlign === 'left' ? 'mr-auto' : homeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
-              } ${activeHeroTab === 'subtitle' ? 'ring-1 ring-purple-400 p-1 rounded' : ''}`}
-            >
-              <FormattedText text={heroSection.subtitle} defaultMarkColor={homeHeroAccentColor} />
-            </p>
+              {heroSection?.subtitle && (
+                <p
+                  onClick={() => setActiveHeroTab('subtitle')}
+                  style={{
+                    fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont}', sans-serif`,
+                    fontSize: homeHeroSubtitleSize,
+                    color: homeHeroSubtitleColor,
+                  }}
+                  className={`max-w-2xl leading-relaxed cursor-pointer hover:opacity-90 transition-all ${
+                    homeHeroAlign === 'left' ? 'mr-auto' : homeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
+                  } ${activeHeroTab === 'subtitle' ? 'ring-1 ring-purple-400 p-1 rounded' : ''}`}
+                >
+                  <FormattedText text={heroSection.subtitle} defaultMarkColor={homeHeroAccentColor} />
+                </p>
+              )}
+            </>
           )}
         </div>
       </Card>
