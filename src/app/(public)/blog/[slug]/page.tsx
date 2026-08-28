@@ -271,18 +271,18 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                     <Link
                       key={featArt.id}
                       href={`/blog/${featArt.slug}`}
-                      className={`group flex items-center gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl transition-all border shadow-md flex-1 ${
+                      className={`group flex items-center gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-md transition-all border shadow-md flex-1 ${
                         isDark
                           ? 'bg-[#0e1424] border-white/10 hover:border-[#a3e635]/60 hover:bg-white/5'
                           : 'bg-white border-slate-200 hover:border-purple-500 hover:bg-slate-50'
                       }`}
                     >
                       {featArt.coverImage ? (
-                        <div className="relative w-32 h-24 sm:w-36 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 bg-slate-950 border border-white/10 shadow-md">
+                        <div className="relative w-32 h-24 sm:w-36 sm:h-28 rounded-md overflow-hidden flex-shrink-0 bg-slate-950 border border-white/10 shadow-md">
                           <Image src={featArt.coverImage} alt={featArt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                       ) : (
-                        <div className="w-32 h-24 sm:w-36 sm:h-28 rounded-xl bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-xs">
+                        <div className="w-32 h-24 sm:w-36 sm:h-28 rounded-md bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-xs">
                           ARTICLE
                         </div>
                       )}
