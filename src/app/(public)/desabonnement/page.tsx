@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, MailX, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
 
@@ -85,5 +85,17 @@ export default function UnsubscribePage() {
 
       </div>
     </div>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[70vh] flex items-center justify-center p-8">
+        <div className="text-sm font-semibold text-slate-500">Chargement...</div>
+      </div>
+    }>
+      <UnsubscribeContent />
+    </Suspense>
   );
 }
