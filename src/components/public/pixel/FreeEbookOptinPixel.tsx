@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Send, Gift, ShieldCheck, CheckCircle, Check, Lock, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react';
+import { Send, Gift, ShieldCheck, CheckCircle, Check, Lock, ArrowLeft, RefreshCw, Sparkles, Rocket, Flame, Star, Diamond, Zap, Crown, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
 
@@ -11,6 +11,19 @@ interface FreeEbookOptinPixelProps {
   settings?: any;
   isEmbedded?: boolean;
 }
+
+const BADGE_ICONS_MAP: Record<string, any> = {
+  Sparkles,
+  Rocket,
+  Flame,
+  Star,
+  Diamond,
+  Gift,
+  Zap,
+  Crown,
+  Target,
+  Check,
+};
 
 export function FreeEbookOptinPixel({
   title,
@@ -65,6 +78,12 @@ export function FreeEbookOptinPixel({
     backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
     borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
   };
+
+  const SelectedBadgeIcon = mergedSettings.badgeIcon && mergedSettings.badgeIcon !== 'None'
+    ? (BADGE_ICONS_MAP[mergedSettings.badgeIcon] || Sparkles)
+    : (mergedSettings.badgeIcon === 'None' ? null : Sparkles);
+
+  const badgeIconColor = mergedSettings.badgeIconColor || badgeColorHex || '#a3e635';
 
   const titleStyle: React.CSSProperties = {
     fontFamily: mergedSettings.titleFont ? `'${mergedSettings.titleFont}', sans-serif` : undefined,
@@ -208,7 +227,7 @@ export function FreeEbookOptinPixel({
             <div className="space-y-3">
               <div className="flex justify-center w-full">
                 <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
-                  <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
+                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={{ color: badgeIconColor }} />}
                   <span>{badgeText}</span>
                 </div>
               </div>
@@ -421,7 +440,7 @@ export function FreeEbookOptinPixel({
             <div className="space-y-4 text-center">
               <div className="flex justify-center w-full">
                 <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
-                  <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
+                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={{ color: badgeIconColor }} />}
                   <span>{badgeText}</span>
                 </div>
               </div>

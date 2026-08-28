@@ -1693,6 +1693,54 @@ export default function AdminHomepageBuilderPage() {
                                         </div>
                                       </div>
 
+                                      {/* CHOIX & COULEUR DE L'ICÔNE DU BADGE */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎭 Choix de l Icône du Badge</label>
+                                          <select
+                                            value={sec.settings?.badgeIcon || 'Sparkles'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'badgeIcon', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900 cursor-pointer"
+                                          >
+                                            <option value="Sparkles">✨ Étincelles (Sparkles)</option>
+                                            <option value="Rocket">🚀 Fusée (Rocket)</option>
+                                            <option value="Flame">🔥 Flamme (Flame)</option>
+                                            <option value="Star">⭐ Étoile (Star)</option>
+                                            <option value="Diamond">💎 Diamant (Diamond)</option>
+                                            <option value="Gift">🎁 Cadeau (Gift)</option>
+                                            <option value="Zap">⚡ Éclair (Zap)</option>
+                                            <option value="Crown">👑 Couronne (Crown)</option>
+                                            <option value="Target">🎯 Cible (Target)</option>
+                                            <option value="Check">✓ Coché (Check)</option>
+                                            <option value="None">🚫 Sans icône</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎨 Couleur de l Icône du Badge</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.badgeIconColor || sec.settings?.badgeColor || '#a3e635'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'badgeIconColor', e.target.value)}
+                                              className="w-8 h-8 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'badgeIconColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-4.5 h-4.5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
                                       <div>
                                         <label className="block text-[11px] font-bold text-slate-700 mb-1">Contenu du Texte du Badge Flottant</label>
                                         <input
