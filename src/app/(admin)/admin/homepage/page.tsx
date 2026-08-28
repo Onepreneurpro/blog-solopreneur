@@ -1539,25 +1539,7 @@ export default function AdminHomepageBuilderPage() {
                             </div>
                           ) : (
                             <>
-                              {/* 1. BADGE FLOTTANT SUPÉRIEUR (HAUT) */}
-                              <div className="space-y-1.5 p-3 bg-purple-50/40 border border-purple-200/80 rounded-xl">
-                                <label className="block text-[11px] font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
-                                  <span>🏷️ Badge Flottant Supérieur du Bloc</span>
-                                </label>
-                                <input
-                                  type="text"
-                                  value={sec.settings?.badgeText || sec.settings?.topTickerText || sec.settings?.floatingBadge || ''}
-                                  onChange={(e) => {
-                                    handleSettingChange(sec.id, 'badgeText', e.target.value);
-                                    handleSettingChange(sec.id, 'topTickerText', e.target.value);
-                                    handleSettingChange(sec.id, 'floatingBadge', e.target.value);
-                                  }}
-                                  className="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                                  placeholder="Saisissez le texte du badge (ex: EBOOK OFFERT A 100%)..."
-                                />
-                              </div>
-
-                              {/* 2. PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> (ÉPASSEUR & DÉCALAGE) & BOUTONS DE FORMATAGE */}
+                              {/* PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> (ÉPASSEUR & DÉCALAGE) & BOUTONS DE FORMATAGE */}
                               <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
@@ -2296,6 +2278,20 @@ export default function AdminHomepageBuilderPage() {
                                   );
                                 })()}
                               </div>
+                            </div>
+
+                            {/* BADGE FLOTTANT SUPÉRIEUR SÉPARÉ */}
+                            <div className="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                              <label className="block text-xs font-heading font-black text-[#a3e635] flex items-center gap-1.5">
+                                <span>🏷️ Personnalisation du Badge Flottant Supérieur du Bloc :</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={settings.badgeText || 'EBOOK OFFERT A 100%'}
+                                onChange={(e) => handleSettingChange(sec.id, 'badgeText', e.target.value)}
+                                className="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white font-bold text-xs focus:outline-none focus:border-[#a3e635]"
+                                placeholder="Saisissez le texte du badge..."
+                              />
                             </div>
 
                             {/* 3. COVER IMAGE & RECOMMENDED DIMENSIONS */}

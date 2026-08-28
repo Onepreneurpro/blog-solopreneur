@@ -174,7 +174,6 @@ export function FreeEbookOptinPixel({
                 <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0">
                   <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
-                  <Gift className="w-4 h-4 text-[#a3e635] shrink-0" />
                 </div>
               </div>
 
@@ -387,7 +386,6 @@ export function FreeEbookOptinPixel({
                 <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0">
                   <Sparkles className="w-4 h-4 text-[#a3e635] shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
-                  <Gift className="w-4 h-4 text-[#a3e635] shrink-0" />
                 </div>
               </div>
 
