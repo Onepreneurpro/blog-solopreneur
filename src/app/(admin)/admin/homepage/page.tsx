@@ -865,10 +865,15 @@ export default function AdminHomepageBuilderPage() {
                     onChange={(e) => setHomeHeroBadgeSize(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
-                    <option value="11px">Discret (11px)</option>
-                    <option value="13px">Standard (13px)</option>
-                    <option value="15px">Grand (15px)</option>
+                    <option value="11px">Très Discret (11px)</option>
+                    <option value="12px">Discret (12px)</option>
+                    <option value="13px">Compact (13px)</option>
+                    <option value="14px">Standard (14px)</option>
+                    <option value="16px">Grand (16px)</option>
                     <option value="18px">Très Grand (18px)</option>
+                    <option value="22px">Géant (22px)</option>
+                    <option value="26px">Ultra Géant (26px)</option>
+                    <option value="32px">Maxi Géant (32px)</option>
                   </select>
                 </div>
 
@@ -1605,8 +1610,8 @@ export default function AdminHomepageBuilderPage() {
                                         </label>
                                       </div>
 
-                                      {/* POLICE / TAILLE / COULEUR DU BADGE */}
-                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                      {/* POLICE / TAILLE / COULEURS DU BADGE */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
                                         <div>
                                           <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
                                           <select
@@ -1627,31 +1632,59 @@ export default function AdminHomepageBuilderPage() {
                                             onChange={(e) => handleSettingChange(sec.id, 'badgeSize', e.target.value)}
                                             className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                                           >
-                                            <option value="11px">Discret (11px)</option>
-                                            <option value="12px">Compact (12px)</option>
-                                            <option value="13px">Standard (13px)</option>
-                                            <option value="15px">Grand (15px)</option>
+                                            <option value="11px">Très Discret (11px)</option>
+                                            <option value="12px">Discret (12px)</option>
+                                            <option value="13px">Compact (13px)</option>
+                                            <option value="14px">Standard (14px)</option>
+                                            <option value="16px">Grand (16px)</option>
                                             <option value="18px">Très Grand (18px)</option>
+                                            <option value="22px">Géant (22px)</option>
+                                            <option value="26px">Ultra Géant (26px)</option>
+                                            <option value="32px">Maxi Géant (32px)</option>
                                           </select>
                                         </div>
 
                                         <div>
-                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Badge</label>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur Texte & Icône</label>
                                           <div className="flex items-center gap-2">
                                             <input
                                               type="color"
                                               value={sec.settings?.badgeColor || '#a3e635'}
                                               onChange={(e) => handleSettingChange(sec.id, 'badgeColor', e.target.value)}
-                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                              className="w-8 h-8 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
                                             />
                                             <div className="flex items-center gap-1 overflow-x-auto">
-                                              {COLOR_PALETTE.map((c) => (
+                                              {COLOR_PALETTE.slice(0, 4).map((c) => (
                                                 <button
                                                   key={c.hex}
                                                   type="button"
                                                   onClick={() => handleSettingChange(sec.id, 'badgeColor', c.hex)}
                                                   style={{ backgroundColor: c.hex }}
-                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  className="w-4.5 h-4.5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur Fond (Bouton Flottant)</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.badgeBgColor || '#a3e635'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'badgeBgColor', e.target.value)}
+                                              className="w-8 h-8 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.slice(0, 4).map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'badgeBgColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-4.5 h-4.5 rounded-full border border-slate-400 shrink-0"
                                                   title={c.name}
                                                 />
                                               ))}

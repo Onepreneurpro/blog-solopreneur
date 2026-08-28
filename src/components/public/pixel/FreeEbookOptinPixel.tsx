@@ -55,10 +55,15 @@ export function FreeEbookOptinPixel({
   const mergedSettings = isEmbedded ? parsedPropSettings : { ...liveParsedSettings, ...parsedPropSettings };
 
   // 5-element font/size/color styling from mergedSettings
+  const badgeBgHex = mergedSettings.badgeBgColor;
+  const badgeColorHex = mergedSettings.badgeColor;
+
   const badgeStyle: React.CSSProperties = {
     fontFamily: mergedSettings.badgeFont ? `'${mergedSettings.badgeFont}', sans-serif` : undefined,
     fontSize: mergedSettings.badgeSize || undefined,
-    color: mergedSettings.badgeColor || undefined,
+    color: badgeColorHex || undefined,
+    backgroundColor: badgeBgHex ? (badgeBgHex.startsWith('#') ? `${badgeBgHex}25` : badgeBgHex) : undefined,
+    borderColor: badgeBgHex || badgeColorHex ? (badgeBgHex || badgeColorHex).startsWith('#') ? `${badgeBgHex || badgeColorHex}60` : (badgeBgHex || badgeColorHex) : undefined,
   };
 
   const titleStyle: React.CSSProperties = {
