@@ -340,12 +340,12 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                       )}
 
                       {/* CIRCULAR ACTION BUTTON TOP LEFT */}
-                      <div className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b8f542] transition-transform duration-300 z-10">
+                      <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#0f172a] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
                         <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
 
                       {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
-                      <span className="absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                      <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#0f172a] text-white border border-white/20 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
                         {prod.category?.name || category.name || 'TEMPLATES'}
                       </span>
 
