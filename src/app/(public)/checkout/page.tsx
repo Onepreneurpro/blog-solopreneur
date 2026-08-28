@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Download, Gift, CheckCircle2, Clock, Zap, Star } from 'lucide-react';
+import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Download, Gift, CheckCircle2, Clock, Zap, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { isDarkTheme } from '@/lib/theme';
@@ -232,23 +232,55 @@ function CheckoutContent() {
                       )}
                     </div>
 
-                    {/* THUMBNAILS GALLERY ROW */}
+                    {/* THUMBNAILS FILMSTRIP CAROUSEL (SINGLE ROW STRICTLY) */}
                     {productGallery.length > 1 && (
-                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 pt-1">
-                        {productGallery.map((imgUrl, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveImageIndex(idx)}
-                            className={`relative h-16 sm:h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                              activeImageIndex === idx
-                                ? 'border-[#a3e635] ring-2 ring-[#a3e635]/50 scale-[1.03]'
-                                : 'border-slate-200 dark:border-white/10 opacity-70 hover:opacity-100'
-                            }`}
-                          >
-                            <img src={imgUrl} alt={`Aperçu ${idx + 1}`} className="w-full h-full object-cover" />
-                          </button>
-                        ))}
+                      <div className="relative pt-1.5 flex items-center group/carousel">
+                        {/* LEFT SCROLL ARROW */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const el = document.getElementById('thumbnail-filmstrip');
+                            if (el) el.scrollBy({ left: -220, behavior: 'smooth' });
+                          }}
+                          className="absolute left-1 z-10 p-2 rounded-full bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                          title="Miniatures précédentes"
+                        >
+                          <ChevronLeft className="w-4 h-4 text-[#a3e635]" />
+                        </button>
+
+                        {/* HORIZONTAL SINGLE-ROW SCROLL CONTAINER */}
+                        <div
+                          id="thumbnail-filmstrip"
+                          className="flex flex-nowrap gap-2.5 overflow-x-auto scrollbar-none py-1.5 px-8 scroll-smooth w-full"
+                        >
+                          {productGallery.map((imgUrl, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setActiveImageIndex(idx)}
+                              className={`relative h-16 sm:h-20 w-24 sm:w-28 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
+                                activeImageIndex === idx
+                                  ? 'border-[#a3e635] ring-2 ring-[#a3e635]/50 scale-[1.03]'
+                                  : 'border-slate-200 dark:border-white/10 opacity-70 hover:opacity-100'
+                              }`}
+                            >
+                              <img src={imgUrl} alt={`Aperçu ${idx + 1}`} className="w-full h-full object-cover" />
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* RIGHT SCROLL ARROW */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const el = document.getElementById('thumbnail-filmstrip');
+                            if (el) el.scrollBy({ left: 220, behavior: 'smooth' });
+                          }}
+                          className="absolute right-1 z-10 p-2 rounded-full bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                          title="Voir plus de miniatures"
+                        >
+                          <ChevronRight className="w-4 h-4 text-[#a3e635]" />
+                        </button>
                       </div>
                     )}
                   </div>
