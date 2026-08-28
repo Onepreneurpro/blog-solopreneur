@@ -266,8 +266,8 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-between space-y-3">
-                  {headerFeaturedArticles.slice(0, 3).map((featArt) => (
+                <div className="flex-1 flex flex-col justify-around gap-3">
+                  {headerFeaturedArticles.slice(0, 2).map((featArt) => (
                     <Link
                       key={featArt.id}
                       href={`/blog/${featArt.slug}`}
