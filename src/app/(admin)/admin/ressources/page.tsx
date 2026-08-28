@@ -453,34 +453,46 @@ export default function AdminRessourcesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Fichier Téléchargeable ou Lien Externe *</label>
-                <input
-                  type="text"
-                  placeholder="Saisir l URL du fichier (ex: Notion, Drive, PDF)..."
-                  value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-
-                <input
-                  type="file"
-                  onChange={(e) => handleFileUpload(e, false)}
-                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200 cursor-pointer"
-                />
-                {uploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement du fichier...</div>}
-                {fileUrl && (
-                  <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-950 flex items-center justify-between mt-2 font-bold">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Fichier Téléchargeable ou Lien Externe *</label>
+                
+                {fileUrl ? (
+                  <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-950 flex items-center justify-between font-bold">
                     <div className="flex items-center gap-2 truncate">
                       <CheckCircle2 className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                      <span className="truncate">Fichier / Lien téléchargeable configuré</span>
+                      <span className="truncate">
+                        {fileUrl.startsWith('/uploads/') ? 'Fichier téléversé avec succès' : 'Lien externe configuré'}
+                      </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setFileUrl('')}
                       className="text-xs text-red-600 font-bold hover:underline shrink-0 ml-2"
                     >
-                      Effacer
+                      Modifier / Effacer
                     </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      onChange={(e) => handleFileUpload(e, false)}
+                      className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200 cursor-pointer"
+                    />
+                    {uploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement du fichier...</div>}
+                    
+                    <div className="relative flex py-0.5 items-center">
+                      <div className="flex-grow border-t border-slate-200"></div>
+                      <span className="flex-shrink mx-2 text-[10px] text-slate-400 font-bold uppercase">ou lien externe</span>
+                      <div className="flex-grow border-t border-slate-200"></div>
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="https://... (Lien Notion, Drive, Dropbox)"
+                      value={fileUrl}
+                      onChange={(e) => setFileUrl(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
                   </div>
                 )}
               </div>
@@ -656,19 +668,39 @@ export default function AdminRessourcesPage() {
 
                               <div>
                                 <label className="block text-[10px] font-bold text-slate-700 mb-1">Fichier ou Lien Externe *</label>
-                                <input
-                                  type="text"
-                                  value={editFileUrl}
-                                  onChange={(e) => setEditFileUrl(e.target.value)}
-                                  className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white mb-2"
-                                  placeholder="Saisir l URL du fichier..."
-                                />
-                                <input
-                                  type="file"
-                                  onChange={(e) => handleFileUpload(e, true)}
-                                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800 cursor-pointer"
-                                />
-                                {editUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement...</div>}
+                                {editFileUrl ? (
+                                  <div className="p-2 bg-white border border-purple-200 rounded-xl text-xs text-purple-950 flex items-center justify-between font-bold shadow-sm">
+                                    <div className="flex items-center gap-1.5 truncate">
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+                                      <span className="truncate">
+                                        {editFileUrl.startsWith('/uploads/') ? 'Fichier téléversé avec succès' : 'Lien externe configuré'}
+                                      </span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditFileUrl('')}
+                                      className="text-xs text-red-600 font-bold hover:underline shrink-0 ml-1.5"
+                                    >
+                                      Modifier / Effacer
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1.5">
+                                    <input
+                                      type="file"
+                                      onChange={(e) => handleFileUpload(e, true)}
+                                      className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800 cursor-pointer"
+                                    />
+                                    {editUploading && <div className="text-[11px] text-purple-600 font-semibold">Téléversement...</div>}
+                                    <input
+                                      type="text"
+                                      value={editFileUrl}
+                                      onChange={(e) => setEditFileUrl(e.target.value)}
+                                      className="w-full px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white placeholder-slate-400"
+                                      placeholder="https://... (ou lien Notion/Drive)"
+                                    />
+                                  </div>
+                                )}
                               </div>
 
                               <div>
