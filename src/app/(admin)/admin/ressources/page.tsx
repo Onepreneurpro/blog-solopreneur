@@ -19,6 +19,7 @@ export default function AdminRessourcesPage() {
   const [coverImage, setCoverImage] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,6 +32,7 @@ export default function AdminRessourcesPage() {
   const [editCoverImage, setEditCoverImage] = useState('');
   const [editFileUrl, setEditFileUrl] = useState('');
   const [editUploading, setEditUploading] = useState(false);
+  const [editImageUploading, setEditImageUploading] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchResources = async () => {
@@ -58,6 +60,35 @@ export default function AdminRessourcesPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
     setSlug(generatedSlug);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isEdit) setEditImageUploading(true);
+    else setImageUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/medias', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur d upload image.');
+
+      if (isEdit) setEditCoverImage(data.media.url);
+      else setCoverImage(data.media.url);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      if (isEdit) setEditImageUploading(false);
+      else setImageUploading(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
@@ -250,6 +281,31 @@ export default function AdminRessourcesPage() {
               </div>
 
               <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Image de Couverture / Visuel de la ressource</label>
+                <input
+                  type="text"
+                  placeholder="https://... ou téléverser une image ci-dessous"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, false)}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200"
+                />
+                {imageUploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement de l image...</div>}
+                {coverImage && (
+                  <div className="p-2 bg-purple-50 border border-purple-200 rounded-lg text-[11px] text-purple-950 flex items-center gap-2 mt-2 font-bold">
+                    <img src={coverImage} alt="Aperçu" className="w-8 h-8 rounded object-cover border border-purple-300" />
+                    <span className="truncate">Image définie : <code className="font-mono text-[10px]">{coverImage}</code></span>
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Fichier Téléchargeable ou Lien Externe *</label>
                 <input
                   type="text"
@@ -365,6 +421,30 @@ export default function AdminRessourcesPage() {
                                   onChange={(e) => setEditShortDesc(e.target.value)}
                                   className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
                                 />
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-700 mb-1">Image de Couverture / Visuel</label>
+                                <input
+                                  type="text"
+                                  value={editCoverImage}
+                                  onChange={(e) => setEditCoverImage(e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white mb-1.5"
+                                  placeholder="https://... ou uploader ci-dessous"
+                                />
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleImageUpload(e, true)}
+                                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800"
+                                />
+                                {editImageUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement de l image...</div>}
+                                {editCoverImage && (
+                                  <div className="mt-1.5 p-1.5 bg-white border border-purple-200 rounded flex items-center gap-2">
+                                    <img src={editCoverImage} alt="Aperçu" className="w-7 h-7 rounded object-cover border border-purple-300" />
+                                    <span className="text-[10px] font-mono text-purple-700 truncate">{editCoverImage}</span>
+                                  </div>
+                                )}
                               </div>
 
                               <div>
