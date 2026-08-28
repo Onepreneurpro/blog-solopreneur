@@ -53,16 +53,16 @@ export function FinalYellowCTA({
             </p>
           )}
 
-          <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href={btn1Url}>
-              <Button className="px-6 py-4 sm:px-8 sm:py-4.5 rounded-xl !bg-slate-950 hover:!bg-slate-900 !text-white font-heading font-extrabold shadow-lg border-0 gap-2 h-auto" style={btnStyle}>
+              <Button className="px-8 py-6 sm:px-12 sm:py-7 rounded-2xl !bg-slate-950 hover:!bg-slate-900 !text-white font-heading font-extrabold shadow-2xl border-0 gap-3 h-auto" style={btnStyle}>
                 <span>{btn1Text}</span>
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-6 h-6" />
               </Button>
             </Link>
             {btn2Text && (
               <Link href={btn2Url}>
-                <Button variant="outline" className="px-6 py-4 sm:px-8 sm:py-4.5 rounded-xl !bg-white !text-slate-950 hover:!bg-slate-100 font-heading font-extrabold border-2 border-slate-950 shadow-md h-auto">
+                <Button variant="outline" className="px-8 py-6 sm:px-12 sm:py-7 rounded-2xl !bg-white !text-slate-950 hover:!bg-slate-100 font-heading font-extrabold border-2 border-slate-950 shadow-lg h-auto">
                   <span>{btn2Text}</span>
                 </Button>
               </Link>
