@@ -381,7 +381,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
       }
 
       const markHtml = (txt: string) =>
-        `<mark color="${color}" style="background-color: ${color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 0.375rem; font-weight: 800;">${txt}</mark>`;
+        `<mark color="${color}" style="background-color: ${color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 0px; font-weight: 800;">${txt}</mark>`;
 
       if (!selection || selection.isCollapsed || !selection.toString().trim()) {
         if (!isLive) {
@@ -396,7 +396,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
       }
     } else {
       if (!isLive) {
-        insertTag(`<mark color="${color}" style="background-color: ${color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 0.375rem; font-weight: 800;">`, '</mark>', 'Texte surligné');
+        insertTag(`<mark color="${color}" style="background-color: ${color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 0px; font-weight: 800;">`, '</mark>', 'Texte surligné');
       }
     }
   };

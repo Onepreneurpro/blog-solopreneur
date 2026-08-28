@@ -26,7 +26,7 @@ export function FormattedText({
       const bgColor = color || defaultMarkColor;
       const isLight = ['#ccff00', '#a3e635', '#facc15', '#fef08a', '#ffff00'].includes(bgColor.toLowerCase());
       const textColor = isLight ? '#0f172a' : '#ffffff';
-      return `<span style="background-color: ${bgColor}; color: ${textColor};" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">${content}</span>`;
+      return `<span style="background-color: ${bgColor}; color: ${textColor};" class="px-3 py-0.5 rounded-none shadow-2xs font-black inline-block my-0.5">${content}</span>`;
     })
     // Replace <u ...>...</u> with support for color, thickness, offset
     .replace(/<u([^>]*)>(.*?)<\/u>/gi, (match, attrString, content) => {
@@ -52,7 +52,7 @@ export function FormattedText({
         }
 
         const transparentStop = Math.max(0, Math.min(100, 100 - percentNum));
-        return `<u style="text-decoration: none !important; background: linear-gradient(180deg, transparent ${transparentStop}%, ${colorVal} ${transparentStop}%, ${colorVal} 100%) !important; color: inherit; padding: 0 4px; border-radius: 3px; display: inline; font-weight: inherit;">${content}</u>`;
+        return `<u style="text-decoration: none !important; background: linear-gradient(180deg, transparent ${transparentStop}%, ${colorVal} ${transparentStop}%, ${colorVal} 100%) !important; color: inherit; padding: 0 4px; border-radius: 0px; display: inline; font-weight: inherit;">${content}</u>`;
       } else {
         const borderSize = thickness.includes('px') ? thickness : `${parseInt(thickness) || 4}px`;
         const offsetSize = offset.includes('px') ? offset : `${parseInt(offset) || 2}px`;
@@ -70,8 +70,8 @@ export function FormattedText({
       return `<span style="color: ${colorVal} !important; display: inline;">${content}</span>`;
     })
     // Fallback replace for simple markdown syntax ==word== and [yellow]word[/yellow]
-    .replace(/==(.*?)==/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`)
-    .replace(/\[yellow\](.*?)\[\/yellow\]/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`);
+    .replace(/==(.*?)==/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-none shadow-2xs font-black inline-block my-0.5">$1</span>`)
+    .replace(/\[yellow\](.*?)\[\/yellow\]/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-none shadow-2xs font-black inline-block my-0.5">$1</span>`);
 
   return (
     <Component
