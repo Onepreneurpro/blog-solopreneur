@@ -55,6 +55,8 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
   let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
   let storeHeroFontFamily = 'Plus Jakarta Sans';
   let storeHeroTitleSize = 'large';
+  let storeHeroSubtitleSize = 'normal';
+  let storeHeroBadgeStyle = 'green';
   let storeHeroAlign = 'center';
 
   try {
@@ -114,6 +116,8 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
     if (settings.storeHeroSubtitle) storeHeroSubtitle = settings.storeHeroSubtitle;
     if (settings.storeHeroFontFamily) storeHeroFontFamily = settings.storeHeroFontFamily;
     if (settings.storeHeroTitleSize) storeHeroTitleSize = settings.storeHeroTitleSize;
+    if (settings.storeHeroSubtitleSize) storeHeroSubtitleSize = settings.storeHeroSubtitleSize;
+    if (settings.storeHeroBadgeStyle) storeHeroBadgeStyle = settings.storeHeroBadgeStyle;
     if (settings.storeHeroAlign) storeHeroAlign = settings.storeHeroAlign;
 
     products = await prisma.product.findMany({
@@ -168,10 +172,21 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
         <div className={`mb-10 max-w-3xl mx-auto space-y-4 ${
           storeHeroAlign === 'left' ? 'text-left' : storeHeroAlign === 'right' ? 'text-right' : 'text-center'
         }`}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{storeHeroBadge}</span>
-          </div>
+          {storeHeroBadgeStyle !== 'hidden' && storeHeroBadge && (
+            <div
+              style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black border shadow-lg backdrop-blur-md ${
+                storeHeroBadgeStyle === 'purple'
+                  ? 'bg-purple-900/40 text-purple-300 border-purple-500/50'
+                  : storeHeroBadgeStyle === 'dark'
+                  ? 'bg-slate-900 text-slate-300 border-slate-700'
+                  : 'bg-[#a3e635]/15 text-[#a3e635] border-[#a3e635]/30'
+              }`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>{storeHeroBadge}</span>
+            </div>
+          )}
 
           <h1
             style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
@@ -186,9 +201,22 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
             {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 font-medium leading-relaxed max-w-2xl mx-auto">
-            {storeHeroSubtitle}
-          </p>
+          {storeHeroSubtitle && (
+            <p
+              style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
+              className={`text-slate-300 font-medium leading-relaxed max-w-2xl ${
+                storeHeroAlign === 'left' ? 'mr-auto' : storeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
+              } ${
+                storeHeroSubtitleSize === 'small'
+                  ? 'text-xs sm:text-sm'
+                  : storeHeroSubtitleSize === 'large'
+                  ? 'text-lg sm:text-xl font-semibold text-white'
+                  : 'text-base sm:text-lg'
+              }`}
+            >
+              {storeHeroSubtitle}
+            </p>
+          )}
         </div>
 
         {/* CATEGORY FILTER PILL TABS */}

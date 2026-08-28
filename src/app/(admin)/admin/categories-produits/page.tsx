@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Tag, Edit, Save, X, ArrowUp, ArrowDown, LayoutTemplate, CheckCircle2, Type, AlignLeft, AlignCenter, AlignRight, Sliders } from 'lucide-react';
+import { Plus, Trash2, Tag, Edit, Save, X, ArrowUp, ArrowDown, LayoutTemplate, CheckCircle2, Type, AlignLeft, AlignCenter, AlignRight, Sliders, Eye, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -43,6 +43,8 @@ export default function AdminProductCategoriesPage() {
   const [storeHeroSubtitle, setStoreHeroSubtitle] = useState('Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.');
   const [storeHeroFontFamily, setStoreHeroFontFamily] = useState('Plus Jakarta Sans');
   const [storeHeroTitleSize, setStoreHeroTitleSize] = useState('large');
+  const [storeHeroSubtitleSize, setStoreHeroSubtitleSize] = useState('normal');
+  const [storeHeroBadgeStyle, setStoreHeroBadgeStyle] = useState('green');
   const [storeHeroAlign, setStoreHeroAlign] = useState('center');
 
   const [savingHero, setSavingHero] = useState(false);
@@ -71,6 +73,8 @@ export default function AdminProductCategoriesPage() {
         if (data.settings.storeHeroSubtitle) setStoreHeroSubtitle(data.settings.storeHeroSubtitle);
         if (data.settings.storeHeroFontFamily) setStoreHeroFontFamily(data.settings.storeHeroFontFamily);
         if (data.settings.storeHeroTitleSize) setStoreHeroTitleSize(data.settings.storeHeroTitleSize);
+        if (data.settings.storeHeroSubtitleSize) setStoreHeroSubtitleSize(data.settings.storeHeroSubtitleSize);
+        if (data.settings.storeHeroBadgeStyle) setStoreHeroBadgeStyle(data.settings.storeHeroBadgeStyle);
         if (data.settings.storeHeroAlign) setStoreHeroAlign(data.settings.storeHeroAlign);
       }
     } catch (err) {
@@ -226,6 +230,8 @@ export default function AdminProductCategoriesPage() {
           storeHeroSubtitle,
           storeHeroFontFamily,
           storeHeroTitleSize,
+          storeHeroSubtitleSize,
+          storeHeroBadgeStyle,
           storeHeroAlign,
         }),
       });
@@ -259,7 +265,7 @@ export default function AdminProductCategoriesPage() {
         </div>
       )}
 
-      {/* 1. GESTION DES CATÉGORIES ET CLASSEMENT (AU-DESSUS) */}
+      {/* 1. GESTION DES CATÉGORIES ET CLASSEMENT (EN HAUT) */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
         
         {/* FORMULAIRE AJOUT CATEGORIE */}
@@ -489,13 +495,13 @@ export default function AdminProductCategoriesPage() {
 
       </div>
 
-      {/* 2. GESTION DE L'ENTÊTE DE LA BOUTIQUE (EN BAS SOUS LES CATÉGORIES) */}
+      {/* 2. GESTION ET FORMATAGE COMPLET DE TOUS LES ÉLÉMENTS DE L'ENTÊTE DE LA BOUTIQUE */}
       <Card className="p-6 bg-white border border-slate-200 shadow-sm space-y-6">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <LayoutTemplate className="w-5 h-5 text-purple-600" />
             <h2 className="text-base font-extrabold text-slate-900">
-              Personnalisation de l Entête de la Boutique (Hero Section)
+              Personnalisation & Formatage de l Entête de la Boutique (Tous les textes)
             </h2>
           </div>
           {heroSuccess && (
@@ -508,15 +514,14 @@ export default function AdminProductCategoriesPage() {
 
         <form onSubmit={handleSaveHeroSettings} className="space-y-6">
           
-          {/* TEXTES DE L'ENTÊTE */}
+          {/* SAISIE DES TEXTES (BADGE, TITRE & SOUS-TITRE) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Texte du Badge Kicker (Pill Vert) *
+                1. Texte du Badge Kicker (Opt-in) *
               </label>
               <input
                 type="text"
-                required
                 value={storeHeroBadge}
                 onChange={(e) => setStoreHeroBadge(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -526,7 +531,7 @@ export default function AdminProductCategoriesPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Titre Principal (Partie 1 & 2) *
+                2. Titre Principal (Lignes 1 & 2) *
               </label>
               <input
                 type="text"
@@ -540,7 +545,7 @@ export default function AdminProductCategoriesPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Titre Accentué (Couleur Vert Neon)
+                3. Titre Accentué (Couleur Vert Neon)
               </label>
               <input
                 type="text"
@@ -554,7 +559,7 @@ export default function AdminProductCategoriesPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Sous-titre / Description de l entête *
+              4. Sous-titre / Description de l entête *
             </label>
             <textarea
               rows={2}
@@ -566,20 +571,20 @@ export default function AdminProductCategoriesPage() {
             />
           </div>
 
-          {/* OUTILS DE FORMATAGE DU TEXTE & CHOIX DE POLICE GOOGLE FONTS */}
-          <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-xl space-y-4">
-            <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 border-b border-purple-200 pb-2">
+          {/* SECTION OUTILS DE FORMATAGE POUR CHAQUE ÉLÉMENT */}
+          <div className="p-5 bg-purple-50/70 border border-purple-200 rounded-xl space-y-5">
+            <div className="flex items-center gap-2 text-xs font-extrabold text-purple-950 border-b border-purple-200 pb-2.5">
               <Sliders className="w-4 h-4 text-purple-700" />
-              <span>Outils de Formatage & Typographie (Google Fonts)</span>
+              <span>Outils de Formatage Avancés (Polices Google Fonts, Tailles & Styles pour chaque élément)</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               
-              {/* CHOIX POLICE GOOGLE FONTS */}
+              {/* 1. POLICE GOOGLE FONTS (TITRE & SOUS-TITRE) */}
               <div>
                 <label className="block text-[11px] font-bold text-purple-950 mb-1 flex items-center gap-1">
                   <Type className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Police Google Fonts pour le Titre</span>
+                  <span>Police Google Fonts</span>
                 </label>
                 <select
                   value={storeHeroFontFamily}
@@ -594,7 +599,7 @@ export default function AdminProductCategoriesPage() {
                 </select>
               </div>
 
-              {/* TAILLE DU TITRE */}
+              {/* 2. TAILLE DU TITRE PRINCIPAL */}
               <div>
                 <label className="block text-[11px] font-bold text-purple-950 mb-1">
                   Taille du Titre Principal
@@ -606,53 +611,88 @@ export default function AdminProductCategoriesPage() {
                 >
                   <option value="normal">Standard (Medium)</option>
                   <option value="large">Grand (Large)</option>
-                  <option value="giant">Très Grand (Geant)</option>
+                  <option value="giant">Très Grand (Géant)</option>
                 </select>
               </div>
 
-              {/* ALIGNEMENT DU TEXTE */}
+              {/* 3. TAILLE DU SOUS-TITRE */}
               <div>
                 <label className="block text-[11px] font-bold text-purple-950 mb-1">
-                  Alignement de l Entête
+                  Taille du Sous-titre
                 </label>
-                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-purple-300">
-                  <button
-                    type="button"
-                    onClick={() => setStoreHeroAlign('left')}
-                    className={`flex-1 py-1 text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors ${
-                      storeHeroAlign === 'left' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <AlignLeft className="w-3.5 h-3.5" />
-                    <span>Gauche</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStoreHeroAlign('center')}
-                    className={`flex-1 py-1 text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors ${
-                      storeHeroAlign === 'center' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <AlignCenter className="w-3.5 h-3.5" />
-                    <span>Centré</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStoreHeroAlign('right')}
-                    className={`flex-1 py-1 text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors ${
-                      storeHeroAlign === 'right' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <AlignRight className="w-3.5 h-3.5" />
-                    <span>Droite</span>
-                  </button>
-                </div>
+                <select
+                  value={storeHeroSubtitleSize}
+                  onChange={(e) => setStoreHeroSubtitleSize(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="small">Discret (Petit)</option>
+                  <option value="normal">Standard (Moyen)</option>
+                  <option value="large">Grand (Bien visible)</option>
+                </select>
+              </div>
+
+              {/* 4. STYLE & COULEUR DU BADGE */}
+              <div>
+                <label className="block text-[11px] font-bold text-purple-950 mb-1 flex items-center gap-1">
+                  <Palette className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Style & Style du Badge</span>
+                </label>
+                <select
+                  value={storeHeroBadgeStyle}
+                  onChange={(e) => setStoreHeroBadgeStyle(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="green">🟢 Vert Neon (Défaut)</option>
+                  <option value="purple">🟣 Violet Premium</option>
+                  <option value="dark">⚫ Sombre Minimal</option>
+                  <option value="hidden">🚫 Masquer le Badge</option>
+                </select>
               </div>
 
             </div>
+
+            {/* ALIGNEMENT GLOBAL DU BLOC */}
+            <div className="pt-2">
+              <label className="block text-[11px] font-bold text-purple-950 mb-1">
+                Alignement Global de l Entête (Titre, Badge & Sous-titre)
+              </label>
+              <div className="flex items-center gap-2 max-w-md bg-white p-1 rounded-lg border border-purple-300">
+                <button
+                  type="button"
+                  onClick={() => setStoreHeroAlign('left')}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                    storeHeroAlign === 'left' ? 'bg-purple-700 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <AlignLeft className="w-4 h-4" />
+                  <span>Gauche</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStoreHeroAlign('center')}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                    storeHeroAlign === 'center' ? 'bg-purple-700 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <AlignCenter className="w-4 h-4" />
+                  <span>Centré</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStoreHeroAlign('right')}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                    storeHeroAlign === 'right' ? 'bg-purple-700 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <AlignRight className="w-4 h-4" />
+                  <span>Droite</span>
+                </button>
+              </div>
+            </div>
+
           </div>
 
-          {/* PREVIEW BOX INTERRACTIF AVEC GOOGLE FONTS */}
+          {/* PREVIEW BOX INTERRACTIF AVEC POLICES ET TOUS LES TEXTES */}
           <div
             className={`p-6 bg-[#050811] text-white rounded-xl border border-slate-800 space-y-3 shadow-inner ${
               storeHeroAlign === 'left' ? 'text-left' : storeHeroAlign === 'right' ? 'text-right' : 'text-center'
@@ -661,9 +701,24 @@ export default function AdminProductCategoriesPage() {
             <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest block">
               Aperçu en direct (Police Google Font : {storeHeroFontFamily})
             </span>
-            <div className="inline-block px-3 py-0.5 rounded text-[10px] font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30">
-              {storeHeroBadge}
-            </div>
+
+            {/* BADGE PREVIEW */}
+            {storeHeroBadgeStyle !== 'hidden' && storeHeroBadge && (
+              <div
+                style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
+                className={`inline-block px-3 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                  storeHeroBadgeStyle === 'purple'
+                    ? 'bg-purple-900/40 text-purple-300 border border-purple-500/50'
+                    : storeHeroBadgeStyle === 'dark'
+                    ? 'bg-slate-900 text-slate-300 border border-slate-700'
+                    : 'bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30'
+                }`}
+              >
+                {storeHeroBadge}
+              </div>
+            )}
+
+            {/* TITLE PREVIEW */}
             <h3
               style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
               className={`font-black tracking-tight text-white leading-tight ${
@@ -676,9 +731,24 @@ export default function AdminProductCategoriesPage() {
             >
               {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
             </h3>
-            <p className="text-xs text-slate-300 max-w-xl mx-auto line-clamp-2">
-              {storeHeroSubtitle}
-            </p>
+
+            {/* SUBTITLE PREVIEW */}
+            {storeHeroSubtitle && (
+              <p
+                style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
+                className={`text-slate-300 max-w-xl line-clamp-2 leading-relaxed ${
+                  storeHeroAlign === 'left' ? 'mr-auto' : storeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
+                } ${
+                  storeHeroSubtitleSize === 'small'
+                    ? 'text-[11px]'
+                    : storeHeroSubtitleSize === 'large'
+                    ? 'text-base font-semibold'
+                    : 'text-xs'
+                }`}
+              >
+                {storeHeroSubtitle}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end pt-1">
