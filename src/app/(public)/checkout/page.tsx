@@ -507,8 +507,8 @@ function CheckoutContent() {
                 </div>
               </div>
 
-              {/* SECTION 4: BÉNÉFICES & CONCEPS INCLUS AVEC LA RESSOURCE */}
-              <div className={`p-4 rounded-2xl space-y-3 pt-3.5 border-t ${
+              {/* SECTION 4: BÉNÉFICES & CONCEPTS INCLUS AVEC LA RESSOURCE */}
+              <div className={`mt-4 p-4 rounded-2xl space-y-3 pt-4 border-t ${
                 isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
               }`}>
                 <h4 className="text-[11px] font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-wider flex items-center gap-1.5">
