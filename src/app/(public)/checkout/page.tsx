@@ -34,6 +34,9 @@ function CheckoutContent() {
   // Multi-Image Gallery State
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  // Recommended Products State
+  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+
   useEffect(() => {
     async function initCheckout() {
       try {
@@ -67,6 +70,17 @@ function CheckoutContent() {
           }
         } catch {
           // Keep default theme
+        }
+
+        // Fetch Recommended Products
+        try {
+          const recRes = await fetch('/api/products');
+          if (recRes.ok) {
+            const recData = await recRes.json();
+            if (recData.products) setRecommendedProducts(recData.products);
+          }
+        } catch {
+          // Ignore fallback
         }
 
         // Fetch Product Details
@@ -612,6 +626,111 @@ function CheckoutContent() {
           </div>
 
         </form>
+
+        {/* RECOMMENDED PRODUCTS CROSS-SELL SECTION */}
+        {recommendedProducts.filter((p) => p.id !== product.id).length > 0 && (
+          <div className="mt-16 pt-10 border-t border-white/10 space-y-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[11px] font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 mb-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>CATALOGUE & COMPLÉMENTS</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-heading font-black text-white tracking-tight">
+                  Vous aimerez aussi : Autres outils recommandés
+                </h3>
+              </div>
+
+              <Link href="/boutique" className="text-xs font-heading font-black text-[#a3e635] hover:underline flex items-center gap-1">
+                <span>Voir toute la boutique</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {recommendedProducts
+                .filter((p) => p.id !== product.id)
+                .slice(0, 4)
+                .map((recProd) => {
+                  const comparePrice = recProd.compareAtPrice || (recProd.price > 0 ? recProd.price * 1.5 : 29);
+                  return (
+                    <Card
+                      key={recProd.id}
+                      className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                    >
+                      <div>
+                        {/* 1:1 SQUARE COVER BOX */}
+                        <Link href={`/checkout?productId=${recProd.id}`} className="relative block aspect-square overflow-hidden bg-slate-950 group">
+                          {recProd.coverImage ? (
+                            <img
+                              src={recProd.coverImage}
+                              alt={recProd.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : recProd.icon ? (
+                            <div className="w-full h-full bg-slate-900 flex items-center justify-center p-8">
+                              <img src={recProd.icon} alt={recProd.name} className="w-20 h-20 object-contain rounded-md" />
+                            </div>
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-2">
+                              <Sparkles className="w-8 h-8 text-[#a3e635]" />
+                              <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{recProd.name}</span>
+                            </div>
+                          )}
+
+                          {/* OVERLAY BADGE */}
+                          <div className="absolute top-2.5 left-2.5 z-10">
+                            <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
+                              <Zap className="w-2.5 h-2.5" />
+                              <span>{recProd.isFreeResource ? '100% OFFERT' : 'ACCÈS DIRECT'}</span>
+                            </span>
+                          </div>
+                        </Link>
+
+                        {/* CARD BODY */}
+                        <div className="p-4 space-y-1.5">
+                          <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
+                            {recProd.category?.name || 'OUTILS & TEMPLATES'}
+                          </div>
+
+                          <Link href={`/checkout?productId=${recProd.id}`}>
+                            <h4 className="font-heading font-black text-sm text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
+                              {recProd.name}
+                            </h4>
+                          </Link>
+
+                          <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
+                            {recProd.shortDescription || 'Système complet prêt à l emploi.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* CARD FOOTER */}
+                      <div className="p-4 pt-0 space-y-3">
+                        <div className="flex items-baseline justify-between border-t border-white/10 pt-2 text-xs">
+                          <span className="text-slate-500 line-through text-[11px] font-semibold">{comparePrice.toFixed(2)} €</span>
+                          <span className="font-heading font-black text-white text-sm">
+                            {recProd.price > 0 ? `${recProd.price.toFixed(2)} €` : '0 € (Gratuit)'}
+                          </span>
+                        </div>
+
+                        <Link href={`/checkout?productId=${recProd.id}`}>
+                          <button
+                            type="button"
+                            className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
+                          >
+                            <span>DÉCOUVRIR</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                          </button>
+                        </Link>
+                      </div>
+
+                    </Card>
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
