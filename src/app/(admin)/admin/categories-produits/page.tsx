@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Tag, Edit, Save, X, ExternalLink } from 'lucide-react';
+import { Plus, Trash2, Tag, Edit, Save, X, ArrowUp, ArrowDown, Move } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -122,6 +122,35 @@ export default function AdminProductCategoriesPage() {
     }
   };
 
+  const handleMove = async (index: number, direction: 'UP' | 'DOWN') => {
+    const targetIndex = direction === 'UP' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+    const newCategories = [...categories];
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[targetIndex];
+    newCategories[targetIndex] = temp;
+
+    // Re-assign position numbers
+    const reorderPayload = newCategories.map((c, i) => ({
+      id: c.id,
+      position: i + 1,
+    }));
+
+    setCategories(newCategories);
+
+    try {
+      await fetch('/api/admin/categories-produits', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reorder: reorderPayload }),
+      });
+    } catch (err) {
+      console.error('Failed to reorder categories:', err);
+      fetchCategories();
+    }
+  };
+
   return (
     <div className="space-y-6 w-full">
       
@@ -131,7 +160,7 @@ export default function AdminProductCategoriesPage() {
           <span>Catégories de Produits Digitaux</span>
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Gérez, renommez et éditez vos catégories de produits (Ressources Gratuites, Templates Notion, Dashboards Excel, etc.).
+          Gérez, classez et réordonnez l affichage de vos catégories de produits. L ordre ci-dessous se reflète immédiatement dans la barre de navigation du store.
         </p>
       </div>
 
@@ -200,13 +229,14 @@ export default function AdminProductCategoriesPage() {
           </Card>
         </div>
 
-        {/* CATEGORIES TABLE WITH EDIT CONTROLS */}
+        {/* CATEGORIES TABLE WITH ORDER REORDERING & EDIT CONTROLS */}
         <div className="md:col-span-8">
           <Card className="bg-white overflow-hidden shadow-sm border border-slate-200 w-full">
             <div className="overflow-x-auto w-full">
               <table className="w-full text-left text-sm text-slate-700">
                 <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   <tr>
+                    <th className="p-4 w-20 text-center">Position</th>
                     <th className="p-4">Catégorie</th>
                     <th className="p-4">Slug URL</th>
                     <th className="p-4">Produits</th>
@@ -216,15 +246,46 @@ export default function AdminProductCategoriesPage() {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={4} className="p-8 text-center text-slate-500">Chargement des catégories...</td>
+                      <td colSpan={5} className="p-8 text-center text-slate-500">Chargement des catégories...</td>
                     </tr>
                   ) : categories.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="p-8 text-center text-slate-500">Aucune catégorie de produit pour le moment.</td>
+                      <td colSpan={5} className="p-8 text-center text-slate-500">Aucune catégorie de produit pour le moment.</td>
                     </tr>
                   ) : (
-                    categories.map((cat) => (
+                    categories.map((cat, idx) => (
                       <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
+                        
+                        {/* POSITION & UP/DOWN BUTTONS */}
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <div className="flex flex-col gap-0.5">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => handleMove(idx, 'UP')}
+                                className="p-1 text-slate-400 hover:text-purple-700 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors"
+                                title="Monter dans le classement"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === categories.length - 1}
+                                onClick={() => handleMove(idx, 'DOWN')}
+                                className="p-1 text-slate-400 hover:text-purple-700 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors"
+                                title="Descendre dans le classement"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                              #{idx + 1}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* CATEGORY DETAILS OR INLINE EDIT */}
                         <td colSpan={editingId === cat.id ? 4 : 1} className="p-4">
                           {editingId === cat.id ? (
                             /* INLINE EDIT FORM */
@@ -296,7 +357,7 @@ export default function AdminProductCategoriesPage() {
                         {editingId !== cat.id && (
                           <>
                             <td className="p-4 text-xs font-mono text-slate-500">
-                              {cat.slug === 'ressources' ? '/ressources' : `/boutique/${cat.slug}`}
+                              {cat.slug === 'ressources' ? '/ressources' : `/boutique/categorie/${cat.slug}`}
                             </td>
                             <td className="p-4">
                               <Badge variant="indigo" className="text-xs bg-purple-100 text-purple-900 border-purple-300 font-extrabold">

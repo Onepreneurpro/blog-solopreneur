@@ -30,7 +30,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   try {
     activeTheme = await getActiveTheme();
     categories = await prisma.productCategory.findMany({
-      orderBy: { name: 'asc' },
+      orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
     });
 
     const whereCondition: any = {

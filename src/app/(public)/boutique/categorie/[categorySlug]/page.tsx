@@ -61,7 +61,7 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
     }
 
     categories = await prisma.productCategory.findMany({
-      orderBy: { name: 'asc' },
+      orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
     });
 
     const whereCondition: any = {

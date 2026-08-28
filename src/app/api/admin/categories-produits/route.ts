@@ -9,23 +9,26 @@ const DEFAULT_PRODUCT_CATEGORIES = [
     name: 'Templates Notion',
     slug: 'notion',
     description: 'Workspaces Notion avancés, CRM et tableaux de gestion',
+    position: 1,
   },
   {
     name: 'Dashboards Excel',
     slug: 'excel',
     description: 'Tableaux de bord Excel de trésorerie, facturation et rentabilité',
+    position: 2,
   },
   {
     name: 'Ressources & Guides',
     slug: 'ressources',
     description: 'Guides pratiques, e-books et ressources téléchargeables',
+    position: 3,
   },
 ];
 
 export async function GET() {
   try {
     let dbCategories = await prisma.productCategory.findMany({
-      orderBy: { createdAt: 'asc' },
+      orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
     });
 
     // Seed default categories ONLY if table is completely empty
@@ -37,7 +40,7 @@ export async function GET() {
       }
 
       dbCategories = await prisma.productCategory.findMany({
-        orderBy: { createdAt: 'asc' },
+        orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
       });
     }
 
@@ -49,6 +52,7 @@ export async function GET() {
           name: 'Ressources & Guides',
           slug: 'ressources',
           description: 'Guides pratiques, e-books et ressources téléchargeables',
+          position: dbCategories.length + 1,
         },
       });
       dbCategories.push(resCat);
@@ -82,17 +86,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
     }
 
-    const { name, slug, description } = await request.json();
+    const { name, slug, description, position } = await request.json();
 
     if (!name || !slug) {
       return NextResponse.json({ error: 'Nom et slug requis.' }, { status: 400 });
     }
+
+    const maxPos = await prisma.productCategory.aggregate({ _max: { position: true } });
+    const nextPos = position ?? ((maxPos._max.position || 0) + 1);
 
     const category = await prisma.productCategory.create({
       data: {
         name,
         slug,
         description,
+        position: nextPos,
       },
     });
 
@@ -110,7 +118,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
     }
 
-    const { id, name, slug, description } = await request.json();
+    const { id, name, slug, description, position } = await request.json();
 
     if (!id || !name || !slug) {
       return NextResponse.json({ error: 'ID, Nom et slug requis.' }, { status: 400 });
@@ -122,12 +130,42 @@ export async function PUT(request: Request) {
         name,
         slug,
         description,
+        ...(position !== undefined ? { position: Number(position) } : {}),
       },
     });
 
     return NextResponse.json({ success: true, category });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Erreur de modification.' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
+    }
+
+    const { reorder } = await request.json(); // Array of { id: string, position: number }
+
+    if (!Array.isArray(reorder)) {
+      return NextResponse.json({ error: 'Format invalide.' }, { status: 400 });
+    }
+
+    await prisma.$transaction(
+      reorder.map((item: { id: string; position: number }) =>
+        prisma.productCategory.update({
+          where: { id: item.id },
+          data: { position: item.position },
+        })
+      )
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('PATCH reorder categories error:', error);
+    return NextResponse.json({ error: error.message || 'Erreur lors du réordonnancement.' }, { status: 500 });
   }
 }
 
