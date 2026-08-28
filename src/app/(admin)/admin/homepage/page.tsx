@@ -807,19 +807,6 @@ export default function AdminHomepageBuilderPage() {
 
           <button
             type="button"
-            onClick={() => setActiveHeroTab('accent')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
-              activeHeroTab === 'accent'
-                ? 'bg-purple-700 text-white shadow-md'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>3. Mot Surligné & Neon</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveHeroTab('subtitle')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'subtitle'
@@ -828,7 +815,7 @@ export default function AdminHomepageBuilderPage() {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>4. Sous-titre / Description</span>
+            <span>3. Sous-titre / Description</span>
           </button>
         </div>
 
@@ -1099,81 +1086,7 @@ export default function AdminHomepageBuilderPage() {
             </div>
           )}
 
-          {/* TAB 3: MOT SURLIGNÉ & NEON */}
-          {activeHeroTab === 'accent' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-extrabold text-purple-950 mb-1">
-                  Mot ou Expression Surlignée Néon (dans &lt;mark&gt;)
-                </label>
-                <input
-                  type="text"
-                  value={
-                    (heroSection?.title?.match(/<mark[^>]*>(.*?)<\/mark>/i)?.[1]) || 'gagner plus'
-                  }
-                  onChange={(e) => {
-                    if (heroSection) {
-                      const newWord = e.target.value;
-                      const currentTitle = heroSection.title || '';
-                      let updatedTitle = '';
-                      if (currentTitle.includes('<mark')) {
-                        updatedTitle = currentTitle.replace(/<mark[^>]*>(.*?)<\/mark>/gi, `<mark color="${homeHeroAccentColor}">${newWord}</mark>`);
-                      } else {
-                        updatedTitle = `${currentTitle} <mark color="${homeHeroAccentColor}">${newWord}</mark>`;
-                      }
-                      handleFieldChange(heroSection.id, 'title', updatedTitle);
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Mot à surligner..."
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Mot Accentué</label>
-                  <select
-                    value={homeHeroAccentFont}
-                    onChange={(e) => {
-                      setHomeHeroAccentFont(e.target.value);
-                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
-                    }}
-                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
-                  >
-                    {GOOGLE_FONTS_OPTIONS.map((f) => (
-                      <option key={f.name} value={f.name}>{f.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur Neon du Surlignage (&lt;mark&gt;)</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={homeHeroAccentColor}
-                      onChange={(e) => setHomeHeroAccentColor(e.target.value)}
-                      className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300"
-                    />
-                    <div className="flex items-center gap-1">
-                      {COLOR_PALETTE.map((c) => (
-                        <button
-                          key={c.hex}
-                          type="button"
-                          onClick={() => setHomeHeroAccentColor(c.hex)}
-                          style={{ backgroundColor: c.hex }}
-                          className="w-5 h-5 rounded-full border border-slate-400"
-                          title={c.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: SOUS-TITRE / DESCRIPTION */}
+          {/* TAB 3: SOUS-TITRE / DESCRIPTION */}
           {activeHeroTab === 'subtitle' && (
             <div className="space-y-4">
               <div>
