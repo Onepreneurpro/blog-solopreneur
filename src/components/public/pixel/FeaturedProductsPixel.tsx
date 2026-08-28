@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check, Bot, BookOpen, Book } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Sparkles, Rocket, Flame, Star, Diamond, Gift, Zap, Crown, Target, Check, Bot, BookOpen, Book } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
@@ -150,46 +150,51 @@ export function FeaturedProductsPixel({
           {products.map((prod, idx) => {
             const badgeText = badgeLabels[idx % badgeLabels.length];
             return (
-              <Card key={prod.id} className="flex flex-col h-full group bg-[#0e1424]/90 border border-white/10 hover:border-[#a3e635]/60 shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10 transition-all duration-300 rounded-md overflow-hidden">
-                
-                {/* IMAGE COVER WITH HIGHLEVEL OVERLAY BADGE */}
-                <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950">
-                  {prod.coverImage ? (
-                    <Image
-                      src={prod.coverImage}
-                      alt={prod.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-500 text-xs font-medium">
-                      Visual Produit HighLevel
+              <Card key={prod.id} className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10">
+                <div className="space-y-3">
+                  {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                  <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
+                    {prod.coverImage ? (
+                      <Image
+                        src={prod.coverImage}
+                        alt={prod.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-500 text-xs font-medium">
+                        Visual Produit HighLevel
+                      </div>
+                    )}
+
+                    {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                    <div className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b8f542] transition-transform duration-300 z-10">
+                      <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                     </div>
-                  )}
 
-                  {/* HIGHLEVEL BLACK/WHITE PILL BADGE TOP LEFT */}
-                  <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 bg-white text-slate-950 font-heading font-black text-[10px] uppercase rounded-sm shadow-lg border border-slate-200">
-                      {badgeText}
+                    {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                    <span className="absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                      {prod.category?.name || badgeText}
                     </span>
+                  </Link>
+
+                  {/* CONTENT AREA */}
+                  <div className="space-y-1.5 px-1">
+                    <h3 className="text-base sm:text-lg font-heading font-black text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
+                      <Link href={`/checkout?productId=${prod.id}`}>{prod.name}</Link>
+                    </h3>
+
+                    <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
+                      {prod.shortDescription}
+                    </p>
                   </div>
-                </Link>
+                </div>
 
-                {/* CONTENT AREA */}
-                <div className="p-6 flex flex-col flex-grow">
-                  
-                  <h3 className="text-lg font-heading font-black text-white group-hover:text-[#a3e635] transition-colors line-clamp-2 mb-2 leading-snug">
-                    <Link href={`/checkout?productId=${prod.id}`}>{prod.name}</Link>
-                  </h3>
-
-                  <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed mb-6 font-normal">
-                    {prod.shortDescription}
-                  </p>
-
-                  {/* FOOTER PRICE & HIGHLEVEL STYLED ACCENT */}
-                  <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
+                {/* FOOTER PRICE & CTA */}
+                <div className="space-y-3 pt-3 px-1">
+                  <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-heading font-black text-[#a3e635]">
+                      <span className="text-lg sm:text-xl font-heading font-black text-[#a3e635]">
                         {prod.price === 0 ? 'Gratuit' : `${prod.price} €`}
                       </span>
 
@@ -201,13 +206,12 @@ export function FeaturedProductsPixel({
                     </div>
 
                     <Link href={`/checkout?productId=${prod.id}`}>
-                      <Button size="sm" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs px-4 py-2 rounded-md shadow-md border-0">
+                      <Button size="sm" className="bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs px-4 py-2 rounded-xl shadow-md border-0">
                         <span>Obtenir</span>
-                        <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                        <ArrowRight className="w-3.5 h-3.5 ml-1 stroke-[2.5]" />
                       </Button>
                     </Link>
                   </div>
-
                 </div>
               </Card>
             );

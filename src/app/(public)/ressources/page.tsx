@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Download, FileText, Sparkles, Gift, ShieldCheck, Zap, Star, ArrowRight } from 'lucide-react';
+import { Download, FileText, Sparkles, Gift, ShieldCheck, Zap, Star, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,11 +70,11 @@ export default async function FreeResourcesPage() {
             {freeResources.map((res) => (
               <Card
                 key={res.id}
-                className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10"
               >
-                <div>
-                  {/* RECTANGULAR COMPACT COVER / ICON MOCKUP BOX */}
-                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
+                <div className="space-y-3">
+                  {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
                     {res.coverImage ? (
                       <img
                         src={res.coverImage}
@@ -92,16 +92,18 @@ export default async function FreeResourcesPage() {
                       </div>
                     )}
 
-                    {/* FLOATING BADGES */}
-                    <div className="absolute top-2.5 left-2.5 z-10">
-                      <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
-                        <Gift className="w-2.5 h-2.5" />
-                        <span>100% OFFERT</span>
-                      </span>
+                    {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                    <div className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b8f542] transition-transform duration-300 z-10">
+                      <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                     </div>
 
+                    {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                    <span className="absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                      100% OFFERT
+                    </span>
+
                     <div className="absolute top-2.5 right-2.5 z-10">
-                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-sm border border-white/20 shadow-lg flex items-center gap-1">
+                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
                         <Download className="w-2.5 h-2.5 text-[#a3e635]" />
                         <span>{res.downloadsCount || 120}+</span>
                       </span>
@@ -109,8 +111,8 @@ export default async function FreeResourcesPage() {
                   </Link>
 
                   {/* CARD BODY */}
-                  <div className="p-4 space-y-1.5">
-                    <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
+                  <div className="space-y-1.5 px-1">
+                    <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
                       RESSOURCE DIGITAL
                     </div>
 
@@ -127,23 +129,22 @@ export default async function FreeResourcesPage() {
                 </div>
 
                 {/* CARD FOOTER WITH HIGH IMPACT BUTTON */}
-                <div className="p-4 pt-0 space-y-3">
-                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-xs">
-                    <span className="text-slate-500 line-through text-[11px] font-semibold">19.00 €</span>
-                    <span className="font-heading font-black text-[#a3e635] text-sm">0 € (Gratuit)</span>
+                <div className="space-y-3 pt-3 px-1">
+                  <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5 text-xs">
+                    <span className="text-[#a3e635] font-black uppercase">100% GRATUIT</span>
+                    <span className="text-slate-500 line-through font-semibold font-mono">19.00 €</span>
                   </div>
 
                   <Link href={`/checkout?productId=${res.id}`}>
                     <button
                       type="button"
-                      className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
+                      className="w-full py-2.5 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5"
                     >
-                      <Download className="w-4 h-4 shrink-0" />
-                      <span>OBTENIR MON ACCÈS GRATUIT</span>
+                      <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>OBTENIR ACCÈS GRATUIT</span>
                     </button>
                   </Link>
                 </div>
-
               </Card>
             ))}
           </div>

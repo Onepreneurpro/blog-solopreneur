@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ShoppingBag, ArrowRight, Sparkles, Star, Zap, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, ArrowRight, ArrowUpRight, Sparkles, Star, Zap, ShieldCheck } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { getActiveTheme, isDarkTheme } from '@/lib/theme';
@@ -314,11 +314,11 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
               return (
                 <Card
                   key={prod.id}
-                  className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                  className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10"
                 >
-                  <div>
-                    {/* RECTANGULAR COMPACT PRODUCT MOCKUP BOX */}
-                    <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
+                  <div className="space-y-3">
+                    {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                    <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
                       {prod.coverImage ? (
                         <img
                           src={prod.coverImage}
@@ -332,16 +332,18 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                         </div>
                       )}
 
-                      {/* FLOATING OVERLAY BADGES */}
-                      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
-                        <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
-                          <Zap className="w-2.5 h-2.5" />
-                          <span>ACCÈS INSTANTANÉ</span>
-                        </span>
+                      {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                      <div className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b8f542] transition-transform duration-300 z-10">
+                        <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
 
+                      {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                      <span className="absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                        {prod.category?.name || category.name || 'TEMPLATES'}
+                      </span>
+
                       <div className="absolute top-2.5 right-2.5 z-10">
-                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-sm border border-white/20 shadow-lg flex items-center gap-1">
+                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
                           <Star className="w-2.5 h-2.5 text-[#a3e635] fill-[#a3e635]" />
                           <span>VÉRIFIÉ</span>
                         </span>
@@ -349,10 +351,9 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                     </Link>
 
                     {/* CARD CONTENT */}
-                    <div className="p-4 space-y-1.5">
-                      <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest flex items-center justify-between">
-                        <span>{prod.category?.name || category.name || 'OUTILS & TEMPLATES'}</span>
-                        <span className="text-slate-400 font-semibold normal-case">Format : {getFileTypeLabel(prod.fileType)}</span>
+                    <div className="space-y-1.5 px-1">
+                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
+                        Format : {getFileTypeLabel(prod.fileType)}
                       </div>
 
                       <Link href={`/checkout?productId=${prod.id}`}>
@@ -368,7 +369,7 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                   </div>
 
                   {/* CARD FOOTER WITH HIGH IMPACT NEON CTA */}
-                  <div className="p-4 pt-0 space-y-3">
+                  <div className="space-y-3 pt-3 px-1">
                     <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5">
                       <div>
                         <span className="text-[10px] text-slate-400 font-bold uppercase block">Prix public</span>
@@ -386,14 +387,13 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                     <Link href={`/checkout?productId=${prod.id}`}>
                       <button
                         type="button"
-                        className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
+                        className="w-full py-2.5 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5"
                       >
                         <span>ACHETER MAINTENANT</span>
-                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                       </button>
                     </Link>
                   </div>
-
                 </Card>
               );
             })}
