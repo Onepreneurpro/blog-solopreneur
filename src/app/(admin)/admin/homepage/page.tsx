@@ -182,6 +182,7 @@ export default function AdminHomepageBuilderPage() {
 
   // Flexible Text Formatting & Google Fonts state for Homepage
   const [activeHeroTab, setActiveHeroTab] = useState<'badge' | 'title' | 'subtitle' | 'cta'>('title');
+  const [sectionTabs, setSectionTabs] = useState<Record<string, 'badge' | 'title' | 'subtitle' | 'cta' | 'reassurance'>>({});
 
   const [homeHeroFontGlobal, setHomeHeroFontGlobal] = useState(false);
   const [homeHeroFontFamily, setHomeHeroFontFamily] = useState('Plus Jakarta Sans');
@@ -1538,226 +1539,310 @@ export default function AdminHomepageBuilderPage() {
                               </Button>
                             </div>
                           ) : (
-                            <>
-                              {/* PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> (ÉPASSEUR & DÉCALAGE) & BOUTONS DE FORMATAGE */}
-                              <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
-                                    <Underline className="w-3.5 h-3.5 text-purple-700" />
-                                    Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
-                                  </span>
-                                  <div className="flex items-center gap-1.5">
+                            (() => {
+                              const activeTab = sectionTabs[sec.id] || 'title';
+                              return (
+                                <div className="space-y-4">
+                                  {/* MENU D'ONGLETS DU BLOC (5 ONGLETS) */}
+                                  <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-purple-100/70 border border-purple-200 rounded-xl text-xs font-bold shadow-2xs">
                                     <button
                                       type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'title', 'u', uColor, uThickness, uOffset)}
-                                      className="px-2 py-0.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-[10px] font-black shadow-xs flex items-center gap-1"
+                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'badge' }))}
+                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                        activeTab === 'badge' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                      }`}
                                     >
-                                      + Insérer &lt;u&gt; au Titre
+                                      🏷️ 1. Badge Flottant
                                     </button>
+
                                     <button
                                       type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
-                                      className="px-2 py-0.5 bg-purple-100 hover:bg-purple-200 text-purple-950 border border-purple-300 rounded-lg text-[10px] font-black shadow-xs flex items-center gap-1"
+                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'title' }))}
+                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                        activeTab === 'title' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                      }`}
                                     >
-                                      + Insérer &lt;u&gt; au Sous-titre
+                                      ✍️ 2. Titre H1 / H2
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'subtitle' }))}
+                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                        activeTab === 'subtitle' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                      }`}
+                                    >
+                                      📝 3. Sous-titre / Description
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'cta' }))}
+                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                        activeTab === 'cta' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                      }`}
+                                    >
+                                      🚀 4. Bouton d Action
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'reassurance' }))}
+                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                        activeTab === 'reassurance' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                      }`}
+                                    >
+                                      🛡️ 5. Réassurances 1 & 2
                                     </button>
                                   </div>
-                                </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                                  <div>
-                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
-                                    <select
-                                      value={uThickness}
-                                      onChange={(e) => setUThickness(e.target.value)}
-                                      className="w-full px-2 py-1 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                                    >
-                                      <option value="1px">Très fine (1px)</option>
-                                      <option value="2px">Fine (2px)</option>
-                                      <option value="4px">Moyenne - Standard (4px)</option>
-                                      <option value="6px">Épaisse (6px)</option>
-                                      <option value="8px">Très épaisse (8px)</option>
-                                      <option value="12px">Ultra épaisse (12px)</option>
-                                      <option value="35%">Socle partiel (35% hauteur)</option>
-                                      <option value="50%">Surlignage bas (50% hauteur)</option>
-                                    </select>
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
-                                    <select
-                                      value={uOffset}
-                                      onChange={(e) => setUOffset(e.target.value)}
-                                      className="w-full px-2 py-1 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
-                                    >
-                                      <option value="0px">Collé au texte (0px)</option>
-                                      <option value="2px">Proche (2px)</option>
-                                      <option value="4px">Standard (4px)</option>
-                                      <option value="6px">Éloigné (6px)</option>
-                                      <option value="9px">Très éloigné (9px)</option>
-                                    </select>
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
-                                    <div className="flex items-center gap-2">
+                                  {/* TAB 1: BADGE FLOTTANT */}
+                                  {activeTab === 'badge' && (
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                      <label className="block text-xs font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
+                                        <span>🏷️ 1. Personnalisation du Badge Flottant Supérieur du Bloc</span>
+                                      </label>
                                       <input
-                                        type="color"
-                                        value={uColor}
-                                        onChange={(e) => setUColor(e.target.value)}
-                                        className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
+                                        type="text"
+                                        value={sec.settings?.badgeText || sec.settings?.topTickerText || sec.settings?.floatingBadge || ''}
+                                        onChange={(e) => {
+                                          handleSettingChange(sec.id, 'badgeText', e.target.value);
+                                          handleSettingChange(sec.id, 'topTickerText', e.target.value);
+                                          handleSettingChange(sec.id, 'floatingBadge', e.target.value);
+                                        }}
+                                        className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                        placeholder="Saisissez le texte du badge (ex: EBOOK OFFERT A 100%)..."
                                       />
-                                      <div className="flex items-center gap-1 overflow-x-auto">
-                                        {COLOR_PALETTE.slice(0, 5).map((c) => (
+                                    </div>
+                                  )}
+
+                                  {/* TAB 2: TITRE PRINCIPAL H1 / H2 */}
+                                  {activeTab === 'title' && (
+                                    <div className="space-y-4">
+                                      {/* PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> */}
+                                      <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
+                                            <Underline className="w-3.5 h-3.5 text-purple-700" />
+                                            Personnalisation du Soulignement (&lt;u&gt;) : Épaisseur & Décalage
+                                          </span>
                                           <button
-                                            key={c.hex}
                                             type="button"
-                                            onClick={() => setUColor(c.hex)}
-                                            style={{ backgroundColor: c.hex }}
-                                            className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
-                                            title={c.name}
-                                          />
-                                        ))}
+                                            onClick={() => insertFormattedTag(sec.id, 'title', 'u', uColor, uThickness, uOffset)}
+                                            className="px-2 py-0.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-[10px] font-black shadow-xs"
+                                          >
+                                            + Insérer &lt;u&gt; au Titre
+                                          </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                                          <div>
+                                            <label className="block text-[10px] font-bold text-slate-600 mb-1">Épaisseur du trait</label>
+                                            <select
+                                              value={uThickness}
+                                              onChange={(e) => setUThickness(e.target.value)}
+                                              className="w-full px-2 py-1 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
+                                            >
+                                              <option value="1px">Très fine (1px)</option>
+                                              <option value="2px">Fine (2px)</option>
+                                              <option value="4px">Moyenne - Standard (4px)</option>
+                                              <option value="6px">Épaisse (6px)</option>
+                                              <option value="8px">Très épaisse (8px)</option>
+                                              <option value="12px">Ultra épaisse (12px)</option>
+                                              <option value="35%">Socle partiel (35% hauteur)</option>
+                                              <option value="50%">Surlignage bas (50% hauteur)</option>
+                                            </select>
+                                          </div>
+
+                                          <div>
+                                            <label className="block text-[10px] font-bold text-slate-600 mb-1">Décalage / Position sous texte</label>
+                                            <select
+                                              value={uOffset}
+                                              onChange={(e) => setUOffset(e.target.value)}
+                                              className="w-full px-2 py-1 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900"
+                                            >
+                                              <option value="0px">Collé au texte (0px)</option>
+                                              <option value="2px">Proche (2px)</option>
+                                              <option value="4px">Standard (4px)</option>
+                                              <option value="6px">Éloigné (6px)</option>
+                                              <option value="9px">Très éloigné (9px)</option>
+                                            </select>
+                                          </div>
+
+                                          <div>
+                                            <label className="block text-[10px] font-bold text-slate-600 mb-1">Couleur du trait</label>
+                                            <div className="flex items-center gap-2">
+                                              <input
+                                                type="color"
+                                                value={uColor}
+                                                onChange={(e) => setUColor(e.target.value)}
+                                                className="w-7 h-7 p-0.5 rounded cursor-pointer border border-slate-300"
+                                              />
+                                              <div className="flex items-center gap-1 overflow-x-auto">
+                                                {COLOR_PALETTE.slice(0, 5).map((c) => (
+                                                  <button
+                                                    key={c.hex}
+                                                    type="button"
+                                                    onClick={() => setUColor(c.hex)}
+                                                    style={{ backgroundColor: c.hex }}
+                                                    className="w-4 h-4 rounded-full border border-slate-400 shrink-0"
+                                                    title={c.name}
+                                                  />
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* INPUT TITRE */}
+                                      <div className="space-y-2">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                          <label className="block text-[11px] font-extrabold uppercase text-slate-700">
+                                            ✍️ 2. Titre principal du bloc H1 / H2
+                                          </label>
+                                          
+                                          {/* QUICK FORMATTING INSERT BUTTONS */}
+                                          <div className="flex items-center gap-1.5">
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'title', 'mark')}
+                                              className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
+                                            >
+                                              + Surligner Néon (&lt;mark&gt;)
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'title', 'color', uColor)}
+                                              className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                                            >
+                                              + Couleur Texte (&lt;color&gt;)
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'title', 'u', uColor, uThickness, uOffset)}
+                                              className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
+                                            >
+                                              + Souligner (&lt;u&gt;)
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        <input
+                                          type="text"
+                                          value={sec.title}
+                                          onChange={(e) => handleFieldChange(sec.id, 'title', e.target.value)}
+                                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                          placeholder="Titre du bloc..."
+                                        />
                                       </div>
                                     </div>
-                                  </div>
+                                  )}
+
+                                  {/* TAB 3: SOUS-TITRE / DESCRIPTION */}
+                                  {activeTab === 'subtitle' && (
+                                    <div className="space-y-2 p-3 bg-purple-50/50 border border-purple-200 rounded-xl">
+                                      <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <label className="block text-[11px] font-extrabold uppercase text-purple-950">
+                                          📝 3. Sous-titre / Description du bloc (Modifiable librement)
+                                        </label>
+
+                                        <div className="flex items-center gap-1.5">
+                                          <button
+                                            type="button"
+                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'mark')}
+                                            className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
+                                          >
+                                            + Surligner Néon (&lt;mark&gt;)
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'color', uColor)}
+                                            className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                                          >
+                                            + Couleur Texte (&lt;color&gt;)
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
+                                            className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
+                                          >
+                                            + Souligner (&lt;u&gt;)
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      <textarea
+                                        rows={4}
+                                        value={sec.subtitle || ''}
+                                        onChange={(e) => handleFieldChange(sec.id, 'subtitle', e.target.value)}
+                                        className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-semibold text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                        placeholder="Saisissez la description du bloc..."
+                                      />
+                                    </div>
+                                  )}
+
+                                  {/* TAB 4: BOUTON D'ACTION (CTA) */}
+                                  {activeTab === 'cta' && (
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                      <label className="block text-xs font-extrabold uppercase text-purple-950">
+                                        🚀 4. Texte du Bouton d Action (Bouton d Envoi)
+                                      </label>
+                                      <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">Texte du Bouton d Action (Envoi)</label>
+                                        <input
+                                          type="text"
+                                          value={sec.settings?.btnText || sec.settings?.btn1Text || ''}
+                                          onChange={(e) => {
+                                            handleSettingChange(sec.id, 'btnText', e.target.value);
+                                            handleSettingChange(sec.id, 'btn1Text', e.target.value);
+                                          }}
+                                          className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                          placeholder="Send My FREE Guide 🚀..."
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* TAB 5: PUCES DE RÉASSURANCE */}
+                                  {activeTab === 'reassurance' && (
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                      <label className="block text-xs font-extrabold uppercase text-purple-950">
+                                        🛡️ 5. Puces de Réassurance (Sous le bouton)
+                                      </label>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-slate-700 mb-1">🛡️ Réassurance 1 (Sous le bouton)</label>
+                                          <input
+                                            type="text"
+                                            value={sec.settings?.reassuranceText1 || sec.settings?.proof1 || ''}
+                                            onChange={(e) => {
+                                              handleSettingChange(sec.id, 'reassuranceText1', e.target.value);
+                                              handleSettingChange(sec.id, 'proof1', e.target.value);
+                                            }}
+                                            className="w-full px-3.5 py-2 bg-white border border-purple-300 rounded-xl text-xs font-medium text-slate-900"
+                                            placeholder="100% Gratuit sans engagement..."
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-slate-700 mb-1">⚡ Réassurance 2 (Sous le bouton)</label>
+                                          <input
+                                            type="text"
+                                            value={sec.settings?.reassuranceText2 || sec.settings?.proof2 || ''}
+                                            onChange={(e) => {
+                                              handleSettingChange(sec.id, 'reassuranceText2', e.target.value);
+                                              handleSettingChange(sec.id, 'proof2', e.target.value);
+                                            }}
+                                            className="w-full px-3.5 py-2 bg-white border border-purple-300 rounded-xl text-xs font-medium text-slate-900"
+                                            placeholder="Téléchargement instantané..."
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
-                              </div>
-
-                              {/* 3. TITRE PRINCIPAL DU BLOC H1 / H2 */}
-                              <div className="space-y-2">
-                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <label className="block text-[11px] font-extrabold uppercase text-slate-700">
-                                    Titre principal du bloc H1 / H2
-                                  </label>
-                                  
-                                  {/* QUICK FORMATTING INSERT BUTTONS */}
-                                  <div className="flex items-center gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'title', 'mark')}
-                                      className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
-                                    >
-                                      + Surligner Néon (&lt;mark&gt;)
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'title', 'color', uColor)}
-                                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
-                                    >
-                                      + Couleur Texte (&lt;color&gt;)
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'title', 'u', uColor, uThickness, uOffset)}
-                                      className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
-                                    >
-                                      + Souligner (&lt;u&gt;)
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <input
-                                  type="text"
-                                  value={sec.title}
-                                  onChange={(e) => handleFieldChange(sec.id, 'title', e.target.value)}
-                                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                                  placeholder="Titre du bloc..."
-                                />
-                              </div>
-
-                              {/* 4. SOUS-TITRE / DESCRIPTION DU BLOC */}
-                              <div className="space-y-2">
-                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <label className="block text-[11px] font-extrabold uppercase text-slate-700">
-                                    Sous-titre / Description du bloc (Modifiable librement)
-                                  </label>
-
-                                  <div className="flex items-center gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'subtitle', 'mark')}
-                                      className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
-                                    >
-                                      + Surligner Néon (&lt;mark&gt;)
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'subtitle', 'color', uColor)}
-                                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
-                                    >
-                                      + Couleur Texte (&lt;color&gt;)
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => insertFormattedTag(sec.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
-                                      className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
-                                    >
-                                      + Souligner (&lt;u&gt;)
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <textarea
-                                  rows={3}
-                                  value={sec.subtitle || ''}
-                                  onChange={(e) => handleFieldChange(sec.id, 'subtitle', e.target.value)}
-                                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 leading-relaxed focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                                  placeholder="Saisissez la description du bloc..."
-                                />
-                              </div>
-
-                              {/* 5. BOUTONS D'ACTION (CTA) ET PUCES DE RÉASSURANCE (BAS) */}
-                              <div className="p-3 bg-purple-50/40 border border-purple-200/80 rounded-xl space-y-3">
-                                <label className="block text-[11px] font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
-                                  <span>🚀 Bouton d Action (CTA) & Puces de Réassurance</span>
-                                </label>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                                  <div>
-                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">🚀 Texte du Bouton d Action (Envoi)</label>
-                                    <input
-                                      type="text"
-                                      value={sec.settings?.btnText || sec.settings?.btn1Text || ''}
-                                      onChange={(e) => {
-                                        handleSettingChange(sec.id, 'btnText', e.target.value);
-                                        handleSettingChange(sec.id, 'btn1Text', e.target.value);
-                                      }}
-                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-bold"
-                                      placeholder="Send My FREE Guide 🚀..."
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">🛡️ Réassurance 1 (Sous le bouton)</label>
-                                    <input
-                                      type="text"
-                                      value={sec.settings?.reassuranceText1 || sec.settings?.proof1 || ''}
-                                      onChange={(e) => {
-                                        handleSettingChange(sec.id, 'reassuranceText1', e.target.value);
-                                        handleSettingChange(sec.id, 'proof1', e.target.value);
-                                      }}
-                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-medium"
-                                      placeholder="100% Gratuit sans engagement..."
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">⚡ Réassurance 2 (Sous le bouton)</label>
-                                    <input
-                                      type="text"
-                                      value={sec.settings?.reassuranceText2 || sec.settings?.proof2 || ''}
-                                      onChange={(e) => {
-                                        handleSettingChange(sec.id, 'reassuranceText2', e.target.value);
-                                        handleSettingChange(sec.id, 'proof2', e.target.value);
-                                      }}
-                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-medium"
-                                      placeholder="Téléchargement instantané..."
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </>
+                              );
+                            })()
                           )
                         )}
 
