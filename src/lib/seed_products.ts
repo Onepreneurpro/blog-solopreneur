@@ -1,7 +1,9 @@
 import { prisma } from './prisma';
 
 const DEMO_PRODUCTS = [
+  // ----------------------------------------------------
   // 1. DASHBOARDS EXCEL
+  // ----------------------------------------------------
   {
     categorySlug: 'excel',
     name: 'Excel Dashboard Trésorerie & Suivi de CA 2026',
@@ -42,7 +44,9 @@ const DEMO_PRODUCTS = [
     isFeatured: true,
   },
 
-  // 2. TEMPLATES NOTION
+  // ----------------------------------------------------
+  // 2. TEMPLATES NOTION (12 PRODUITS EXACTS)
+  // ----------------------------------------------------
   {
     categorySlug: 'notion',
     name: 'Notion Freelance OS — Second Cerveau Complete',
@@ -82,8 +86,127 @@ const DEMO_PRODUCTS = [
     isFreeResource: false,
     isFeatured: false,
   },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Second Brain — Méthode PARA',
+    slug: 'notion-second-brain-methode-para',
+    shortDescription: 'Organisez votre vie et vos connaissances avec la méthode PARA (Projets, Domaines, Ressources, Archives).',
+    longDescription: 'Centralisez toutes vos idées, notes de réunions et ressources web dans une structure épurée et hautement productive.',
+    price: 45.00,
+    compareAtPrice: 79.00,
+    coverImage: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Finance & Facturation Freelance',
+    slug: 'notion-finance-facturation-freelance',
+    shortDescription: 'Suivi dynamique de votre chiffre d affaires, des factures émises et prévision des cotisations URSSAF.',
+    longDescription: 'Espace de gestion comptable simplifié sur Notion avec calcul automatique de TVA, relances d impayés et bilan annuel.',
+    price: 29.00,
+    compareAtPrice: 49.00,
+    coverImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Hub Prospection & Cold Emailing',
+    slug: 'notion-hub-prospection-cold-emailing',
+    shortDescription: 'Séquences de prospection B2B, modèles de messages de relance et suivi des taux de réponse.',
+    longDescription: 'Organisez votre prospection sortante avec un suivi par lead, des scripts de vente prêts à l emploi et des statistiques.',
+    price: 25.00,
+    compareAtPrice: 45.00,
+    coverImage: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Client Portal — Espace de Collaboration Client',
+    slug: 'notion-client-portal-espace-collaboration-client',
+    shortDescription: 'Portail privé professionnel pour partager livrables, briefs, factures et plannings avec vos clients.',
+    longDescription: 'Impressionnez vos clients avec un espace de marque dédié, sécurisé et interactif pour chaque mission de prestation.',
+    price: 35.00,
+    compareAtPrice: 65.00,
+    coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Habit & Goal Tracker Pro',
+    slug: 'notion-habit-goal-tracker-pro',
+    shortDescription: 'Suivez vos objectifs trimestriels OKR, habitudes quotidiennes et routines de performance.',
+    longDescription: 'Un tableau de suivi des habitudes avec jauges de progression automatiques et bilans hebdomadaires de productivité.',
+    price: 19.00,
+    compareAtPrice: 35.00,
+    coverImage: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Agency OS — Multi-Membres & Équipe',
+    slug: 'notion-agency-os-multi-membres-equipe',
+    shortDescription: 'Workspace collaboratif complet pour agences web, studios et collectifs de freelances.',
+    longDescription: 'Gérez plusieurs collaborateurs, assignez des tâches, suivez les marges par projet et partagez une base de connaissances commune.',
+    price: 69.00,
+    compareAtPrice: 119.00,
+    coverImage: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Content Marketing & Social Media Calendar',
+    slug: 'notion-content-marketing-social-media-calendar',
+    shortDescription: 'Calendrier éditorial multi-plateforme avec modèles de posts, carrousels et scripts vidéo.',
+    longDescription: 'Planifiez vos campagnes réseaux sociaux de A à Z avec un pipeline visuel de validation et de recyclage de contenu.',
+    price: 27.00,
+    compareAtPrice: 49.00,
+    coverImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Knowledge Base & Wiki Entreprise',
+    slug: 'notion-knowledge-base-wiki-entreprise',
+    shortDescription: 'Centre de documentation interne, processus SOPs et guides d onboarding.',
+    longDescription: 'Rassemblez les connaissances de votre entreprise dans un wiki structuré, recherchable et simple à maintenir à jour.',
+    price: 32.00,
+    compareAtPrice: 59.00,
+    coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'notion',
+    name: 'Notion Project Manager Agile & Scrum',
+    slug: 'notion-project-manager-agile-scrum',
+    shortDescription: 'Gestionnaire de projet moderne avec Sprints, Backlog de fonctionnalités et Roadmaps visuelles.',
+    longDescription: 'Appliquez les méthodologies Agile dans Notion : gestion de sprints de 2 semaines, suivi de vélocité et retrospectives.',
+    price: 39.00,
+    compareAtPrice: 69.00,
+    coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
+    fileType: 'NOTION',
+    isFreeResource: false,
+    isFeatured: false,
+  },
 
+  // ----------------------------------------------------
   // 3. TEMPLATES SIO (SYSTEME.IO)
+  // ----------------------------------------------------
   {
     categorySlug: 'templates-sio',
     name: 'Systeme.io Tunnel de Vente Ebook High-Converting',
@@ -124,7 +247,9 @@ const DEMO_PRODUCTS = [
     isFeatured: false,
   },
 
+  // ----------------------------------------------------
   // 4. RESSOURCES & GUIDES
+  // ----------------------------------------------------
   {
     categorySlug: 'ressources',
     name: 'Ebook : Négocier et Doubler son TJM Freelance',
@@ -152,7 +277,9 @@ const DEMO_PRODUCTS = [
     isFeatured: false,
   },
 
-  // 5. OUTILS DE GESTION (WEB APPS)
+  // ----------------------------------------------------
+  // 5. OUTILS DE GESTION (12 PRODUITS EXACTS)
+  // ----------------------------------------------------
   {
     categorySlug: 'outils-de-gestion',
     name: 'ERP Web App Solopreneur — Gestion globale d Activité & Projets',
@@ -204,6 +331,84 @@ const DEMO_PRODUCTS = [
     fileType: 'ZIP',
     isFreeResource: false,
     isFeatured: true,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Gestionnaire de Projets & Temps Facturable Web App',
+    slug: 'gestionnaire-projets-temps-facturable-web-app',
+    shortDescription: 'Timer en ligne, suivi du temps passé par client et rapport de facturation automatisé.',
+    longDescription: 'Suivez le temps exact consacré à chaque client, définissez vos taux horaires par projet et exportez des rapports d activité détaillés.',
+    price: 45.00,
+    compareAtPrice: 79.00,
+    coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Portail Client & Signature de Devis Web App',
+    slug: 'portail-client-signature-devis-web-app',
+    shortDescription: 'Envoi de propositions commerciales en ligne avec validation, signature électronique et paiement d acompte.',
+    longDescription: 'Accélérez votre processus de vente avec des devis interactifs signables directement en ligne par vos clients.',
+    price: 55.00,
+    compareAtPrice: 95.00,
+    coverImage: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Calculateur d Impôts & Cotisations Micro-Entreprise Web App',
+    slug: 'calculateur-impots-cotisations-micro-entreprise-web-app',
+    shortDescription: 'Simulation en temps réel de votre net après cotisations URSSAF et versement libératoire de l impôt.',
+    longDescription: 'Anticipez vos prélèvements fiscaux et sociaux selon votre chiffre d affaires et votre secteur d activité (Acre, CFP, TVA).',
+    price: 22.00,
+    compareAtPrice: 39.00,
+    coverImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Outil de Gestion des Notes de Frais & Reçus Web App',
+    slug: 'outil-gestion-notes-de-frais-recus-web-app',
+    shortDescription: 'Numérisation, extraction automatique et catégorisation de vos reçus et factures d achats.',
+    longDescription: 'Garez tous vos reçus de frais professionnels et exportez des récapitulatifs mensuels prêts pour votre comptable.',
+    price: 35.00,
+    compareAtPrice: 59.00,
+    coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Gestionnaire de Rendez-vous & Prise de RDV Coachs Web App',
+    slug: 'gestionnaire-rendez-vous-prise-rdv-coachs-web-app',
+    shortDescription: 'Calendrier de réservation en ligne synchronisé avec rappels automatiques e-mail et SMS.',
+    longDescription: 'Permettez à vos clients de réserver leurs créneaux de coaching en direct selon vos disponibilités avec paiement préalable.',
+    price: 49.00,
+    compareAtPrice: 89.00,
+    coverImage: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'outils-de-gestion',
+    name: 'Dashboard Analytics & Suivi de KPI Solopreneur Web App',
+    slug: 'dashboard-analytics-suivi-kpi-solopreneur-web-app',
+    shortDescription: 'Centralisez vos statistiques Stripe, Google Analytics, taux de conversion et chiffre d affaires.',
+    longDescription: 'Visualisez la santé globale de votre activité d indépendant grâce à des indicateurs clés de performance agrégés.',
+    price: 39.00,
+    compareAtPrice: 69.00,
+    coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
   },
   {
     categorySlug: 'outils-de-gestion',
