@@ -820,7 +820,7 @@ export default function AdminHomepageBuilderPage() {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>3. Sous-titre / Description</span>
+            <span>3. Sous-titre</span>
           </button>
 
           <button
@@ -1577,7 +1577,7 @@ export default function AdminHomepageBuilderPage() {
                                         activeTab === 'subtitle' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
                                       }`}
                                     >
-                                      📝 3. Sous-titre / Description
+                                       📝 3. Sous-titre
                                     </button>
 
                                     <button
@@ -2013,7 +2013,7 @@ export default function AdminHomepageBuilderPage() {
                                       <div className="space-y-2">
                                         <div className="flex flex-wrap items-center justify-between gap-2">
                                           <label className="block text-[11px] font-extrabold uppercase text-purple-950">
-                                            📝 3. Sous-titre / Description du bloc (Modifiable librement)
+                                            📝 3. Sous-titre du bloc (Modifiable librement)
                                           </label>
 
                                           <div className="flex items-center gap-1.5">
