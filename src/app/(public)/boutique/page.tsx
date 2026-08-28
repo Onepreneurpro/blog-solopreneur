@@ -81,8 +81,8 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-10 sm:pt-14">
         
         {/* HERO SECTION */}
-        <div className="mb-12 text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
+        <div className="mb-10 text-center max-w-3xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES</span>
           </div>
@@ -97,11 +97,11 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
         </div>
 
         {/* CATEGORY FILTER PILL TABS */}
-        <div className="mb-12 flex justify-center">
-          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar scrollbar-none p-1.5 bg-[#0e1424] border border-white/10 rounded-2xl shadow-xl">
+        <div className="mb-10 flex justify-center">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scrollbar-none p-1.5 bg-[#0e1424] border border-white/10 rounded-md shadow-xl">
             <Link
               href="/boutique"
-              className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-heading font-black whitespace-nowrap transition-all bg-[#a3e635] text-slate-950 shadow-md"
+              className="px-5 py-2 rounded-md text-xs sm:text-sm font-heading font-black whitespace-nowrap transition-all bg-[#a3e635] text-slate-950 shadow-md"
             >
               Tous les produits
             </Link>
@@ -110,7 +110,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
               <Link
                 key={cat.id}
                 href={`/boutique/categorie/${cat.slug}`}
-                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-heading font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap"
+                className="px-5 py-2 rounded-md text-xs sm:text-sm font-heading font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap"
               >
                 {cat.name}
               </Link>
@@ -120,19 +120,19 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
 
         {/* HIGH-DENSITY 4-COLUMN PRODUCTS GRID */}
         {products.length === 0 ? (
-          <div className="text-center py-20 rounded-3xl bg-[#0e1424] border border-white/10 text-slate-400 shadow-2xl">
+          <div className="text-center py-20 rounded-md bg-[#0e1424] border border-white/10 text-slate-400 shadow-2xl">
             <ShoppingBag className="w-12 h-12 mx-auto text-purple-400 mb-3 opacity-60" />
             <p className="text-lg font-heading font-bold text-white">Aucun produit disponible pour le moment.</p>
             <p className="text-xs text-slate-400 mt-1">Revenez très bientôt pour découvrir nos nouveaux outils.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {products.map((prod) => {
               const comparePrice = prod.compareAtPrice || (prod.price > 0 ? prod.price * 1.5 : 29);
               return (
                 <Card
                   key={prod.id}
-                  className="bg-[#0e1424] border-2 border-white/10 hover:border-[#a3e635] transition-all duration-300 rounded-3xl overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                  className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
                 >
                   <div>
                     {/* 1:1 SQUARE PRODUCT MOCKUP BOX */}
@@ -151,15 +151,15 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                       )}
 
                       {/* FLOATING OVERLAY BADGES */}
-                      <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-                        <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2.5 py-1 rounded-md shadow-lg flex items-center gap-1">
+                      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
+                        <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
                           <Zap className="w-2.5 h-2.5" />
                           <span>ACCÈS INSTANTANÉ</span>
                         </span>
                       </div>
 
-                      <div className="absolute top-3 right-3 z-10">
-                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-md border border-white/20 shadow-lg flex items-center gap-1">
+                      <div className="absolute top-2.5 right-2.5 z-10">
+                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-sm border border-white/20 shadow-lg flex items-center gap-1">
                           <Star className="w-2.5 h-2.5 text-[#a3e635] fill-[#a3e635]" />
                           <span>VÉRIFIÉ</span>
                         </span>
@@ -167,7 +167,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                     </Link>
 
                     {/* CARD CONTENT */}
-                    <div className="p-5 space-y-2">
+                    <div className="p-4 space-y-1.5">
                       <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
                         {prod.category?.name || 'OUTILS & TEMPLATES'}
                       </div>
@@ -185,8 +185,8 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                   </div>
 
                   {/* CARD FOOTER WITH HIGH IMPACT NEON CTA */}
-                  <div className="p-5 pt-0 space-y-3.5">
-                    <div className="flex items-baseline justify-between border-t border-white/10 pt-3">
+                  <div className="p-4 pt-0 space-y-3">
+                    <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5">
                       <div>
                         <span className="text-[10px] text-slate-400 font-bold uppercase block">Prix public</span>
                         <span className="text-xs text-slate-500 line-through font-semibold">{comparePrice.toFixed(2)} €</span>
@@ -194,7 +194,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
 
                       <div className="text-right">
                         <span className="text-[10px] text-[#a3e635] font-bold uppercase block">Prix spécial</span>
-                        <span className="text-xl font-heading font-black text-white">
+                        <span className="text-lg sm:text-xl font-heading font-black text-white">
                           {prod.price > 0 ? `${prod.price.toFixed(2)} €` : '0 € (Gratuit)'}
                         </span>
                       </div>
@@ -203,7 +203,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                     <Link href={`/boutique/${prod.slug}`}>
                       <button
                         type="button"
-                        className="w-full py-3 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group/btn"
+                        className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
                       >
                         <span>ACHETER MAINTENANT</span>
                         <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -218,20 +218,20 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
         )}
 
         {/* TRUST BADGES FOOTER BAR */}
-        <div className="mt-16 pt-10 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+        <div className="mt-14 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-5 text-center">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <ShieldCheck className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Paiement 100% Sécurisé</h4>
             <p className="text-xs text-slate-400">Transactions chiffrées SSL via Stripe.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <Zap className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Livraison Instantanée</h4>
             <p className="text-xs text-slate-400">Accès immédiat dans votre espace client.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <Sparkles className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Mises à jour à Vie</h4>
             <p className="text-xs text-slate-400">Toutes les futures versions incluses.</p>

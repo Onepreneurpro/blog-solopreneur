@@ -44,8 +44,8 @@ export default async function FreeResourcesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-10 sm:pt-14">
         
         {/* HERO HEADER */}
-        <div className="mb-12 text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
+        <div className="mb-10 text-center max-w-3xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
             <Gift className="w-3.5 h-3.5" />
             <span>ACCÈS LIBRE & 100% GRATUIT</span>
           </div>
@@ -61,16 +61,16 @@ export default async function FreeResourcesPage() {
 
         {/* HIGH-DENSITY 4-COLUMN RESOURCES GRID */}
         {freeResources.length === 0 ? (
-          <div className="text-center py-20 rounded-3xl bg-[#0e1424] border border-white/10 text-slate-400 shadow-2xl">
+          <div className="text-center py-20 rounded-md bg-[#0e1424] border border-white/10 text-slate-400 shadow-2xl">
             <FileText className="w-12 h-12 mx-auto text-purple-400 mb-3 opacity-60" />
             <p className="text-lg font-heading font-bold text-white">Aucune ressource gratuite disponible pour le moment.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {freeResources.map((res) => (
               <Card
                 key={res.id}
-                className="bg-[#0e1424] border-2 border-white/10 hover:border-[#a3e635] transition-all duration-300 rounded-3xl overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
               >
                 <div>
                   {/* 1:1 SQUARE COVER / ICON MOCKUP BOX */}
@@ -83,7 +83,7 @@ export default async function FreeResourcesPage() {
                       />
                     ) : res.icon ? (
                       <div className="w-full h-full bg-slate-900 flex items-center justify-center p-8">
-                        <img src={res.icon} alt={res.name} className="w-24 h-24 object-contain rounded-2xl shadow-xl" />
+                        <img src={res.icon} alt={res.name} className="w-24 h-24 object-contain rounded-lg shadow-xl" />
                       </div>
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
@@ -93,15 +93,15 @@ export default async function FreeResourcesPage() {
                     )}
 
                     {/* FLOATING BADGES */}
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2.5 py-1 rounded-md shadow-lg flex items-center gap-1">
+                    <div className="absolute top-2.5 left-2.5 z-10">
+                      <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
                         <Gift className="w-2.5 h-2.5" />
                         <span>100% OFFERT</span>
                       </span>
                     </div>
 
-                    <div className="absolute top-3 right-3 z-10">
-                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-md border border-white/20 shadow-lg flex items-center gap-1">
+                    <div className="absolute top-2.5 right-2.5 z-10">
+                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-sm border border-white/20 shadow-lg flex items-center gap-1">
                         <Download className="w-2.5 h-2.5 text-[#a3e635]" />
                         <span>{res.downloadsCount || 120}+</span>
                       </span>
@@ -109,7 +109,7 @@ export default async function FreeResourcesPage() {
                   </Link>
 
                   {/* CARD BODY */}
-                  <div className="p-5 space-y-2">
+                  <div className="p-4 space-y-1.5">
                     <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
                       RESSOURCE DIGITAL
                     </div>
@@ -127,8 +127,8 @@ export default async function FreeResourcesPage() {
                 </div>
 
                 {/* CARD FOOTER WITH HIGH IMPACT BUTTON */}
-                <div className="p-5 pt-0 space-y-3">
-                  <div className="flex items-center justify-between border-t border-white/10 pt-3 text-xs">
+                <div className="p-4 pt-0 space-y-3">
+                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-xs">
                     <span className="text-slate-500 line-through text-[11px] font-semibold">19.00 €</span>
                     <span className="font-heading font-black text-[#a3e635] text-sm">0 € (Gratuit)</span>
                   </div>
@@ -136,7 +136,7 @@ export default async function FreeResourcesPage() {
                   <Link href={`/checkout?productId=${res.id}`}>
                     <button
                       type="button"
-                      className="w-full py-3 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group/btn"
+                      className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
                     >
                       <Download className="w-4 h-4 shrink-0" />
                       <span>OBTENIR MON ACCÈS GRATUIT</span>
@@ -150,20 +150,20 @@ export default async function FreeResourcesPage() {
         )}
 
         {/* TRUST BADGES FOOTER BAR */}
-        <div className="mt-16 pt-10 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+        <div className="mt-14 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-5 text-center">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <ShieldCheck className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Sans Carte Bancaire</h4>
             <p className="text-xs text-slate-400">Téléchargement 100% libre et gratuit.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <Zap className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Téléchargement Immédiat</h4>
             <p className="text-xs text-slate-400">Accès direct au format PDF & Notion.</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0e1424] border border-white/5 space-y-1.5">
+          <div className="p-4 rounded-md bg-[#0e1424] border border-white/10 space-y-1">
             <Sparkles className="w-6 h-6 text-[#a3e635] mx-auto" />
             <h4 className="font-heading font-black text-sm text-white">Mises à jour à Vie</h4>
             <p className="text-xs text-slate-400">Futures versions gratuites incluses.</p>

@@ -50,7 +50,7 @@ export default function SalesSocialProofToast() {
           : 'translate-y-8 opacity-0 scale-95 pointer-events-none'
       }`}
     >
-      <div className="bg-[#0e1424]/95 backdrop-blur-md border border-[#a3e635]/40 text-white rounded-2xl p-3.5 shadow-2xl shadow-purple-950/50 flex items-start gap-3 relative overflow-hidden group">
+      <div className="bg-[#0e1424]/95 backdrop-blur-md border border-[#a3e635]/40 text-white rounded-lg p-3.5 shadow-2xl shadow-purple-950/50 flex items-start gap-3 relative overflow-hidden group">
         
         {/* NEON LEFT ACCENT BAR */}
         <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-[#a3e635] to-purple-600"></div>
