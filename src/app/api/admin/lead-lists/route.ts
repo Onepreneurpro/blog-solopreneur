@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 const DEFAULT_LEAD_LISTS = [
   { name: 'Opt-in eBook Gratuit', slug: 'ebook-optin', description: 'Prospects ayant souscrit via le bloc eBook de la page d accueil', color: '#a3e635', sourceType: 'EBOOK_OPTIN' },
   { name: 'Ressources Gratuites', slug: 'free-resource', description: 'Prospects ayant téléchargé une fiche ou un guide gratuit', color: '#38bdf8', sourceType: 'FREE_RESOURCE' },
+  { name: 'Clients de la Boutique', slug: 'customers', description: 'Clients ayant acheté un produit numérique payant', color: '#a855f7', sourceType: 'CUSTOMERS' },
   { name: 'Newsletter Général', slug: 'newsletter', description: 'Abonnés à la newsletter mensuelle', color: '#c084fc', sourceType: 'NEWSLETTER' },
 ];
 

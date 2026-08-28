@@ -11,7 +11,7 @@ export async function GET(
   try {
     const product = await prisma.product.findUnique({
       where: { id: params.id },
-      include: { category: true },
+      include: { category: true, targetList: true, welcomeStep: true },
     });
 
     if (!product) {
@@ -49,6 +49,8 @@ export async function PUT(
       isFreeResource,
       isFeatured,
       status,
+      targetListId,
+      welcomeStepId,
     } = body;
 
     if (!name || !slug) {
@@ -72,6 +74,8 @@ export async function PUT(
         isFreeResource: Boolean(isFreeResource),
         isFeatured: Boolean(isFeatured),
         status: status || 'PUBLISHED',
+        targetListId: targetListId || null,
+        welcomeStepId: welcomeStepId || null,
         updatedAt: new Date(),
       },
     });

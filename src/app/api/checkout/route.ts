@@ -112,75 +112,66 @@ export async function POST(request: Request) {
 
     let assignedLead: any = null;
 
-    // AUTOMATIC LEAD & LIST ROUTING WITH CUSTOMER PROTECTION RULE
-    if (product.price === 0 || product.isFreeResource) {
-      // RULE: If contact is ALREADY a CUSTOMER, preserve their CUSTOMER status & list!
-      if (!existingLead || existingLead.source !== 'CUSTOMER') {
+    // AUTOMATIC LEAD & LIST ROUTING WITH PRODUCT CUSTOM OVERRIDES & CUSTOMER PROTECTION RULE
+    let targetListId: string | null = product.targetListId || null;
+
+    if (!targetListId) {
+      if (product.price === 0 || product.isFreeResource) {
         const freeList = await prisma.leadList.findFirst({
           where: { sourceType: 'FREE_RESOURCE' },
           orderBy: { createdAt: 'desc' },
         });
-
-        assignedLead = await prisma.lead.upsert({
-          where: { email: cleanEmail },
-          update: {
-            firstName: cleanFirstName || undefined,
-            lastName: cleanLastName || undefined,
-            source: 'FREE_RESOURCE',
-            listId: freeList ? freeList.id : undefined,
-            updatedAt: new Date(),
-          },
-          create: {
-            email: cleanEmail,
-            firstName: cleanFirstName,
-            lastName: cleanLastName,
-            source: 'FREE_RESOURCE',
-            listId: freeList ? freeList.id : undefined,
-          },
-        });
+        targetListId = freeList?.id || null;
       } else {
-        assignedLead = await prisma.lead.update({
-          where: { email: cleanEmail },
-          data: {
-            firstName: cleanFirstName || existingLead.firstName,
-            lastName: cleanLastName || existingLead.lastName,
-            updatedAt: new Date(),
-          },
+        const customerList = await prisma.leadList.findFirst({
+          where: { sourceType: 'CUSTOMERS' },
+          orderBy: { createdAt: 'desc' },
         });
+        targetListId = customerList?.id || null;
       }
-    } else {
-      // Paid shop buyer -> ALWAYS UPGRADE TO CUSTOMER list!
-      const customerList = await prisma.leadList.findFirst({
-        where: { sourceType: 'CUSTOMERS' },
-        orderBy: { createdAt: 'desc' },
-      });
+    }
 
+    const isPaid = product.price > 0 && !product.isFreeResource;
+    const leadSource = isPaid ? 'CUSTOMER' : 'FREE_RESOURCE';
+
+    if (isPaid || !existingLead || existingLead.source !== 'CUSTOMER') {
       assignedLead = await prisma.lead.upsert({
         where: { email: cleanEmail },
         update: {
           firstName: cleanFirstName || undefined,
           lastName: cleanLastName || undefined,
-          source: 'CUSTOMER',
-          listId: customerList ? customerList.id : undefined,
+          source: leadSource,
+          listId: targetListId || undefined,
           updatedAt: new Date(),
         },
         create: {
           email: cleanEmail,
           firstName: cleanFirstName,
           lastName: cleanLastName,
-          source: 'CUSTOMER',
-          listId: customerList ? customerList.id : undefined,
+          source: leadSource,
+          listId: targetListId || undefined,
+        },
+      });
+    } else {
+      assignedLead = await prisma.lead.update({
+        where: { email: cleanEmail },
+        data: {
+          firstName: cleanFirstName || existingLead.firstName,
+          lastName: cleanLastName || existingLead.lastName,
+          updatedAt: new Date(),
         },
       });
     }
 
     // AUTOMATED EMAIL CAMPAIGN DISPATCHER
-    if (assignedLead && assignedLead.listId) {
+    const activeListId = targetListId || assignedLead?.listId;
+    if (assignedLead && activeListId) {
       triggerCampaignSequencesForLead({
         leadEmail: cleanEmail,
         leadFirstName: assignedLead.firstName,
         leadLastName: assignedLead.lastName,
-        listId: assignedLead.listId,
+        listId: activeListId,
+        welcomeStepId: product.welcomeStepId || undefined,
       }).catch((err) => console.error('Background campaign error:', err));
     }
 

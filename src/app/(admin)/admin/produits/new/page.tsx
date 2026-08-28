@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Link as LinkIcon, Upload, CheckCircle2, Tag } from 'lucide-react';
+import { ArrowLeft, Save, Link as LinkIcon, Upload, CheckCircle2, Tag, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { PRODUCT_FORMAT_OPTIONS } from '@/lib/product-formats';
@@ -13,6 +13,8 @@ export default function NewProductAdminPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [categories, setCategories] = useState<any[]>([]);
+  const [leadLists, setLeadLists] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -25,6 +27,9 @@ export default function NewProductAdminPage() {
   const [fileType, setFileType] = useState('ZIP');
   const [isFreeResource, setIsFreeResource] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
+
+  const [targetListId, setTargetListId] = useState('');
+  const [welcomeStepId, setWelcomeStepId] = useState('');
 
   // Delivery options: 'LINK' (Option 1) vs 'FILE' (Option 2)
   const [deliveryOption, setDeliveryOption] = useState<'LINK' | 'FILE'>('LINK');
@@ -44,7 +49,41 @@ export default function NewProductAdminPage() {
         }
       })
       .catch(() => {});
+
+    fetch('/api/admin/lead-lists')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.lists) setLeadLists(data.lists);
+      })
+      .catch(() => {});
+
+    fetch('/api/admin/campaigns')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.campaigns) setCampaigns(data.campaigns);
+      })
+      .catch(() => {});
   }, []);
+
+  const availableSequenceSteps: { id: string; label: string }[] = [];
+  campaigns.forEach((camp) => {
+    if (camp.sequences) {
+      camp.sequences.forEach((step: any) => {
+        availableSequenceSteps.push({
+          id: step.id,
+          label: `[${camp.name}] Étape ${step.stepOrder} - ${step.subject}`,
+        });
+        if (step.variants) {
+          step.variants.forEach((v: any) => {
+            availableSequenceSteps.push({
+              id: v.id,
+              label: `[${camp.name}] (Sous-email) ${v.subject}`,
+            });
+          });
+        }
+      });
+    }
+  });
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -120,6 +159,8 @@ export default function NewProductAdminPage() {
           isFreeResource,
           isFeatured,
           status: 'PUBLISHED',
+          targetListId: targetListId || null,
+          welcomeStepId: welcomeStepId || null,
         }),
       });
 
@@ -379,6 +420,64 @@ export default function NewProductAdminPage() {
               />
               <span className="text-xs font-bold text-slate-800">Mettre en Avant (Coup de Cœur)</span>
             </label>
+          </div>
+        </Card>
+
+        {/* AUTOMATISATION & MARKETING EMAIL */}
+        <Card className="p-6 space-y-4 border-2 border-purple-200 bg-slate-50/50 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-2 text-purple-900 font-extrabold text-sm sm:text-base border-b border-purple-100 pb-3">
+            <Mail className="w-5 h-5 text-purple-600" />
+            <span>AUTOMATISATION & MARKETING EMAIL (CRM)</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* LISTE EMAIL */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Liste d'emails du {isFreeResource ? 'Lead' : 'Client'} *
+              </label>
+              <select
+                value={targetListId}
+                onChange={(e) => setTargetListId(e.target.value)}
+                className="w-full h-11 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              >
+                <option value="">
+                  {isFreeResource ? '⚡ Par défaut : Ressources Gratuites' : '⚡ Par défaut : Clients de la Boutique'}
+                </option>
+                {leadLists.map((list) => (
+                  <option key={list.id} value={list.id}>
+                    {list.name} {list.sourceType ? `(${list.sourceType})` : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Liste où le contact sera automatiquement enregistré après la commande ou le téléchargement.
+              </p>
+            </div>
+
+            {/* EMAIL DE BIENVENUE */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Email de Bienvenue automatique
+              </label>
+              <select
+                value={welcomeStepId}
+                onChange={(e) => setWelcomeStepId(e.target.value)}
+                className="w-full h-11 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              >
+                <option value="">
+                  ⚡ Par défaut : Premier email de la séquence de la campagne
+                </option>
+                {availableSequenceSteps.map((step) => (
+                  <option key={step.id} value={step.id}>
+                    {step.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Email ou sous-email spécifique envoyé immédiatement dès la validation.
+              </p>
+            </div>
           </div>
         </Card>
 

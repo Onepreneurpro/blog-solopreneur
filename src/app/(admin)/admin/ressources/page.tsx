@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Plus, Trash2, Edit, Save, X, Download, FileText, Upload, CheckCircle2, Eye, Sparkles } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Edit, Save, X, Download, FileText, Upload, CheckCircle2, Eye, Sparkles, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -32,6 +32,11 @@ export default function AdminRessourcesPage() {
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState('');
 
+  const [leadLists, setLeadLists] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [targetListId, setTargetListId] = useState('');
+  const [welcomeStepId, setWelcomeStepId] = useState('');
+
   // Inline Edit State for editing an existing resource
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -42,6 +47,9 @@ export default function AdminRessourcesPage() {
   const [editImages, setEditImages] = useState<string[]>([]);
   const [editIcon, setEditIcon] = useState('');
   const [editFileUrl, setEditFileUrl] = useState('');
+  const [editTargetListId, setEditTargetListId] = useState('');
+  const [editWelcomeStepId, setEditWelcomeStepId] = useState('');
+
   const [editUploading, setEditUploading] = useState(false);
   const [editImageUploading, setEditImageUploading] = useState(false);
   const [editIconUploading, setEditIconUploading] = useState(false);
@@ -62,7 +70,41 @@ export default function AdminRessourcesPage() {
 
   useEffect(() => {
     fetchResources();
+
+    fetch('/api/admin/lead-lists')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.lists) setLeadLists(data.lists);
+      })
+      .catch(() => {});
+
+    fetch('/api/admin/campaigns')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.campaigns) setCampaigns(data.campaigns);
+      })
+      .catch(() => {});
   }, []);
+
+  const availableSequenceSteps: { id: string; label: string }[] = [];
+  campaigns.forEach((camp) => {
+    if (camp.sequences) {
+      camp.sequences.forEach((step: any) => {
+        availableSequenceSteps.push({
+          id: step.id,
+          label: `[${camp.name}] Étape ${step.stepOrder} - ${step.subject}`,
+        });
+        if (step.variants) {
+          step.variants.forEach((v: any) => {
+            availableSequenceSteps.push({
+              id: v.id,
+              label: `[${camp.name}] (Sous-email) ${v.subject}`,
+            });
+          });
+        }
+      });
+    }
+  });
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -239,6 +281,8 @@ export default function AdminRessourcesPage() {
           images,
           icon,
           fileUrl,
+          targetListId: targetListId || null,
+          welcomeStepId: welcomeStepId || null,
         }),
       });
 
@@ -253,6 +297,8 @@ export default function AdminRessourcesPage() {
       setImages([]);
       setIcon('');
       setFileUrl('');
+      setTargetListId('');
+      setWelcomeStepId('');
       fetchResources();
     } catch (err: any) {
       setError(err.message);
@@ -282,6 +328,8 @@ export default function AdminRessourcesPage() {
     setEditImages(parsedImages);
     setEditIcon(resItem.icon || '');
     setEditFileUrl(resItem.fileUrl || '');
+    setEditTargetListId(resItem.targetListId || '');
+    setEditWelcomeStepId(resItem.welcomeStepId || '');
   };
 
   const handleSaveEdit = async (id: string) => {
@@ -301,6 +349,8 @@ export default function AdminRessourcesPage() {
           images: editImages,
           icon: editIcon,
           fileUrl: editFileUrl,
+          targetListId: editTargetListId || null,
+          welcomeStepId: editWelcomeStepId || null,
         }),
       });
 
@@ -527,6 +577,50 @@ export default function AdminRessourcesPage() {
                 />
               </div>
 
+              {/* AUTOMATISATION EMAIL (CRM) */}
+              <div className="p-3.5 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3">
+                <div className="flex items-center gap-1.5 text-purple-900 font-extrabold text-xs border-b border-purple-200/60 pb-1.5">
+                  <Mail className="w-4 h-4 text-purple-600" />
+                  <span>MARKETING & LISTE EMAIL DU LEAD</span>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Liste d'emails du Lead *
+                  </label>
+                  <select
+                    value={targetListId}
+                    onChange={(e) => setTargetListId(e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  >
+                    <option value="">⚡ Par défaut : Ressources Gratuites</option>
+                    {leadLists.map((list) => (
+                      <option key={list.id} value={list.id}>
+                        {list.name} {list.sourceType ? `(${list.sourceType})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Email de Bienvenue automatique
+                  </label>
+                  <select
+                    value={welcomeStepId}
+                    onChange={(e) => setWelcomeStepId(e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  >
+                    <option value="">⚡ Par défaut : Premier email de la séquence</option>
+                    {availableSequenceSteps.map((step) => (
+                      <option key={step.id} value={step.id}>
+                        {step.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               {/* SOLID VIOLET BUTTON */}
               <Button
                 type="submit"
@@ -731,6 +825,52 @@ export default function AdminRessourcesPage() {
                                   onChange={(e) => setEditLongDesc(e.target.value)}
                                   className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white"
                                 />
+                              </div>
+
+                              {/* AUTOMATISATION EMAIL (CRM) */}
+                              <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-2">
+                                <div className="flex items-center gap-1.5 text-purple-900 font-extrabold text-[11px] border-b border-purple-200/60 pb-1">
+                                  <Mail className="w-3.5 h-3.5 text-purple-600" />
+                                  <span>MARKETING & LISTE EMAIL DU LEAD</span>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">
+                                      Liste d'emails du Lead
+                                    </label>
+                                    <select
+                                      value={editTargetListId}
+                                      onChange={(e) => setEditTargetListId(e.target.value)}
+                                      className="w-full px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900"
+                                    >
+                                      <option value="">⚡ Par défaut : Ressources Gratuites</option>
+                                      {leadLists.map((list) => (
+                                        <option key={list.id} value={list.id}>
+                                          {list.name} {list.sourceType ? `(${list.sourceType})` : ''}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[10px] font-bold text-slate-700 mb-0.5">
+                                      Email de Bienvenue
+                                    </label>
+                                    <select
+                                      value={editWelcomeStepId}
+                                      onChange={(e) => setEditWelcomeStepId(e.target.value)}
+                                      className="w-full px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900"
+                                    >
+                                      <option value="">⚡ Par défaut : Premier email</option>
+                                      {availableSequenceSteps.map((step) => (
+                                        <option key={step.id} value={step.id}>
+                                          {step.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
                               </div>
 
                               <div className="flex justify-end gap-2 pt-2 border-t border-purple-200/60">

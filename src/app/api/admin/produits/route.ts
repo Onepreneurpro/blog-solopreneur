@@ -9,7 +9,7 @@ export async function GET() {
     const products = await prisma.product.findMany({
       where: { isFreeResource: false },
       orderBy: { createdAt: 'desc' },
-      include: { category: true },
+      include: { category: true, targetList: true, welcomeStep: true },
     });
 
     return NextResponse.json({ products });
@@ -40,6 +40,8 @@ export async function POST(request: Request) {
       isFreeResource,
       isFeatured,
       status,
+      targetListId,
+      welcomeStepId,
     } = body;
 
     if (!name || !slug || price === undefined) {
@@ -62,6 +64,8 @@ export async function POST(request: Request) {
         isFreeResource: Boolean(isFreeResource),
         isFeatured: Boolean(isFeatured),
         status: status || 'PUBLISHED',
+        targetListId: targetListId || null,
+        welcomeStepId: welcomeStepId || null,
       },
     });
 

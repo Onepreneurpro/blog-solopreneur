@@ -132,10 +132,14 @@ model Product {
   badgeText         String?          // e.g. "HOT", "NEW", "-50%"
   downloadsCount    Int              @default(0)
   status            String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  targetListId      String?
+  targetList        LeadList?          @relation("ProductTargetList", fields: [targetListId], references: [id], onDelete: SetNull)
+  welcomeStepId     String?
+  welcomeStep       EmailSequenceStep? @relation("ProductWelcomeStep", fields: [welcomeStepId], references: [id], onDelete: SetNull)
   seoTitle          String?
   seoDescription    String?
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @default(now())
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
 
   orderItems        OrderItem[]
   downloads         Download[]
@@ -320,6 +324,7 @@ model LeadList {
 
   leads       Lead[]
   campaigns   CampaignLeadList[]
+  products    Product[]          @relation("ProductTargetList")
 }
 
 model Lead {
@@ -398,6 +403,7 @@ model EmailSequenceStep {
   parent         EmailSequenceStep?   @relation("SequenceStepVariants", fields: [parentId], references: [id], onDelete: Cascade)
   variants       EmailSequenceStep[]  @relation("SequenceStepVariants")
   queue          EmailSequenceQueue[]
+  products       Product[]            @relation("ProductWelcomeStep")
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @default(now())
 }
