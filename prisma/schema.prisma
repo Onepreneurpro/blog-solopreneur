@@ -1,0 +1,434 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  passwordHash    String
+  name            String?
+  avatar          String?
+  role            String          @default("CUSTOMER") // ADMIN, EDITOR, CUSTOMER
+  isBlocked       Boolean         @default(false)
+  storeCredit     Float           @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  articles        Article[]
+  orders          Order[]
+  customerOrders  Order[]         @relation("OrderCustomer")
+  downloads       Download[]
+  tickets         Ticket[]
+  customerTickets Ticket[]        @relation("TicketCustomer")
+  directMessages  DirectMessage[]
+}
+
+model Category {
+  id             String     @id @default(uuid())
+  name           String
+  slug           String     @unique
+  description    String?
+  image          String?
+  parentId       String?
+  parent         Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: Cascade)
+  children       Category[] @relation("SubCategories")
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  articles       Article[]
+}
+
+model Tag {
+  id        String       @id @default(uuid())
+  name      String       @unique
+  slug      String       @unique
+  articles  ArticleTag[]
+}
+
+model Article {
+  id             String     @id @default(uuid())
+  title          String
+  slug           String     @unique
+  excerpt        String?
+  content        String
+  coverImage     String?
+  authorId       String
+  author         User       @relation(fields: [authorId], references: [id])
+  categoryId     String?
+  category       Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  status         String     @default("DRAFT") // DRAFT, PENDING, PUBLISHED, SCHEDULED, ARCHIVED
+  readingTime    Int        @default(3)
+  viewsCount     Int        @default(0)
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  publishedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  tags           ArticleTag[]
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+model Page {
+  id             String    @id @default(uuid())
+  title          String
+  slug           String    @unique
+  content        String
+  coverImage     String?
+  targetMenu     String?   @default("NONE") // HEADER, FOOTER, RESSOURCES, TEMPLATES, NONE
+  status         String    @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime? @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+}
+
+model Product {
+  id                String           @id @default(uuid())
+  name              String
+  slug              String           @unique
+  shortDescription  String?
+  longDescription   String?
+  price             Float            @default(0.0)
+  compareAtPrice    Float?
+  coverImage        String?
+  fileUrl           String?          // File link (ZIP, PDF, Notion template)
+  fileType          String?          @default("NOTION") // NOTION, EXCEL, PDF, ZIP
+  categoryId        String?
+  category          ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  productCategoryId String?
+  isFeatured        Boolean          @default(false)
+  isFreeResource    Boolean          @default(false)
+  badgeText         String?          // e.g. "HOT", "NEW", "-50%"
+  downloadsCount    Int              @default(0)
+  status            String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  seoTitle          String?
+  seoDescription    String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+
+  orderItems        OrderItem[]
+  downloads         Download[]
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerId      String?
+  customer        User?       @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  customerEmail   String
+  totalAmount     Float
+  status          String      @default("PENDING") // PENDING, PAID, CANCELLED, REFUNDED
+  paymentMethod   String      @default("STRIPE")  // STRIPE, PAYPAL, FREE
+  paymentIntentId String?
+  downloadToken   String?     @default(uuid())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @default(now())
+
+  items           OrderItem[]
+  downloads       Download[]
+  tickets         Ticket[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price     Float
+  title     String?
+}
+
+model Download {
+  id            String   @id @default(uuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderId       String?
+  order         Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ipAddress     String?
+  downloadToken String?  @unique
+  downloadCount Int      @default(0)
+  maxDownloads  Int      @default(20)
+  createdAt     DateTime @default(now())
+  downloadedAt  DateTime @default(now())
+}
+
+model Ticket {
+  id            String          @id @default(uuid())
+  ticketNumber  String          @unique
+  userId        String?
+  user          User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customerId    String?
+  customer      User?           @relation("TicketCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  customerEmail String          @default("customer@solopreneur.io")
+  orderId       String?
+  order         Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  subject       String
+  message       String?
+  category      String          @default("GENERAL") // GENERAL, TECHNICAL, BILLING, PRODUCT
+  status        String          @default("OPEN")    // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  priority      String          @default("MEDIUM")  // LOW, MEDIUM, HIGH, URGENT
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  messages      TicketMessage[]
+  replies       TicketReply[]
+}
+
+model TicketMessage {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model TicketReply {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender    String   @default("ADMIN")
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model DirectMessage {
+  id             String               @id @default(uuid())
+  senderId       String?
+  sender         User?                @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  customerId     String?
+  customerEmail  String               @default("customer@solopreneur.io")
+  subject        String?
+  content        String
+  promoCode      String?
+  isRead         Boolean              @default(false)
+  customerIsRead Boolean              @default(false)
+  createdAt      DateTime             @default(now())
+
+  replies        DirectMessageReply[]
+}
+
+model DirectMessageReply {
+  id              String        @id @default(uuid())
+  messageId       String?
+  directMessageId String?
+  messageRef      DirectMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  sender          String        @default("ADMIN")
+  content         String        @default("")
+  message         String?
+  createdAt       DateTime      @default(now())
+}
+
+model Media {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String?
+  title        String?
+  altText      String?
+  url          String
+  mimeType     String
+  size         Int
+  folder       String?  @default("uploads")
+  createdAt    DateTime @default(now())
+}
+
+model Menu {
+  id        String     @id @default(uuid())
+  title     String
+  location  String     @unique // HEADER, FOOTER, MOBILE
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id        String     @id @default(uuid())
+  menuId    String
+  menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  title     String
+  url       String
+  type      String     @default("CUSTOM") // CUSTOM, CATEGORY, PAGE, PRODUCT, RESOURCE
+  parentId  String?
+  parent    MenuItem?  @relation("SubMenuItems", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MenuItem[] @relation("SubMenuItems")
+  order     Int        @default(0)
+}
+
+model HomepageSection {
+  id         String   @id @default(uuid())
+  sectionKey String   @unique // HERO, CATEGORIES, ARTICLES, RESOURCES, PRODUCTS, NEWSLETTER, CTA
+  title      String
+  subtitle   String?
+  isEnabled  Boolean  @default(true)
+  order      Int      @default(0)
+  settings   String?  // JSON string
+  updatedAt  DateTime @updatedAt
+}
+
+model SiteSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String // JSON string
+}
+
+model LeadList {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  slug        String             @unique
+  description String?
+  color       String             @default("#a3e635")
+  sourceType  String             @default("ALL") // EBOOK_OPTIN, FREE_RESOURCE, CUSTOMERS, NEWSLETTER, ALL
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now())
+
+  leads       Lead[]
+  campaigns   CampaignLeadList[]
+}
+
+model Lead {
+  id        String    @id @default(uuid())
+  firstName String?
+  lastName  String?
+  email     String    @unique
+  source    String    @default("EBOOK_OPTIN") // EBOOK_OPTIN, FREE_RESOURCE, CUSTOMERS, NEWSLETTER
+  status            String    @default("SUBSCRIBED")  // SUBSCRIBED, UNSUBSCRIBED, BLOCKED
+  listId            String?
+  list              LeadList? @relation(fields: [listId], references: [id], onDelete: SetNull)
+  openedEmailsCount Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now())
+}
+
+model SmtpServer {
+  id          String   @id @default(uuid())
+  name        String
+  host        String
+  port        Int      @default(587)
+  username    String
+  password    String
+  encryption  String   @default("TLS") // TLS, SSL, NONE
+  fromEmail   String
+  fromName    String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  campaigns   EmailCampaign[]
+}
+
+model EmailCampaign {
+  id           String               @id @default(uuid())
+  name         String
+  description  String?
+  status       String               @default("ACTIVE") // DRAFT, ACTIVE, PAUSED, ARCHIVED
+  smtpServerId String?
+  smtpServer   SmtpServer?          @relation(fields: [smtpServerId], references: [id], onDelete: SetNull)
+  pausedAt     DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @default(now())
+
+  lists        CampaignLeadList[]
+  sequences    EmailSequenceStep[]
+  queue        EmailSequenceQueue[]
+}
+
+model CampaignLeadList {
+  campaignId String
+  listId     String
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  list       LeadList      @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, listId])
+}
+
+model EmailSequenceStep {
+  id             String               @id @default(uuid())
+  campaignId     String
+  campaign       EmailCampaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  stepOrder      Int                  @default(1)
+  subject        String
+  content        String
+  triggerType    String               @default("IMMEDIATE") // IMMEDIATE, DELAYED
+  delayHours     Int                  @default(0)
+  delayMinutes   Int                  @default(0)
+  status         String               @default("ACTIVE")    // DRAFT, ACTIVE, PAUSED
+  sentCount      Int                  @default(0)
+  openRate       Float                @default(0.0)
+  clicksCount    Int                  @default(0)
+  attachmentUrl  String?
+  attachmentName String?
+  parentId       String?
+  parent         EmailSequenceStep?   @relation("SequenceStepVariants", fields: [parentId], references: [id], onDelete: Cascade)
+  variants       EmailSequenceStep[]  @relation("SequenceStepVariants")
+  queue          EmailSequenceQueue[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @default(now())
+}
+
+model EmailSequenceQueue {
+  id            String            @id @default(uuid())
+  campaignId    String
+  campaign      EmailCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  stepId        String
+  step          EmailSequenceStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  leadEmail     String
+  leadFirstName String?
+  leadLastName  String?
+  scheduledAt   DateTime
+  status        String            @default("PENDING") // PENDING, SENT, FAILED, CANCELLED
+  sentAt        DateTime?
+  openedAt      DateTime?
+  isOpened      Boolean           @default(false)
+  isClicked     Boolean           @default(false)
+  clickedAt     DateTime?
+  clicksCount   Int               @default(0)
+  error         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @default(now())
+
+  @@index([scheduledAt, status])
+}
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
