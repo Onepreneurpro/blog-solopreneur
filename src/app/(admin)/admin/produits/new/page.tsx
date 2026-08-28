@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Save, Link as LinkIcon, Upload, CheckCircle2, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { PRODUCT_FORMAT_OPTIONS } from '@/lib/product-formats';
 
 export default function NewProductAdminPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function NewProductAdminPage() {
   const [longDescription, setLongDescription] = useState('');
   const [coverImage, setCoverImage] = useState('');
   const [productCategoryId, setProductCategoryId] = useState('');
+  const [fileType, setFileType] = useState('ZIP');
   const [isFreeResource, setIsFreeResource] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
 
@@ -53,6 +55,19 @@ export default function NewProductAdminPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
     setSlug(generatedSlug);
+  };
+
+  const handleCategoryChange = (catId: string) => {
+    setProductCategoryId(catId);
+    const selectedCat = categories.find((c) => c.id === catId);
+    if (selectedCat) {
+      const slug = selectedCat.slug.toLowerCase();
+      if (slug.includes('notion')) setFileType('TEMPLATE NOTION');
+      else if (slug.includes('sio')) setFileType('TEMPLATESIO');
+      else if (slug.includes('excel')) setFileType('EXCEL');
+      else if (slug.includes('outils') || slug.includes('gestion')) setFileType('WEB APP');
+      else if (slug.includes('ressources') || slug.includes('guide')) setFileType('PDF');
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +115,7 @@ export default function NewProductAdminPage() {
           longDescription,
           coverImage,
           productCategoryId: productCategoryId || null,
+          fileType,
           fileUrl: finalFileUrl,
           isFreeResource,
           isFeatured,
@@ -151,7 +167,7 @@ export default function NewProductAdminPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Slug URL *</label>
               <input
@@ -167,17 +183,36 @@ export default function NewProductAdminPage() {
             <div>
               <label className="block text-xs font-bold text-purple-950 mb-1 flex items-center gap-1.5">
                 <Tag className="w-4 h-4 text-purple-600" />
-                <span>Catégorie du Produit Digital *</span>
+                <span>Catégorie du Produit *</span>
               </label>
               <select
                 value={productCategoryId}
-                onChange={(e) => setProductCategoryId(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="w-full px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg text-xs font-extrabold text-purple-950 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               >
                 <option value="">-- Sélectionner une catégorie --</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name} ({cat.slug})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* SELECTION FORMAT DU PRODUIT */}
+            <div>
+              <label className="block text-xs font-bold text-purple-950 mb-1 flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-purple-600" />
+                <span>Format / Type *</span>
+              </label>
+              <select
+                value={fileType}
+                onChange={(e) => setFileType(e.target.value)}
+                className="w-full px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg text-xs font-extrabold text-purple-950 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              >
+                {PRODUCT_FORMAT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label} ({opt.value})
                   </option>
                 ))}
               </select>
@@ -198,157 +233,172 @@ export default function NewProductAdminPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Ancien Prix barré (€)</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Prix barré (€)</label>
               <input
                 type="number"
                 step="0.01"
                 value={compareAtPrice || ''}
                 onChange={(e) => setCompareAtPrice(e.target.value ? Number(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-400 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
             </div>
           </div>
-
-          <div className="flex items-center gap-6 pt-2">
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isFreeResource}
-                onChange={(e) => setIsFreeResource(e.target.checked)}
-                className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              <span>Ressource 100% Gratuite (0 €)</span>
-            </label>
-
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span>Mettre en avant (Best-seller)</span>
-            </label>
-          </div>
         </Card>
 
-        {/* SECURE DELIVERY OPTIONS (OPTION 1 VS OPTION 2) */}
+        {/* COMPORTEMENT LIVRAISON DU PRODUIT */}
         <Card className="p-6 bg-white space-y-4 border border-slate-200 shadow-sm">
-          <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-bold text-slate-900">Livraison du Fichier & Sécurisation après Paiement</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Le produit sera disponible au téléchargement ou débloqué <strong>uniquement après validation du paiement</strong>.
-            </p>
-          </div>
+          <h3 className="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-2">
+            Mode de Livraison du Produit Digital
+          </h3>
 
-          {/* TOGGLE OPTIONS */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               type="button"
               onClick={() => setDeliveryOption('LINK')}
-              className={`p-4 rounded-xl border text-left transition-all ${deliveryOption === 'LINK' ? 'border-purple-600 bg-purple-50/60 ring-2 ring-purple-500/20' : 'border-slate-200 hover:border-slate-300'}`}
+              className={`p-4 rounded-xl border-2 text-left space-y-1 transition-all ${
+                deliveryOption === 'LINK'
+                  ? 'border-purple-600 bg-purple-50/50 text-purple-950'
+                  : 'border-slate-200 hover:border-slate-300 text-slate-700'
+              }`}
             >
-              <div className="flex items-center gap-2 font-bold text-xs text-purple-900 mb-1">
+              <div className="flex items-center gap-2 font-bold text-sm">
                 <LinkIcon className="w-4 h-4 text-purple-600" />
-                <span>Option 1 : Lien Externe Sécurisé</span>
+                <span>Option 1 : Lien Externe (Notion, Drive...)</span>
               </div>
-              <p className="text-[11px] text-slate-500">Lien Notion, Google Drive ou Dropbox protégé par jeton post-achat.</p>
+              <p className="text-xs text-slate-500">
+                Redirige l acheteur vers un lien externe ou un modèle Notion dupliquable.
+              </p>
             </button>
 
             <button
               type="button"
               onClick={() => setDeliveryOption('FILE')}
-              className={`p-4 rounded-xl border text-left transition-all ${deliveryOption === 'FILE' ? 'border-purple-600 bg-purple-50/60 ring-2 ring-purple-500/20' : 'border-slate-200 hover:border-slate-300'}`}
+              className={`p-4 rounded-xl border-2 text-left space-y-1 transition-all ${
+                deliveryOption === 'FILE'
+                  ? 'border-purple-600 bg-purple-50/50 text-purple-950'
+                  : 'border-slate-200 hover:border-slate-300 text-slate-700'
+              }`}
             >
-              <div className="flex items-center gap-2 font-bold text-xs text-purple-900 mb-1">
+              <div className="flex items-center gap-2 font-bold text-sm">
                 <Upload className="w-4 h-4 text-purple-600" />
-                <span>Option 2 : Uploader le Fichier sur le Site</span>
+                <span>Option 2 : Fichier Téléchargeable (PDF, ZIP, Excel)</span>
               </div>
-              <p className="text-[11px] text-slate-500">Hébergement direct du fichier (Excel, PDF, Zip) sur le serveur.</p>
+              <p className="text-xs text-slate-500">
+                L acheteur télécharge directement le fichier hébergé sur la plateforme.
+              </p>
             </button>
           </div>
 
-          {/* OPTION 1 CONTENT */}
-          {deliveryOption === 'LINK' && (
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">URL du produit / Lien Notion *</label>
+          {deliveryOption === 'LINK' ? (
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">URL de la ressource externe *</label>
               <input
                 type="url"
-                placeholder="https://notion.so/workspace-duplication-link..."
+                required={deliveryOption === 'LINK'}
+                placeholder="https://notion.so/template-dupliquable..."
                 value={externalLink}
                 onChange={(e) => setExternalLink(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
             </div>
-          )}
-
-          {/* OPTION 2 CONTENT */}
-          {deliveryOption === 'FILE' && (
-            <div className="pt-2 space-y-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Uploader le Fichier (.xlsx, .pdf, .zip) *</label>
-              <input
-                type="file"
-                onChange={handleFileUpload}
-                className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
-              />
-              {uploading && <div className="text-xs text-purple-600 font-semibold">Téléversement du fichier...</div>}
+          ) : (
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Téléverser le fichier digital *</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                />
+                {uploading && <span className="text-xs text-purple-600 font-bold">Upload en cours...</span>}
+              </div>
               {uploadedFileUrl && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Fichier téléversé : <code className="font-mono">{uploadedFileUrl}</code></span>
+                <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-200 font-bold">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="truncate">{uploadedFileUrl}</span>
                 </div>
               )}
             </div>
           )}
         </Card>
 
-        {/* DESCRIPTIONS & COVER IMAGE */}
+        {/* VISUEL & DESCRIPTIONS */}
         <Card className="p-6 bg-white space-y-4 border border-slate-200 shadow-sm">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Description courte</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Image de couverture (URL) *</label>
             <input
               type="text"
-              value={shortDescription}
-              onChange={(e) => setShortDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Description détaillée (HTML)</label>
-            <textarea
-              rows={5}
-              value={longDescription}
-              onChange={(e) => setLongDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">URL Image de présentation</label>
-            <input
-              type="text"
-              placeholder="https://images.unsplash.com/..."
+              required
+              placeholder="https://images.unsplash.com/photo-..."
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Courte description (Résumé Fiche) *</label>
+            <input
+              type="text"
+              required
+              placeholder="Accroche en 1 ou 2 phrases..."
+              value={shortDescription}
+              onChange={(e) => setShortDescription(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Description détaillée (Contenu complet)</label>
+            <textarea
+              rows={6}
+              placeholder="Présentez les fonctionnalités, les modules et les avantages de ce produit..."
+              value={longDescription}
+              onChange={(e) => setLongDescription(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-6 pt-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isFreeResource}
+                onChange={(e) => setIsFreeResource(e.target.checked)}
+                className="w-4 h-4 text-purple-600 rounded"
+              />
+              <span className="text-xs font-bold text-slate-800">Ressource Offerte (0 € / Opt-in)</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+                className="w-4 h-4 text-purple-600 rounded"
+              />
+              <span className="text-xs font-bold text-slate-800">Mettre en Avant (Coup de Cœur)</span>
+            </label>
           </div>
         </Card>
 
-        <Button
-          type="submit"
-          disabled={saving}
-          variant="primary"
-          size="lg"
-          className="w-full font-extrabold gap-2 shadow-md btn-purple"
-        >
-          <Save className="w-5 h-5" />
-          <span>{saving ? 'Création en cours...' : 'Créer le produit digital'}</span>
-        </Button>
+        {/* ACTIONS */}
+        <div className="flex justify-end gap-3 pt-4">
+          <Link href="/admin/produits">
+            <Button variant="outline" type="button">Annuler</Button>
+          </Link>
+          <Button
+            type="submit"
+            disabled={saving}
+            variant="primary"
+            className="bg-purple-700 hover:bg-purple-800 text-white font-extrabold gap-2 px-6"
+          >
+            <Save className="w-4 h-4" />
+            <span>{saving ? 'Enregistrement...' : 'Publier le Produit'}</span>
+          </Button>
+        </div>
 
       </form>
-
     </div>
   );
 }

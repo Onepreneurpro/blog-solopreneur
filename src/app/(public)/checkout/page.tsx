@@ -8,6 +8,7 @@ import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Downloa
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { isDarkTheme } from '@/lib/theme';
+import { getFileTypeLabel } from '@/lib/product-formats';
 
 export const dynamic = 'force-dynamic';
 
@@ -260,7 +261,7 @@ function CheckoutContent() {
                     {isFree ? 'Ressource Offerte' : 'Produit Numérique'}
                   </span>
                   <span className="text-xs font-bold opacity-75">
-                    Format : {product.fileType || 'PDF / Modèle Notion'}
+                    Format : {getFileTypeLabel(product.fileType)}
                   </span>
                 </div>
 
@@ -415,7 +416,7 @@ function CheckoutContent() {
                   <div>
                     <h4 className="font-heading font-black text-xs leading-snug">{product.name}</h4>
                     <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {isFree ? 'Ressource offerte (PDF / Modèle)' : `Format : ${product.fileType || 'DIGITAL'}`}
+                      {isFree ? `Ressource offerte (${getFileTypeLabel(product.fileType)})` : `Format : ${getFileTypeLabel(product.fileType)}`}
                     </p>
                   </div>
                 </div>

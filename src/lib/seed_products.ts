@@ -2,7 +2,7 @@ import { prisma } from './prisma';
 
 const DEMO_PRODUCTS = [
   // ----------------------------------------------------
-  // 1. DASHBOARDS EXCEL
+  // 1. DASHBOARDS EXCEL (fileType: 'EXCEL')
   // ----------------------------------------------------
   {
     categorySlug: 'excel',
@@ -45,7 +45,7 @@ const DEMO_PRODUCTS = [
   },
 
   // ----------------------------------------------------
-  // 2. TEMPLATES NOTION (12 PRODUITS)
+  // 2. TEMPLATES NOTION (fileType: 'TEMPLATE NOTION')
   // ----------------------------------------------------
   {
     categorySlug: 'notion',
@@ -56,7 +56,7 @@ const DEMO_PRODUCTS = [
     price: 49.00,
     compareAtPrice: 89.00,
     coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -69,7 +69,7 @@ const DEMO_PRODUCTS = [
     price: 29.00,
     compareAtPrice: 49.00,
     coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -82,7 +82,7 @@ const DEMO_PRODUCTS = [
     price: 35.00,
     compareAtPrice: 59.00,
     coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -95,7 +95,7 @@ const DEMO_PRODUCTS = [
     price: 45.00,
     compareAtPrice: 79.00,
     coverImage: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -108,7 +108,7 @@ const DEMO_PRODUCTS = [
     price: 29.00,
     compareAtPrice: 49.00,
     coverImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -121,7 +121,7 @@ const DEMO_PRODUCTS = [
     price: 25.00,
     compareAtPrice: 45.00,
     coverImage: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -134,7 +134,7 @@ const DEMO_PRODUCTS = [
     price: 35.00,
     compareAtPrice: 65.00,
     coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -147,7 +147,7 @@ const DEMO_PRODUCTS = [
     price: 19.00,
     compareAtPrice: 35.00,
     coverImage: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -160,7 +160,7 @@ const DEMO_PRODUCTS = [
     price: 69.00,
     compareAtPrice: 119.00,
     coverImage: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -173,7 +173,7 @@ const DEMO_PRODUCTS = [
     price: 27.00,
     compareAtPrice: 49.00,
     coverImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -186,7 +186,7 @@ const DEMO_PRODUCTS = [
     price: 32.00,
     compareAtPrice: 59.00,
     coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -199,13 +199,13 @@ const DEMO_PRODUCTS = [
     price: 39.00,
     compareAtPrice: 69.00,
     coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-    fileType: 'NOTION',
+    fileType: 'TEMPLATE NOTION',
     isFreeResource: false,
     isFeatured: false,
   },
 
   // ----------------------------------------------------
-  // 3. TEMPLATES SIO / SYSTEME.IO (12 PRODUITS EXACTS)
+  // 3. TEMPLATES SIO (fileType: 'TEMPLATESIO')
   // ----------------------------------------------------
   {
     categorySlug: 'templates-sio',
@@ -216,7 +216,7 @@ const DEMO_PRODUCTS = [
     price: 47.00,
     compareAtPrice: 87.00,
     coverImage: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -229,7 +229,7 @@ const DEMO_PRODUCTS = [
     price: 37.00,
     compareAtPrice: 65.00,
     coverImage: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -242,7 +242,7 @@ const DEMO_PRODUCTS = [
     price: 29.00,
     compareAtPrice: 49.00,
     coverImage: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -255,7 +255,7 @@ const DEMO_PRODUCTS = [
     price: 59.00,
     compareAtPrice: 99.00,
     coverImage: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -268,7 +268,7 @@ const DEMO_PRODUCTS = [
     price: 49.00,
     compareAtPrice: 89.00,
     coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -281,7 +281,7 @@ const DEMO_PRODUCTS = [
     price: 67.00,
     compareAtPrice: 119.00,
     coverImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -294,7 +294,7 @@ const DEMO_PRODUCTS = [
     price: 45.00,
     compareAtPrice: 79.00,
     coverImage: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -307,7 +307,7 @@ const DEMO_PRODUCTS = [
     price: 55.00,
     compareAtPrice: 95.00,
     coverImage: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -320,7 +320,7 @@ const DEMO_PRODUCTS = [
     price: 32.00,
     compareAtPrice: 59.00,
     coverImage: 'https://images.unsplash.com/photo-1556742049-0a674648c668?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -333,7 +333,7 @@ const DEMO_PRODUCTS = [
     price: 27.00,
     compareAtPrice: 49.00,
     coverImage: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -346,7 +346,7 @@ const DEMO_PRODUCTS = [
     price: 49.00,
     compareAtPrice: 89.00,
     coverImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -359,13 +359,13 @@ const DEMO_PRODUCTS = [
     price: 57.00,
     compareAtPrice: 99.00,
     coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'TEMPLATESIO',
     isFreeResource: false,
     isFeatured: true,
   },
 
   // ----------------------------------------------------
-  // 4. RESSOURCES & GUIDES
+  // 4. RESSOURCES & GUIDES (fileType: 'PDF')
   // ----------------------------------------------------
   {
     categorySlug: 'ressources',
@@ -395,7 +395,7 @@ const DEMO_PRODUCTS = [
   },
 
   // ----------------------------------------------------
-  // 5. OUTILS DE GESTION (12 PRODUITS)
+  // 5. OUTILS DE GESTION (fileType: 'WEB APP')
   // ----------------------------------------------------
   {
     categorySlug: 'outils-de-gestion',
@@ -406,7 +406,7 @@ const DEMO_PRODUCTS = [
     price: 69.00,
     compareAtPrice: 129.00,
     coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -419,7 +419,7 @@ const DEMO_PRODUCTS = [
     price: 59.00,
     compareAtPrice: 99.00,
     coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -432,7 +432,7 @@ const DEMO_PRODUCTS = [
     price: 49.00,
     compareAtPrice: 89.00,
     coverImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -445,7 +445,7 @@ const DEMO_PRODUCTS = [
     price: 39.00,
     compareAtPrice: 79.00,
     coverImage: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -458,7 +458,7 @@ const DEMO_PRODUCTS = [
     price: 45.00,
     compareAtPrice: 79.00,
     coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -471,7 +471,7 @@ const DEMO_PRODUCTS = [
     price: 55.00,
     compareAtPrice: 95.00,
     coverImage: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -484,7 +484,7 @@ const DEMO_PRODUCTS = [
     price: 22.00,
     compareAtPrice: 39.00,
     coverImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -497,7 +497,7 @@ const DEMO_PRODUCTS = [
     price: 35.00,
     compareAtPrice: 59.00,
     coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -510,7 +510,7 @@ const DEMO_PRODUCTS = [
     price: 49.00,
     compareAtPrice: 89.00,
     coverImage: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: true,
   },
@@ -523,7 +523,7 @@ const DEMO_PRODUCTS = [
     price: 39.00,
     compareAtPrice: 69.00,
     coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
-    fileType: 'ZIP',
+    fileType: 'WEB APP',
     isFreeResource: false,
     isFeatured: false,
   },
@@ -603,7 +603,7 @@ export async function seedDemoProducts() {
           status: 'PUBLISHED',
         },
       });
-      console.log(`Updated product: ${item.name}`);
+      console.log(`Updated product: ${item.name} (${item.fileType})`);
     } else {
       await prisma.product.create({
         data: {
@@ -622,11 +622,11 @@ export async function seedDemoProducts() {
           status: 'PUBLISHED',
         },
       });
-      console.log(`Created product: ${item.name}`);
+      console.log(`Created product: ${item.name} (${item.fileType})`);
     }
   }
 
-  // NOW FIX ALL EXISTING PRODUCTS IN DATABASE SO categoryId IS NEVER NULL
+  // NOW FIX ALL EXISTING PRODUCTS IN DATABASE SO categoryId IS NEVER NULL AND fileType IS ACCURATE
   const excelCat = categories.find((c) => c.slug === 'excel')?.id || null;
   const notionCat = categories.find((c) => c.slug === 'notion')?.id || null;
   const sioCat = categories.find((c) => c.slug === 'templates-sio')?.id || null;
@@ -636,6 +636,7 @@ export async function seedDemoProducts() {
   const allProducts = await prisma.product.findMany();
   for (const prod of allProducts) {
     let targetCatId: string | null = prod.categoryId || prod.productCategoryId;
+    let targetFileType = prod.fileType;
 
     if (!targetCatId) {
       const lowerName = prod.name.toLowerCase();
@@ -652,18 +653,30 @@ export async function seedDemoProducts() {
       }
     }
 
-    if (targetCatId) {
-      await prisma.product.update({
-        where: { id: prod.id },
-        data: {
-          categoryId: targetCatId,
-          productCategoryId: targetCatId,
-        },
-      });
+    if (!targetFileType || targetFileType === 'ZIP') {
+      if (targetCatId === notionCat || prod.name.toLowerCase().includes('notion')) {
+        targetFileType = 'TEMPLATE NOTION';
+      } else if (targetCatId === sioCat || prod.name.toLowerCase().includes('systeme') || prod.name.toLowerCase().includes('sio')) {
+        targetFileType = 'TEMPLATESIO';
+      } else if (targetCatId === excelCat || prod.name.toLowerCase().includes('excel')) {
+        targetFileType = 'EXCEL';
+      } else if (targetCatId === gestionCat || prod.name.toLowerCase().includes('web app') || prod.name.toLowerCase().includes('logiciel') || prod.name.toLowerCase().includes('erp') || prod.name.toLowerCase().includes('crm')) {
+        targetFileType = 'WEB APP';
+      } else if (targetCatId === resCat || prod.name.toLowerCase().includes('pdf') || prod.name.toLowerCase().includes('ebook')) {
+        targetFileType = 'PDF';
+      }
     }
+
+    await prisma.product.update({
+      where: { id: prod.id },
+      data: {
+        ...(targetCatId ? { categoryId: targetCatId, productCategoryId: targetCatId } : {}),
+        fileType: targetFileType,
+      },
+    });
   }
 
-  console.log('--- Demo Products Seeding Completed & Category IDs Fixed! ---');
+  console.log('--- Demo Products Seeding Completed & Formats Updated! ---');
 }
 
 if (require.main === module) {

@@ -6,6 +6,7 @@ import { ShoppingBag, ArrowRight, Sparkles, Star, Zap, ShieldCheck } from 'lucid
 import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { getActiveTheme, isDarkTheme } from '@/lib/theme';
+import { getFileTypeLabel } from '@/lib/product-formats';
 import SalesSocialProofToast from '@/components/public/SalesSocialProofToast';
 
 export const dynamic = 'force-dynamic';
@@ -220,8 +221,9 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
 
                     {/* CARD CONTENT */}
                     <div className="p-4 space-y-1.5">
-                      <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
-                        {prod.category?.name || category.name || 'OUTILS & TEMPLATES'}
+                      <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest flex items-center justify-between">
+                        <span>{prod.category?.name || category.name || 'OUTILS & TEMPLATES'}</span>
+                        <span className="text-slate-400 font-semibold normal-case">Format : {getFileTypeLabel(prod.fileType)}</span>
                       </div>
 
                       <Link href={`/checkout?productId=${prod.id}`}>
