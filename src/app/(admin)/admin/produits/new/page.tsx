@@ -69,17 +69,19 @@ export default function NewProductAdminPage() {
   campaigns.forEach((camp) => {
     if (camp.sequences) {
       camp.sequences.forEach((step: any) => {
-        availableSequenceSteps.push({
-          id: step.id,
-          label: `[${camp.name}] Étape ${step.stepOrder} - ${step.subject}`,
-        });
-        if (step.variants) {
-          step.variants.forEach((v: any) => {
-            availableSequenceSteps.push({
-              id: v.id,
-              label: `[${camp.name}] (Sous-email) ${v.subject}`,
-            });
+        if (step.stepOrder === 1 || step.triggerType === 'IMMEDIATE') {
+          availableSequenceSteps.push({
+            id: step.id,
+            label: `[${camp.name}] Étape 1 - ${step.subject}`,
           });
+          if (step.variants) {
+            step.variants.forEach((v: any) => {
+              availableSequenceSteps.push({
+                id: v.id,
+                label: `[${camp.name}] (Sous-email) ${v.subject}`,
+              });
+            });
+          }
         }
       });
     }
