@@ -1598,27 +1598,143 @@ export default function AdminHomepageBuilderPage() {
 
                                   {/* TAB 1: BADGE FLOTTANT */}
                                   {activeTab === 'badge' && (
-                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
-                                      <label className="block text-xs font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
-                                        <span>🏷️ 1. Personnalisation du Badge Flottant Supérieur du Bloc</span>
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={sec.settings?.badgeText || sec.settings?.topTickerText || sec.settings?.floatingBadge || ''}
-                                        onChange={(e) => {
-                                          handleSettingChange(sec.id, 'badgeText', e.target.value);
-                                          handleSettingChange(sec.id, 'topTickerText', e.target.value);
-                                          handleSettingChange(sec.id, 'floatingBadge', e.target.value);
-                                        }}
-                                        className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                                        placeholder="Saisissez le texte du badge (ex: EBOOK OFFERT A 100%)..."
-                                      />
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
+                                      <div className="flex items-center justify-between">
+                                        <label className="block text-xs font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
+                                          <span>🏷️ 1. Personnalisation du Badge Flottant Supérieur du Bloc</span>
+                                        </label>
+                                      </div>
+
+                                      {/* POLICE / TAILLE / COULEUR DU BADGE */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
+                                          <select
+                                            value={sec.settings?.badgeFont || 'Plus Jakarta Sans'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'badgeFont', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            {GOOGLE_FONTS_OPTIONS.map((f) => (
+                                              <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Badge</label>
+                                          <select
+                                            value={sec.settings?.badgeSize || '13px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'badgeSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            <option value="11px">Discret (11px)</option>
+                                            <option value="12px">Compact (12px)</option>
+                                            <option value="13px">Standard (13px)</option>
+                                            <option value="15px">Grand (15px)</option>
+                                            <option value="18px">Très Grand (18px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Badge</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.badgeColor || '#a3e635'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'badgeColor', e.target.value)}
+                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'badgeColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">Contenu du Texte du Badge Flottant</label>
+                                        <input
+                                          type="text"
+                                          value={sec.settings?.badgeText || sec.settings?.topTickerText || sec.settings?.floatingBadge || ''}
+                                          onChange={(e) => {
+                                            handleSettingChange(sec.id, 'badgeText', e.target.value);
+                                            handleSettingChange(sec.id, 'topTickerText', e.target.value);
+                                            handleSettingChange(sec.id, 'floatingBadge', e.target.value);
+                                          }}
+                                          className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                          placeholder="Saisissez le texte du badge (ex: EBOOK OFFERT A 100%)..."
+                                        />
+                                      </div>
                                     </div>
                                   )}
 
                                   {/* TAB 2: TITRE PRINCIPAL H1 / H2 */}
                                   {activeTab === 'title' && (
                                     <div className="space-y-4">
+                                      {/* POLICE / TAILLE / COULEUR DU TITRE */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl shadow-2xs">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre</label>
+                                          <select
+                                            value={sec.settings?.titleFont || 'Plus Jakarta Sans'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'titleFont', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            {GOOGLE_FONTS_OPTIONS.map((f) => (
+                                              <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Titre</label>
+                                          <select
+                                            value={sec.settings?.titleSize || '32px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'titleSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            <option value="28px">Moyenne (28px)</option>
+                                            <option value="32px">Standard (32px)</option>
+                                            <option value="40px">Grande (40px)</option>
+                                            <option value="48px">Très Grande (48px)</option>
+                                            <option value="64px">Géante (64px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Titre</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.titleColor || '#ffffff'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'titleColor', e.target.value)}
+                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'titleColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
                                       {/* PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> */}
                                       <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
                                         <div className="flex items-center justify-between">
@@ -1741,53 +1857,164 @@ export default function AdminHomepageBuilderPage() {
 
                                   {/* TAB 3: SOUS-TITRE / DESCRIPTION */}
                                   {activeTab === 'subtitle' && (
-                                    <div className="space-y-2 p-3 bg-purple-50/50 border border-purple-200 rounded-xl">
-                                      <div className="flex flex-wrap items-center justify-between gap-2">
-                                        <label className="block text-[11px] font-extrabold uppercase text-purple-950">
-                                          📝 3. Sous-titre / Description du bloc (Modifiable librement)
-                                        </label>
+                                    <div className="space-y-4 p-4 bg-purple-50/70 border border-purple-200 rounded-xl shadow-2xs">
+                                      {/* POLICE / TAILLE / COULEUR DU SOUS-TITRE */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
+                                          <select
+                                            value={sec.settings?.subtitleFont || 'Plus Jakarta Sans'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'subtitleFont', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            {GOOGLE_FONTS_OPTIONS.map((f) => (
+                                              <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                          </select>
+                                        </div>
 
-                                        <div className="flex items-center gap-1.5">
-                                          <button
-                                            type="button"
-                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'mark')}
-                                            className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Sous-titre</label>
+                                          <select
+                                            value={sec.settings?.subtitleSize || '16px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'subtitleSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                                           >
-                                            + Surligner Néon (&lt;mark&gt;)
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'color', uColor)}
-                                            className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
-                                          >
-                                            + Couleur Texte (&lt;color&gt;)
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => insertFormattedTag(sec.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
-                                            className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
-                                          >
-                                            + Souligner (&lt;u&gt;)
-                                          </button>
+                                            <option value="14px">Discret (14px)</option>
+                                            <option value="16px">Standard (16px)</option>
+                                            <option value="18px">Grand (18px)</option>
+                                            <option value="20px">Très Grand (20px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Sous-titre</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.subtitleColor || '#94a3b8'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'subtitleColor', e.target.value)}
+                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'subtitleColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
 
-                                      <textarea
-                                        rows={4}
-                                        value={sec.subtitle || ''}
-                                        onChange={(e) => handleFieldChange(sec.id, 'subtitle', e.target.value)}
-                                        className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-semibold text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                                        placeholder="Saisissez la description du bloc..."
-                                      />
+                                      <div className="space-y-2">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                          <label className="block text-[11px] font-extrabold uppercase text-purple-950">
+                                            📝 3. Sous-titre / Description du bloc (Modifiable librement)
+                                          </label>
+
+                                          <div className="flex items-center gap-1.5">
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'subtitle', 'mark')}
+                                              className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
+                                            >
+                                              + Surligner Néon (&lt;mark&gt;)
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'subtitle', 'color', uColor)}
+                                              className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                                            >
+                                              + Couleur Texte (&lt;color&gt;)
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => insertFormattedTag(sec.id, 'subtitle', 'u', uColor, uThickness, uOffset)}
+                                              className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
+                                            >
+                                              + Souligner (&lt;u&gt;)
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        <textarea
+                                          rows={4}
+                                          value={sec.subtitle || ''}
+                                          onChange={(e) => handleFieldChange(sec.id, 'subtitle', e.target.value)}
+                                          className="w-full px-3.5 py-2.5 bg-white border border-purple-300 rounded-xl text-xs font-semibold text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                          placeholder="Saisissez la description du bloc..."
+                                        />
+                                      </div>
                                     </div>
                                   )}
 
                                   {/* TAB 4: BOUTON D'ACTION (CTA) */}
                                   {activeTab === 'cta' && (
-                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
                                       <label className="block text-xs font-extrabold uppercase text-purple-950">
-                                        🚀 4. Texte du Bouton d Action (Bouton d Envoi)
+                                        🚀 4. Texte & Style du Bouton d Action (Bouton d Envoi)
                                       </label>
+
+                                      {/* POLICE / TAILLE / COULEUR DU BOUTON */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Bouton</label>
+                                          <select
+                                            value={sec.settings?.btnFont || 'Plus Jakarta Sans'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'btnFont', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            {GOOGLE_FONTS_OPTIONS.map((f) => (
+                                              <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Texte</label>
+                                          <select
+                                            value={sec.settings?.btnSize || '15px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'btnSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            <option value="13px">Compact (13px)</option>
+                                            <option value="15px">Standard (15px)</option>
+                                            <option value="18px">Grand (18px)</option>
+                                            <option value="20px">Très Grand (20px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Bouton</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.btnColor || '#a3e635'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'btnColor', e.target.value)}
+                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'btnColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
                                       <div>
                                         <label className="block text-[11px] font-bold text-slate-700 mb-1">Texte du Bouton d Action (Envoi)</label>
                                         <input
@@ -1806,10 +2033,65 @@ export default function AdminHomepageBuilderPage() {
 
                                   {/* TAB 5: PUCES DE RÉASSURANCE */}
                                   {activeTab === 'reassurance' && (
-                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
+                                    <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
                                       <label className="block text-xs font-extrabold uppercase text-purple-950">
                                         🛡️ 5. Puces de Réassurance (Sous le bouton)
                                       </label>
+
+                                      {/* POLICE / TAILLE / COULEUR DES RÉASSURANCES */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Police des Puces</label>
+                                          <select
+                                            value={sec.settings?.reassuranceFont || 'Plus Jakarta Sans'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'reassuranceFont', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            {GOOGLE_FONTS_OPTIONS.map((f) => (
+                                              <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille des Puces</label>
+                                          <select
+                                            value={sec.settings?.reassuranceSize || '12px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'reassuranceSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                                          >
+                                            <option value="11px">Très Discret (11px)</option>
+                                            <option value="12px">Standard (12px)</option>
+                                            <option value="13px">Grand (13px)</option>
+                                            <option value="14px">Très Grand (14px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur des Puces</label>
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="color"
+                                              value={sec.settings?.reassuranceColor || '#94a3b8'}
+                                              onChange={(e) => handleSettingChange(sec.id, 'reassuranceColor', e.target.value)}
+                                              className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
+                                            />
+                                            <div className="flex items-center gap-1 overflow-x-auto">
+                                              {COLOR_PALETTE.map((c) => (
+                                                <button
+                                                  key={c.hex}
+                                                  type="button"
+                                                  onClick={() => handleSettingChange(sec.id, 'reassuranceColor', c.hex)}
+                                                  style={{ backgroundColor: c.hex }}
+                                                  className="w-5 h-5 rounded-full border border-slate-400 shrink-0"
+                                                  title={c.name}
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
                                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                         <div>
                                           <label className="block text-[11px] font-bold text-slate-700 mb-1">🛡️ Réassurance 1 (Sous le bouton)</label>
