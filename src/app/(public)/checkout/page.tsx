@@ -116,6 +116,22 @@ function CheckoutContent() {
 
   const isDark = isDarkTheme(activeTheme);
 
+  const productGallery: string[] = React.useMemo(() => {
+    if (!product) return [];
+    if (product.images) {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {
+        if (typeof product.images === 'string' && product.images) return [product.images];
+      }
+    }
+    return product.coverImage ? [product.coverImage] : [];
+  }, [product]);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const activeCover = productGallery[activeImageIndex] || product?.coverImage;
+
   if (loading) {
     return <div className={`py-20 text-center font-medium ${isDark ? 'bg-[#0b0f19] text-slate-400' : 'bg-[#faf8ff] text-slate-500'}`}>Chargement de votre accès...</div>;
   }
@@ -195,14 +211,41 @@ function CheckoutContent() {
                   {product.name}
                 </h2>
 
-                {/* PRODUCT COVER IMAGE OR VISUAL PREVIEW BANNER */}
-                {product.coverImage ? (
-                  <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg">
-                    <img
-                      src={product.coverImage}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+                {/* PRODUCT COVER IMAGE OR MULTI-IMAGE GALLERY */}
+                {productGallery.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg group">
+                      <img
+                        src={activeCover}
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-all duration-300"
+                      />
+                      {productGallery.length > 1 && (
+                        <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-full border border-white/20">
+                          Visuel {activeImageIndex + 1} sur {productGallery.length}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* THUMBNAILS GALLERY ROW */}
+                    {productGallery.length > 1 && (
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 pt-1">
+                        {productGallery.map((imgUrl, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveImageIndex(idx)}
+                            className={`relative h-16 sm:h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                              activeImageIndex === idx
+                                ? 'border-[#a3e635] ring-2 ring-[#a3e635]/50 scale-[1.03]'
+                                : 'border-slate-200 dark:border-white/10 opacity-70 hover:opacity-100'
+                            }`}
+                          >
+                            <img src={imgUrl} alt={`Aperçu ${idx + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border border-purple-500/20 shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4">

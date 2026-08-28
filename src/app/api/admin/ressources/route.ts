@@ -31,11 +31,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, slug, shortDescription, longDescription, coverImage, fileUrl } = body;
+    const { name, slug, shortDescription, longDescription, coverImage, images, fileUrl } = body;
 
     if (!name || !slug) {
       return NextResponse.json({ error: 'Nom et slug requis.' }, { status: 400 });
     }
+
+    const imagesList = Array.isArray(images) ? images : (typeof images === 'string' && images ? [images] : []);
+    const imagesJson = imagesList.length > 0 ? JSON.stringify(imagesList) : null;
+    const primaryCover = coverImage || (imagesList.length > 0 ? imagesList[0] : null);
 
     const resource = await prisma.product.create({
       data: {
@@ -43,7 +47,8 @@ export async function POST(request: Request) {
         slug,
         shortDescription: shortDescription || null,
         longDescription: longDescription || '',
-        coverImage: coverImage || null,
+        coverImage: primaryCover,
+        images: imagesJson,
         fileUrl: fileUrl || null,
         price: 0,
         compareAtPrice: null,
@@ -68,11 +73,15 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, name, slug, shortDescription, longDescription, coverImage, fileUrl } = body;
+    const { id, name, slug, shortDescription, longDescription, coverImage, images, fileUrl } = body;
 
     if (!id || !name || !slug) {
       return NextResponse.json({ error: 'ID, nom et slug requis.' }, { status: 400 });
     }
+
+    const imagesList = Array.isArray(images) ? images : (typeof images === 'string' && images ? [images] : []);
+    const imagesJson = imagesList.length > 0 ? JSON.stringify(imagesList) : null;
+    const primaryCover = coverImage || (imagesList.length > 0 ? imagesList[0] : null);
 
     const updatedResource = await prisma.product.update({
       where: { id },
@@ -81,7 +90,8 @@ export async function PUT(request: Request) {
         slug,
         shortDescription: shortDescription || null,
         longDescription: longDescription || '',
-        coverImage: coverImage || null,
+        coverImage: primaryCover,
+        images: imagesJson,
         fileUrl: fileUrl || null,
         price: 0,
         isFreeResource: true,

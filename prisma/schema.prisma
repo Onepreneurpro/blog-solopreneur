@@ -119,6 +119,7 @@ model Product {
   price             Float            @default(0.0)
   compareAtPrice    Float?
   coverImage        String?
+  images            String?          // JSON array string for multiple gallery images
   fileUrl           String?          // File link (ZIP, PDF, Notion template)
   fileType          String?          @default("NOTION") // NOTION, EXCEL, PDF, ZIP
   categoryId        String?

@@ -17,6 +17,7 @@ export default function AdminRessourcesPage() {
   const [shortDescription, setShortDescription] = useState('');
   const [longDescription, setLongDescription] = useState('');
   const [coverImage, setCoverImage] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const [fileUrl, setFileUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
@@ -30,6 +31,7 @@ export default function AdminRessourcesPage() {
   const [editShortDesc, setEditShortDesc] = useState('');
   const [editLongDesc, setEditLongDesc] = useState('');
   const [editCoverImage, setEditCoverImage] = useState('');
+  const [editImages, setEditImages] = useState<string[]>([]);
   const [editFileUrl, setEditFileUrl] = useState('');
   const [editUploading, setEditUploading] = useState(false);
   const [editImageUploading, setEditImageUploading] = useState(false);
@@ -62,32 +64,67 @@ export default function AdminRessourcesPage() {
     setSlug(generatedSlug);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleBatchImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     if (isEdit) setEditImageUploading(true);
     else setImageUploading(true);
 
-    const formData = new FormData();
-    formData.append('file', file);
+    const uploadedUrls: string[] = [];
 
     try {
-      const res = await fetch('/api/admin/medias', {
-        method: 'POST',
-        body: formData,
-      });
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/admin/medias', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok && data.media?.url) {
+          uploadedUrls.push(data.media.url);
+        }
+      }
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur d upload image.');
-
-      if (isEdit) setEditCoverImage(data.media.url);
-      else setCoverImage(data.media.url);
+      if (isEdit) {
+        setEditImages((prev) => {
+          const next = [...prev, ...uploadedUrls];
+          if (!editCoverImage && next.length > 0) setEditCoverImage(next[0]);
+          return next;
+        });
+      } else {
+        setImages((prev) => {
+          const next = [...prev, ...uploadedUrls];
+          if (!coverImage && next.length > 0) setCoverImage(next[0]);
+          return next;
+        });
+      }
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Erreur lors de l upload des images.');
     } finally {
       if (isEdit) setEditImageUploading(false);
       else setImageUploading(false);
+    }
+  };
+
+  const removeImage = (indexToRemove: number, isEdit = false) => {
+    if (isEdit) {
+      setEditImages((prev) => {
+        const next = prev.filter((_, idx) => idx !== indexToRemove);
+        if (editCoverImage === prev[indexToRemove]) {
+          setEditCoverImage(next[0] || '');
+        }
+        return next;
+      });
+    } else {
+      setImages((prev) => {
+        const next = prev.filter((_, idx) => idx !== indexToRemove);
+        if (coverImage === prev[indexToRemove]) {
+          setCoverImage(next[0] || '');
+        }
+        return next;
+      });
     }
   };
 
@@ -134,7 +171,8 @@ export default function AdminRessourcesPage() {
           slug,
           shortDescription,
           longDescription,
-          coverImage,
+          coverImage: coverImage || (images[0] || ''),
+          images,
           fileUrl,
         }),
       });
@@ -147,6 +185,7 @@ export default function AdminRessourcesPage() {
       setShortDescription('');
       setLongDescription('');
       setCoverImage('');
+      setImages([]);
       setFileUrl('');
       fetchResources();
     } catch (err: any) {
@@ -163,6 +202,17 @@ export default function AdminRessourcesPage() {
     setEditShortDesc(resItem.shortDescription || '');
     setEditLongDesc(resItem.longDescription || '');
     setEditCoverImage(resItem.coverImage || '');
+    let parsedImages: string[] = [];
+    if (resItem.images) {
+      try {
+        parsedImages = JSON.parse(resItem.images);
+      } catch {
+        parsedImages = [resItem.images];
+      }
+    } else if (resItem.coverImage) {
+      parsedImages = [resItem.coverImage];
+    }
+    setEditImages(parsedImages);
     setEditFileUrl(resItem.fileUrl || '');
   };
 
@@ -178,7 +228,8 @@ export default function AdminRessourcesPage() {
           slug: editSlug,
           shortDescription: editShortDesc,
           longDescription: editLongDesc,
-          coverImage: editCoverImage,
+          coverImage: editCoverImage || (editImages[0] || ''),
+          images: editImages,
           fileUrl: editFileUrl,
         }),
       });
@@ -281,26 +332,46 @@ export default function AdminRessourcesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Image de Couverture / Visuel de la ressource</label>
-                <input
-                  type="text"
-                  placeholder="https://... ou téléverser une image ci-dessous"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-
+                <label className="block text-xs font-bold text-slate-700 mb-1">Images du produit / Galerie (Importer plusieurs images)</label>
+                
                 <input
                   type="file"
+                  multiple
                   accept="image/*"
-                  onChange={(e) => handleImageUpload(e, false)}
-                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200"
+                  onChange={(e) => handleBatchImagesUpload(e, false)}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200 cursor-pointer"
                 />
-                {imageUploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement de l image...</div>}
-                {coverImage && (
-                  <div className="p-2 bg-purple-50 border border-purple-200 rounded-lg text-[11px] text-purple-950 flex items-center gap-2 mt-2 font-bold">
-                    <img src={coverImage} alt="Aperçu" className="w-8 h-8 rounded object-cover border border-purple-300" />
-                    <span className="truncate">Image définie : <code className="font-mono text-[10px]">{coverImage}</code></span>
+                {imageUploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement des images en cours...</div>}
+
+                {/* IMAGES GALLERY GRID */}
+                {images.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-[11px] font-bold text-slate-500">Images sélectionnées ({images.length}) - Cliquez pour définir la couverture :</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {images.map((imgUrl, idx) => {
+                        const isCover = coverImage === imgUrl || (!coverImage && idx === 0);
+                        return (
+                          <div key={idx} className={`relative group rounded-xl overflow-hidden border-2 transition-all ${
+                            isCover ? 'border-purple-600 ring-2 ring-purple-400' : 'border-slate-200 hover:border-purple-300'
+                          }`}>
+                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-16 object-cover cursor-pointer" onClick={() => setCoverImage(imgUrl)} />
+                            {isCover && (
+                              <span className="absolute top-1 left-1 bg-purple-700 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">
+                                ★ Principal
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx, false)}
+                              className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 shadow transition-opacity"
+                              title="Supprimer cette image"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -424,25 +495,44 @@ export default function AdminRessourcesPage() {
                               </div>
 
                               <div>
-                                <label className="block text-[10px] font-bold text-slate-700 mb-1">Image de Couverture / Visuel</label>
-                                <input
-                                  type="text"
-                                  value={editCoverImage}
-                                  onChange={(e) => setEditCoverImage(e.target.value)}
-                                  className="w-full px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white mb-1.5"
-                                  placeholder="https://... ou uploader ci-dessous"
-                                />
+                                <label className="block text-[10px] font-bold text-slate-700 mb-1">Images du produit (Ajouter plusieurs images)</label>
                                 <input
                                   type="file"
+                                  multiple
                                   accept="image/*"
-                                  onChange={(e) => handleImageUpload(e, true)}
-                                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800"
+                                  onChange={(e) => handleBatchImagesUpload(e, true)}
+                                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800 cursor-pointer"
                                 />
-                                {editImageUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement de l image...</div>}
-                                {editCoverImage && (
-                                  <div className="mt-1.5 p-1.5 bg-white border border-purple-200 rounded flex items-center gap-2">
-                                    <img src={editCoverImage} alt="Aperçu" className="w-7 h-7 rounded object-cover border border-purple-300" />
-                                    <span className="text-[10px] font-mono text-purple-700 truncate">{editCoverImage}</span>
+                                {editImageUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement des images...</div>}
+
+                                {editImages.length > 0 && (
+                                  <div className="mt-2 space-y-1">
+                                    <p className="text-[10px] font-bold text-slate-500">Galerie ({editImages.length} images) - Cliquez pour sélectionner la couverture :</p>
+                                    <div className="grid grid-cols-4 gap-1.5">
+                                      {editImages.map((imgUrl, idx) => {
+                                        const isCover = editCoverImage === imgUrl || (!editCoverImage && idx === 0);
+                                        return (
+                                          <div key={idx} className={`relative group rounded-lg overflow-hidden border-2 transition-all ${
+                                            isCover ? 'border-purple-600 ring-2 ring-purple-400' : 'border-slate-200 hover:border-purple-300'
+                                          }`}>
+                                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-14 object-cover cursor-pointer" onClick={() => setEditCoverImage(imgUrl)} />
+                                            {isCover && (
+                                              <span className="absolute top-0.5 left-0.5 bg-purple-700 text-white text-[8px] font-black px-1 rounded shadow">
+                                                ★ Cover
+                                              </span>
+                                            )}
+                                            <button
+                                              type="button"
+                                              onClick={() => removeImage(idx, true)}
+                                              className="absolute top-0.5 right-0.5 bg-red-600 text-white p-0.5 rounded-full opacity-90 hover:opacity-100 shadow transition-opacity"
+                                              title="Supprimer cette image"
+                                            >
+                                              <X className="w-2.5 h-2.5" />
+                                            </button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 )}
                               </div>
