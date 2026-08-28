@@ -318,7 +318,6 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {products.map((prod) => {
               const comparePrice = prod.compareAtPrice || (prod.price > 0 ? prod.price * 1.5 : 29);
-              const formatInfo = getProductFormatLogo(prod);
 
               return (
                 <Card
@@ -334,10 +333,14 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                           alt={prod.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                      ) : prod.icon ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center p-6 text-center space-y-3">
+                          <img src={prod.icon} alt={prod.name} className="w-16 h-16 object-contain rounded-xl shadow-lg" />
+                        </div>
                       ) : (
-                        <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
-                          <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
-                          <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{prod.name}</span>
+                        <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
+                          <Sparkles className="w-10 h-10 text-[#a3e635]" />
+                          <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{prod.name}</span>
                         </div>
                       )}
 
@@ -361,9 +364,8 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
 
                     {/* CARD CONTENT */}
                     <div className="space-y-1.5 px-1">
-                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                        <span>Format : {formatInfo.badgeLabel}</span>
+                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
+                        Format : {getFileTypeLabel(prod.fileType)}
                       </div>
 
                       <Link href={`/checkout?productId=${prod.id}`}>

@@ -69,8 +69,6 @@ export default async function FreeResourcesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {freeResources.map((res) => {
-              const formatInfo = getProductFormatLogo(res);
-
               return (
                 <Card
                   key={res.id}
@@ -85,10 +83,14 @@ export default async function FreeResourcesPage() {
                           alt={res.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                      ) : res.icon ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center p-6 text-center space-y-3">
+                          <img src={res.icon} alt={res.name} className="w-16 h-16 object-contain rounded-xl shadow-lg" />
+                        </div>
                       ) : (
-                        <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
-                          <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
-                          <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{res.name}</span>
+                        <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
+                          <FileText className="w-10 h-10 text-[#a3e635]" />
+                          <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{res.name}</span>
                         </div>
                       )}
 
@@ -112,9 +114,8 @@ export default async function FreeResourcesPage() {
 
                     {/* CARD BODY */}
                     <div className="space-y-1.5 px-1">
-                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                        <span>{formatInfo.badgeLabel}</span>
+                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
+                        RESSOURCE DIGITALE
                       </div>
 
                       <Link href={`/checkout?productId=${res.id}`}>
