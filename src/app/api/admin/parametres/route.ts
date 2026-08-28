@@ -14,14 +14,26 @@ const DEFAULT_SETTINGS = {
   bannerTickerText: 'Nouveau : Formations & Templates IA pour Solopreneurs 2026',
   bannerTickerLink: '/boutique',
   footerCopyright: '© 2026 Solopreneur&Co. Tous droits réservés.',
+
   storeHeroBadge: 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES',
   storeHeroTitle: 'Templates Notion & Dashboards Excel',
   storeHeroTitleAccent: 'Haute Performance',
   storeHeroSubtitle: 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.',
+
+  // Flexible Formatting Controls
+  storeHeroFontGlobal: true,
   storeHeroFontFamily: 'Plus Jakarta Sans',
-  storeHeroTitleSize: 'large',
-  storeHeroSubtitleSize: 'normal',
-  storeHeroBadgeStyle: 'green',
+  storeHeroBadgeFont: 'Plus Jakarta Sans',
+  storeHeroBadgeSize: '11px',
+  storeHeroBadgeColor: '#a3e635',
+  storeHeroTitleFont: 'Plus Jakarta Sans',
+  storeHeroTitleSize: '48px',
+  storeHeroTitleColor: '#ffffff',
+  storeHeroAccentFont: 'Plus Jakarta Sans',
+  storeHeroAccentColor: '#a3e635',
+  storeHeroSubtitleFont: 'Plus Jakarta Sans',
+  storeHeroSubtitleSize: '16px',
+  storeHeroSubtitleColor: '#cbd5e1',
   storeHeroAlign: 'center',
 };
 

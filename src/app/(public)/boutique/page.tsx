@@ -31,10 +31,25 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   let storeHeroTitle = 'Templates Notion & Dashboards Excel';
   let storeHeroTitleAccent = 'Haute Performance';
   let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
+
+  let storeHeroFontGlobal = true;
   let storeHeroFontFamily = 'Plus Jakarta Sans';
-  let storeHeroTitleSize = 'large';
-  let storeHeroSubtitleSize = 'normal';
-  let storeHeroBadgeStyle = 'green';
+  
+  let storeHeroBadgeFont = 'Plus Jakarta Sans';
+  let storeHeroBadgeSize = '11px';
+  let storeHeroBadgeColor = '#a3e635';
+  
+  let storeHeroTitleFont = 'Plus Jakarta Sans';
+  let storeHeroTitleSize = '48px';
+  let storeHeroTitleColor = '#ffffff';
+  
+  let storeHeroAccentFont = 'Plus Jakarta Sans';
+  let storeHeroAccentColor = '#a3e635';
+  
+  let storeHeroSubtitleFont = 'Plus Jakarta Sans';
+  let storeHeroSubtitleSize = '16px';
+  let storeHeroSubtitleColor = '#cbd5e1';
+  
   let storeHeroAlign = 'center';
 
   try {
@@ -64,16 +79,31 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
     const generalSettingsRecord = await prisma.siteSetting.findUnique({
       where: { key: 'general_settings' },
     });
-    const settings = generalSettingsRecord ? JSON.parse(generalSettingsRecord.value) : {};
-    if (settings.storeHeroBadge) storeHeroBadge = settings.storeHeroBadge;
-    if (settings.storeHeroTitle) storeHeroTitle = settings.storeHeroTitle;
-    if (settings.storeHeroTitleAccent !== undefined) storeHeroTitleAccent = settings.storeHeroTitleAccent;
-    if (settings.storeHeroSubtitle) storeHeroSubtitle = settings.storeHeroSubtitle;
-    if (settings.storeHeroFontFamily) storeHeroFontFamily = settings.storeHeroFontFamily;
-    if (settings.storeHeroTitleSize) storeHeroTitleSize = settings.storeHeroTitleSize;
-    if (settings.storeHeroSubtitleSize) storeHeroSubtitleSize = settings.storeHeroSubtitleSize;
-    if (settings.storeHeroBadgeStyle) storeHeroBadgeStyle = settings.storeHeroBadgeStyle;
-    if (settings.storeHeroAlign) storeHeroAlign = settings.storeHeroAlign;
+    const s = generalSettingsRecord ? JSON.parse(generalSettingsRecord.value) : {};
+    if (s.storeHeroBadge) storeHeroBadge = s.storeHeroBadge;
+    if (s.storeHeroTitle) storeHeroTitle = s.storeHeroTitle;
+    if (s.storeHeroTitleAccent !== undefined) storeHeroTitleAccent = s.storeHeroTitleAccent;
+    if (s.storeHeroSubtitle) storeHeroSubtitle = s.storeHeroSubtitle;
+
+    if (s.storeHeroFontGlobal !== undefined) storeHeroFontGlobal = Boolean(s.storeHeroFontGlobal);
+    if (s.storeHeroFontFamily) storeHeroFontFamily = s.storeHeroFontFamily;
+
+    if (s.storeHeroBadgeFont) storeHeroBadgeFont = s.storeHeroBadgeFont;
+    if (s.storeHeroBadgeSize) storeHeroBadgeSize = s.storeHeroBadgeSize;
+    if (s.storeHeroBadgeColor) storeHeroBadgeColor = s.storeHeroBadgeColor;
+
+    if (s.storeHeroTitleFont) storeHeroTitleFont = s.storeHeroTitleFont;
+    if (s.storeHeroTitleSize) storeHeroTitleSize = s.storeHeroTitleSize;
+    if (s.storeHeroTitleColor) storeHeroTitleColor = s.storeHeroTitleColor;
+
+    if (s.storeHeroAccentFont) storeHeroAccentFont = s.storeHeroAccentFont;
+    if (s.storeHeroAccentColor) storeHeroAccentColor = s.storeHeroAccentColor;
+
+    if (s.storeHeroSubtitleFont) storeHeroSubtitleFont = s.storeHeroSubtitleFont;
+    if (s.storeHeroSubtitleSize) storeHeroSubtitleSize = s.storeHeroSubtitleSize;
+    if (s.storeHeroSubtitleColor) storeHeroSubtitleColor = s.storeHeroSubtitleColor;
+
+    if (s.storeHeroAlign) storeHeroAlign = s.storeHeroAlign;
 
     products = await prisma.product.findMany({
       where: whereCondition,
@@ -98,18 +128,30 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
     'Bricolage Grotesque': 'Bricolage+Grotesque:opsz,wght@12..96,800',
     'Inter': 'Inter:wght@800;900',
   };
-  const fontImportName = fontImportMap[storeHeroFontFamily] || fontImportMap['Plus Jakarta Sans'];
+
+  const fontsToLoad = Array.from(new Set([
+    storeHeroFontFamily,
+    storeHeroBadgeFont,
+    storeHeroTitleFont,
+    storeHeroAccentFont,
+    storeHeroSubtitleFont,
+  ])).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-[#050811] text-white relative overflow-hidden font-sans pb-20">
       
-      {/* DYNAMIC GOOGLE FONT LINK */}
-      {fontImportName && (
-        <link
-          rel="stylesheet"
-          href={`https://fonts.googleapis.com/css2?family=${fontImportName}&display=swap`}
-        />
-      )}
+      {/* DYNAMIC GOOGLE FONTS LINKS */}
+      {fontsToLoad.map((fName) => {
+        const importStr = fontImportMap[fName];
+        if (!importStr) return null;
+        return (
+          <link
+            key={fName}
+            rel="stylesheet"
+            href={`https://fonts.googleapis.com/css2?family=${importStr}&display=swap`}
+          />
+        );
+      })}
 
       {/* TOP NEON PROMO TICKER BAR */}
       <div className="bg-[#a3e635] text-slate-950 font-heading font-black text-xs sm:text-sm py-2.5 px-4 shadow-xl text-center flex items-center justify-center gap-3 uppercase tracking-wider relative z-20">
@@ -128,46 +170,54 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
         <div className={`mb-10 max-w-3xl mx-auto space-y-4 ${
           storeHeroAlign === 'left' ? 'text-left' : storeHeroAlign === 'right' ? 'text-right' : 'text-center'
         }`}>
-          {storeHeroBadgeStyle !== 'hidden' && storeHeroBadge && (
+          {storeHeroBadge && (
             <div
-              style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black border shadow-lg backdrop-blur-md ${
-                storeHeroBadgeStyle === 'purple'
-                  ? 'bg-purple-900/40 text-purple-300 border-purple-500/50'
-                  : storeHeroBadgeStyle === 'dark'
-                  ? 'bg-slate-900 text-slate-300 border-slate-700'
-                  : 'bg-[#a3e635]/15 text-[#a3e635] border-[#a3e635]/30'
-              }`}
+              style={{
+                fontFamily: `'${storeHeroFontGlobal ? storeHeroFontFamily : storeHeroBadgeFont}', sans-serif`,
+                fontSize: storeHeroBadgeSize,
+                color: storeHeroBadgeColor,
+                borderColor: `${storeHeroBadgeColor}40`,
+                backgroundColor: `${storeHeroBadgeColor}15`,
+              }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black border shadow-lg backdrop-blur-md"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
               <span>{storeHeroBadge}</span>
             </div>
           )}
 
-          <h1
-            style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
-            className={`font-black tracking-tight leading-tight text-white ${
-              storeHeroTitleSize === 'normal'
-                ? 'text-2xl sm:text-4xl lg:text-5xl'
-                : storeHeroTitleSize === 'giant'
-                ? 'text-4xl sm:text-6xl lg:text-7xl'
-                : 'text-3xl sm:text-5xl lg:text-6xl'
-            }`}
-          >
-            {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
+          <h1 className="font-black tracking-tight leading-tight">
+            <span
+              style={{
+                fontFamily: `'${storeHeroFontGlobal ? storeHeroFontFamily : storeHeroTitleFont}', sans-serif`,
+                fontSize: storeHeroTitleSize,
+                color: storeHeroTitleColor,
+              }}
+            >
+              {storeHeroTitle}{' '}
+            </span>
+            {storeHeroTitleAccent && (
+              <span
+                style={{
+                  fontFamily: `'${storeHeroFontGlobal ? storeHeroFontFamily : storeHeroAccentFont}', sans-serif`,
+                  fontSize: storeHeroTitleSize,
+                  color: storeHeroAccentColor,
+                }}
+              >
+                {storeHeroTitleAccent}
+              </span>
+            )}
           </h1>
 
           {storeHeroSubtitle && (
             <p
-              style={{ fontFamily: `'${storeHeroFontFamily}', sans-serif` }}
-              className={`text-slate-300 font-medium leading-relaxed max-w-2xl ${
+              style={{
+                fontFamily: `'${storeHeroFontGlobal ? storeHeroFontFamily : storeHeroSubtitleFont}', sans-serif`,
+                fontSize: storeHeroSubtitleSize,
+                color: storeHeroSubtitleColor,
+              }}
+              className={`font-medium leading-relaxed max-w-2xl ${
                 storeHeroAlign === 'left' ? 'mr-auto' : storeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
-              } ${
-                storeHeroSubtitleSize === 'small'
-                  ? 'text-xs sm:text-sm'
-                  : storeHeroSubtitleSize === 'large'
-                  ? 'text-lg sm:text-xl font-semibold text-white'
-                  : 'text-base sm:text-lg'
               }`}
             >
               {storeHeroSubtitle}
