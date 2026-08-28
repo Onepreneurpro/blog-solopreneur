@@ -138,7 +138,7 @@ function CheckoutContent() {
     <div className={`py-12 min-h-screen transition-colors ${
       isDark ? 'bg-[#0b0f19] text-white' : 'bg-[#faf8ff] text-slate-900'
     }`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* HEADER */}
         <div className="text-center space-y-2">
