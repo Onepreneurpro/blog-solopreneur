@@ -28,20 +28,36 @@ export function FormattedText({
       const textColor = isLight ? '#0f172a' : '#ffffff';
       return `<span style="background-color: ${bgColor}; color: ${textColor};" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">${content}</span>`;
     })
-    // Replace <u>...</u> or <u color="..." thickness="...">...</u>
-    .replace(/<u(?:\s+color=["']([^"']+)["'])?(?:\s+thickness=["']([^"']+)["'])?>(.*?)<\/u>/gi, (match, color, thickness, content) => {
-      const colorVal = color || defaultMarkColor;
-      let gradientPercent = '64%'; // Default medium (~36% height pedestal)
-      
-      if (thickness === 'thin') gradientPercent = '78%';
-      if (thickness === 'medium') gradientPercent = '64%';
-      if (thickness === 'thick') gradientPercent = '50%';
-      if (thickness && thickness.endsWith('%')) {
-        const num = parseInt(thickness);
-        if (!isNaN(num)) gradientPercent = `${100 - num}%`;
-      }
+    // Replace <u ...>...</u> with support for color, thickness, offset
+    .replace(/<u([^>]*)>(.*?)<\/u>/gi, (match, attrString, content) => {
+      const getAttr = (name: string) => {
+        const m = attrString.match(new RegExp(`${name}=["']([^"']+)["']`, 'i'));
+        return m ? m[1] : null;
+      };
 
-      return `<u style="text-decoration: none !important; background: linear-gradient(180deg, transparent ${gradientPercent}, ${colorVal} ${gradientPercent}, ${colorVal} 92%) !important; color: inherit; padding: 0 4px; border-radius: 4px; display: inline; font-weight: inherit;">${content}</u>`;
+      const colorVal = getAttr('color') || defaultMarkColor;
+      const thickness = getAttr('thickness') || '4px';
+      const offset = getAttr('offset') || '2px';
+
+      const isPercent = thickness.endsWith('%') || thickness === 'thin' || thickness === 'medium' || thickness === 'thick';
+
+      if (isPercent) {
+        let percentNum = 40; // Default 40% height band
+        if (thickness === 'thin') percentNum = 20;
+        if (thickness === 'medium') percentNum = 40;
+        if (thickness === 'thick') percentNum = 60;
+        if (thickness.endsWith('%')) {
+          const parsed = parseInt(thickness);
+          if (!isNaN(parsed)) percentNum = parsed;
+        }
+
+        const transparentStop = Math.max(0, Math.min(100, 100 - percentNum));
+        return `<u style="text-decoration: none !important; background: linear-gradient(180deg, transparent ${transparentStop}%, ${colorVal} ${transparentStop}%, ${colorVal} 100%) !important; color: inherit; padding: 0 4px; border-radius: 3px; display: inline; font-weight: inherit;">${content}</u>`;
+      } else {
+        const borderSize = thickness.includes('px') ? thickness : `${parseInt(thickness) || 4}px`;
+        const offsetSize = offset.includes('px') ? offset : `${parseInt(offset) || 2}px`;
+        return `<u style="text-decoration: none !important; border-bottom: ${borderSize} solid ${colorVal} !important; padding-bottom: ${offsetSize} !important; color: inherit; display: inline; font-weight: inherit; line-height: normal;">${content}</u>`;
+      }
     })
     // Fallback replace for simple markdown syntax ==word== and [yellow]word[/yellow]
     .replace(/==(.*?)==/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`)
