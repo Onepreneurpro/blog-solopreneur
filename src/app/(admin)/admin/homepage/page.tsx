@@ -2,11 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Save, Eye, EyeOff, MoveUp, MoveDown, ExternalLink, Check, Sparkles, Highlighter, Underline, Palette, LayoutGrid, Megaphone, RotateCcw, Zap, Layers, ShoppingBag, Gift, Star, BookOpen, User, Award, MessageSquare, TrendingUp, DollarSign, Repeat, Link as LinkIcon, Plus, Trash2, GripVertical } from 'lucide-react';
+import { Save, Eye, EyeOff, MoveUp, MoveDown, ExternalLink, Check, Sparkles, Highlighter, Underline, Palette, LayoutGrid, Megaphone, RotateCcw, Zap, Layers, ShoppingBag, Gift, Star, BookOpen, User, Award, MessageSquare, TrendingUp, DollarSign, Repeat, Link as LinkIcon, Plus, Trash2, GripVertical, Type, AlignLeft, AlignCenter, AlignRight, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FormattedText } from '@/components/ui/FormattedText';
+
+const GOOGLE_FONTS_OPTIONS = [
+  { name: 'Plus Jakarta Sans', importName: 'Plus+Jakarta+Sans:wght@700;800;900' },
+  { name: 'Outfit', importName: 'Outfit:wght@700;800;900' },
+  { name: 'Syne', importName: 'Syne:wght@700;800' },
+  { name: 'Space Grotesk', importName: 'Space+Grotesk:wght@700' },
+  { name: 'Poppins', importName: 'Poppins:wght@700;800;900' },
+  { name: 'Montserrat', importName: 'Montserrat:wght@800;900' },
+  { name: 'Playfair Display', importName: 'Playfair+Display:ital,wght@0,800;1,700' },
+  { name: 'Bricolage Grotesque', importName: 'Bricolage+Grotesque:opsz,wght@12..96,800' },
+  { name: 'Inter', importName: 'Inter:wght@800;900' },
+];
 
 interface Section {
   id: string;
@@ -168,9 +180,31 @@ export default function AdminHomepageBuilderPage() {
   const [savingBlockId, setSavingBlockId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Formatting Toolbar State
-  const [selectedColor, setSelectedColor] = useState('#a3e635');
-  const [selectedThickness, setSelectedThickness] = useState('medium');
+  // Flexible Text Formatting & Google Fonts state for Homepage
+  const [activeHeroTab, setActiveHeroTab] = useState<'global' | 'badge' | 'title' | 'accent' | 'subtitle'>('global');
+
+  const [homeHeroFontGlobal, setHomeHeroFontGlobal] = useState(true);
+  const [homeHeroFontFamily, setHomeHeroFontFamily] = useState('Plus Jakarta Sans');
+
+  const [homeHeroBadgeFont, setHomeHeroBadgeFont] = useState('Plus Jakarta Sans');
+  const [homeHeroBadgeSize, setHomeHeroBadgeSize] = useState('12px');
+  const [homeHeroBadgeColor, setHomeHeroBadgeColor] = useState('#a3e635');
+
+  const [homeHeroTitleFont, setHomeHeroTitleFont] = useState('Plus Jakarta Sans');
+  const [homeHeroTitleSize, setHomeHeroTitleSize] = useState('48px');
+  const [homeHeroTitleColor, setHomeHeroTitleColor] = useState('#ffffff');
+
+  const [homeHeroAccentFont, setHomeHeroAccentFont] = useState('Plus Jakarta Sans');
+  const [homeHeroAccentColor, setHomeHeroAccentColor] = useState('#a3e635');
+
+  const [homeHeroSubtitleFont, setHomeHeroSubtitleFont] = useState('Plus Jakarta Sans');
+  const [homeHeroSubtitleSize, setHomeHeroSubtitleSize] = useState('18px');
+  const [homeHeroSubtitleColor, setHomeHeroSubtitleColor] = useState('#cbd5e1');
+
+  const [homeHeroAlign, setHomeHeroAlign] = useState('center');
+
+  const selectedColor = homeHeroAccentColor;
+  const selectedThickness = 'medium';
 
   const fetchSections = async () => {
     try {
@@ -195,6 +229,35 @@ export default function AdminHomepageBuilderPage() {
         .then((res) => res.json())
         .then((data) => {
           if (data.activeTheme) setActiveSiteTheme(data.activeTheme);
+        })
+        .catch(() => {});
+
+      // Fetch Homepage Hero Settings
+      fetch('/api/admin/parametres')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.settings) {
+            const s = data.settings;
+            if (s.homeHeroFontGlobal !== undefined) setHomeHeroFontGlobal(Boolean(s.homeHeroFontGlobal));
+            if (s.homeHeroFontFamily) setHomeHeroFontFamily(s.homeHeroFontFamily);
+
+            if (s.homeHeroBadgeFont) setHomeHeroBadgeFont(s.homeHeroBadgeFont);
+            if (s.homeHeroBadgeSize) setHomeHeroBadgeSize(s.homeHeroBadgeSize);
+            if (s.homeHeroBadgeColor) setHomeHeroBadgeColor(s.homeHeroBadgeColor);
+
+            if (s.homeHeroTitleFont) setHomeHeroTitleFont(s.homeHeroTitleFont);
+            if (s.homeHeroTitleSize) setHomeHeroTitleSize(s.homeHeroTitleSize);
+            if (s.homeHeroTitleColor) setHomeHeroTitleColor(s.homeHeroTitleColor);
+
+            if (s.homeHeroAccentFont) setHomeHeroAccentFont(s.homeHeroAccentFont);
+            if (s.homeHeroAccentColor) setHomeHeroAccentColor(s.homeHeroAccentColor);
+
+            if (s.homeHeroSubtitleFont) setHomeHeroSubtitleFont(s.homeHeroSubtitleFont);
+            if (s.homeHeroSubtitleSize) setHomeHeroSubtitleSize(s.homeHeroSubtitleSize);
+            if (s.homeHeroSubtitleColor) setHomeHeroSubtitleColor(s.homeHeroSubtitleColor);
+
+            if (s.homeHeroAlign) setHomeHeroAlign(s.homeHeroAlign);
+          }
         })
         .catch(() => {});
 
@@ -545,6 +608,27 @@ export default function AdminHomepageBuilderPage() {
         settings: sec.settings,
       }));
 
+      await fetch('/api/admin/parametres', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          homeHeroFontGlobal,
+          homeHeroFontFamily,
+          homeHeroBadgeFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont,
+          homeHeroBadgeSize,
+          homeHeroBadgeColor,
+          homeHeroTitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont,
+          homeHeroTitleSize,
+          homeHeroTitleColor,
+          homeHeroAccentFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont,
+          homeHeroAccentColor,
+          homeHeroSubtitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont,
+          homeHeroSubtitleSize,
+          homeHeroSubtitleColor,
+          homeHeroAlign,
+        }),
+      });
+
       const res = await fetch('/api/admin/homepage', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -650,53 +734,502 @@ export default function AdminHomepageBuilderPage() {
         </div>
       )}
 
-      {/* GLOBAL FORMATTING TOOLBAR */}
-      <div className="bg-white p-4.5 rounded-3xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Palette className="w-4 h-4 text-purple-600" />
-          <span className="text-xs font-heading font-black text-slate-950">Barre de Formatage de Texte :</span>
+      {/* ÉDITEUR ULTRA SOUPLE PAR ÉLÉMENT DE LA PAGE D'ACCUEIL */}
+      <Card className="p-6 bg-white border border-slate-200 shadow-sm space-y-6 rounded-3xl">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <LayoutGrid className="w-5 h-5 text-purple-600" />
+            <h2 className="text-base font-extrabold text-slate-900">
+              Outils de Formatage & Polices Google Fonts (Page d Accueil)
+            </h2>
+          </div>
+          <Button
+            type="button"
+            onClick={handleSaveAll}
+            disabled={saving}
+            size="sm"
+            className="bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs gap-1.5 px-4"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>Enregistrer les styles</span>
+          </Button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs">
+        {/* SELECTIONS D'ÉLÉMENT PAR ONGLETS INTERACTIFS */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+          <button
+            type="button"
+            onClick={() => setActiveHeroTab('global')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              activeHeroTab === 'global'
+                ? 'bg-purple-700 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>Réglages Globaux & Alignement</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveHeroTab('badge')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              activeHeroTab === 'badge'
+                ? 'bg-purple-700 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-[#a3e635]" />
+            <span>1. Badge Flottant / Ticker</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveHeroTab('title')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              activeHeroTab === 'title'
+                ? 'bg-purple-700 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <Type className="w-3.5 h-3.5" />
+            <span>2. Titre H1 Hero</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveHeroTab('accent')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              activeHeroTab === 'accent'
+                ? 'bg-purple-700 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span>3. Mot Surligné & Neon</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveHeroTab('subtitle')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              activeHeroTab === 'subtitle'
+                ? 'bg-purple-700 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>4. Sous-titre / Description</span>
+          </button>
+        </div>
+
+        {/* CONTENU DE L'ONGLET SÉLECTIONNÉ */}
+        <div className="p-5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-4">
           
-          {/* COLOR SELECTOR */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-500">Couleur Néon :</span>
-            <div className="flex items-center gap-1">
-              {COLOR_PALETTE.map((c) => (
-                <button
-                  key={c.hex}
-                  type="button"
-                  onClick={() => setSelectedColor(c.hex)}
-                  className={`w-6 h-6 rounded-full border transition-all ${
-                    selectedColor === c.hex
-                      ? 'ring-2 ring-purple-600 ring-offset-2 scale-110 border-white'
-                      : 'border-slate-300 opacity-80 hover:opacity-100'
-                  }`}
-                  style={{ backgroundColor: c.hex }}
-                  title={c.name}
-                />
-              ))}
-            </div>
-          </div>
+          {/* TAB 0: REGLAGES GLOBAUX */}
+          {activeHeroTab === 'global' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-purple-950">Mode de Typographie Globale :</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={homeHeroFontGlobal}
+                    onChange={(e) => {
+                      const isG = e.target.checked;
+                      setHomeHeroFontGlobal(isG);
+                      if (isG) {
+                        setHomeHeroBadgeFont(homeHeroFontFamily);
+                        setHomeHeroTitleFont(homeHeroFontFamily);
+                        setHomeHeroAccentFont(homeHeroFontFamily);
+                        setHomeHeroSubtitleFont(homeHeroFontFamily);
+                      }
+                    }}
+                    className="w-4 h-4 text-purple-600 rounded"
+                  />
+                  <span className="text-xs font-bold text-purple-950">
+                    Appliquer la même police à TOUS les textes de la Homepage
+                  </span>
+                </label>
+              </div>
 
-          {/* THICKNESS SELECTOR */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-500">Épaisseur Souligné :</span>
-            <select
-              value={selectedThickness}
-              onChange={(e) => setSelectedThickness(e.target.value)}
-              className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none"
-            >
-              <option value="thin">Fine</option>
-              <option value="medium">Moyenne</option>
-              <option value="thick">Épaisse</option>
-              <option value="extra-thick">Ultra Épaisse</option>
-            </select>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Police Google Fonts Globale
+                  </label>
+                  <select
+                    value={homeHeroFontFamily}
+                    onChange={(e) => {
+                      const f = e.target.value;
+                      setHomeHeroFontFamily(f);
+                      if (homeHeroFontGlobal) {
+                        setHomeHeroBadgeFont(f);
+                        setHomeHeroTitleFont(f);
+                        setHomeHeroAccentFont(f);
+                        setHomeHeroSubtitleFont(f);
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    {GOOGLE_FONTS_OPTIONS.map((f) => (
+                      <option key={f.name} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Alignement Global de l Entête
+                  </label>
+                  <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-purple-300">
+                    <button
+                      type="button"
+                      onClick={() => setHomeHeroAlign('left')}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                        homeHeroAlign === 'left' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <AlignLeft className="w-4 h-4" />
+                      <span>Gauche</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHomeHeroAlign('center')}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                        homeHeroAlign === 'center' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <AlignCenter className="w-4 h-4" />
+                      <span>Centré</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHomeHeroAlign('right')}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
+                        homeHeroAlign === 'right' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <AlignRight className="w-4 h-4" />
+                      <span>Droite</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 1: BADGE FLOTTANT */}
+          {activeHeroTab === 'badge' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {!homeHeroFontGlobal && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
+                    <select
+                      value={homeHeroBadgeFont}
+                      onChange={(e) => setHomeHeroBadgeFont(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    >
+                      {GOOGLE_FONTS_OPTIONS.map((f) => (
+                        <option key={f.name} value={f.name}>{f.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille de Police</label>
+                  <select
+                    value={homeHeroBadgeSize}
+                    onChange={(e) => setHomeHeroBadgeSize(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                  >
+                    <option value="11px">Discret (11px)</option>
+                    <option value="13px">Standard (13px)</option>
+                    <option value="15px">Grand (15px)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Badge</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={homeHeroBadgeColor}
+                      onChange={(e) => setHomeHeroBadgeColor(e.target.value)}
+                      className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300"
+                    />
+                    <div className="flex items-center gap-1">
+                      {COLOR_PALETTE.map((c) => (
+                        <button
+                          key={c.hex}
+                          type="button"
+                          onClick={() => setHomeHeroBadgeColor(c.hex)}
+                          style={{ backgroundColor: c.hex }}
+                          className="w-5 h-5 rounded-full border border-slate-400"
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: TITRE PRINCIPAL H1 */}
+          {activeHeroTab === 'title' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {!homeHeroFontGlobal && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre H1</label>
+                    <select
+                      value={homeHeroTitleFont}
+                      onChange={(e) => setHomeHeroTitleFont(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    >
+                      {GOOGLE_FONTS_OPTIONS.map((f) => (
+                        <option key={f.name} value={f.name}>{f.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Titre H1</label>
+                  <select
+                    value={homeHeroTitleSize}
+                    onChange={(e) => setHomeHeroTitleSize(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                  >
+                    <option value="36px">Moyenne (36px)</option>
+                    <option value="48px">Grande (48px)</option>
+                    <option value="64px">Géante (64px)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Titre H1</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={homeHeroTitleColor}
+                      onChange={(e) => setHomeHeroTitleColor(e.target.value)}
+                      className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300"
+                    />
+                    <div className="flex items-center gap-1">
+                      {COLOR_PALETTE.map((c) => (
+                        <button
+                          key={c.hex}
+                          type="button"
+                          onClick={() => setHomeHeroTitleColor(c.hex)}
+                          style={{ backgroundColor: c.hex }}
+                          className="w-5 h-5 rounded-full border border-slate-400"
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: ACCENT NEON <mark> */}
+          {activeHeroTab === 'accent' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {!homeHeroFontGlobal && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Texte Accentué</label>
+                    <select
+                      value={homeHeroAccentFont}
+                      onChange={(e) => setHomeHeroAccentFont(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    >
+                      {GOOGLE_FONTS_OPTIONS.map((f) => (
+                        <option key={f.name} value={f.name}>{f.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur Neon du Surlignage (&lt;mark&gt;)</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={homeHeroAccentColor}
+                      onChange={(e) => setHomeHeroAccentColor(e.target.value)}
+                      className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300"
+                    />
+                    <div className="flex items-center gap-1">
+                      {COLOR_PALETTE.map((c) => (
+                        <button
+                          key={c.hex}
+                          type="button"
+                          onClick={() => setHomeHeroAccentColor(c.hex)}
+                          style={{ backgroundColor: c.hex }}
+                          className="w-5 h-5 rounded-full border border-slate-400"
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: SOUS-TITRE / DESCRIPTION */}
+          {activeHeroTab === 'subtitle' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {!homeHeroFontGlobal && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
+                    <select
+                      value={homeHeroSubtitleFont}
+                      onChange={(e) => setHomeHeroSubtitleFont(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    >
+                      {GOOGLE_FONTS_OPTIONS.map((f) => (
+                        <option key={f.name} value={f.name}>{f.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Sous-titre</label>
+                  <select
+                    value={homeHeroSubtitleSize}
+                    onChange={(e) => setHomeHeroSubtitleSize(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                  >
+                    <option value="14px">Discret (14px)</option>
+                    <option value="18px">Standard (18px)</option>
+                    <option value="22px">Grand (22px)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur du Sous-titre</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={homeHeroSubtitleColor}
+                      onChange={(e) => setHomeHeroSubtitleColor(e.target.value)}
+                      className="w-9 h-9 p-0.5 rounded cursor-pointer border border-slate-300"
+                    />
+                    <div className="flex items-center gap-1">
+                      {COLOR_PALETTE.map((c) => (
+                        <button
+                          key={c.hex}
+                          type="button"
+                          onClick={() => setHomeHeroSubtitleColor(c.hex)}
+                          style={{ backgroundColor: c.hex }}
+                          className="w-5 h-5 rounded-full border border-slate-400"
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
-      </div>
+
+        {/* APERÇU INTERACTIF HOMEPAGE HERO */}
+        <div
+          className={`p-6 bg-[#050811] text-white rounded-2xl border border-slate-800 space-y-4 shadow-xl ${
+            homeHeroAlign === 'left' ? 'text-left' : homeHeroAlign === 'right' ? 'text-right' : 'text-center'
+          }`}
+        >
+          <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest block">
+            Aperçu interactif Hero (Police : {homeHeroFontGlobal ? homeHeroFontFamily : 'Individuelle par élément'})
+          </span>
+
+          <div
+            onClick={() => setActiveHeroTab('badge')}
+            style={{
+              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont}', sans-serif`,
+              fontSize: homeHeroBadgeSize,
+              color: homeHeroBadgeColor,
+              borderColor: `${homeHeroBadgeColor}40`,
+              backgroundColor: `${homeHeroBadgeColor}15`,
+            }}
+            className={`inline-block px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border cursor-pointer hover:ring-2 hover:ring-white transition-all ${
+              activeHeroTab === 'badge' ? 'ring-2 ring-purple-400' : ''
+            }`}
+          >
+            🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés
+          </div>
+
+          <h3
+            onClick={() => setActiveHeroTab('title')}
+            className="font-black tracking-tight leading-tight cursor-pointer hover:opacity-90 transition-all"
+          >
+            <span
+              style={{
+                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
+                fontSize: homeHeroTitleSize,
+                color: homeHeroTitleColor,
+              }}
+              className={activeHeroTab === 'title' ? 'underline decoration-purple-400 underline-offset-4' : ''}
+            >
+              Les formations & templates qui te font{' '}
+            </span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveHeroTab('accent');
+              }}
+              style={{
+                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont}', sans-serif`,
+                fontSize: homeHeroTitleSize,
+                color: homeHeroAccentColor,
+                backgroundColor: `${homeHeroAccentColor}20`,
+                paddingLeft: '6px',
+                paddingRight: '6px',
+                borderRadius: '4px',
+              }}
+              className={`hover:opacity-90 transition-all ${
+                activeHeroTab === 'accent' ? 'ring-2 ring-emerald-400' : ''
+              }`}
+            >
+              gagner plus
+            </span>
+            <span
+              style={{
+                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
+                fontSize: homeHeroTitleSize,
+                color: homeHeroTitleColor,
+              }}
+            >
+              {' '}en freelance
+            </span>
+          </h3>
+
+          <p
+            onClick={() => setActiveHeroTab('subtitle')}
+            style={{
+              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont}', sans-serif`,
+              fontSize: homeHeroSubtitleSize,
+              color: homeHeroSubtitleColor,
+            }}
+            className={`max-w-2xl leading-relaxed cursor-pointer hover:opacity-90 transition-all ${
+              homeHeroAlign === 'left' ? 'mr-auto' : homeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
+            } ${activeHeroTab === 'subtitle' ? 'ring-1 ring-purple-400 p-1 rounded' : ''}`}
+          >
+            Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d affaires.
+          </p>
+        </div>
+      </Card>
 
           {/* SECTIONS LIST CANVAS DROPZONE */}
           {loading ? (

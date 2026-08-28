@@ -15,12 +15,12 @@ const DEFAULT_SETTINGS = {
   bannerTickerLink: '/boutique',
   footerCopyright: '© 2026 Solopreneur&Co. Tous droits réservés.',
 
+  // Store Hero Settings
   storeHeroBadge: 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES',
   storeHeroTitle: 'Templates Notion & Dashboards Excel',
   storeHeroTitleAccent: 'Haute Performance',
   storeHeroSubtitle: 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.',
 
-  // Flexible Formatting Controls
   storeHeroFontGlobal: true,
   storeHeroFontFamily: 'Plus Jakarta Sans',
   storeHeroBadgeFont: 'Plus Jakarta Sans',
@@ -35,6 +35,22 @@ const DEFAULT_SETTINGS = {
   storeHeroSubtitleSize: '16px',
   storeHeroSubtitleColor: '#cbd5e1',
   storeHeroAlign: 'center',
+
+  // Homepage Hero Settings
+  homeHeroFontGlobal: true,
+  homeHeroFontFamily: 'Plus Jakarta Sans',
+  homeHeroBadgeFont: 'Plus Jakarta Sans',
+  homeHeroBadgeSize: '12px',
+  homeHeroBadgeColor: '#a3e635',
+  homeHeroTitleFont: 'Plus Jakarta Sans',
+  homeHeroTitleSize: '48px',
+  homeHeroTitleColor: '#ffffff',
+  homeHeroAccentFont: 'Plus Jakarta Sans',
+  homeHeroAccentColor: '#a3e635',
+  homeHeroSubtitleFont: 'Plus Jakarta Sans',
+  homeHeroSubtitleSize: '18px',
+  homeHeroSubtitleColor: '#cbd5e1',
+  homeHeroAlign: 'center',
 };
 
 export async function GET() {
@@ -70,7 +86,7 @@ export async function PUT(request: Request) {
     const mergedValues = { ...currentValues, ...body };
 
     await prisma.siteSetting.upsert({
-      where: { key: 'general_settings' },
+      where: { key: 'general_settings', value: JSON.stringify(mergedValues) },
       update: { value: JSON.stringify(mergedValues) },
       create: { key: 'general_settings', value: JSON.stringify(mergedValues) },
     });
