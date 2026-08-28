@@ -261,7 +261,7 @@ export function FreeEbookOptinPixel({
               </div>
             ) : step === 'DETAILS' ? (
               /* STEP 1: INITIAL DETAILS FORM */
-              <form onSubmit={handleSendCode} className="space-y-3 pt-1 flex flex-col justify-between flex-grow">
+              <form onSubmit={handleSendCode} className="space-y-2.5 pt-1">
                 <div className="space-y-2.5">
                   {errorMsg && (
                     <div className="p-2.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-md text-xs font-bold animate-in fade-in">
@@ -449,7 +449,7 @@ export function FreeEbookOptinPixel({
         <div className="bg-slate-950 p-5 sm:p-7 rounded-2xl border-2 border-slate-900 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* LEFT FORM COLUMN */}
-          <div className="lg:col-span-7 flex flex-col justify-between space-y-3.5">
+          <div className="lg:col-span-7 flex flex-col justify-center space-y-3">
             <div className="space-y-2 text-center">
               <div className="flex justify-center w-full">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
@@ -481,7 +481,7 @@ export function FreeEbookOptinPixel({
               </div>
             ) : step === 'DETAILS' ? (
               /* STEP 1: INITIAL DETAILS FORM */
-              <form onSubmit={handleSendCode} className="space-y-2.5 pt-1 flex flex-col justify-between flex-grow">
+              <form onSubmit={handleSendCode} className="space-y-2.5 pt-1">
                 <div className="space-y-2">
                   {errorMsg && (
                     <div className="p-2.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-lg text-xs font-bold animate-in fade-in">
@@ -632,7 +632,7 @@ export function FreeEbookOptinPixel({
 
           {/* RIGHT COVER IMAGE COLUMN - ALIGNED TOP TO BOTTOM WITH LEFT COLUMN */}
           <div className="lg:col-span-5 flex justify-center items-center h-full">
-            <div className="relative group max-w-[340px] sm:max-w-[380px] w-full h-full flex flex-col justify-stretch">
+            <div className="relative group max-w-[280px] sm:max-w-[310px] w-full h-full flex flex-col justify-stretch">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#a3e635] to-emerald-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500" />
               
               {bookCoverUrl ? (
