@@ -195,13 +195,25 @@ function CheckoutContent() {
                   {product.name}
                 </h2>
 
-                {product.coverImage && (
+                {/* PRODUCT COVER IMAGE OR VISUAL PREVIEW BANNER */}
+                {product.coverImage ? (
                   <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg">
                     <img
                       src={product.coverImage}
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />
+                  </div>
+                ) : (
+                  <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border border-purple-500/20 shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4">
+                    <div className="w-20 h-20 rounded-3xl bg-purple-600/30 border border-purple-400/30 flex items-center justify-center shadow-2xl backdrop-blur-md">
+                      <Sparkles className="w-10 h-10 text-[#a3e635]" />
+                    </div>
+                    <div className="space-y-1.5 max-w-md">
+                      <div className="text-xs font-black uppercase tracking-widest text-[#a3e635]">Aperçu de la ressource offerte</div>
+                      <h3 className="text-xl sm:text-2xl font-heading font-black text-white">{product.name}</h3>
+                      <p className="text-xs sm:text-sm text-slate-300">Format digital immédiatement prêt à l emploi (PDF & Modèle Notion).</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -233,16 +245,16 @@ function CheckoutContent() {
 
           </div>
 
-          {/* RIGHT COLUMN: SINGLE MERGED CARD (RÉCAPITULATIF + DESTINATAIRE + REASSURANCE - 4 COLONNES) */}
+          {/* RIGHT COLUMN: SINGLE MERGED CARD (DISCREET DIVIDERS & HIGH IMPACT CTA) */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-8">
-            <Card className={`p-5 sm:p-6 space-y-5 rounded-3xl shadow-xl ${
+            <Card className={`p-5 sm:p-6 space-y-4.5 rounded-3xl shadow-xl ${
               isDark ? 'bg-[#0e1424] border-2 border-white/15 text-white' : 'bg-white border-2 border-purple-200 text-slate-900'
             }`}>
               
               {/* SECTION 1: RÉCAPITULATIF DE LA RESSOURCE */}
-              <div className="space-y-3.5">
-                <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-white/10">
-                  <h3 className="text-base font-heading font-black">Récapitulatif de la ressource</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/5">
+                  <h3 className="text-sm font-heading font-black">Récapitulatif</h3>
                   {isFree && (
                     <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
                       isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
@@ -260,7 +272,7 @@ function CheckoutContent() {
                       className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
                       <Download className="w-6 h-6" />
                     </div>
                   )}
@@ -272,7 +284,7 @@ function CheckoutContent() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 border-t pt-3 border-slate-100 dark:border-white/10 text-xs font-medium">
+                <div className="space-y-1 text-xs font-medium pt-1">
                   <div className="flex justify-between">
                     <span className="opacity-75">Prix public</span>
                     <span className="line-through opacity-60">
@@ -280,7 +292,7 @@ function CheckoutContent() {
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-base font-heading font-black pt-1.5 border-t border-slate-100 dark:border-white/10">
+                  <div className="flex justify-between items-center text-base font-heading font-black pt-1">
                     <span>Total</span>
                     <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
                       {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
@@ -290,9 +302,9 @@ function CheckoutContent() {
               </div>
 
               {/* SECTION 2: 1. DESTINATAIRE DE LA RESSOURCE */}
-              <div className="space-y-3.5 pt-3 border-t border-slate-100 dark:border-white/10">
+              <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire de la ressource</h3>
+                  <h3 className="text-[11px] font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire</h3>
                   <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
                     isDark ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-purple-100 text-purple-900'
                   }`}>
@@ -301,7 +313,7 @@ function CheckoutContent() {
                 </div>
 
                 {currentUser ? (
-                  <div className={`p-3.5 rounded-2xl flex items-center justify-between ${
+                  <div className={`p-3 rounded-2xl flex items-center justify-between ${
                     isDark ? 'bg-slate-950 border border-white/10' : 'bg-purple-50/80 border border-purple-200'
                   }`}>
                     <div className="flex items-center gap-2.5">
@@ -321,18 +333,18 @@ function CheckoutContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     
                     {/* NOM & PRÉNOM */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <label className={`block text-[11px] font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Prénom</label>
+                        <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Prénom</label>
                         <input
                           type="text"
                           placeholder="ex. Alex"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
-                          className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                          className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
                             isDark
                               ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                               : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
@@ -341,13 +353,13 @@ function CheckoutContent() {
                       </div>
 
                       <div>
-                        <label className={`block text-[11px] font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Nom</label>
+                        <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre Nom</label>
                         <input
                           type="text"
                           placeholder="ex. Morel"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
-                          className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                          className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
                             isDark
                               ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                               : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
@@ -358,22 +370,19 @@ function CheckoutContent() {
 
                     {/* EMAIL */}
                     <div>
-                      <label className={`block text-[11px] font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre e-mail *</label>
+                      <label className={`block text-[11px] font-bold mb-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Votre e-mail *</label>
                       <input
                         type="email"
                         required
                         placeholder="votre.email@exemple.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                        className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
                           isDark
                             ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                             : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
                         }`}
                       />
-                      <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        Lien d accès envoyé directement à cette adresse.
-                      </p>
                     </div>
 
                   </div>
@@ -381,12 +390,12 @@ function CheckoutContent() {
 
                 {/* PAYMENT METHOD (ONLY FOR PAID PRODUCTS) */}
                 {!isFree && (
-                  <div className="space-y-2.5 pt-2.5 border-t border-slate-100 dark:border-white/10">
+                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/5">
                     <h4 className="text-xs font-heading font-black">2. Mode de paiement</h4>
                     
                     <div
                       onClick={() => setPaymentMethod('DEMO')}
-                      className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
                         paymentMethod === 'DEMO'
                           ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
                           : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
@@ -405,7 +414,7 @@ function CheckoutContent() {
 
                     <div
                       onClick={() => setPaymentMethod('CARD')}
-                      className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
                         paymentMethod === 'CARD'
                           ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
                           : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
@@ -422,12 +431,12 @@ function CheckoutContent() {
                   </div>
                 )}
 
-                {/* ACTION BUTTON */}
+                {/* HIGH IMPACT CTA BUTTON (BIGGER TEXT, TIGHT PADDING) */}
                 <div className="pt-1">
                   <Button
                     type="submit"
                     disabled={processing}
-                    className={`w-full py-3.5 text-xs font-heading font-black rounded-xl shadow-lg transition-all gap-1.5 ${
+                    className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-xl shadow-xl transition-all gap-2 ${
                       isDark
                         ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
                         : 'bg-purple-700 text-white hover:bg-purple-800'
@@ -437,13 +446,13 @@ function CheckoutContent() {
                       <span>Validation...</span>
                     ) : isFree ? (
                       <>
-                        <Gift className="w-4 h-4" />
+                        <Gift className="w-5 h-5 shrink-0" />
                         <span>Obtenir mon accès gratuit</span>
                       </>
                     ) : (
                       <>
-                        <Lock className="w-4 h-4" />
-                        <span>Payer & Valider ({product.price.toFixed(2)} €)</span>
+                        <Lock className="w-5 h-5 shrink-0" />
+                        <span>Payer ({product.price.toFixed(2)} €)</span>
                       </>
                     )}
                   </Button>
@@ -451,8 +460,8 @@ function CheckoutContent() {
               </div>
 
               {/* SECTION 3: COMMENTAIRE DISCRET AU BAS DU BLOC FUSIONNÉ */}
-              <div className={`p-3.5 rounded-xl text-xs space-y-1 ${
-                isDark ? 'bg-slate-950/50 text-slate-300 border border-white/5' : 'bg-purple-50/60 text-purple-950 border border-purple-100'
+              <div className={`p-3 rounded-xl text-xs space-y-0.5 ${
+                isDark ? 'bg-slate-950/40 text-slate-300 border border-white/5' : 'bg-purple-50/50 text-purple-950 border border-purple-100'
               }`}>
                 <div className="font-bold text-[11px] flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#a3e635]" />
