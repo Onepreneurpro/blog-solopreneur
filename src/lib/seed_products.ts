@@ -45,7 +45,7 @@ const DEMO_PRODUCTS = [
   },
 
   // ----------------------------------------------------
-  // 2. TEMPLATES NOTION (12 PRODUITS EXACTS)
+  // 2. TEMPLATES NOTION (12 PRODUITS)
   // ----------------------------------------------------
   {
     categorySlug: 'notion',
@@ -205,7 +205,7 @@ const DEMO_PRODUCTS = [
   },
 
   // ----------------------------------------------------
-  // 3. TEMPLATES SIO (SYSTEME.IO)
+  // 3. TEMPLATES SIO / SYSTEME.IO (12 PRODUITS EXACTS)
   // ----------------------------------------------------
   {
     categorySlug: 'templates-sio',
@@ -246,6 +246,123 @@ const DEMO_PRODUCTS = [
     isFreeResource: false,
     isFeatured: false,
   },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Tunnel Webinar Automatisé & Replay Evergreen',
+    slug: 'systeme-io-tunnel-webinar-automatise-replay-evergreen',
+    shortDescription: 'Tunnel complet pour vendre vos accompagnements ou formations avec inscription webinar et relances e-mails.',
+    longDescription: 'Un entonnoir complet pour diffuser vos conférences en ligne en mode automatique, capturer les leads et déclencher les achats.',
+    price: 59.00,
+    compareAtPrice: 99.00,
+    coverImage: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Landing Page VSL (Video Sales Letter)',
+    slug: 'systeme-io-landing-page-vsl-video-sales-letter',
+    shortDescription: 'Page de vente vidéo haute conversion avec compte à rebours et blocs de preuves sociales intégrant Stripe.',
+    longDescription: 'Template Systeme.io axé sur la démonstration vidéo pour présenter l impact de votre offre et générer des ventes directes.',
+    price: 49.00,
+    compareAtPrice: 89.00,
+    coverImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Tunnel de Lancement d Offre (Launch Funnel)',
+    slug: 'systeme-io-tunnel-lancement-offre-launch-funnel',
+    shortDescription: 'Séquence 4 vidéos de valeur + page d ouverture des ventes pour vos lancements d accompagnement.',
+    longDescription: 'Entonnoir de lancement de produit basé sur la méthode de lancement orchestré avec page de pré-inscription et compte à rebours.',
+    price: 67.00,
+    compareAtPrice: 119.00,
+    coverImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Template Espace Membre VIP & Coaching Mastermind',
+    slug: 'systeme-io-template-espace-membre-vip-coaching-mastermind',
+    shortDescription: 'Design premium sombre et épuré avec calendrier de suivi et ressources partagées pour vos clients VIP.',
+    longDescription: 'Offrez un portail haut de gamme à vos clients de coaching individuel ou de Mastermind avec fiches de synthèse et téléchargements.',
+    price: 45.00,
+    compareAtPrice: 79.00,
+    coverImage: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Tunnel de Prise de RDV Qualifiés (High-Ticket)',
+    slug: 'systeme-io-tunnel-prise-rdv-qualifies-high-ticket',
+    shortDescription: 'Page de candidature avec questionnaire de cadrage et intégration calendrier de réservation en ligne.',
+    longDescription: 'Filtrez les prospects non qualifiés avant vos appels téléphoniques de clôture grâce à un formulaire dynamique.',
+    price: 55.00,
+    compareAtPrice: 95.00,
+    coverImage: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Pack 10 Pages de Remerciement & Order Bumps',
+    slug: 'systeme-io-pack-10-pages-remerciement-order-bumps',
+    shortDescription: 'Pages Thank You et offres complémentaires post-achat pour faire grimper le panier moyen.',
+    longDescription: 'Incitez vos clients à ajouter un second produit en 1 clic grâce à des boutons d upsell et des pages de confirmation claires.',
+    price: 32.00,
+    compareAtPrice: 59.00,
+    coverImage: 'https://images.unsplash.com/photo-1556742049-0a674648c668?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Template Newsletter & Emails de Relance Ventes',
+    slug: 'systeme-io-template-newsletter-emails-relance-ventes',
+    shortDescription: 'Modèles de newsletters responsive et séquences d emails de relance de panier abandonné.',
+    longDescription: 'Pack de templates d e-mails HTML/Text à intégrer dans vos campagnes automatisées et newsletters hebdomadaires.',
+    price: 27.00,
+    compareAtPrice: 49.00,
+    coverImage: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Tunnel Challenge 5 Jours (Event Funnel)',
+    slug: 'systeme-io-tunnel-challenge-5-jours-event-funnel',
+    shortDescription: 'Structure complète pour organiser un défi gratuit 5 jours et convertir vos participants en formation payante.',
+    longDescription: 'Gérez l inscription, l accès aux replays quotidiens et l ouverture du panier final avec un tunnel événementiel prêt à l emploi.',
+    price: 49.00,
+    compareAtPrice: 89.00,
+    coverImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: false,
+  },
+  {
+    categorySlug: 'templates-sio',
+    name: 'Systeme.io Template Micro-SaaS & Vente de Logiciels',
+    slug: 'systeme-io-template-micro-saas-vente-logiciels',
+    shortDescription: 'Design moderne style tech SaaS avec tableau comparatif de tarifs et FAQ interactive.',
+    longDescription: 'Présentez votre outil ou votre application web avec une page de vente au design épuré inspiré des meilleures startups tech.',
+    price: 57.00,
+    compareAtPrice: 99.00,
+    coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+    fileType: 'ZIP',
+    isFreeResource: false,
+    isFeatured: true,
+  },
 
   // ----------------------------------------------------
   // 4. RESSOURCES & GUIDES
@@ -278,7 +395,7 @@ const DEMO_PRODUCTS = [
   },
 
   // ----------------------------------------------------
-  // 5. OUTILS DE GESTION (12 PRODUITS EXACTS)
+  // 5. OUTILS DE GESTION (12 PRODUITS)
   // ----------------------------------------------------
   {
     categorySlug: 'outils-de-gestion',
