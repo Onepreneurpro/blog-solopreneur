@@ -14,8 +14,9 @@ interface BlogPageProps {
 }
 
 export default async function BlogListingPage({ searchParams }: BlogPageProps) {
-  const selectedCatSlug = searchParams.category;
-  const searchQuery = searchParams.search;
+  const safeParams = searchParams || {};
+  const selectedCatSlug = safeParams.category;
+  const searchQuery = safeParams.search;
 
   if (selectedCatSlug) {
     redirect(`/blog/categorie/${selectedCatSlug}`);

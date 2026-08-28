@@ -69,27 +69,33 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
     return () => window.removeEventListener('notifications-read', handleNotificationsRead);
   }, [user]);
 
-  const itemsToUse = dynamicHeaderItems.length > 0 ? dynamicHeaderItems : (initialMenuItems.length > 0 ? initialMenuItems : [
-    { id: '1', title: 'Accueil', url: '/', type: 'CUSTOM' },
-    { id: '2', title: 'Blog', url: '/blog', type: 'CUSTOM' },
-    { id: '3', title: 'Ressources', url: '/ressources', type: 'CUSTOM' },
-    { id: '4', title: 'Boutique', url: '/boutique', type: 'CUSTOM' },
-  ]);
+  const itemsToUse = (Array.isArray(dynamicHeaderItems) && dynamicHeaderItems.length > 0) 
+    ? dynamicHeaderItems 
+    : ((Array.isArray(initialMenuItems) && initialMenuItems.length > 0) ? initialMenuItems : [
+        { id: '1', title: 'Accueil', url: '/', type: 'CUSTOM' },
+        { id: '2', title: 'Blog', url: '/blog', type: 'CUSTOM' },
+        { id: '3', title: 'Ressources', url: '/ressources', type: 'CUSTOM' },
+        { id: '4', title: 'Boutique', url: '/boutique', type: 'CUSTOM' },
+      ]);
 
   // Build hierarchical tree for sub-menus
   const rootNavItems: (MenuItemType & { children: MenuItemType[] })[] = [];
   const map: { [id: string]: MenuItemType & { children: MenuItemType[] } } = {};
 
-  itemsToUse.forEach((item) => {
-    map[item.id] = { ...item, children: [] };
+  (itemsToUse || []).forEach((item) => {
+    if (item && item.id) {
+      map[item.id] = { ...item, children: [] };
+    }
   });
 
-  itemsToUse.forEach((item) => {
-    if (item.parentId && map[item.parentId]) {
-      map[item.parentId].children.push(map[item.id]);
-    } else {
-      if (map[item.id]) {
-        rootNavItems.push(map[item.id]);
+  (itemsToUse || []).forEach((item) => {
+    if (item && item.id) {
+      if (item.parentId && map[item.parentId]) {
+        map[item.parentId].children.push(map[item.id]);
+      } else if (!item.parentId) {
+        if (map[item.id]) {
+          rootNavItems.push(map[item.id]);
+        }
       }
     }
   });

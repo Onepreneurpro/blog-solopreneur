@@ -17,8 +17,9 @@ interface BoutiquePageProps {
 }
 
 export default async function BoutiqueListingPage({ searchParams }: BoutiquePageProps) {
-  const selectedCatSlug = searchParams.category;
-  const searchQuery = searchParams.search;
+  const safeParams = searchParams || {};
+  const selectedCatSlug = safeParams.category;
+  const searchQuery = safeParams.search;
 
   if (selectedCatSlug) {
     redirect(`/boutique/categorie/${selectedCatSlug}`);

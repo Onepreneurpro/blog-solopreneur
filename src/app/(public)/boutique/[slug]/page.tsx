@@ -45,6 +45,9 @@ export async function generateMetadata({ params }: SingleProductOrCategoryPagePr
 }
 
 export default async function BoutiqueDynamicSlugPage({ params, searchParams }: SingleProductOrCategoryPageProps) {
+  const slug = params?.slug;
+  const safeParams = searchParams || {};
+  const searchQuery = safeParams.search;
   let activeTheme = 'modern-bento';
   let product: any = null;
 
@@ -54,9 +57,9 @@ export default async function BoutiqueDynamicSlugPage({ params, searchParams }: 
     const category = await prisma.productCategory.findFirst({
       where: {
         OR: [
-          { slug: params.slug },
-          { slug: params.slug.replace(/_/g, '-') },
-          { slug: params.slug.replace(/-/g, '_') },
+          { slug: slug || '' },
+          { slug: (slug || '').replace(/_/g, '-') },
+          { slug: (slug || '').replace(/-/g, '_') },
         ],
       },
     });

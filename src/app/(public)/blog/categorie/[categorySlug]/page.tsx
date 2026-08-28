@@ -41,8 +41,9 @@ export async function generateMetadata({ params }: BlogCategoryPageProps): Promi
 }
 
 export default async function BlogCategoryPage({ params, searchParams }: BlogCategoryPageProps) {
-  const { categorySlug } = params;
-  const searchQuery = searchParams.search;
+  const categorySlug = params?.categorySlug;
+  const safeParams = searchParams || {};
+  const searchQuery = safeParams.search;
 
   let activeTheme = 'modern-bento';
   let category: any = null;
