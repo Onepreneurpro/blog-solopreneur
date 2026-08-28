@@ -150,6 +150,13 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
 
     if (s.storeHeroAlign) storeHeroAlign = s.storeHeroAlign;
 
+    if (activeTheme === 'blusky') {
+      if (storeHeroTitleColor === '#ffffff' || !s.storeHeroTitleColor) storeHeroTitleColor = '#0f172a';
+      if (storeHeroSubtitleColor === '#cbd5e1' || !s.storeHeroSubtitleColor) storeHeroSubtitleColor = '#334155';
+      if (storeHeroBadgeColor === '#a3e635' || storeHeroBadgeColor === '#c084fc' || !s.storeHeroBadgeColor) storeHeroBadgeColor = '#00A0FF';
+      if (storeHeroAccentColor === '#a3e635' || storeHeroAccentColor === '#ccff00' || !s.storeHeroAccentColor) storeHeroAccentColor = '#00A0FF';
+    }
+
     products = await prisma.product.findMany({
       where: whereCondition,
       orderBy: { isFeatured: 'desc' },

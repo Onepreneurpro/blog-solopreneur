@@ -282,7 +282,15 @@ body.theme-blusky .text-slate-400 {
   color: #475569 !important;
 }
 
-body.theme-blusky .text-white {
+body.theme-blusky .text-white,
+body.theme-blusky h1 [style*="color: #ffffff"],
+body.theme-blusky h1 [style*="color:#ffffff"],
+body.theme-blusky h1 [style*="color: rgb(255, 255, 255)"],
+body.theme-blusky h1 [style*="color:white"],
+body.theme-blusky h1[style*="color: #ffffff"],
+body.theme-blusky h1[style*="color: rgb(255, 255, 255)"],
+body.theme-blusky span[style*="color: #ffffff"],
+body.theme-blusky span[style*="color: rgb(255, 255, 255)"] {
   color: #0f172a !important;
 }
 
