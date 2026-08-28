@@ -181,9 +181,9 @@ export default function AdminHomepageBuilderPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   // Flexible Text Formatting & Google Fonts state for Homepage
-  const [activeHeroTab, setActiveHeroTab] = useState<'global' | 'badge' | 'title' | 'accent' | 'subtitle'>('global');
+  const [activeHeroTab, setActiveHeroTab] = useState<'badge' | 'title' | 'subtitle'>('title');
 
-  const [homeHeroFontGlobal, setHomeHeroFontGlobal] = useState(true);
+  const [homeHeroFontGlobal, setHomeHeroFontGlobal] = useState(false);
   const [homeHeroFontFamily, setHomeHeroFontFamily] = useState('Plus Jakarta Sans');
 
   const [homeHeroBadgeFont, setHomeHeroBadgeFont] = useState('Plus Jakarta Sans');
@@ -599,17 +599,17 @@ export default function AdminHomepageBuilderPage() {
     setMessage(null);
     try {
       const heroFormatting = {
-        homeHeroFontGlobal,
+        homeHeroFontGlobal: false,
         homeHeroFontFamily,
-        homeHeroBadgeFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont,
+        homeHeroBadgeFont,
         homeHeroBadgeSize,
         homeHeroBadgeColor,
-        homeHeroTitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont,
+        homeHeroTitleFont,
         homeHeroTitleSize,
         homeHeroTitleColor,
-        homeHeroAccentFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont,
+        homeHeroAccentFont,
         homeHeroAccentColor,
-        homeHeroSubtitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont,
+        homeHeroSubtitleFont,
         homeHeroSubtitleSize,
         homeHeroSubtitleColor,
         homeHeroAlign,
@@ -768,19 +768,6 @@ export default function AdminHomepageBuilderPage() {
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
           <button
             type="button"
-            onClick={() => setActiveHeroTab('global')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
-              activeHeroTab === 'global'
-                ? 'bg-purple-700 text-white shadow-md'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Réglages Globaux & Alignement</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveHeroTab('badge')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
               activeHeroTab === 'badge'
@@ -821,99 +808,6 @@ export default function AdminHomepageBuilderPage() {
 
         {/* CONTENU DE L'ONGLET SÉLECTIONNÉ */}
         <div className="p-5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-4">
-          
-          {/* TAB 0: REGLAGES GLOBAUX */}
-          {activeHeroTab === 'global' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-purple-950">Mode de Typographie Globale :</span>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={homeHeroFontGlobal}
-                    onChange={(e) => {
-                      const isG = e.target.checked;
-                      setHomeHeroFontGlobal(isG);
-                      if (isG) {
-                        setHomeHeroBadgeFont(homeHeroFontFamily);
-                        setHomeHeroTitleFont(homeHeroFontFamily);
-                        setHomeHeroAccentFont(homeHeroFontFamily);
-                        setHomeHeroSubtitleFont(homeHeroFontFamily);
-                      }
-                    }}
-                    className="w-4 h-4 text-purple-600 rounded"
-                  />
-                  <span className="text-xs font-bold text-purple-950">
-                    Appliquer la même police à TOUS les textes de la Homepage
-                  </span>
-                </label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Police Google Fonts Globale
-                  </label>
-                  <select
-                    value={homeHeroFontFamily}
-                    onChange={(e) => {
-                      const f = e.target.value;
-                      setHomeHeroFontFamily(f);
-                      if (homeHeroFontGlobal) {
-                        setHomeHeroBadgeFont(f);
-                        setHomeHeroTitleFont(f);
-                        setHomeHeroAccentFont(f);
-                        setHomeHeroSubtitleFont(f);
-                      }
-                    }}
-                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    {GOOGLE_FONTS_OPTIONS.map((f) => (
-                      <option key={f.name} value={f.name}>{f.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Alignement Global de l Entête
-                  </label>
-                  <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-purple-300">
-                    <button
-                      type="button"
-                      onClick={() => setHomeHeroAlign('left')}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
-                        homeHeroAlign === 'left' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <AlignLeft className="w-4 h-4" />
-                      <span>Gauche</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHomeHeroAlign('center')}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
-                        homeHeroAlign === 'center' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <AlignCenter className="w-4 h-4" />
-                      <span>Centré</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHomeHeroAlign('right')}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors ${
-                        homeHeroAlign === 'right' ? 'bg-purple-700 text-white' : 'text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <AlignRight className="w-4 h-4" />
-                      <span>Droite</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* TAB 1: BADGE FLOTTANT */}
           {activeHeroTab === 'badge' && (
@@ -941,10 +835,7 @@ export default function AdminHomepageBuilderPage() {
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
                   <select
                     value={homeHeroBadgeFont}
-                    onChange={(e) => {
-                      setHomeHeroBadgeFont(e.target.value);
-                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
-                    }}
+                    onChange={(e) => setHomeHeroBadgeFont(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     {GOOGLE_FONTS_OPTIONS.map((f) => (
@@ -1033,10 +924,7 @@ export default function AdminHomepageBuilderPage() {
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre H1</label>
                   <select
                     value={homeHeroTitleFont}
-                    onChange={(e) => {
-                      setHomeHeroTitleFont(e.target.value);
-                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
-                    }}
+                    onChange={(e) => setHomeHeroTitleFont(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     {GOOGLE_FONTS_OPTIONS.map((f) => (
@@ -1107,10 +995,7 @@ export default function AdminHomepageBuilderPage() {
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
                   <select
                     value={homeHeroSubtitleFont}
-                    onChange={(e) => {
-                      setHomeHeroSubtitleFont(e.target.value);
-                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
-                    }}
+                    onChange={(e) => setHomeHeroSubtitleFont(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     {GOOGLE_FONTS_OPTIONS.map((f) => (
