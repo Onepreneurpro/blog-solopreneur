@@ -171,7 +171,7 @@ export function FreeEbookOptinPixel({
           <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-sm text-xs sm:text-sm font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-xl shadow-[#a3e635]/20 border border-[#a3e635] uppercase tracking-widest whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-2.5 px-6 py-2 rounded-full text-sm sm:text-base font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-xl shadow-[#a3e635]/20 border border-[#a3e635] uppercase tracking-wider whitespace-nowrap shrink-0">
                   <Sparkles className="w-4 h-4 text-slate-950 shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
                   <Gift className="w-4 h-4 text-slate-950 shrink-0" />
@@ -243,8 +243,8 @@ export function FreeEbookOptinPixel({
                   <Button
                     type="submit"
                     disabled={loading}
-                    size="md"
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-xs sm:text-sm py-3 rounded-md shadow-xl border-0 transition-all gap-2"
+                    size="lg"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base sm:text-lg py-3.5 rounded-xl shadow-xl shadow-[#a3e635]/20 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
@@ -384,7 +384,7 @@ export function FreeEbookOptinPixel({
           <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
             <div className="space-y-4 text-center">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-3 px-7 py-2.5 rounded-full text-sm sm:text-base font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-2xl shadow-[#a3e635]/25 border-2 border-[#a3e635] uppercase tracking-widest whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-3 px-7 py-2 rounded-full text-base sm:text-lg font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-2xl shadow-[#a3e635]/25 border-2 border-[#a3e635] uppercase tracking-wider whitespace-nowrap shrink-0">
                   <Sparkles className="w-5 h-5 text-slate-950 shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
                   <Gift className="w-5 h-5 text-slate-950 shrink-0" />
@@ -460,7 +460,7 @@ export function FreeEbookOptinPixel({
                     type="submit"
                     disabled={loading}
                     size="lg"
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base py-4 rounded-xl shadow-lg border-0 transition-all gap-2"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-lg sm:text-xl py-3.5 sm:py-4 rounded-xl shadow-xl shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
