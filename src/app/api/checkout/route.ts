@@ -159,9 +159,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      orderId: order.id,
       orderNumber: order.orderNumber,
       downloadToken: order.downloadToken,
-      downloadUrl: `/checkout/confirmation?token=${order.downloadToken}`,
+      redirectUrl: `/checkout/confirmation?orderId=${order.id}`,
+      downloadUrl: `/checkout/confirmation?orderId=${order.id}`,
     });
   } catch (error) {
     console.error('Checkout Error:', error);

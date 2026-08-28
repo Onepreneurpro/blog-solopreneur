@@ -139,10 +139,12 @@ function CheckoutContent() {
 
       if (data.redirectUrl) {
         router.push(data.redirectUrl);
+      } else if (data.downloadUrl) {
+        router.push(data.downloadUrl);
       } else if (data.orderId) {
-        router.push(`/merci?orderId=${data.orderId}`);
+        router.push(`/checkout/confirmation?orderId=${data.orderId}`);
       } else {
-        router.push('/dashboard/achats');
+        router.push('/compte');
       }
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la commande.');
