@@ -291,6 +291,26 @@ body.theme-blusky button.bg-\[\#a3e635\]:hover {
   color: #ffffff !important;
 }
 
+/* Green elements override to Electric Sky Blue for BluSky */
+body.theme-blusky .bg-\[\#a3e635\] {
+  background-color: #00A0FF !important;
+  color: #ffffff !important;
+}
+
+body.theme-blusky .bg-\[\#a3e635\]\/20,
+body.theme-blusky .bg-\[\#a3e635\]\/15 {
+  background-color: #e0f2fe !important;
+  color: #00A0FF !important;
+}
+
+body.theme-blusky .text-\[\#a3e635\] {
+  color: #00A0FF !important;
+}
+
+body.theme-blusky .border-\[\#a3e635\] {
+  border-color: #00A0FF !important;
+}
+
 /* Footer rules for BluSky */
 body.theme-blusky footer {
   background-color: #f8fafc !important;

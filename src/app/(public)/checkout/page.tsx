@@ -211,6 +211,7 @@ function CheckoutContent() {
   };
 
   const isDark = isDarkTheme(activeTheme);
+  const isBluSky = activeTheme === 'blusky';
 
   if (loading) {
     return (
@@ -275,14 +276,18 @@ function CheckoutContent() {
         <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-5 border-slate-200 dark:border-white/10">
           {isFree ? (
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold ${
-              isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-purple-100 text-purple-900 border border-purple-200'
+              isDark
+                ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30'
+                : (isBluSky ? 'bg-[#e0f2fe] text-[#00A0FF] border border-[#00A0FF]/30' : 'bg-purple-100 text-purple-900 border border-purple-200')
             }`}>
               <Gift className="w-3.5 h-3.5" />
               <span>Ressource 100% Gratuite (Aucun Paiement Requis)</span>
             </div>
           ) : (
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold ${
-              isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-purple-100 text-purple-900 border border-purple-200'
+              isDark
+                ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30'
+                : (isBluSky ? 'bg-[#e0f2fe] text-[#00A0FF] border border-[#00A0FF]/30' : 'bg-purple-100 text-purple-900 border border-purple-200')
             }`}>
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Paiement Sécurisé SSL (Crypté 256 bits)</span>
@@ -313,7 +318,9 @@ function CheckoutContent() {
               <div className="space-y-4 border-b pb-5 border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
                   <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-sm ${
-                    isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                    isDark
+                      ? 'bg-[#a3e635] text-slate-950'
+                      : (isBluSky ? 'bg-[#00A0FF] text-white' : 'bg-purple-700 text-white')
                   }`}>
                     {isFree ? 'Ressource Offerte' : 'Produit Numérique'}
                   </span>
@@ -444,7 +451,9 @@ function CheckoutContent() {
                     <h3 className="text-sm font-heading font-black">Récapitulatif</h3>
                     {isFree && (
                       <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
-                        isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                        isDark
+                          ? 'bg-[#a3e635] text-slate-950'
+                          : (isBluSky ? 'bg-[#00A0FF] text-white' : 'bg-purple-700 text-white')
                       }`}>
                         100% Offert
                       </span>
@@ -465,7 +474,9 @@ function CheckoutContent() {
                         className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-md bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
+                      <div className={`w-12 h-12 rounded-md text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm ${
+                        isBluSky ? 'bg-[#00A0FF]' : 'bg-purple-700'
+                      }`}>
                         <Download className="w-6 h-6" />
                       </div>
                     )}
@@ -487,7 +498,7 @@ function CheckoutContent() {
 
                     <div className="flex justify-between items-center text-base font-heading font-black pt-1">
                       <span>Total</span>
-                      <span className={isFree ? (isDark ? 'text-[#a3e635]' : 'text-purple-700') : ''}>
+                      <span className={isFree ? (isDark ? 'text-[#a3e635]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-700')) : (isBluSky ? 'text-[#00A0FF]' : '')}>
                         {isFree ? '0 € (Gratuit)' : `${product.price.toFixed(2)} €`}
                       </span>
                     </div>
@@ -499,7 +510,9 @@ function CheckoutContent() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-[11px] font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire</h3>
                     <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
-                      isDark ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-purple-100 text-purple-900'
+                      isDark
+                        ? 'bg-[#a3e635]/20 text-[#a3e635]'
+                        : (isBluSky ? 'bg-[#e0f2fe] text-[#00A0FF]' : 'bg-purple-100 text-purple-900')
                     }`}>
                       Accès Instantané
                     </span>
@@ -507,11 +520,15 @@ function CheckoutContent() {
 
                   {currentUser ? (
                     <div className={`p-3 rounded-md flex items-center justify-between ${
-                      isDark ? 'bg-slate-950 border border-white/10' : 'bg-purple-50/80 border border-purple-200'
+                      isDark
+                        ? 'bg-slate-950 border border-white/10'
+                        : (isBluSky ? 'bg-[#f0f9ff] border border-[#00A0FF]/30' : 'bg-purple-50/80 border border-purple-200')
                     }`}>
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-xs shadow-sm ${
-                          isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+                          isDark
+                            ? 'bg-[#a3e635] text-slate-950'
+                            : (isBluSky ? 'bg-[#00A0FF] text-white' : 'bg-purple-700 text-white')
                         }`}>
                           <UserCheck className="w-4 h-4" />
                         </div>
@@ -542,7 +559,9 @@ function CheckoutContent() {
                             className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                               isDark
                                 ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                                : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                                : (isBluSky
+                                    ? 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#00A0FF] focus:bg-white'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white')
                             }`}
                           />
                         </div>
@@ -558,7 +577,9 @@ function CheckoutContent() {
                             className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                               isDark
                                 ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                                : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                                : (isBluSky
+                                    ? 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#00A0FF] focus:bg-white'
+                                    : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white')
                             }`}
                           />
                         </div>
@@ -577,7 +598,9 @@ function CheckoutContent() {
                           className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                             isDark
                               ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
-                              : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
+                              : (isBluSky
+                                  ? 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#00A0FF] focus:bg-white'
+                                  : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white')
                           }`}
                         />
                       </div>
@@ -594,15 +617,22 @@ function CheckoutContent() {
                         onClick={() => setPaymentMethod('DEMO')}
                         className={`p-2.5 rounded-md border cursor-pointer transition-all ${
                           paymentMethod === 'DEMO'
-                            ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
-                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
+                            ? (isDark
+                                ? 'border-[#a3e635] bg-[#a3e635]/15'
+                                : (isBluSky ? 'border-[#00A0FF] bg-[#e0f2fe]/80 ring-2 ring-[#00A0FF]/20' : 'border-purple-600 bg-purple-50/70'))
+                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200 bg-white')
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <input type="radio" checked={paymentMethod === 'DEMO'} readOnly className="text-purple-600" />
+                            <input
+                              type="radio"
+                              checked={paymentMethod === 'DEMO'}
+                              readOnly
+                              className={isBluSky ? 'text-[#00A0FF]' : 'text-purple-600'}
+                            />
                             <span className="font-heading font-black text-xs flex items-center gap-1">
-                              <Sparkles className="w-3.5 h-3.5 text-[#a3e635]" />
+                              <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-[#a3e635]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-600')}`} />
                               <span>Paiement Démo / Test</span>
                             </span>
                           </div>
@@ -613,14 +643,21 @@ function CheckoutContent() {
                         onClick={() => setPaymentMethod('CARD')}
                         className={`p-2.5 rounded-md border cursor-pointer transition-all ${
                           paymentMethod === 'CARD'
-                            ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
-                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
+                            ? (isDark
+                                ? 'border-[#a3e635] bg-[#a3e635]/15'
+                                : (isBluSky ? 'border-[#00A0FF] bg-[#e0f2fe]/80 ring-2 ring-[#00A0FF]/20' : 'border-purple-600 bg-purple-50/70'))
+                            : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200 bg-white')
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <input type="radio" checked={paymentMethod === 'CARD'} readOnly className="text-purple-600" />
+                          <input
+                            type="radio"
+                            checked={paymentMethod === 'CARD'}
+                            readOnly
+                            className={isBluSky ? 'text-[#00A0FF]' : 'text-purple-600'}
+                          />
                           <span className="font-heading font-black text-xs flex items-center gap-1.5">
-                            <CreditCard className="w-3.5 h-3.5 text-purple-500" />
+                            <CreditCard className={`w-3.5 h-3.5 ${isBluSky ? 'text-[#00A0FF]' : 'text-purple-500'}`} />
                             <span>Carte Bancaire (Stripe)</span>
                           </span>
                         </div>
@@ -630,7 +667,11 @@ function CheckoutContent() {
 
                   {/* INFO MESSAGE & CODE VERIFICATION BOX */}
                   {infoMsg && (
-                    <div className="p-3 rounded-md bg-[#a3e635]/20 border border-[#a3e635]/50 text-[#a3e635] text-xs font-bold flex items-center gap-2">
+                    <div className={`p-3 rounded-md text-xs font-bold flex items-center gap-2 ${
+                      isDark
+                        ? 'bg-[#a3e635]/20 border border-[#a3e635]/50 text-[#a3e635]'
+                        : (isBluSky ? 'bg-[#e0f2fe] border border-[#00A0FF]/40 text-[#00A0FF]' : 'bg-purple-100 border border-purple-300 text-purple-900')
+                    }`}>
                       <Lock className="w-4 h-4 shrink-0" />
                       <span>{infoMsg}</span>
                     </div>
@@ -644,14 +685,20 @@ function CheckoutContent() {
 
                   {/* 4-DIGIT VERIFICATION CODE INPUT STEP */}
                   {!currentUser && codeSent && (
-                    <div className="p-4 rounded-xl bg-[#a3e635]/15 border-2 border-[#a3e635]/60 space-y-3 my-2 shadow-xl animate-in fade-in duration-300">
-                      <div className="flex items-center gap-2 text-[#a3e635] text-xs font-heading font-black uppercase">
+                    <div className={`p-4 rounded-xl space-y-3 my-2 shadow-xl animate-in fade-in duration-300 ${
+                      isDark
+                        ? 'bg-[#a3e635]/15 border-2 border-[#a3e635]/60 text-[#a3e635]'
+                        : (isBluSky ? 'bg-[#e0f2fe]/80 border-2 border-[#00A0FF]/60 text-[#00A0FF]' : 'bg-purple-50 border-2 border-purple-300 text-purple-950')
+                    }`}>
+                      <div className={`flex items-center gap-2 text-xs font-heading font-black uppercase ${
+                        isDark ? 'text-[#a3e635]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-900')
+                      }`}>
                         <Lock className="w-4 h-4" />
                         <span>Code de confirmation requis</span>
                       </div>
                       
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        Un code à 4 chiffres a été envoyé par e-mail à <strong className="text-white">{email}</strong>.
+                      <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                        Un code à 4 chiffres a été envoyé par e-mail à <strong className={isDark ? 'text-white' : 'text-slate-950'}>{email}</strong>.
                       </p>
 
                       <div className="flex justify-center">
@@ -662,7 +709,11 @@ function CheckoutContent() {
                           placeholder="1234"
                           value={verificationCode}
                           onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                          className="w-full text-center tracking-[12px] font-mono text-2xl font-black py-2.5 px-3 bg-slate-950 border border-white/20 rounded-lg text-[#a3e635] focus:outline-none focus:border-[#a3e635]"
+                          className={`w-full text-center tracking-[12px] font-mono text-2xl font-black py-2.5 px-3 rounded-lg focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border border-white/20 text-[#a3e635] focus:border-[#a3e635]'
+                              : (isBluSky ? 'bg-white border-2 border-[#00A0FF] text-[#00A0FF]' : 'bg-white border-2 border-purple-600 text-purple-900')
+                          }`}
                         />
                       </div>
 
@@ -671,7 +722,7 @@ function CheckoutContent() {
                           type="button"
                           onClick={handleSendVerificationCode}
                           disabled={sendingCode}
-                          className="text-[#a3e635] hover:underline font-bold"
+                          className={`font-bold hover:underline ${isDark ? 'text-[#a3e635]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-700')}`}
                         >
                           {sendingCode ? 'Envoi...' : 'Renvoyer le code'}
                         </button>
@@ -679,7 +730,7 @@ function CheckoutContent() {
                         <button
                           type="button"
                           onClick={() => { setCodeSent(false); setVerificationCode(''); setInfoMsg(''); setError(''); }}
-                          className="text-slate-400 hover:text-white underline"
+                          className="text-slate-400 hover:text-slate-900 underline"
                         >
                           Modifier l e-mail
                         </button>
@@ -695,7 +746,7 @@ function CheckoutContent() {
                       className={`w-full py-3 px-4 text-sm sm:text-base font-heading font-black tracking-tight rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] ${
                         isDark
                           ? 'bg-[#a3e635] text-slate-950 hover:bg-[#b8f542]'
-                          : 'bg-purple-700 text-white hover:bg-purple-800'
+                          : (isBluSky ? 'bg-[#00A0FF] text-white hover:bg-[#0082D6]' : 'bg-purple-700 text-white hover:bg-purple-800')
                       }`}
                     >
                       {sendingCode ? (
