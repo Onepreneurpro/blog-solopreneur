@@ -49,7 +49,8 @@ export function FeaturedProductsPixel({
   if (!products || products.length === 0) return null;
 
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
-  const linkText = s.btnText || s.btn1Text || 'Voir toute la boutique →';
+  const rawLinkText = s.btnText || s.btn1Text || 'Voir toute la boutique';
+  const linkText = rawLinkText.replace(/→|\s*→/g, '').trim();
   const linkUrl = s.btn1Url || '/boutique';
 
   const badgeText = s.badgeText || 'OUTILS HAUTE CONVERSION';
@@ -131,10 +132,13 @@ export function FeaturedProductsPixel({
             )}
           </div>
 
-          <Link href={linkUrl}>
-            <Button size="lg" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-md px-6 py-4 shadow-xl border-0" style={btnStyle}>
-              <span>{linkText}</span>
-            </Button>
+          <Link
+            href={linkUrl}
+            className="text-xs sm:text-sm font-heading font-black text-[#a3e635] hover:underline inline-flex items-center gap-1 transition-colors shrink-0"
+            style={btnStyle}
+          >
+            <span>{linkText}</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
