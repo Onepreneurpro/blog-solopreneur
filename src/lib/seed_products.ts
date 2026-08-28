@@ -209,7 +209,7 @@ export async function seedDemoProducts() {
       continue;
     }
 
-    // Upsert product by slug
+    // Upsert product by slug setting BOTH categoryId and productCategoryId
     const existing = await prisma.product.findUnique({ where: { slug: item.slug } });
     if (existing) {
       await prisma.product.update({
@@ -224,6 +224,7 @@ export async function seedDemoProducts() {
           fileType: item.fileType,
           isFreeResource: item.isFreeResource,
           isFeatured: item.isFeatured,
+          categoryId: categoryId,
           productCategoryId: categoryId,
           status: 'PUBLISHED',
         },
@@ -242,6 +243,7 @@ export async function seedDemoProducts() {
           fileType: item.fileType,
           isFreeResource: item.isFreeResource,
           isFeatured: item.isFeatured,
+          categoryId: categoryId,
           productCategoryId: categoryId,
           status: 'PUBLISHED',
         },
@@ -250,7 +252,44 @@ export async function seedDemoProducts() {
     }
   }
 
-  console.log('--- Demo Products Seeding Completed! ---');
+  // NOW FIX ALL EXISTING PRODUCTS IN DATABASE SO categoryId IS NEVER NULL
+  const excelCat = categories.find((c) => c.slug === 'excel')?.id || null;
+  const notionCat = categories.find((c) => c.slug === 'notion')?.id || null;
+  const sioCat = categories.find((c) => c.slug === 'templates-sio')?.id || null;
+  const resCat = categories.find((c) => c.slug === 'ressources')?.id || null;
+  const gestionCat = categories.find((c) => c.slug === 'outils-de-gestion')?.id || null;
+
+  const allProducts = await prisma.product.findMany();
+  for (const prod of allProducts) {
+    let targetCatId: string | null = prod.categoryId || prod.productCategoryId;
+
+    if (!targetCatId) {
+      const lowerName = prod.name.toLowerCase();
+      if (lowerName.includes('excel') || lowerName.includes('budget') || lowerName.includes('trésorerie') || lowerName.includes('devis') || lowerName.includes('frais') || lowerName.includes('marge') || lowerName.includes('dépenses')) {
+        targetCatId = excelCat;
+      } else if (lowerName.includes('notion')) {
+        targetCatId = notionCat;
+      } else if (lowerName.includes('systeme') || lowerName.includes('sio') || lowerName.includes('tunnel')) {
+        targetCatId = sioCat;
+      } else if (lowerName.includes('guide') || lowerName.includes('ebook') || lowerName.includes('checklist') || lowerName.includes('fiche') || lowerName.includes('cheat') || lowerName.includes('modèle')) {
+        targetCatId = resCat;
+      } else {
+        targetCatId = gestionCat || excelCat;
+      }
+    }
+
+    if (targetCatId) {
+      await prisma.product.update({
+        where: { id: prod.id },
+        data: {
+          categoryId: targetCatId,
+          productCategoryId: targetCatId,
+        },
+      });
+    }
+  }
+
+  console.log('--- Demo Products Seeding Completed & Category IDs Fixed! ---');
 }
 
 if (require.main === module) {

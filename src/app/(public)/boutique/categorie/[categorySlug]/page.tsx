@@ -71,11 +71,17 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
     if (categorySlug === 'ressources') {
       whereCondition.OR = [
         { isFreeResource: true },
+        { categoryId: category.id },
+        { productCategoryId: category.id },
         { category: { slug: 'ressources' } },
       ];
     } else {
       whereCondition.isFreeResource = false;
-      whereCondition.category = { slug: categorySlug };
+      whereCondition.OR = [
+        { categoryId: category.id },
+        { productCategoryId: category.id },
+        { category: { slug: categorySlug } },
+      ];
     }
 
     if (searchQuery) {
