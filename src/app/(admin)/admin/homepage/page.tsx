@@ -1185,67 +1185,38 @@ export default function AdminHomepageBuilderPage() {
               activeHeroTab === 'badge' ? 'ring-2 ring-purple-400' : ''
             }`}
           >
-            🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés
+            {heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés'}
           </div>
 
           <h3
             onClick={() => setActiveHeroTab('title')}
-            className="font-black tracking-tight leading-tight cursor-pointer hover:opacity-90 transition-all"
+            style={{
+              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
+              fontSize: homeHeroTitleSize,
+              color: homeHeroTitleColor,
+            }}
+            className={`font-black tracking-tight leading-tight cursor-pointer hover:opacity-90 transition-all ${
+              activeHeroTab === 'title' ? 'ring-1 ring-purple-400 p-1 rounded' : ''
+            }`}
           >
-            <span
-              style={{
-                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
-                fontSize: homeHeroTitleSize,
-                color: homeHeroTitleColor,
-              }}
-              className={activeHeroTab === 'title' ? 'underline decoration-purple-400 underline-offset-4' : ''}
-            >
-              Les formations & templates qui te font{' '}
-            </span>
-            <span
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveHeroTab('accent');
-              }}
-              style={{
-                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont}', sans-serif`,
-                fontSize: homeHeroTitleSize,
-                color: homeHeroAccentColor,
-                backgroundColor: `${homeHeroAccentColor}20`,
-                paddingLeft: '6px',
-                paddingRight: '6px',
-                borderRadius: '4px',
-              }}
-              className={`hover:opacity-90 transition-all ${
-                activeHeroTab === 'accent' ? 'ring-2 ring-emerald-400' : ''
-              }`}
-            >
-              gagner plus
-            </span>
-            <span
-              style={{
-                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont}', sans-serif`,
-                fontSize: homeHeroTitleSize,
-                color: homeHeroTitleColor,
-              }}
-            >
-              {' '}en freelance
-            </span>
+            <FormattedText text={heroSection?.title || 'Les formations & templates qui te font <mark>gagner plus</mark> en freelance'} defaultMarkColor={homeHeroAccentColor} />
           </h3>
 
-          <p
-            onClick={() => setActiveHeroTab('subtitle')}
-            style={{
-              fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont}', sans-serif`,
-              fontSize: homeHeroSubtitleSize,
-              color: homeHeroSubtitleColor,
-            }}
-            className={`max-w-2xl leading-relaxed cursor-pointer hover:opacity-90 transition-all ${
-              homeHeroAlign === 'left' ? 'mr-auto' : homeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
-            } ${activeHeroTab === 'subtitle' ? 'ring-1 ring-purple-400 p-1 rounded' : ''}`}
-          >
-            Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d affaires.
-          </p>
+          {heroSection?.subtitle && (
+            <p
+              onClick={() => setActiveHeroTab('subtitle')}
+              style={{
+                fontFamily: `'${homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont}', sans-serif`,
+                fontSize: homeHeroSubtitleSize,
+                color: homeHeroSubtitleColor,
+              }}
+              className={`max-w-2xl leading-relaxed cursor-pointer hover:opacity-90 transition-all ${
+                homeHeroAlign === 'left' ? 'mr-auto' : homeHeroAlign === 'right' ? 'ml-auto' : 'mx-auto'
+              } ${activeHeroTab === 'subtitle' ? 'ring-1 ring-purple-400 p-1 rounded' : ''}`}
+            >
+              <FormattedText text={heroSection.subtitle} defaultMarkColor={homeHeroAccentColor} />
+            </p>
+          )}
         </div>
       </Card>
 
