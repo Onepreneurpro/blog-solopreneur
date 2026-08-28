@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Download, Gift, CheckCircle2, Clock, Zap, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CreditCard, ShieldCheck, Lock, ArrowRight, ArrowUpRight, Sparkles, UserCheck, Download, Gift, CheckCircle2, Clock, Zap, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { isDarkTheme } from '@/lib/theme';
@@ -659,11 +659,11 @@ function CheckoutContent() {
                   return (
                     <Card
                       key={recProd.id}
-                      className="bg-[#0e1424] border border-white/15 hover:border-[#a3e635] transition-all duration-300 rounded-md overflow-hidden flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-purple-950/50"
+                      className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10"
                     >
-                      <div>
-                        {/* 1:1 SQUARE COVER BOX */}
-                        <Link href={`/checkout?productId=${recProd.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950 group">
+                      <div className="space-y-3">
+                        {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                        <Link href={`/checkout?productId=${recProd.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
                           {recProd.coverImage ? (
                             <img
                               src={recProd.coverImage}
@@ -671,8 +671,8 @@ function CheckoutContent() {
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : recProd.icon ? (
-                            <div className="w-full h-full bg-slate-900 flex items-center justify-center p-8">
-                              <img src={recProd.icon} alt={recProd.name} className="w-20 h-20 object-contain rounded-md" />
+                            <div className="w-full h-full bg-slate-900 flex items-center justify-center p-4">
+                              <img src={recProd.icon} alt={recProd.name} className="w-16 h-16 object-contain rounded-lg shadow-xl" />
                             </div>
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-2">
@@ -681,19 +681,28 @@ function CheckoutContent() {
                             </div>
                           )}
 
-                          {/* OVERLAY BADGE */}
-                          <div className="absolute top-2.5 left-2.5 z-10">
-                            <span className="bg-[#a3e635] text-slate-950 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-sm shadow-lg flex items-center gap-1">
-                              <Zap className="w-2.5 h-2.5" />
-                              <span>{recProd.isFreeResource ? '100% OFFERT' : 'ACCÈS DIRECT'}</span>
+                          {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                          <div className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b8f542] transition-transform duration-300 z-10">
+                            <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+                          </div>
+
+                          {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                          <span className="absolute bottom-2.5 left-2.5 px-3 py-1 bg-[#a3e635] text-slate-950 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                            {recProd.category?.name || (recProd.isFreeResource ? '100% OFFERT' : 'TEMPLATES')}
+                          </span>
+
+                          <div className="absolute top-2.5 right-2.5 z-10">
+                            <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
+                              <Star className="w-2.5 h-2.5 text-[#a3e635] fill-[#a3e635]" />
+                              <span>VÉRIFIÉ</span>
                             </span>
                           </div>
                         </Link>
 
                         {/* CARD BODY */}
-                        <div className="p-4 space-y-1.5">
-                          <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">
-                            {recProd.category?.name || 'OUTILS & TEMPLATES'}
+                        <div className="space-y-1.5 px-1">
+                          <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
+                            Format : {getFileTypeLabel(recProd.fileType)}
                           </div>
 
                           <Link href={`/checkout?productId=${recProd.id}`}>
@@ -709,8 +718,8 @@ function CheckoutContent() {
                       </div>
 
                       {/* CARD FOOTER */}
-                      <div className="p-4 pt-0 space-y-3">
-                        <div className="flex items-baseline justify-between border-t border-white/10 pt-2 text-xs">
+                      <div className="space-y-3 pt-3 px-1">
+                        <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5 text-xs">
                           <span className="text-slate-500 line-through text-[11px] font-semibold">{comparePrice.toFixed(2)} €</span>
                           <span className="font-heading font-black text-white text-sm">
                             {recProd.price > 0 ? `${recProd.price.toFixed(2)} €` : '0 € (Gratuit)'}
@@ -720,10 +729,10 @@ function CheckoutContent() {
                         <Link href={`/checkout?productId=${recProd.id}`}>
                           <button
                             type="button"
-                            className="w-full py-2.5 bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-md shadow-md transition-all flex items-center justify-center gap-2 group/btn"
+                            className="w-full py-2.5 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5"
                           >
                             <span>DÉCOUVRIR</span>
-                            <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                           </button>
                         </Link>
                       </div>
