@@ -1579,7 +1579,6 @@ export default function AdminHomepageBuilderPage() {
                                     >
                                        📝 3. Sous-titre
                                     </button>
-
                                     <button
                                       type="button"
                                       onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'cta' }))}
@@ -1590,15 +1589,17 @@ export default function AdminHomepageBuilderPage() {
                                       🚀 4. Bouton d Action
                                     </button>
 
-                                    <button
-                                      type="button"
-                                      onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'reassurance' }))}
-                                      className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
-                                        activeTab === 'reassurance' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
-                                      }`}
-                                    >
-                                      🛡️ 5. Réassurances 1 & 2
-                                    </button>
+                                    {['FREE_EBOOK', 'HERO', 'FINAL_CTA'].includes(sec.sectionKey) && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setSectionTabs((prev) => ({ ...prev, [sec.id]: 'reassurance' }))}
+                                        className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-heading font-black ${
+                                          activeTab === 'reassurance' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
+                                        }`}
+                                      >
+                                        🛡️ 5. Réassurances 1 & 2
+                                      </button>
+                                    )}
                                   </div>
 
                                   {/* TAB 1: BADGE FLOTTANT */}
@@ -2130,7 +2131,7 @@ export default function AdminHomepageBuilderPage() {
                                   )}
 
                                   {/* TAB 5: PUCES DE RÉASSURANCE */}
-                                  {activeTab === 'reassurance' && (
+                                  {activeTab === 'reassurance' && ['FREE_EBOOK', 'HERO', 'FINAL_CTA'].includes(sec.sectionKey) && (
                                     <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
                                       <label className="block text-xs font-extrabold uppercase text-purple-950">
                                         🛡️ 5. Puces de Réassurance (Sous le bouton)
