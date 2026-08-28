@@ -1693,10 +1693,10 @@ export default function AdminHomepageBuilderPage() {
                                         </div>
                                       </div>
 
-                                      {/* CHOIX & COULEUR DE L'ICÔNE DU BADGE */}
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
+                                      {/* CHOIX, TAILLE & COULEUR DE L'ICÔNE DU BADGE */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-white border border-purple-200 rounded-xl">
                                         <div>
-                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎭 Choix de l Icône du Badge</label>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎭 Choix de l Icône</label>
                                           <select
                                             value={sec.settings?.badgeIcon || 'Sparkles'}
                                             onChange={(e) => handleSettingChange(sec.id, 'badgeIcon', e.target.value)}
@@ -1717,7 +1717,24 @@ export default function AdminHomepageBuilderPage() {
                                         </div>
 
                                         <div>
-                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎨 Couleur de l Icône du Badge</label>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">📐 Taille de l Icône</label>
+                                          <select
+                                            value={sec.settings?.badgeIconSize || '16px'}
+                                            onChange={(e) => handleSettingChange(sec.id, 'badgeIconSize', e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-purple-300 rounded-lg text-xs font-bold text-slate-900 cursor-pointer"
+                                          >
+                                            <option value="12px">Très petite (12px)</option>
+                                            <option value="14px">Petite (14px)</option>
+                                            <option value="16px">Standard (16px)</option>
+                                            <option value="20px">Moyenne (20px)</option>
+                                            <option value="24px">Grande (24px)</option>
+                                            <option value="28px">Très Grande (28px)</option>
+                                            <option value="32px">Géante (32px)</option>
+                                          </select>
+                                        </div>
+
+                                        <div>
+                                          <label className="block text-[11px] font-bold text-purple-950 mb-1">🎨 Couleur de l Icône</label>
                                           <div className="flex items-center gap-2">
                                             <input
                                               type="color"
@@ -1726,7 +1743,7 @@ export default function AdminHomepageBuilderPage() {
                                               className="w-8 h-8 p-0.5 rounded cursor-pointer border border-slate-300 shrink-0"
                                             />
                                             <div className="flex items-center gap-1 overflow-x-auto">
-                                              {COLOR_PALETTE.map((c) => (
+                                              {COLOR_PALETTE.slice(0, 4).map((c) => (
                                                 <button
                                                   key={c.hex}
                                                   type="button"

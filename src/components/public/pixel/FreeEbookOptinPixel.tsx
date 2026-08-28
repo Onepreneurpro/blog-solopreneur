@@ -85,6 +85,12 @@ export function FreeEbookOptinPixel({
 
   const badgeIconColor = mergedSettings.badgeIconColor || badgeColorHex || '#a3e635';
 
+  const iconStyle: React.CSSProperties = {
+    color: badgeIconColor,
+    width: mergedSettings.badgeIconSize || undefined,
+    height: mergedSettings.badgeIconSize || undefined,
+  };
+
   const titleStyle: React.CSSProperties = {
     fontFamily: mergedSettings.titleFont ? `'${mergedSettings.titleFont}', sans-serif` : undefined,
     fontSize: mergedSettings.titleSize || undefined,
@@ -227,7 +233,7 @@ export function FreeEbookOptinPixel({
             <div className="space-y-3">
               <div className="flex justify-center w-full">
                 <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
-                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={{ color: badgeIconColor }} />}
+                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={iconStyle} />}
                   <span>{badgeText}</span>
                 </div>
               </div>
@@ -440,7 +446,7 @@ export function FreeEbookOptinPixel({
             <div className="space-y-4 text-center">
               <div className="flex justify-center w-full">
                 <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
-                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={{ color: badgeIconColor }} />}
+                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={iconStyle} />}
                   <span>{badgeText}</span>
                 </div>
               </div>
