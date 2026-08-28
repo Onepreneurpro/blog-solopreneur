@@ -857,7 +857,7 @@ function CheckoutContent() {
                           )}
 
                           {/* CIRCULAR ACTION BUTTON TOP LEFT */}
-                          <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-white text-slate-900 border border-slate-200/80 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
+                          <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#00A0FF] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
                             <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                           </div>
 

@@ -348,23 +348,37 @@ body.theme-blusky button.bg-\[\#a3e635\]:hover {
   color: #ffffff !important;
 }
 
-/* Cover Image Overlay Elements (Light Button Background & Dark Text) */
-.img-overlay-arrow,
+/* Cover Image Overlay Elements (White Pill Background & Black Text for Category Badges) */
 .img-overlay-badge,
-body.theme-blusky .img-overlay-arrow,
-body.theme-blusky .img-overlay-badge {
+body.theme-blusky .img-overlay-badge,
+span.img-overlay-badge,
+body.theme-blusky span.img-overlay-badge {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border: 1px solid rgba(15, 23, 42, 0.15) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
   font-weight: 900 !important;
+}
+
+.img-overlay-arrow,
+body.theme-blusky .img-overlay-arrow,
+div.img-overlay-arrow,
+body.theme-blusky div.img-overlay-arrow {
+  background-color: #00A0FF !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.img-overlay-arrow svg,
+body.theme-blusky .img-overlay-arrow svg {
+  color: #ffffff !important;
 }
 
 body.theme-blusky .img-overlay-arrow:hover,
 .img-overlay-arrow:hover {
-  background-color: #f8fafc !important;
-  color: #00A0FF !important;
-  border-color: #00A0FF !important;
+  background-color: #0082D6 !important;
+  color: #ffffff !important;
 }
 
 /* Distinct Vibrant Collection Icon Boxes */
