@@ -46,7 +46,7 @@ export function DarkFeatureModern({
           
           {/* LEFT COLUMN: CHECKLIST & HEADLINE */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-[#ccff00] border border-white/15 text-xs font-heading font-black">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm bg-white/10 text-[#ccff00] border border-white/15 text-xs font-heading font-black">
               <Zap className="w-3.5 h-3.5 fill-[#ccff00]" />
               <span>SÉCURITÉ & PERFORMANCE</span>
             </div>
@@ -63,15 +63,15 @@ export function DarkFeatureModern({
 
             {/* CHECKLIST ITEMS */}
             <div className="space-y-4 pt-2">
-              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-md border border-white/10">
                 <CheckCircle2 className="w-5 h-5 text-[#ccff00] flex-shrink-0 mt-0.5" />
                 <span className="text-sm sm:text-base font-semibold text-slate-200">{check1}</span>
               </div>
-              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-md border border-white/10">
                 <CheckCircle2 className="w-5 h-5 text-[#ccff00] flex-shrink-0 mt-0.5" />
                 <span className="text-sm sm:text-base font-semibold text-slate-200">{check2}</span>
               </div>
-              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-md border border-white/10">
                 <CheckCircle2 className="w-5 h-5 text-[#ccff00] flex-shrink-0 mt-0.5" />
                 <span className="text-sm sm:text-base font-semibold text-slate-200">{check3}</span>
               </div>
@@ -79,7 +79,7 @@ export function DarkFeatureModern({
 
             <div className="pt-4">
               <Link href={ctaUrl}>
-                <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-sm rounded-full px-8 py-6 hover:scale-105 transition-all shadow-2xl">
+                <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-sm rounded-md px-8 py-6 hover:scale-102 transition-all shadow-2xl">
                   <span>{ctaText}</span>
                   <ArrowRight className="w-5 h-5 ml-1" />
                 </Button>
@@ -91,7 +91,7 @@ export function DarkFeatureModern({
           <div className="lg:col-span-5 space-y-6">
             
             {/* CARD 1 */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl space-y-4 shadow-2xl relative">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-md space-y-4 shadow-2xl relative">
               <div className="flex items-center gap-1 text-amber-400">
                 {[...Array(Number(review1Score) || 5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-400" />
@@ -100,19 +100,17 @@ export function DarkFeatureModern({
               <p className="text-sm text-slate-100 italic leading-relaxed">
                 "{review1Quote}"
               </p>
-              <div className="flex items-center gap-3 pt-2 border-t border-white/10">
-                <div className="w-9 h-9 rounded-full bg-[#ccff00] text-slate-950 font-black flex items-center justify-center text-xs">
-                  {review1Author[0]}
-                </div>
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-heading font-extrabold text-white">{review1Author}</div>
-                  <div className="text-[11px] text-slate-400 font-medium">{review1Role}</div>
+                  <div className="font-heading font-black text-white text-sm">{review1Author}</div>
+                  <div className="text-xs text-purple-300 font-medium">{review1Role}</div>
                 </div>
+                <span className="text-xs font-heading font-black text-[#ccff00] px-2.5 py-1 bg-[#ccff00]/10 rounded-sm border border-[#ccff00]/20">Achat Vérifié</span>
               </div>
             </div>
 
             {/* CARD 2 */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl space-y-4 shadow-2xl relative">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-md space-y-4 shadow-2xl relative">
               <div className="flex items-center gap-1 text-amber-400">
                 {[...Array(Number(review2Score) || 5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-400" />
@@ -121,14 +119,12 @@ export function DarkFeatureModern({
               <p className="text-sm text-slate-100 italic leading-relaxed">
                 "{review2Quote}"
               </p>
-              <div className="flex items-center gap-3 pt-2 border-t border-white/10">
-                <div className="w-9 h-9 rounded-full bg-purple-500 text-white font-black flex items-center justify-center text-xs">
-                  {review2Author[0]}
-                </div>
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-heading font-extrabold text-white">{review2Author}</div>
-                  <div className="text-[11px] text-slate-400 font-medium">{review2Role}</div>
+                  <div className="font-heading font-black text-white text-sm">{review2Author}</div>
+                  <div className="text-xs text-purple-300 font-medium">{review2Role}</div>
                 </div>
+                <span className="text-xs font-heading font-black text-[#ccff00] px-2.5 py-1 bg-[#ccff00]/10 rounded-sm border border-[#ccff00]/20">Achat Vérifié</span>
               </div>
             </div>
 

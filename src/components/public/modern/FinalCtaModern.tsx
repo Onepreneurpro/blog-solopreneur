@@ -28,7 +28,7 @@ export function FinalCtaModern({
     <section className="py-24 bg-[#ccff00] text-slate-950 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
         
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-950 text-[#ccff00] text-xs font-heading font-black uppercase tracking-wider shadow-lg">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm bg-slate-950 text-[#ccff00] text-xs font-heading font-black uppercase tracking-wider shadow-lg">
           <Sparkles className="w-4 h-4 fill-[#ccff00]" />
           <span>{badgeText}</span>
         </div>
@@ -45,7 +45,7 @@ export function FinalCtaModern({
 
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href={btnUrl} className="w-full sm:w-auto">
-            <Button size="lg" className="w-full bg-slate-950 hover:bg-slate-900 text-[#ccff00] font-heading font-black text-sm sm:text-base rounded-full px-10 py-6 hover:scale-105 transition-all shadow-2xl">
+            <Button size="lg" className="w-full bg-slate-950 hover:bg-slate-900 text-[#ccff00] font-heading font-black text-sm sm:text-base rounded-md px-10 py-6 hover:scale-102 transition-all shadow-2xl">
               <span>{btnText}</span>
               <ArrowRight className="w-5 h-5 ml-1" />
             </Button>

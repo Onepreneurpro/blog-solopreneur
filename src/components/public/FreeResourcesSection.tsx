@@ -44,7 +44,7 @@ export function FreeResourcesSection({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-heading font-black mb-2 shadow-xs ${
+            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-sm text-xs font-heading font-black mb-2 shadow-xs ${
               isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-[#ccff00] text-slate-950'
             }`}>
               <Gift className="w-3.5 h-3.5" />
@@ -77,20 +77,20 @@ export function FreeResourcesSection({
         {/* RESOURCES GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {resources.map((res) => (
-            <Card key={res.id} className={`p-7 rounded-3xl flex flex-col justify-between transition-all shadow-md hover:shadow-xl ${
+            <Card key={res.id} className={`p-7 rounded-md flex flex-col justify-between transition-all shadow-md hover:shadow-xl ${
               isDark
                 ? 'bg-slate-900/90 border border-slate-800 hover:border-[#a3e635]/60 text-white'
                 : 'bg-white border-2 border-slate-200 hover:border-purple-600 text-slate-950'
             }`}>
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`w-10 h-10 rounded-2xl flex items-center justify-center font-extrabold ${
+                  <span className={`w-10 h-10 rounded-md flex items-center justify-center font-extrabold ${
                     isDark ? 'bg-[#a3e635]/20 border border-[#a3e635]/30 text-[#a3e635]' : 'bg-purple-100 border border-purple-200 text-purple-700'
                   }`}>
                     <FileText className="w-5 h-5" />
                   </span>
 
-                  <span className={`px-3 py-1 rounded-full text-xs font-heading font-black shadow-xs ${
+                  <span className={`px-3 py-1 rounded-sm text-xs font-heading font-black shadow-xs ${
                     isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-[#ccff00] text-slate-950'
                   }`}>
                     Gratuit
@@ -120,11 +120,12 @@ export function FreeResourcesSection({
                   {res.downloadsCount} téléchargements
                 </span>
 
-                <Link href={`/boutique/${res.slug}`}>
-                  <Button size="sm" className={`text-xs font-heading font-black py-2.5 px-5 shadow-md ${
-                    isDark ? 'bg-[#a3e635] hover:bg-[#86efac] text-slate-950 rounded-xl border-0' : 'btn-purple rounded-full'
+                <Link href={`/checkout?productId=${res.id}`}>
+                  <Button size="sm" className={`gap-2 font-heading font-black rounded-md px-4 py-2.5 shadow-md ${
+                    isDark ? 'bg-[#a3e635] hover:bg-[#86efac] text-slate-950' : 'btn-purple'
                   }`}>
-                    Télécharger
+                    <span>Obtenir gratuitement</span>
+                    <Download className="w-4 h-4" />
                   </Button>
                 </Link>
               </div>

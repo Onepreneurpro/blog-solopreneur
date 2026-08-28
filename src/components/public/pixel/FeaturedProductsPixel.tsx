@@ -53,7 +53,7 @@ export function FeaturedProductsPixel({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-heading font-black bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30 mb-3 shadow-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm text-xs font-heading font-black bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30 mb-3 shadow-md">
               <Sparkles className="w-3.5 h-3.5" />
               <span>OUTILS HAUTE CONVERSION</span>
             </div>
@@ -68,7 +68,7 @@ export function FeaturedProductsPixel({
           </div>
 
           <Link href={linkUrl}>
-            <Button size="lg" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-2xl px-6 py-4 shadow-xl border-0">
+            <Button size="lg" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-md px-6 py-4 shadow-xl border-0">
               <span>{linkText}</span>
             </Button>
           </Link>
@@ -79,10 +79,10 @@ export function FeaturedProductsPixel({
           {products.map((prod, idx) => {
             const badgeText = badgeLabels[idx % badgeLabels.length];
             return (
-              <Card key={prod.id} className="flex flex-col h-full group bg-[#0e1424]/90 border border-white/10 hover:border-[#a3e635]/60 shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10 transition-all duration-300 rounded-3xl overflow-hidden">
+              <Card key={prod.id} className="flex flex-col h-full group bg-[#0e1424]/90 border border-white/10 hover:border-[#a3e635]/60 shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10 transition-all duration-300 rounded-md overflow-hidden">
                 
                 {/* IMAGE COVER WITH HIGHLEVEL OVERLAY BADGE */}
-                <Link href={`/boutique/${prod.slug}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950">
+                <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950">
                   {prod.coverImage ? (
                     <Image
                       src={prod.coverImage}
@@ -98,7 +98,7 @@ export function FeaturedProductsPixel({
 
                   {/* HIGHLEVEL BLACK/WHITE PILL BADGE TOP LEFT */}
                   <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                    <span className="px-3 py-1 bg-white text-slate-950 font-heading font-black text-[10px] uppercase rounded-full shadow-lg border border-slate-200">
+                    <span className="px-2.5 py-0.5 bg-white text-slate-950 font-heading font-black text-[10px] uppercase rounded-sm shadow-lg border border-slate-200">
                       {badgeText}
                     </span>
                   </div>
@@ -108,7 +108,7 @@ export function FeaturedProductsPixel({
                 <div className="p-6 flex flex-col flex-grow">
                   
                   <h3 className="text-lg font-heading font-black text-white group-hover:text-[#a3e635] transition-colors line-clamp-2 mb-2 leading-snug">
-                    <Link href={`/boutique/${prod.slug}`}>{prod.name}</Link>
+                    <Link href={`/checkout?productId=${prod.id}`}>{prod.name}</Link>
                   </h3>
 
                   <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed mb-6 font-normal">
@@ -129,8 +129,8 @@ export function FeaturedProductsPixel({
                       )}
                     </div>
 
-                    <Link href={`/boutique/${prod.slug}`}>
-                      <Button size="sm" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs px-4 py-2 rounded-xl shadow-md border-0">
+                    <Link href={`/checkout?productId=${prod.id}`}>
+                      <Button size="sm" className="bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-heading font-black text-xs px-4 py-2 rounded-md shadow-md border-0">
                         <span>Obtenir</span>
                         <ArrowRight className="w-3.5 h-3.5 ml-1" />
                       </Button>

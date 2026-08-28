@@ -26,7 +26,7 @@ export function FeaturedProductsModern({
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
           <div className="max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-xs font-heading font-black">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-purple-500/20 text-purple-300 border border-purple-400/30 text-xs font-heading font-black">
               <ShoppingBag className="w-3.5 h-3.5 text-[#ccff00]" />
               <span>BOUTIQUE EXCLUSIVE</span>
             </div>
@@ -44,7 +44,7 @@ export function FeaturedProductsModern({
 
           <div>
             <Link href="/boutique">
-              <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-full px-6 py-5 hover:scale-105 transition-all shadow-xl">
+              <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-xs sm:text-sm rounded-md px-6 py-5 hover:scale-102 transition-all shadow-xl">
                 <span>Voir tous les produits</span>
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
@@ -54,16 +54,16 @@ export function FeaturedProductsModern({
 
         {/* PRODUCTS GRID */}
         {products.length === 0 ? (
-          <div className="text-center py-16 bg-slate-900/60 rounded-3xl border border-slate-800">
+          <div className="text-center py-16 bg-slate-900/60 rounded-md border border-slate-800">
             <p className="text-slate-400">Aucun produit mis en avant pour le moment.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((prod) => (
-              <Card key={prod.id} className="flex flex-col h-full group bg-slate-900 border border-slate-800 hover:border-purple-500/60 shadow-xl hover:shadow-2xl hover:shadow-purple-900/20 transition-all duration-300 rounded-3xl overflow-hidden">
+              <Card key={prod.id} className="flex flex-col h-full group bg-slate-900 border border-slate-800 hover:border-purple-500/60 shadow-xl hover:shadow-2xl hover:shadow-purple-900/20 transition-all duration-300 rounded-md overflow-hidden">
                 
                 {/* IMAGE COVER WITH CATEGORY BADGE */}
-                <Link href={`/boutique/${prod.slug}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950">
+                <Link href={`/checkout?productId=${prod.id}`} className="relative block aspect-[16/10] overflow-hidden bg-slate-950">
                   {prod.coverImage ? (
                     <Image
                       src={prod.coverImage}
@@ -80,7 +80,7 @@ export function FeaturedProductsModern({
                   {/* CATEGORY BADGE */}
                   {prod.category && (
                     <div className="absolute top-4 left-4 z-10">
-                      <span className="px-3.5 py-1 bg-slate-950/90 backdrop-blur-md text-[#ccff00] font-heading font-black text-[11px] rounded-full border border-[#ccff00]/30 shadow-md">
+                      <span className="px-3.5 py-1 bg-slate-950/90 backdrop-blur-md text-[#ccff00] font-heading font-black text-[11px] rounded-sm border border-[#ccff00]/30 shadow-md">
                         {prod.category.name}
                       </span>
                     </div>
@@ -90,7 +90,7 @@ export function FeaturedProductsModern({
                 {/* CONTENT */}
                 <div className="p-6 flex flex-col flex-grow space-y-4">
                   <h3 className="text-xl font-heading font-extrabold text-white group-hover:text-[#ccff00] transition-colors line-clamp-2 leading-snug">
-                    <Link href={`/boutique/${prod.slug}`}>{prod.name}</Link>
+                    <Link href={`/checkout?productId=${prod.id}`}>{prod.name}</Link>
                   </h3>
 
                   <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed flex-grow">
@@ -98,12 +98,12 @@ export function FeaturedProductsModern({
                   </p>
 
                   <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                    <span className="text-2xl font-heading font-black text-white">
+                    <span className="text-2xl font-heading font-black text-[#ccff00]">
                       {prod.price === 0 ? 'Gratuit' : `${prod.price} €`}
                     </span>
 
-                    <Link href={`/boutique/${prod.slug}`}>
-                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white font-heading font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md">
+                    <Link href={`/checkout?productId=${prod.id}`}>
+                      <Button size="sm" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-xs px-4 py-2 rounded-md shadow-md">
                         <span>Obtenir</span>
                         <ArrowRight className="w-3.5 h-3.5 ml-1" />
                       </Button>

@@ -116,7 +116,7 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
             
             {/* LOGO */}
             <Link href="/" className="flex items-center gap-2 font-heading font-extrabold text-lg sm:text-xl tracking-tight text-white">
-              <span className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-2xl bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-500 flex items-center justify-center text-white font-black text-base sm:text-lg shadow-lg shadow-purple-500/30">
+              <span className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-md bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-500 flex items-center justify-center text-white font-black text-base sm:text-lg shadow-lg shadow-purple-500/30">
                 S
               </span>
               <span>Solopreneur<span className="text-violet-500">&Co</span></span>
@@ -132,7 +132,7 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
                     <div key={item.id} className="relative group">
                       <Link
                         href={item.url}
-                        className="flex items-center gap-1 px-3.5 py-2 text-sm font-semibold rounded-xl transition-all text-slate-200 hover:text-white"
+                        className="flex items-center gap-1 px-3.5 py-2 text-sm font-semibold rounded-md transition-all text-slate-200 hover:text-white"
                       >
                         {item.title}
                         <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform" />
@@ -140,12 +140,12 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
 
                       {/* SUB-MENU DROPDOWN */}
                       <div className="absolute left-0 top-full pt-2 w-64 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                        <div className="mega-menu-dropdown bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-800 p-2 grid gap-1">
+                        <div className="mega-menu-dropdown bg-slate-900/95 backdrop-blur-2xl rounded-md shadow-2xl border border-slate-800 p-2 grid gap-1">
                           {item.children.map((child) => (
                             <Link
                               key={child.id}
                               href={child.url}
-                              className="flex items-center gap-2.5 p-2.5 rounded-xl transition-colors hover:bg-purple-950/40 text-slate-200 hover:text-white"
+                              className="flex items-center gap-2.5 p-2.5 rounded-md transition-colors hover:bg-purple-950/40 text-slate-200 hover:text-white"
                             >
                               <FileText className="w-4 h-4 text-purple-400 flex-shrink-0" />
                               <div className="text-sm font-semibold">{child.title}</div>
@@ -161,7 +161,7 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
                   <Link
                     key={item.id}
                     href={item.url}
-                    className="px-3.5 py-2 text-sm font-semibold rounded-xl transition-all text-slate-200 hover:text-white"
+                    className="px-3.5 py-2 text-sm font-semibold rounded-md transition-all text-slate-200 hover:text-white"
                   >
                     {item.title}
                   </Link>
@@ -174,7 +174,7 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
               {user ? (
                 <div className="flex items-center gap-2">
                   <Link href="/compte">
-                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 rounded-full font-extrabold px-4 py-2 shadow-md relative">
+                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 rounded-md font-extrabold px-4 py-2 shadow-md relative">
                       <User className="w-4 h-4" />
                       <span>Mon Compte</span>
                       {unreadNotificationsCount > 0 && (
@@ -186,7 +186,7 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
                   </Link>
 
                   <form action="/api/auth/logout" method="POST">
-                    <Button type="submit" variant="danger" size="sm" className="header-logout-btn flex items-center gap-1.5 rounded-full font-bold px-4 py-2 text-xs">
+                    <Button type="submit" variant="danger" size="sm" className="header-logout-btn flex items-center gap-1.5 rounded-md font-bold px-4 py-2 text-xs">
                       <LogOut className="w-4 h-4 text-red-600" />
                       <span>Déconnexion</span>
                     </Button>
@@ -195,12 +195,12 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm" className="font-semibold text-slate-200 hover:text-white hover:bg-slate-800">
+                    <Button variant="ghost" size="sm" className="font-semibold text-slate-200 hover:text-white hover:bg-slate-800 rounded-md">
                       Connexion
                     </Button>
                   </Link>
                   <Link href="/boutique">
-                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 font-extrabold rounded-full px-5">
+                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 font-extrabold rounded-md px-5">
                       <ShoppingBag className="w-4 h-4" />
                       <span>Les Produits</span>
                     </Button>

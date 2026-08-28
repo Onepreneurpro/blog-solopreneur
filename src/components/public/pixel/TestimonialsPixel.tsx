@@ -88,7 +88,7 @@ export function TestimonialsPixel({
         {/* DYNAMIC TESTIMONIALS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((t: any, idx: number) => (
-            <Card key={idx} className="p-6 bg-[#0e1424]/90 border border-white/10 rounded-3xl space-y-4 hover:border-[#a3e635]/40 transition-all shadow-md">
+            <Card key={idx} className="p-6 bg-[#0e1424]/90 border border-white/10 rounded-md space-y-4 hover:border-[#a3e635]/40 transition-all shadow-md">
               <div className="flex items-center gap-3">
                 {t.avatar ? (
                   <img src={t.avatar} alt={t.name} className="w-11 h-11 rounded-full object-cover border border-white/20 shrink-0" />

@@ -159,7 +159,7 @@ export function FreeEbookOptinPixel({
 
   if (isEmbedded) {
     return (
-      <div className="my-10 p-6 sm:p-9 bg-gradient-to-br from-slate-950 via-[#0f1422] to-slate-950 text-white rounded-3xl border border-[#a3e635]/40 shadow-2xl shadow-[#a3e635]/5 relative overflow-hidden not-prose">
+      <div className="my-10 p-6 sm:p-9 bg-gradient-to-br from-slate-950 via-[#0f1422] to-slate-950 text-white rounded-md border border-[#a3e635]/40 shadow-2xl shadow-[#a3e635]/5 relative overflow-hidden not-prose">
         
         {/* AMBIENT NEON GLOW */}
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#a3e635]/15 rounded-full blur-3xl pointer-events-none" />
@@ -171,7 +171,7 @@ export function FreeEbookOptinPixel({
           <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full text-xs sm:text-sm font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-xl shadow-[#a3e635]/20 border border-[#a3e635] uppercase tracking-widest whitespace-nowrap shrink-0">
+                <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-sm text-xs sm:text-sm font-heading font-black bg-gradient-to-r from-[#a3e635] via-[#ccff00] to-emerald-400 text-slate-950 shadow-xl shadow-[#a3e635]/20 border border-[#a3e635] uppercase tracking-widest whitespace-nowrap shrink-0">
                   <Sparkles className="w-4 h-4 text-slate-950 shrink-0 animate-pulse" />
                   <span>{badgeText}</span>
                   <Gift className="w-4 h-4 text-slate-950 shrink-0" />
@@ -190,13 +190,13 @@ export function FreeEbookOptinPixel({
             </div>
 
             {submitted ? (
-              <div className="p-5 bg-[#a3e635]/15 border border-[#a3e635]/40 rounded-2xl text-center space-y-2 animate-in fade-in">
-                <div className="w-10 h-10 rounded-full bg-[#a3e635] text-slate-950 flex items-center justify-center mx-auto text-lg font-black shadow-md">
-                  <Check className="w-5 h-5 stroke-[3]" />
+              <div className="p-6 bg-[#a3e635]/15 border border-[#a3e635]/50 text-[#a3e635] rounded-md text-center space-y-2 animate-in zoom-in-95">
+                <div className="w-12 h-12 rounded-md bg-[#a3e635] text-slate-950 flex items-center justify-center mx-auto text-xl font-bold shadow-lg">
+                  ✓
                 </div>
-                <h4 className="text-base font-heading font-black text-[#a3e635]">Félicitations {firstName || ''} ! 🚀</h4>
-                <p className="text-xs text-slate-200 font-medium">
-                  Votre adresse email a été vérifiée avec succès. Votre eBook vous a été envoyé à <strong className="text-white">{email}</strong>.
+                <h4 className="text-lg font-heading font-black">Accès Débloqué !</h4>
+                <p className="text-xs text-slate-200">
+                  Votre guide gratuit a été envoyé à <code className="font-bold text-white">{email}</code>.
                 </p>
               </div>
             ) : step === 'DETAILS' ? (
@@ -204,7 +204,7 @@ export function FreeEbookOptinPixel({
               <form onSubmit={handleSendCode} className="space-y-3 pt-1 flex flex-col justify-between flex-grow">
                 <div className="space-y-2.5">
                   {errorMsg && (
-                    <div className="p-2.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold animate-in fade-in">
+                    <div className="p-2.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-md text-xs font-bold animate-in fade-in">
                       {errorMsg}
                     </div>
                   )}
@@ -216,14 +216,14 @@ export function FreeEbookOptinPixel({
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Votre Prénom*"
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-md bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                     />
                     <input
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Votre Nom"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-md bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                     />
                   </div>
 
@@ -234,7 +234,7 @@ export function FreeEbookOptinPixel({
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Votre Email Pro*"
                       required
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-md bg-slate-900/90 border border-slate-800 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                     />
                   </div>
                 </div>
@@ -244,7 +244,7 @@ export function FreeEbookOptinPixel({
                     type="submit"
                     disabled={loading}
                     size="md"
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-xs sm:text-sm py-3 rounded-xl shadow-xl border-0 transition-all gap-2"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-xs sm:text-sm py-3 rounded-md shadow-xl border-0 transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>

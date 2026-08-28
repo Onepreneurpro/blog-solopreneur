@@ -48,7 +48,7 @@ export function CollectionsPixel({
           )}
         </div>
 
-        {/* CIRCULAR COLLECTIONS STRIP */}
+        {/* COLLECTIONS GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           {collections.map((col, idx) => {
             const Icon = col.icon;
@@ -56,10 +56,10 @@ export function CollectionsPixel({
               <Link
                 key={idx}
                 href={col.url}
-                className="group p-6 bg-[#0e1424]/90 rounded-3xl border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 flex flex-col items-center text-center shadow-xl hover:scale-[1.03]"
+                className="group p-6 bg-[#0e1424]/90 rounded-md border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 flex flex-col items-center text-center shadow-xl hover:scale-[1.02]"
               >
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 mb-4 shadow-md ${col.color}`}>
-                  <Icon className="w-8 h-8" />
+                <div className={`w-14 h-14 rounded-md flex items-center justify-center border-2 mb-4 shadow-md ${col.color}`}>
+                  <Icon className="w-7 h-7" />
                 </div>
                 
                 <div className="flex items-center gap-1.5 text-sm font-heading font-extrabold text-white group-hover:text-[#a3e635] transition-colors">
