@@ -310,9 +310,8 @@ export function FreeEbookOptinPixel({
                   <Button
                     type="submit"
                     disabled={loading}
-                    size="lg"
                     style={btnStyle}
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base sm:text-lg py-3.5 rounded-xl shadow-xl shadow-[#a3e635]/20 border-0 hover:scale-[1.01] transition-all gap-2"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-lg sm:text-xl py-2 px-3 h-auto rounded-lg shadow-lg shadow-[#a3e635]/20 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
@@ -533,9 +532,8 @@ export function FreeEbookOptinPixel({
                   <Button
                     type="submit"
                     disabled={loading}
-                    size="lg"
                     style={btnStyle}
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base sm:text-lg py-2.5 sm:py-3 rounded-lg shadow-lg shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-lg sm:text-xl py-2 px-3 h-auto rounded-lg shadow-lg shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
