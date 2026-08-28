@@ -23,73 +23,89 @@ function CheckoutContent() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
 
+  // Form Fields for guest checkout
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'PAYPAL' | 'DEMO' | 'FREE'>('DEMO');
 
-  // Fake Demo card details
-  const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
-  const [expiry, setExpiry] = useState('12/28');
-  const [cvc, setCvc] = useState('123');
+  // Payment Method State
+  const [paymentMethod, setPaymentMethod] = useState<'DEMO' | 'CARD'>('DEMO');
+
+  // Multi-Image Gallery State
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
-    // Fetch theme
-    fetch('/api/admin/theme')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.activeTheme) setActiveTheme(data.activeTheme);
-      });
+    async function initCheckout() {
+      try {
+        setLoading(true);
 
-    // Fetch user
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) {
-          setCurrentUser(data.user);
-          setEmail(data.user.email);
-          if (data.user.name) setFirstName(data.user.name);
+        // Fetch User Session
+        try {
+          const userRes = await fetch('/api/auth/me');
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            if (userData.user) {
+              setCurrentUser(userData.user);
+              setEmail(userData.user.email || '');
+              if (userData.user.name) {
+                const parts = userData.user.name.split(' ');
+                setFirstName(parts[0] || '');
+                setLastName(parts.slice(1).join(' ') || '');
+              }
+            }
+          }
+        } catch {
+          // Guest mode fallback
         }
-      });
 
-    // Fetch product details
-    if (!productId) {
-      setLoading(false);
-      return;
-    }
+        // Fetch Active Theme
+        try {
+          const themeRes = await fetch('/api/theme');
+          if (themeRes.ok) {
+            const themeData = await themeRes.json();
+            if (themeData.theme) setActiveTheme(themeData.theme);
+          }
+        } catch {
+          // Keep default theme
+        }
 
-    fetch(`/api/products/${productId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.product) {
-          setProduct(data.product);
-          if (data.product.isFreeResource || data.product.price === 0) {
-            setPaymentMethod('FREE');
+        // Fetch Product Details
+        if (productId) {
+          const prodRes = await fetch(`/api/products/${productId}`);
+          if (prodRes.ok) {
+            const prodData = await prodRes.json();
+            if (prodData.product) {
+              setProduct(prodData.product);
+            } else {
+              setError('Produit non trouvé.');
+            }
+          } else {
+            setError('Impossible de charger le produit.');
           }
         } else {
-          setError('Produit non trouvé.');
+          setError('Aucun produit spécifié.');
         }
-      })
-      .catch(() => setError('Erreur de chargement du produit.'))
-      .finally(() => setLoading(false));
+      } catch (err: any) {
+        setError(err.message || 'Erreur lors du chargement.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    initCheckout();
   }, [productId]);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
 
-    const finalEmail = currentUser ? currentUser.email : email;
-
-    if (!finalEmail) {
-      setError('Veuillez saisir votre adresse e-mail.');
+    if (!currentUser && (!email || !firstName)) {
+      setError('Veuillez remplir votre prénom et votre adresse e-mail.');
       return;
     }
 
     setProcessing(true);
     setError('');
-
-    const effectivePaymentMethod = (product.isFreeResource || product.price === 0) ? 'FREE' : paymentMethod;
-    const combinedLeadName = `${firstName} ${lastName}`.trim();
 
     try {
       const res = await fetch('/api/checkout', {
@@ -97,81 +113,101 @@ function CheckoutContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          email: finalEmail,
-          firstName: currentUser ? currentUser.name : (combinedLeadName || firstName || lastName),
-          paymentMethod: effectivePaymentMethod,
+          email,
+          firstName,
+          lastName,
+          paymentMethod: product.isFreeResource ? 'FREE' : paymentMethod,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Échec de la demande.');
+      if (!res.ok) throw new Error(data.error || 'Erreur lors de la validation.');
 
-      // Redirect to Confirmation Page
-      router.push(`/checkout/confirmation?orderId=${data.orderId}&token=${data.downloadToken}`);
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else if (data.orderId) {
+        router.push(`/merci?orderId=${data.orderId}`);
+      } else {
+        router.push('/dashboard/achats');
+      }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erreur lors de la commande.');
       setProcessing(false);
     }
   };
 
   const isDark = isDarkTheme(activeTheme);
 
-  const productGallery: string[] = React.useMemo(() => {
-    if (!product) return [];
-    let gallery: string[] = [];
-    if (product.images) {
-      try {
-        const parsed = JSON.parse(product.images);
-        if (Array.isArray(parsed) && parsed.length > 0) gallery = parsed;
-      } catch {
-        if (typeof product.images === 'string' && product.images) gallery = [product.images];
-      }
-    }
-    if (product.coverImage) {
-      const rest = gallery.filter((img) => img !== product.coverImage);
-      return [product.coverImage, ...rest];
-    }
-    return gallery;
-  }, [product]);
-
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const activeCover = productGallery[activeImageIndex] || product?.coverImage;
-
   if (loading) {
-    return <div className={`py-20 text-center font-medium ${isDark ? 'bg-[#0b0f19] text-slate-400' : 'bg-[#faf8ff] text-slate-500'}`}>Chargement de votre accès...</div>;
+    return (
+      <div className={`min-h-screen py-24 flex items-center justify-center ${isDark ? 'bg-[#0a0915] text-white' : 'bg-[#faf8f5] text-slate-900'}`}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-heading font-bold text-sm">Chargement de votre commande...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!product) {
     return (
-      <div className={`py-20 text-center space-y-4 max-w-md mx-auto px-4 min-h-screen ${isDark ? 'bg-[#0b0f19] text-white' : 'bg-[#faf8ff] text-slate-900'}`}>
-        <h1 className="text-2xl font-bold">Aucun produit sélectionné</h1>
-        <p className="text-sm opacity-75">Veuillez choisir un produit dans notre boutique pour finaliser votre commande.</p>
-        <Link href="/boutique">
-          <Button variant="primary">Accéder à la boutique</Button>
-        </Link>
+      <div className={`min-h-screen py-24 flex items-center justify-center px-4 ${isDark ? 'bg-[#0a0915] text-white' : 'bg-[#faf8f5] text-slate-900'}`}>
+        <Card className="max-w-md w-full p-8 text-center space-y-4 rounded-md shadow-xl border">
+          <h2 className="text-xl font-heading font-black">Produit introuvable</h2>
+          <p className="text-sm opacity-75">{error || "La ressource demandée n'existe pas ou n'est plus disponible."}</p>
+          <Link href="/boutique">
+            <Button className="w-full font-heading font-bold rounded-md">Retour à la boutique</Button>
+          </Link>
+        </Card>
       </div>
     );
   }
 
   const isFree = product.isFreeResource || product.price === 0;
 
+  // Prepare product gallery with coverImage prioritized at index 0
+  let rawImages: string[] = [];
+  if (product.images) {
+    try {
+      rawImages = JSON.parse(product.images);
+    } catch {
+      rawImages = [product.images];
+    }
+  }
+
+  if (product.coverImage) {
+    rawImages = [product.coverImage, ...rawImages.filter((img) => img !== product.coverImage)];
+  }
+
+  const productGallery = rawImages.length > 0 ? rawImages : (product.coverImage ? [product.coverImage] : []);
+  const activeCover = productGallery[activeImageIndex] || product.coverImage;
+
   return (
-    <div className={`py-12 min-h-screen transition-colors ${
-      isDark ? 'bg-[#0b0f19] text-white' : 'bg-[#faf8ff] text-slate-900'
+    <div className={`py-10 sm:py-14 min-h-screen relative overflow-hidden font-sans ${
+      isDark ? 'bg-[#050811] text-white' : 'bg-[#faf8f5] text-slate-900'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      {/* AMBIENT LIGHTING GLOWS */}
+      {isDark && (
+        <>
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[180px] pointer-events-none" />
+          <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#a3e635]/10 rounded-full blur-[180px] pointer-events-none" />
+        </>
+      )}
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* HEADER */}
-        <div className="text-center space-y-2">
+        {/* TOP REASSURANCE BANNER */}
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-5 border-slate-200 dark:border-white/10">
           {isFree ? (
-            <div className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black shadow-sm ${
-              isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold ${
+              isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-purple-100 text-purple-900 border border-purple-200'
             }`}>
               <Gift className="w-3.5 h-3.5" />
               <span>Ressource 100% Gratuite (Aucun Paiement Requis)</span>
             </div>
           ) : (
-            <div className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold ${
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold ${
               isDark ? 'bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/30' : 'bg-purple-100 text-purple-900 border border-purple-200'
             }`}>
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -179,30 +215,30 @@ function CheckoutContent() {
             </div>
           )}
 
-          <h1 className="text-3xl font-heading font-black tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-heading font-black tracking-tight">
             {isFree ? 'Accéder à votre ressource offerte' : 'Finaliser votre commande'}
           </h1>
         </div>
 
         {error && (
-          <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-2xl text-xs font-bold text-center">
+          <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-md text-xs font-bold text-center mb-6">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <form onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* LEFT COLUMN: PRODUCT NAME, COVER IMAGE & FULL DETAILS (EN HAUT À GAUCHE - 8 COLONNES) */}
+          {/* LEFT COLUMN: PRODUCT COVER IMAGE & FULL DETAILS */}
           <div className="lg:col-span-8 space-y-6">
 
-            <Card className={`p-6 sm:p-9 space-y-7 rounded-3xl shadow-xl ${
-              isDark ? 'bg-[#0e1424]/90 border-2 border-white/15 text-white' : 'bg-white border-2 border-slate-200 text-slate-900'
+            <Card className={`p-5 sm:p-7 space-y-6 rounded-md shadow-xl ${
+              isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-slate-200 text-slate-900'
             }`}>
               
               {/* RESOURCE TITLE & COVER IMAGE */}
-              <div className="space-y-5 border-b pb-6 border-slate-100 dark:border-white/10">
+              <div className="space-y-4 border-b pb-5 border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
-                  <span className={`text-[11px] font-black uppercase px-3 py-1 rounded-full ${
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-sm ${
                     isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
                   }`}>
                     {isFree ? 'Ressource Offerte' : 'Produit Numérique'}
@@ -212,29 +248,29 @@ function CheckoutContent() {
                   </span>
                 </div>
 
-                <h2 className="text-2xl sm:text-4xl font-heading font-black leading-snug tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-heading font-black leading-snug tracking-tight">
                   {product.name}
                 </h2>
 
                 {/* PRODUCT COVER IMAGE OR MULTI-IMAGE GALLERY */}
                 {productGallery.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg group">
+                  <div className="space-y-2.5">
+                    <div className="relative w-full h-72 sm:h-96 rounded-md overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg group">
                       <img
                         src={activeCover}
                         alt={product.name}
                         className="w-full h-full object-cover transition-all duration-300"
                       />
                       {productGallery.length > 1 && (
-                        <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-full border border-white/20">
+                        <div className="absolute bottom-3 right-3 bg-black/85 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-sm border border-white/20">
                           Visuel {activeImageIndex + 1} sur {productGallery.length}
                         </div>
                       )}
                     </div>
 
-                    {/* THUMBNAILS FILMSTRIP CAROUSEL (SINGLE ROW STRICTLY) */}
+                    {/* THUMBNAILS FILMSTRIP CAROUSEL */}
                     {productGallery.length > 1 && (
-                      <div className="relative pt-1.5 flex items-center group/carousel">
+                      <div className="relative pt-1 flex items-center group/carousel">
                         {/* LEFT SCROLL ARROW */}
                         <button
                           type="button"
@@ -242,7 +278,7 @@ function CheckoutContent() {
                             const el = document.getElementById('thumbnail-filmstrip');
                             if (el) el.scrollBy({ left: -220, behavior: 'smooth' });
                           }}
-                          className="absolute left-1 z-10 p-2 rounded-full bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                          className="absolute left-1 z-10 p-2 rounded-md bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-105 active:scale-95"
                           title="Miniatures précédentes"
                         >
                           <ChevronLeft className="w-4 h-4 text-[#a3e635]" />
@@ -251,16 +287,16 @@ function CheckoutContent() {
                         {/* HORIZONTAL SINGLE-ROW SCROLL CONTAINER */}
                         <div
                           id="thumbnail-filmstrip"
-                          className="flex flex-nowrap gap-2.5 overflow-x-auto scrollbar-none py-1.5 px-8 scroll-smooth w-full"
+                          className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-none py-1 px-8 scroll-smooth w-full"
                         >
                           {productGallery.map((imgUrl, idx) => (
                             <button
                               key={idx}
                               type="button"
                               onClick={() => setActiveImageIndex(idx)}
-                              className={`relative h-16 sm:h-20 w-24 sm:w-28 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
+                              className={`relative h-16 sm:h-20 w-24 sm:w-28 shrink-0 rounded-md overflow-hidden border-2 transition-all ${
                                 activeImageIndex === idx
-                                  ? 'border-[#a3e635] ring-2 ring-[#a3e635]/50 scale-[1.03]'
+                                  ? 'border-[#a3e635] ring-2 ring-[#a3e635]/50 scale-[1.02]'
                                   : 'border-slate-200 dark:border-white/10 opacity-70 hover:opacity-100'
                               }`}
                             >
@@ -276,7 +312,7 @@ function CheckoutContent() {
                             const el = document.getElementById('thumbnail-filmstrip');
                             if (el) el.scrollBy({ left: 220, behavior: 'smooth' });
                           }}
-                          className="absolute right-1 z-10 p-2 rounded-full bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                          className="absolute right-1 z-10 p-2 rounded-md bg-slate-950/85 text-white border border-white/20 shadow-xl opacity-90 hover:opacity-100 transition-all hover:scale-105 active:scale-95"
                           title="Voir plus de miniatures"
                         >
                           <ChevronRight className="w-4 h-4 text-[#a3e635]" />
@@ -285,36 +321,34 @@ function CheckoutContent() {
                     )}
                   </div>
                 ) : (
-                  <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border border-purple-500/20 shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4">
-                    <div className="w-20 h-20 rounded-3xl bg-purple-600/30 border border-purple-400/30 flex items-center justify-center shadow-2xl backdrop-blur-md">
-                      <Sparkles className="w-10 h-10 text-[#a3e635]" />
+                  <div className="relative w-full h-64 sm:h-80 rounded-md overflow-hidden bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border border-purple-500/20 shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4">
+                    <div className="w-16 h-16 rounded-md bg-purple-600/30 border border-purple-400/30 flex items-center justify-center shadow-2xl backdrop-blur-md">
+                      <Sparkles className="w-8 h-8 text-[#a3e635]" />
                     </div>
-                    <div className="space-y-1.5 max-w-md">
-                      <div className="text-xs font-black uppercase tracking-widest text-[#a3e635]">Aperçu de la ressource offerte</div>
-                      <h3 className="text-xl sm:text-2xl font-heading font-black text-white">{product.name}</h3>
-                      <p className="text-xs sm:text-sm text-slate-300">Format digital immédiatement prêt à l emploi (PDF & Modèle Notion).</p>
+                    <div className="space-y-1 max-w-md">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-[#a3e635]">Aperçu de la ressource offerte</div>
+                      <h3 className="text-lg sm:text-xl font-heading font-black text-white">{product.name}</h3>
+                      <p className="text-xs text-slate-300">Format digital immédiatement prêt à l emploi.</p>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* SHORT & LONG DESCRIPTION */}
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <h3 className="text-xs font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-widest flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
                   <span>Contenu & Détails de la ressource</span>
                 </h3>
 
-                <div className="space-y-5 text-base leading-relaxed font-medium">
-                  {product.shortDescription ? (
+                <div className="space-y-4 text-base leading-relaxed font-medium">
+                  {product.shortDescription && (
                     <p className="text-base sm:text-lg font-semibold leading-relaxed opacity-95">{product.shortDescription}</p>
-                  ) : (
-                    <p className="text-base sm:text-lg font-semibold leading-relaxed opacity-95">Capturez l attention de vos lecteurs dès la première ligne de vos posts LinkedIn.</p>
                   )}
 
                   {product.longDescription && (
                     <div
-                      className="pt-5 border-t border-slate-100 dark:border-white/10 opacity-95 text-sm sm:text-base leading-relaxed space-y-4 [&_h3]:font-heading [&_h3]:font-black [&_h3]:text-lg [&_h3]:mt-5 [&_h3]:mb-2 [&_p]:my-2.5 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3 [&_li]:my-2"
+                      className="pt-4 border-t border-slate-100 dark:border-white/10 opacity-95 text-sm sm:text-base leading-relaxed space-y-4 [&_h3]:font-heading [&_h3]:font-black [&_h3]:text-lg [&_h3]:mt-4 [&_h3]:mb-2 [&_p]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2.5 [&_li]:my-1.5"
                       dangerouslySetInnerHTML={{ __html: product.longDescription }}
                     />
                   )}
@@ -325,18 +359,18 @@ function CheckoutContent() {
 
           </div>
 
-          {/* RIGHT COLUMN: SINGLE MERGED CARD (DISCREET DIVIDERS & HIGH IMPACT CTA) */}
+          {/* RIGHT COLUMN: SINGLE MERGED CARD */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-8">
-            <Card className={`p-5 sm:p-6 space-y-4.5 rounded-3xl shadow-xl ${
-              isDark ? 'bg-[#0e1424] border-2 border-white/15 text-white' : 'bg-white border-2 border-purple-200 text-slate-900'
+            <Card className={`p-5 space-y-4 rounded-md shadow-xl ${
+              isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-purple-200 text-slate-900'
             }`}>
               
               {/* SECTION 1: RÉCAPITULATIF DE LA RESSOURCE */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/5">
+                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
                   <h3 className="text-sm font-heading font-black">Récapitulatif</h3>
                   {isFree && (
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
                       isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
                     }`}>
                       100% Offert
@@ -349,16 +383,16 @@ function CheckoutContent() {
                     <img
                       src={product.icon}
                       alt={product.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 shadow-sm"
+                      className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
                     />
                   ) : product.coverImage ? (
                     <img
                       src={product.coverImage}
                       alt={product.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 shadow-sm"
+                      className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
+                    <div className="w-12 h-12 rounded-md bg-purple-700 text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm">
                       <Download className="w-6 h-6" />
                     </div>
                   )}
@@ -388,10 +422,10 @@ function CheckoutContent() {
               </div>
 
               {/* SECTION 2: 1. DESTINATAIRE DE LA RESSOURCE */}
-              <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/5">
+              <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/10">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[11px] font-heading font-black uppercase text-slate-400 tracking-wider">1. Destinataire</h3>
-                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-sm ${
                     isDark ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-purple-100 text-purple-900'
                   }`}>
                     Accès Instantané
@@ -399,11 +433,11 @@ function CheckoutContent() {
                 </div>
 
                 {currentUser ? (
-                  <div className={`p-3 rounded-2xl flex items-center justify-between ${
+                  <div className={`p-3 rounded-md flex items-center justify-between ${
                     isDark ? 'bg-slate-950 border border-white/10' : 'bg-purple-50/80 border border-purple-200'
                   }`}>
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs shadow-sm ${
+                      <div className={`w-8 h-8 rounded-md flex items-center justify-center font-extrabold text-xs shadow-sm ${
                         isDark ? 'bg-[#a3e635] text-slate-950' : 'bg-purple-700 text-white'
                       }`}>
                         <UserCheck className="w-4 h-4" />
@@ -430,7 +464,7 @@ function CheckoutContent() {
                           placeholder="ex. Alex"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
-                          className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                          className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                             isDark
                               ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                               : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
@@ -445,7 +479,7 @@ function CheckoutContent() {
                           placeholder="ex. Morel"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
-                          className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                          className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                             isDark
                               ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                               : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
@@ -463,7 +497,7 @@ function CheckoutContent() {
                         placeholder="votre.email@exemple.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full px-3 py-2 rounded-xl text-xs font-medium focus:outline-none transition-all ${
+                        className={`w-full px-3 py-2 rounded-md text-xs font-medium focus:outline-none transition-all ${
                           isDark
                             ? 'bg-slate-950 border border-white/10 text-white placeholder-slate-500 focus:border-[#a3e635]'
                             : 'bg-slate-50 border border-slate-200 text-slate-900 focus:border-purple-600 focus:bg-white'
@@ -476,12 +510,12 @@ function CheckoutContent() {
 
                 {/* PAYMENT METHOD (ONLY FOR PAID PRODUCTS) */}
                 {!isFree && (
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/10">
                     <h4 className="text-xs font-heading font-black">2. Mode de paiement</h4>
                     
                     <div
                       onClick={() => setPaymentMethod('DEMO')}
-                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
+                      className={`p-2.5 rounded-md border cursor-pointer transition-all ${
                         paymentMethod === 'DEMO'
                           ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
                           : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
@@ -500,7 +534,7 @@ function CheckoutContent() {
 
                     <div
                       onClick={() => setPaymentMethod('CARD')}
-                      className={`p-2.5 rounded-xl border cursor-pointer transition-all ${
+                      className={`p-2.5 rounded-md border cursor-pointer transition-all ${
                         paymentMethod === 'CARD'
                           ? (isDark ? 'border-[#a3e635] bg-[#a3e635]/15' : 'border-purple-600 bg-purple-50/70')
                           : (isDark ? 'border-white/10 bg-slate-950/60' : 'border-slate-200')
@@ -522,7 +556,7 @@ function CheckoutContent() {
                   <Button
                     type="submit"
                     disabled={processing}
-                    className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-xl shadow-xl transition-all gap-2 ${
+                    className={`w-full py-2.5 px-3 text-base sm:text-lg font-heading font-black tracking-tight rounded-md shadow-xl transition-all gap-2 ${
                       isDark
                         ? 'bg-[#a3e635] text-slate-950 hover:bg-[#86efac]'
                         : 'bg-purple-700 text-white hover:bg-purple-800'
@@ -546,7 +580,7 @@ function CheckoutContent() {
               </div>
 
               {/* SECTION 4: BÉNÉFICES & CONCEPTS INCLUS AVEC LA RESSOURCE */}
-              <div className={`mt-4 p-4 rounded-2xl space-y-3 pt-4 border-t ${
+              <div className={`mt-4 p-4 rounded-md space-y-3 pt-4 border-t ${
                 isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
               }`}>
                 <h4 className="text-[11px] font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-wider flex items-center gap-1.5">
