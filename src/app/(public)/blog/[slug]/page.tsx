@@ -102,36 +102,36 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       },
     });
 
-    // 3. Fetch 5 Store Products for Right Sidebar
+    // 3. Fetch 3 Store Products for Right Sidebar
     sidebarStoreProducts = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
         isFreeResource: false,
       },
-      take: 5,
+      take: 3,
       orderBy: { downloadsCount: 'desc' },
       include: {
         category: { select: { name: true, slug: true } },
       },
     });
 
-    // 4. Fetch 5 Free Resources for Right Sidebar
+    // 4. Fetch 3 Free Resources for Right Sidebar
     sidebarFreeResources = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
         isFreeResource: true,
       },
-      take: 5,
+      take: 3,
       orderBy: { downloadsCount: 'desc' },
     });
 
-    // 5. Fetch 5 Recent Blog Articles for Right Sidebar
+    // 5. Fetch 3 Recent Blog Articles for Right Sidebar
     sidebarBlogArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         id: { not: article.id },
       },
-      take: 5,
+      take: 3,
       orderBy: { publishedAt: 'desc' },
       include: {
         category: { select: { name: true, slug: true } },
@@ -442,12 +442,12 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
           {/* RIGHT SIDEBAR COLUMN (4 COLUMNS STICKY BELOW COVER ROW) */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
             
-            {/* SIDEBAR BLOCK 1: 5 STORE PRODUCTS */}
+            {/* SIDEBAR BLOCK 1: 3 STORE PRODUCTS */}
             {sidebarStoreProducts.length > 0 && (
-              <Card className={`p-4 space-y-3.5 rounded-md shadow-xl ${
+              <Card className={`p-4 space-y-4 rounded-xl shadow-xl ${
                 isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-slate-200 text-slate-900'
               }`}>
-                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
+                <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-white/10">
                   <div className="flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4 text-[#a3e635]" />
                     <h3 className="text-xs font-heading font-black uppercase tracking-wider">Produits de la boutique</h3>
@@ -457,29 +457,29 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
 
-                <div className="space-y-2.5">
-                  {sidebarStoreProducts.map((prod) => (
+                <div className="space-y-3">
+                  {sidebarStoreProducts.slice(0, 3).map((prod) => (
                     <Link
                       key={prod.id}
                       href={`/checkout?productId=${prod.id}`}
-                      className="group flex items-start gap-3 p-2 rounded-md hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+                      className="group flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
                     >
                       {prod.coverImage ? (
-                        <img src={prod.coverImage} alt={prod.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
+                        <img src={prod.coverImage} alt={prod.name} className="w-20 h-16 rounded-lg object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
                       ) : prod.icon ? (
-                        <img src={prod.icon} alt={prod.name} className="w-12 h-12 rounded-md object-contain flex-shrink-0 bg-slate-950 p-1.5 border border-white/10" />
+                        <img src={prod.icon} alt={prod.name} className="w-20 h-16 rounded-lg object-contain flex-shrink-0 bg-slate-950 p-2 border border-white/10" />
                       ) : (
-                        <div className="w-12 h-12 rounded-md bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-[10px]">
+                        <div className="w-20 h-16 rounded-lg bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-xs">
                           PROD
                         </div>
                       )}
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase text-[#a3e635] truncate max-w-[110px]">{prod.category?.name || 'OUTILS'}</span>
-                          <span className="text-xs font-heading font-black text-white">{prod.price > 0 ? `${prod.price.toFixed(2)} €` : 'Gratuit'}</span>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[9px] font-black uppercase text-[#a3e635] truncate">{prod.category?.name || 'OUTILS'}</span>
+                          <span className="text-xs font-heading font-black text-white shrink-0">{prod.price > 0 ? `${prod.price.toFixed(2)} €` : 'Gratuit'}</span>
                         </div>
-                        <h4 className="font-heading font-bold text-xs leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{prod.name}</h4>
-                        <p className="text-[10px] text-slate-400 line-clamp-1 leading-normal">{prod.shortDescription || 'Système prêt à l emploi.'}</p>
+                        <h4 className="font-heading font-black text-xs sm:text-sm leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{prod.name}</h4>
+                        <p className="text-xs text-slate-400 font-normal line-clamp-1 leading-normal">{prod.shortDescription || 'Système prêt à l emploi.'}</p>
                       </div>
                     </Link>
                   ))}
@@ -487,12 +487,12 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
               </Card>
             )}
 
-            {/* SIDEBAR BLOCK 2: 5 FREE RESOURCES */}
+            {/* SIDEBAR BLOCK 2: 3 FREE RESOURCES */}
             {sidebarFreeResources.length > 0 && (
-              <Card className={`p-4 space-y-3.5 rounded-md shadow-xl ${
+              <Card className={`p-4 space-y-4 rounded-xl shadow-xl ${
                 isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-slate-200 text-slate-900'
               }`}>
-                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
+                <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-white/10">
                   <div className="flex items-center gap-2">
                     <Gift className="w-4 h-4 text-[#a3e635]" />
                     <h3 className="text-xs font-heading font-black uppercase tracking-wider">Ressources Offertes</h3>
@@ -502,29 +502,29 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
 
-                <div className="space-y-2.5">
-                  {sidebarFreeResources.map((res) => (
+                <div className="space-y-3">
+                  {sidebarFreeResources.slice(0, 3).map((res) => (
                     <Link
                       key={res.id}
                       href={`/checkout?productId=${res.id}`}
-                      className="group flex items-start gap-3 p-2 rounded-md hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+                      className="group flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
                     >
                       {res.coverImage ? (
-                        <img src={res.coverImage} alt={res.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
+                        <img src={res.coverImage} alt={res.name} className="w-20 h-16 rounded-lg object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
                       ) : res.icon ? (
-                        <img src={res.icon} alt={res.name} className="w-12 h-12 rounded-md object-contain flex-shrink-0 bg-slate-950 p-1.5 border border-white/10" />
+                        <img src={res.icon} alt={res.name} className="w-20 h-16 rounded-lg object-contain flex-shrink-0 bg-slate-950 p-2 border border-white/10" />
                       ) : (
-                        <div className="w-12 h-12 rounded-md bg-emerald-950 flex items-center justify-center flex-shrink-0 text-[#a3e635] font-black text-[10px]">
+                        <div className="w-20 h-16 rounded-lg bg-emerald-950 flex items-center justify-center flex-shrink-0 text-[#a3e635] font-black text-xs">
                           FREE
                         </div>
                       )}
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase text-slate-950 bg-[#a3e635] px-1.5 py-0.2 rounded-sm">100% OFFERT</span>
-                          <span className="text-[10px] text-slate-400 font-medium">{res.downloadsCount || 100}+ dl</span>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[9px] font-black uppercase text-slate-950 bg-[#a3e635] px-1.5 py-0.5 rounded-sm">100% OFFERT</span>
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">{res.downloadsCount || 100}+ dl</span>
                         </div>
-                        <h4 className="font-heading font-bold text-xs leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{res.name}</h4>
-                        <p className="text-[10px] text-slate-400 line-clamp-1 leading-normal">{res.shortDescription || 'Guide offert.'}</p>
+                        <h4 className="font-heading font-black text-xs sm:text-sm leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{res.name}</h4>
+                        <p className="text-xs text-slate-400 font-normal line-clamp-1 leading-normal">{res.shortDescription || 'Guide offert.'}</p>
                       </div>
                     </Link>
                   ))}
@@ -532,12 +532,12 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
               </Card>
             )}
 
-            {/* SIDEBAR BLOCK 3: 5 RECENT BLOG ARTICLES */}
+            {/* SIDEBAR BLOCK 3: 3 RECENT BLOG ARTICLES */}
             {sidebarBlogArticles.length > 0 && (
-              <Card className={`p-4 space-y-3.5 rounded-md shadow-xl ${
+              <Card className={`p-4 space-y-4 rounded-xl shadow-xl ${
                 isDark ? 'bg-[#0e1424] border border-white/15 text-white' : 'bg-white border border-slate-200 text-slate-900'
               }`}>
-                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
+                <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-white/10">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-purple-400" />
                     <h3 className="text-xs font-heading font-black uppercase tracking-wider">Derniers Articles</h3>
@@ -547,27 +547,27 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
 
-                <div className="space-y-2.5">
-                  {sidebarBlogArticles.map((art) => (
+                <div className="space-y-3">
+                  {sidebarBlogArticles.slice(0, 3).map((art) => (
                     <Link
                       key={art.id}
                       href={`/blog/${art.slug}`}
-                      className="group flex items-start gap-3 p-2 rounded-md hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+                      className="group flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
                     >
                       {art.coverImage ? (
-                        <img src={art.coverImage} alt={art.title} className="w-12 h-12 rounded-md object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
+                        <img src={art.coverImage} alt={art.title} className="w-20 h-16 rounded-lg object-cover flex-shrink-0 border border-white/10 group-hover:scale-105 transition-transform" />
                       ) : (
-                        <div className="w-12 h-12 rounded-md bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-[10px]">
+                        <div className="w-20 h-16 rounded-lg bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-xs">
                           BLOG
                         </div>
                       )}
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase text-purple-400 truncate max-w-[110px]">{art.category?.name || 'ARTICLE'}</span>
-                          <span className="text-[10px] text-slate-400 font-medium">{art.publishedAt ? new Date(art.publishedAt).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }) : ''}</span>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[9px] font-black uppercase text-purple-400 truncate">{art.category?.name || 'ARTICLE'}</span>
+                          <span className="text-[10px] text-slate-400 font-medium shrink-0">{art.publishedAt ? new Date(art.publishedAt).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }) : ''}</span>
                         </div>
-                        <h4 className="font-heading font-bold text-xs leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{art.title}</h4>
-                        <p className="text-[10px] text-slate-400 line-clamp-1 leading-normal">{art.excerpt || 'Conseils pratiques.'}</p>
+                        <h4 className="font-heading font-black text-xs sm:text-sm leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{art.title}</h4>
+                        <p className="text-xs text-slate-400 font-normal line-clamp-1 leading-normal">{art.excerpt || 'Conseils pratiques.'}</p>
                       </div>
                     </Link>
                   ))}
