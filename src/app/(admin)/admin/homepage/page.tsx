@@ -1539,7 +1539,25 @@ export default function AdminHomepageBuilderPage() {
                             </div>
                           ) : (
                             <>
-                              {/* PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> (ÉPASSEUR & DÉCALAGE) & BOUTONS DE FORMATAGE */}
+                              {/* 1. BADGE FLOTTANT SUPÉRIEUR (HAUT) */}
+                              <div className="space-y-1.5 p-3 bg-purple-50/40 border border-purple-200/80 rounded-xl">
+                                <label className="block text-[11px] font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
+                                  <span>🏷️ Badge Flottant Supérieur du Bloc</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  value={sec.settings?.badgeText || sec.settings?.topTickerText || sec.settings?.floatingBadge || ''}
+                                  onChange={(e) => {
+                                    handleSettingChange(sec.id, 'badgeText', e.target.value);
+                                    handleSettingChange(sec.id, 'topTickerText', e.target.value);
+                                    handleSettingChange(sec.id, 'floatingBadge', e.target.value);
+                                  }}
+                                  className="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                  placeholder="Saisissez le texte du badge (ex: EBOOK OFFERT A 100%)..."
+                                />
+                              </div>
+
+                              {/* 2. PANNEAU DE PERSONNALISATION DU SOULIGNEMENT <u> (ÉPASSEUR & DÉCALAGE) & BOUTONS DE FORMATAGE */}
                               <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-3 shadow-2xs">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[11px] font-extrabold text-purple-950 flex items-center gap-1.5">
@@ -1624,7 +1642,7 @@ export default function AdminHomepageBuilderPage() {
                                 </div>
                               </div>
 
-                              {/* TITLE INPUT + TOOLBAR INSERT BUTTONS */}
+                              {/* 3. TITRE PRINCIPAL DU BLOC H1 / H2 */}
                               <div className="space-y-2">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <label className="block text-[11px] font-extrabold uppercase text-slate-700">
@@ -1666,7 +1684,7 @@ export default function AdminHomepageBuilderPage() {
                                 />
                               </div>
 
-                              {/* SUBTITLE / DESCRIPTION INPUT WITH MULTI-LINE TEXTAREA & FORMATTING BUTTONS */}
+                              {/* 4. SOUS-TITRE / DESCRIPTION DU BLOC */}
                               <div className="space-y-2">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <label className="block text-[11px] font-extrabold uppercase text-slate-700">
@@ -1705,6 +1723,57 @@ export default function AdminHomepageBuilderPage() {
                                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 leading-relaxed focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                                   placeholder="Saisissez la description du bloc..."
                                 />
+                              </div>
+
+                              {/* 5. BOUTONS D'ACTION (CTA) ET PUCES DE RÉASSURANCE (BAS) */}
+                              <div className="p-3 bg-purple-50/40 border border-purple-200/80 rounded-xl space-y-3">
+                                <label className="block text-[11px] font-extrabold uppercase text-purple-950 flex items-center gap-1.5">
+                                  <span>🚀 Bouton d Action (CTA) & Puces de Réassurance</span>
+                                </label>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                  <div>
+                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">🚀 Texte du Bouton d Action (Envoi)</label>
+                                    <input
+                                      type="text"
+                                      value={sec.settings?.btnText || sec.settings?.btn1Text || ''}
+                                      onChange={(e) => {
+                                        handleSettingChange(sec.id, 'btnText', e.target.value);
+                                        handleSettingChange(sec.id, 'btn1Text', e.target.value);
+                                      }}
+                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-bold"
+                                      placeholder="Send My FREE Guide 🚀..."
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">🛡️ Réassurance 1 (Sous le bouton)</label>
+                                    <input
+                                      type="text"
+                                      value={sec.settings?.reassuranceText1 || sec.settings?.proof1 || ''}
+                                      onChange={(e) => {
+                                        handleSettingChange(sec.id, 'reassuranceText1', e.target.value);
+                                        handleSettingChange(sec.id, 'proof1', e.target.value);
+                                      }}
+                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-medium"
+                                      placeholder="100% Gratuit sans engagement..."
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[10px] text-slate-600 font-bold mb-1">⚡ Réassurance 2 (Sous le bouton)</label>
+                                    <input
+                                      type="text"
+                                      value={sec.settings?.reassuranceText2 || sec.settings?.proof2 || ''}
+                                      onChange={(e) => {
+                                        handleSettingChange(sec.id, 'reassuranceText2', e.target.value);
+                                        handleSettingChange(sec.id, 'proof2', e.target.value);
+                                      }}
+                                      className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-slate-900 font-medium"
+                                      placeholder="Téléchargement instantané..."
+                                    />
+                                  </div>
+                                </div>
                               </div>
                             </>
                           )
@@ -2226,50 +2295,6 @@ export default function AdminHomepageBuilderPage() {
                                     </select>
                                   );
                                 })()}
-                              </div>
-                            </div>
-
-                            {/* 1. BADGE & BOUTON TEXTS */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                              <div>
-                                <label className="block text-[11px] text-slate-300 font-bold mb-1">🏷️ Badge Flottant Supérieur</label>
-                                <input
-                                  type="text"
-                                  value={settings.badgeText || 'EBOOK OFFERT A 100%'}
-                                  onChange={(e) => handleSettingChange(sec.id, 'badgeText', e.target.value)}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] text-[#a3e635] font-bold mb-1">🚀 Texte du Bouton d Action (Bouton d Envoi)</label>
-                                <input
-                                  type="text"
-                                  value={settings.btnText || 'Send My FREE Guide 🚀'}
-                                  onChange={(e) => handleSettingChange(sec.id, 'btnText', e.target.value)}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold"
-                                />
-                              </div>
-                            </div>
-
-                            {/* 2. REASSURANCE TEXTS */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1 border-t border-slate-800/80">
-                              <div>
-                                <label className="block text-[11px] text-slate-300 font-bold mb-1">🛡️ Réassurance 1 (Sous le bouton)</label>
-                                <input
-                                  type="text"
-                                  value={settings.reassuranceText1 || '100% Gratuit sans engagement'}
-                                  onChange={(e) => handleSettingChange(sec.id, 'reassuranceText1', e.target.value)}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[11px] text-slate-300 font-bold mb-1">⚡ Réassurance 2 (Sous le bouton)</label>
-                                <input
-                                  type="text"
-                                  value={settings.reassuranceText2 || 'Téléchargement instantané'}
-                                  onChange={(e) => handleSettingChange(sec.id, 'reassuranceText2', e.target.value)}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold"
-                                />
                               </div>
                             </div>
 
