@@ -67,6 +67,25 @@ export function HeroPixelFunnel({
 
   const align = heroStyles?.align || 'left';
 
+  const btn1Style = s.btn1Style || 'yellow';
+  const btn2Style = s.btn2Style || 'transparent';
+
+  const getButtonStyle = (style: string) => {
+    switch (style) {
+      case 'yellow':
+        return 'bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-black shadow-xl shadow-[#a3e635]/25 border-0 hover:scale-[1.02] transition-all';
+      case 'purple':
+        return 'bg-purple-700 hover:bg-purple-800 text-white font-extrabold shadow-xl shadow-purple-600/30 border-0 hover:scale-[1.02] transition-all';
+      case 'white':
+        return 'bg-white hover:bg-slate-100 text-slate-950 font-black border border-slate-200 shadow-md hover:scale-[1.02] transition-all';
+      case 'dark':
+        return 'bg-slate-900 hover:bg-slate-800 text-white font-black border border-slate-700 shadow-md hover:scale-[1.02] transition-all';
+      case 'transparent':
+      default:
+        return 'bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 hover:scale-[1.02] transition-all';
+    }
+  };
+
   return (
     <section className="relative overflow-hidden bg-[#050811] text-white pt-16 sm:pt-20 pb-20 sm:pb-24 border-b border-slate-800">
       
@@ -125,19 +144,23 @@ export function HeroPixelFunnel({
               )}
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Link href={btn1Url} className="w-full sm:w-auto">
-                <Button size="lg" className="w-full gap-2 text-base font-heading font-black bg-[#a3e635] hover:bg-[#86efac] text-slate-950 rounded-md px-8 py-6 shadow-xl shadow-[#a3e635]/20 border-0 hover:scale-[1.02] transition-all">
-                  <span>{btn1Text}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
+            <div className={`pt-2 flex flex-col sm:flex-row items-center gap-4 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+              {btn1Text && (
+                <Link href={btn1Url} className="w-full sm:w-auto">
+                  <Button size="lg" className={`w-full sm:w-auto gap-2 text-base sm:text-lg font-heading rounded-xl px-7 py-3.5 sm:py-4 ${getButtonStyle(btn1Style)}`}>
+                    <span>{btn1Text}</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+              )}
 
-              <Link href={btn2Url} className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full text-base font-heading font-bold bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-md px-8 py-6">
-                  <span>{btn2Text}</span>
-                </Button>
-              </Link>
+              {btn2Text && (
+                <Link href={btn2Url} className="w-full sm:w-auto">
+                  <Button size="lg" className={`w-full sm:w-auto gap-2 text-base sm:text-lg font-heading rounded-xl px-7 py-3.5 sm:py-4 ${getButtonStyle(btn2Style)}`}>
+                    <span>{btn2Text}</span>
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
 

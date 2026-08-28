@@ -120,10 +120,10 @@ export function HeroModernBento({
             )}
 
             {/* DUAL BUTTONS */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className={`pt-2 flex flex-col sm:flex-row items-center gap-4 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
               {btn1Text && (
                 <Link href={btn1Url} className="w-full sm:w-auto">
-                  <Button size="lg" className={`w-full gap-2 text-sm sm:text-base font-heading rounded-md px-8 py-6 ${getButtonStyle(btn1Style)}`}>
+                  <Button size="lg" className={`w-full sm:w-auto gap-2 text-base sm:text-lg font-heading rounded-xl px-7 py-3.5 sm:py-4 ${getButtonStyle(btn1Style)}`}>
                     <span>{btn1Text}</span>
                     <ArrowRight className="w-5 h-5" />
                   </Button>
@@ -132,7 +132,7 @@ export function HeroModernBento({
 
               {btn2Text && (
                 <Link href={btn2Url} className="w-full sm:w-auto">
-                  <Button size="lg" className={`w-full text-sm sm:text-base font-heading rounded-md px-8 py-6 ${getButtonStyle(btn2Style)}`}>
+                  <Button size="lg" className={`w-full sm:w-auto gap-2 text-base sm:text-lg font-heading rounded-xl px-7 py-3.5 sm:py-4 ${getButtonStyle(btn2Style)}`}>
                     <span>{btn2Text}</span>
                   </Button>
                 </Link>
