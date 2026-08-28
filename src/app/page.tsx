@@ -128,7 +128,7 @@ export default async function HomePage() {
 
     freeResources = await prisma.product.findMany({
       where: { status: 'PUBLISHED', isFreeResource: true },
-      take: 2,
+      take: 3,
       orderBy: { downloadsCount: 'desc' },
     });
   } catch (error) {
