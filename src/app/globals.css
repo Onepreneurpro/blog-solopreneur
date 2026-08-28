@@ -336,6 +336,36 @@ body.theme-blusky span[style*="color: rgb(255, 255, 255)"] {
   color: #0f172a !important;
 }
 
+/* Placeholder Cover Box Overrides for BluSky Theme */
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50,
+body.theme-blusky div[class*="from-purple-900"] {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #eff6ff 100%) !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 span,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 h3,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 span,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 h3,
+body.theme-blusky div[class*="from-purple-900"] span,
+body.theme-blusky div[class*="from-purple-900"] h3 {
+  color: #0f172a !important;
+}
+
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 p,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 p,
+body.theme-blusky div[class*="from-purple-900"] p {
+  color: #475569 !important;
+}
+
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 svg,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 svg,
+body.theme-blusky div[class*="from-purple-900"] svg {
+  color: #00A0FF !important;
+}
+
 body.theme-blusky .btn-purple,
 body.theme-blusky button.bg-\[\#a3e635\] {
   background-color: #00A0FF !important;

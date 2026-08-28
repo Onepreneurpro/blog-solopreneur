@@ -402,14 +402,38 @@ function CheckoutContent() {
                     )}
                   </div>
                 ) : (
-                  <div className="relative w-full h-64 sm:h-80 rounded-md overflow-hidden bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border border-purple-500/20 shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4">
-                    <div className="w-16 h-16 rounded-md bg-purple-600/30 border border-purple-400/30 flex items-center justify-center shadow-2xl backdrop-blur-md">
-                      <Sparkles className="w-8 h-8 text-[#a3e635]" />
+                  <div className={`relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden shadow-xl flex flex-col items-center justify-center p-8 text-center space-y-4 border ${
+                    isDark
+                      ? 'bg-gradient-to-br from-purple-900/50 via-purple-950 to-slate-950 border-purple-500/20 text-white'
+                      : (isBluSky
+                          ? 'bg-gradient-to-br from-sky-50 via-white to-blue-50/80 border-slate-200 text-slate-900'
+                          : 'bg-gradient-to-br from-purple-50 via-white to-purple-100/50 border-purple-200 text-slate-900')
+                  }`}>
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg border backdrop-blur-md ${
+                      isDark
+                        ? 'bg-purple-600/30 border-purple-400/30 text-[#a3e635]'
+                        : (isBluSky
+                            ? 'bg-[#e0f2fe] border-[#00A0FF]/30 text-[#00A0FF]'
+                            : 'bg-purple-100 border-purple-300 text-purple-700')
+                    }`}>
+                      <Sparkles className="w-8 h-8" />
                     </div>
-                    <div className="space-y-1 max-w-md">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-[#a3e635]">Aperçu de la ressource offerte</div>
-                      <h3 className="text-lg sm:text-xl font-heading font-black text-white">{product.name}</h3>
-                      <p className="text-xs text-slate-300">Format digital immédiatement prêt à l emploi.</p>
+                    <div className="space-y-1.5 max-w-md">
+                      <div className={`text-[10px] font-black uppercase tracking-widest ${
+                        isDark ? 'text-[#a3e635]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-700')
+                      }`}>
+                        {product.price === 0 ? 'Aperçu de la ressource offerte' : 'Aperçu du produit digital'}
+                      </div>
+                      <h3 className={`text-lg sm:text-xl font-heading font-black leading-snug ${
+                        isDark ? 'text-white' : 'text-slate-900'
+                      }`}>
+                        {product.name}
+                      </h3>
+                      <p className={`text-xs font-medium ${
+                        isDark ? 'text-slate-300' : 'text-slate-600'
+                      }`}>
+                        Format digital immédiatement disponible & prêt à l emploi.
+                      </p>
                     </div>
                   </div>
                 )}
