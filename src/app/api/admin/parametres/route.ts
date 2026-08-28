@@ -73,7 +73,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'ADMIN') {
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'EDITOR')) {
       return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
     }
 

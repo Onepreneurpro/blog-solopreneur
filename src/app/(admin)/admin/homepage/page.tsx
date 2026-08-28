@@ -598,35 +598,43 @@ export default function AdminHomepageBuilderPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const payload = sections.map((sec, idx) => ({
-        id: sec.id,
-        sectionKey: sec.sectionKey,
-        title: sec.title,
-        subtitle: sec.subtitle,
-        isEnabled: sec.isEnabled,
-        order: idx,
-        settings: sec.settings,
-      }));
+      const heroFormatting = {
+        homeHeroFontGlobal,
+        homeHeroFontFamily,
+        homeHeroBadgeFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont,
+        homeHeroBadgeSize,
+        homeHeroBadgeColor,
+        homeHeroTitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont,
+        homeHeroTitleSize,
+        homeHeroTitleColor,
+        homeHeroAccentFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont,
+        homeHeroAccentColor,
+        homeHeroSubtitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont,
+        homeHeroSubtitleSize,
+        homeHeroSubtitleColor,
+        homeHeroAlign,
+      };
+
+      const payload = sections.map((sec, idx) => {
+        let secSettings = typeof sec.settings === 'string' ? (JSON.parse(sec.settings || '{}') || {}) : (sec.settings || {});
+        if (sec.sectionKey === 'HERO') {
+          secSettings = { ...secSettings, heroStyles: heroFormatting };
+        }
+        return {
+          id: sec.id,
+          sectionKey: sec.sectionKey,
+          title: sec.title,
+          subtitle: sec.subtitle,
+          isEnabled: sec.isEnabled,
+          order: idx,
+          settings: secSettings,
+        };
+      });
 
       await fetch('/api/admin/parametres', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          homeHeroFontGlobal,
-          homeHeroFontFamily,
-          homeHeroBadgeFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroBadgeFont,
-          homeHeroBadgeSize,
-          homeHeroBadgeColor,
-          homeHeroTitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroTitleFont,
-          homeHeroTitleSize,
-          homeHeroTitleColor,
-          homeHeroAccentFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroAccentFont,
-          homeHeroAccentColor,
-          homeHeroSubtitleFont: homeHeroFontGlobal ? homeHeroFontFamily : homeHeroSubtitleFont,
-          homeHeroSubtitleSize,
-          homeHeroSubtitleColor,
-          homeHeroAlign,
-        }),
+        body: JSON.stringify(heroFormatting),
       });
 
       const res = await fetch('/api/admin/homepage', {

@@ -81,6 +81,33 @@ export default async function HomePage() {
       } catch (e) {}
     }
 
+    let heroSecFromDb = dbSections.find((s) => s.sectionKey === 'HERO');
+    if (heroSecFromDb?.settings) {
+      try {
+        const secSet = typeof heroSecFromDb.settings === 'string' ? JSON.parse(heroSecFromDb.settings) : heroSecFromDb.settings;
+        if (secSet?.heroStyles) {
+          const hs = secSet.heroStyles;
+          heroStyles = {
+            ...heroStyles,
+            fontGlobal: hs.homeHeroFontGlobal !== undefined ? Boolean(hs.homeHeroFontGlobal) : heroStyles.fontGlobal,
+            fontFamily: hs.homeHeroFontFamily || heroStyles.fontFamily,
+            badgeFont: hs.homeHeroBadgeFont || heroStyles.badgeFont,
+            badgeSize: hs.homeHeroBadgeSize || heroStyles.badgeSize,
+            badgeColor: hs.homeHeroBadgeColor || heroStyles.badgeColor,
+            titleFont: hs.homeHeroTitleFont || heroStyles.titleFont,
+            titleSize: hs.homeHeroTitleSize || heroStyles.titleSize,
+            titleColor: hs.homeHeroTitleColor || heroStyles.titleColor,
+            accentFont: hs.homeHeroAccentFont || heroStyles.accentFont,
+            accentColor: hs.homeHeroAccentColor || heroStyles.accentColor,
+            subtitleFont: hs.homeHeroSubtitleFont || heroStyles.subtitleFont,
+            subtitleSize: hs.homeHeroSubtitleSize || heroStyles.subtitleSize,
+            subtitleColor: hs.homeHeroSubtitleColor || heroStyles.subtitleColor,
+            align: hs.homeHeroAlign || heroStyles.align,
+          };
+        }
+      } catch (e) {}
+    }
+
     articles = await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
       take: 3,
