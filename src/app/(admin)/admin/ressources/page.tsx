@@ -6,10 +6,16 @@ import { BookOpen, Plus, Trash2, Edit, Save, X, Download, FileText, Upload, Chec
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import IconCropperModal from '@/components/admin/IconCropperModal';
 
 export default function AdminRessourcesPage() {
   const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Crop Modal State
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState('');
+  const [cropIsEdit, setCropIsEdit] = useState(false);
 
   // Form State for creating a new resource
   const [name, setName] = useState('');
@@ -143,15 +149,29 @@ export default function AdminRessourcesPage() {
     }
   };
 
-  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+  const handleIconSelect = (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      if (evt.target?.result) {
+        setCropImageSrc(evt.target.result as string);
+        setCropIsEdit(isEdit);
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCroppedIconUpload = async (croppedFile: File) => {
+    const isEdit = cropIsEdit;
     if (isEdit) setEditIconUploading(true);
     else setIconUploading(true);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', croppedFile);
 
     try {
       const res = await fetch('/api/admin/medias', {
@@ -431,7 +451,7 @@ export default function AdminRessourcesPage() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => handleIconUpload(e, false)}
+                  onChange={(e) => handleIconSelect(e, false)}
                   className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200 cursor-pointer"
                 />
                 {iconUploading && <div className="text-xs text-purple-600 font-semibold mt-1">Téléversement de l icône...</div>}
@@ -645,7 +665,7 @@ export default function AdminRessourcesPage() {
                                 <input
                                   type="file"
                                   accept="image/*"
-                                  onChange={(e) => handleIconUpload(e, true)}
+                                  onChange={(e) => handleIconSelect(e, true)}
                                   className="block w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-800 cursor-pointer"
                                 />
                                 {editIconUploading && <div className="text-[11px] text-purple-600 font-semibold mt-1">Téléversement de l icône...</div>}
@@ -790,6 +810,13 @@ export default function AdminRessourcesPage() {
 
       </div>
 
+      {/* ICON CROPPER MODAL */}
+      <IconCropperModal
+        isOpen={cropModalOpen}
+        imageSrc={cropImageSrc}
+        onClose={() => setCropModalOpen(false)}
+        onCropComplete={handleCroppedIconUpload}
+      />
     </div>
   );
 }
