@@ -8,6 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { PRODUCT_FORMAT_OPTIONS } from '@/lib/product-formats';
 
+const ICON_PRESETS = [
+  { label: 'Notion', url: '/images/logos/notion-logo.webp' },
+  { label: 'Excel', url: '/images/logos/excel-logo.png' },
+  { label: 'Systeme.io', url: '/images/logos/systemeio-logo.jpg' },
+  { label: 'PWA Web App', url: '/images/logos/pwa-logo.png' },
+];
+
 export default function EditProductAdminPage() {
   const router = useRouter();
   const params = useParams();
@@ -27,6 +34,7 @@ export default function EditProductAdminPage() {
   const [shortDescription, setShortDescription] = useState('');
   const [longDescription, setLongDescription] = useState('');
   const [coverImage, setCoverImage] = useState('');
+  const [icon, setIcon] = useState('');
   const [productCategoryId, setProductCategoryId] = useState('');
   const [fileType, setFileType] = useState('ZIP');
   const [isFreeResource, setIsFreeResource] = useState(false);
@@ -77,6 +85,7 @@ export default function EditProductAdminPage() {
           setShortDescription(p.shortDescription || '');
           setLongDescription(p.longDescription || '');
           setCoverImage(p.coverImage || '');
+          setIcon(p.icon || '');
           setProductCategoryId(p.productCategoryId || '');
           setFileType(p.fileType || 'ZIP');
           setIsFreeResource(p.isFreeResource);
@@ -138,6 +147,28 @@ export default function EditProductAdminPage() {
     }
   };
 
+  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/medias', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur d upload d icône.');
+
+      setIcon(data.media.url);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const availableSequenceSteps: { id: string; label: string }[] = [];
   campaigns.forEach((camp) => {
     if (camp.sequences) {
@@ -179,6 +210,7 @@ export default function EditProductAdminPage() {
           shortDescription,
           longDescription,
           coverImage,
+          icon,
           productCategoryId: productCategoryId || null,
           fileType,
           fileUrl: finalFileUrl,
@@ -317,6 +349,72 @@ export default function EditProductAdminPage() {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* ICÔNE / LOGO DU PRODUIT */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Icône / Mini-Logo du Produit (Optionnel)
+            </label>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600">Présélection rapide :</span>
+                {ICON_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setIcon(preset.url)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border flex items-center gap-1.5 transition-all ${
+                      icon === preset.url
+                        ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-sm'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <img src={preset.url} alt={preset.label} className="w-4 h-4 object-contain rounded" />
+                    <span>{preset.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                <div className="relative flex-1 w-full">
+                  <input
+                    type="text"
+                    placeholder="Ou saisissez une URL d icône (ex: /images/logos/...)"
+                    value={icon}
+                    onChange={(e) => setIcon(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  />
+                </div>
+
+                <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold cursor-pointer shrink-0 transition-all">
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Téléverser Icône</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleIconUpload}
+                  />
+                </label>
+              </div>
+
+              {icon && (
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-200">
+                  <div className="w-10 h-10 rounded-md bg-white border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+                    <img src={icon} alt="Aperçu icône" className="w-full h-full object-contain" />
+                  </div>
+                  <span className="text-xs text-slate-600 font-bold truncate">Aperçu : {icon}</span>
+                  <button
+                    type="button"
+                    onClick={() => setIcon('')}
+                    className="text-xs font-bold text-rose-600 hover:underline ml-auto"
+                  >
+                    Effacer
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
