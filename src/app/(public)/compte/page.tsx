@@ -320,7 +320,7 @@ export default function CustomerAccountPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* HEADER CUSTOMER BANNER & NOTIFICATION ALERT (HIGH CONTRAST WHITE TEXT) */}
-        <div className="p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-slate-800">
+        <div className="account-user-banner p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-slate-800">
           <div className="flex items-center gap-4">
             <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 p-0.5 shadow-lg flex-shrink-0">
               <div className="w-full h-full bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center font-extrabold text-2xl text-purple-300">
@@ -334,12 +334,12 @@ export default function CustomerAccountPage() {
 
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white !text-white">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
                   {user.name || 'Client Solopreneur'}
                 </h1>
                 {user.role === 'ADMIN' && <Badge variant="indigo">Admin</Badge>}
               </div>
-              <p className="text-xs text-purple-200 !text-purple-200 font-mono font-bold mt-0.5 opacity-90">
+              <p className="text-xs font-mono font-bold mt-0.5 opacity-90">
                 {user.email}
               </p>
               

@@ -366,6 +366,37 @@ body.theme-blusky div[class*="from-purple-900"] svg {
   color: #00A0FF !important;
 }
 
+/* Customer Account User Banner Overrides for BluSky Theme */
+.account-user-banner,
+body.theme-blusky .account-user-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 15px 40px -10px rgba(0, 160, 255, 0.18), 0 4px 15px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.theme-blusky .account-user-banner h1,
+body.theme-blusky .account-user-banner h2,
+body.theme-blusky .account-user-banner h3 {
+  color: #0f172a !important;
+}
+
+body.theme-blusky .account-user-banner p {
+  color: #475569 !important;
+}
+
+body.theme-blusky .account-user-banner button,
+body.theme-blusky .account-user-banner button.bg-violet-600 {
+  background-color: #00A0FF !important;
+  color: #ffffff !important;
+  border-color: #00A0FF !important;
+  box-shadow: 0 4px 14px rgba(0, 160, 255, 0.35) !important;
+}
+
+body.theme-blusky .account-user-banner button:hover {
+  background-color: #0082D6 !important;
+}
+
 body.theme-blusky .btn-purple,
 body.theme-blusky button.bg-\[\#a3e635\] {
   background-color: #00A0FF !important;
