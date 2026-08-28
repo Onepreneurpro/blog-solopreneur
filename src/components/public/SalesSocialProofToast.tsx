@@ -1,13 +1,42 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Sparkles, X, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
+import { ShoppingBag, Sparkles, X, CheckCircle2, ArrowUpRight } from 'lucide-react';
 
 const RECENT_PROOF_DATA = [
-  { name: 'Alexandre M.', location: 'Paris, France', product: 'Checklist Clôture d Exercice & URSSAF', time: 'il y a 4 min', image: '/uploads/1787916424805-il_1588xN.4961319796_ha1x.webp' },
-  { name: 'Sophie L.', location: 'Lyon, France', product: 'Dashboard Finances & Facturation Excel', time: 'il y a 12 min', image: '/uploads/1787916424842-il_1588xN.4961319862_kxit.webp' },
-  { name: 'Thomas B.', location: 'Bruxelles, Belgique', product: 'Planner Solopreneur All-in-One Notion', time: 'il y a 19 min', image: '/uploads/1787916424878-il_1588xN.5009583835_bkdb.webp' },
-  { name: 'Camille D.', location: 'Genève, Suisse', product: 'Kit Prospecting & Script Vente Freelance', time: 'il y a 28 min', image: '/uploads/1787916424914-il_1588xN.5009583857_qpur.webp' },
+  {
+    name: 'Alexandre M.',
+    location: 'Paris, France',
+    product: 'Checklist Clôture d Exercice & URSSAF',
+    time: 'il y a 4 min',
+    image: '/uploads/1787916424805-il_1588xN.4961319796_ha1x.webp',
+    url: '/boutique/checklist-cloture-declaration-micro-entreprise',
+  },
+  {
+    name: 'Sophie L.',
+    location: 'Lyon, France',
+    product: 'Dashboard Finances & Facturation Excel',
+    time: 'il y a 12 min',
+    image: '/uploads/1787916424842-il_1588xN.4961319862_kxit.webp',
+    url: '/boutique/excel-dashboard-tresorerie-suivi-ca-2026',
+  },
+  {
+    name: 'Thomas B.',
+    location: 'Bruxelles, Belgique',
+    product: 'Planner Solopreneur All-in-One Notion',
+    time: 'il y a 19 min',
+    image: '/uploads/1787916424878-il_1588xN.5009583835_bkdb.webp',
+    url: '/boutique/notion-freelance-os-second-cerveau-complete',
+  },
+  {
+    name: 'Camille D.',
+    location: 'Genève, Suisse',
+    product: 'Kit Prospecting & Script Vente Freelance',
+    time: 'il y a 28 min',
+    image: '/uploads/1787916424914-il_1588xN.5009583857_qpur.webp',
+    url: '/boutique/kit-facturation-relance-automatisee',
+  },
 ];
 
 export default function SalesSocialProofToast() {
@@ -41,6 +70,7 @@ export default function SalesSocialProofToast() {
   if (isDismissed) return null;
 
   const currentProof = RECENT_PROOF_DATA[currentIndex];
+  const targetUrl = currentProof.url || '/boutique';
 
   return (
     <div
@@ -50,54 +80,62 @@ export default function SalesSocialProofToast() {
           : 'translate-y-8 opacity-0 scale-95 pointer-events-none'
       }`}
     >
-      <div className="bg-[#0e1424]/95 backdrop-blur-md border border-[#a3e635]/40 text-white rounded-lg p-3.5 shadow-2xl shadow-purple-950/50 flex items-start gap-3 relative overflow-hidden group">
-        
+      <Link
+        href={targetUrl}
+        className="block bg-[#0e1424]/95 hover:bg-[#131b30] backdrop-blur-md border border-[#00A0FF]/40 hover:border-[#00A0FF] text-white rounded-md p-3.5 shadow-2xl shadow-purple-950/50 flex items-start gap-3 relative overflow-hidden group cursor-pointer transition-all hover:scale-[1.02]"
+        title={`Voir ${currentProof.product}`}
+      >
         {/* NEON LEFT ACCENT BAR */}
-        <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-[#a3e635] to-purple-600"></div>
+        <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-[#00A0FF] to-sky-400"></div>
 
         {/* THUMBNAIL / ICON */}
-        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 mt-0.5">
+        <div className="relative w-12 h-12 rounded-md overflow-hidden bg-slate-900 border border-white/10 shrink-0 mt-0.5">
           {currentProof.image ? (
-            <img src={currentProof.image} alt={currentProof.product} className="w-full h-full object-cover" />
+            <img src={currentProof.image} alt={currentProof.product} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
           ) : (
-            <div className="w-full h-full bg-purple-900/60 flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5 text-[#a3e635]" />
+            <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+              <ShoppingBag className="w-5 h-5 text-[#00A0FF]" />
             </div>
           )}
-          <span className="absolute bottom-0 right-0 bg-[#a3e635] p-0.5 rounded-tl-md">
-            <CheckCircle2 className="w-2.5 h-2.5 text-slate-950" />
+          <span className="absolute bottom-0 right-0 bg-[#00A0FF] p-0.5 rounded-tl-md">
+            <CheckCircle2 className="w-2.5 h-2.5 text-white" />
           </span>
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 min-w-0 pr-4">
+        <div className="flex-1 min-w-0 pr-2">
           <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wide">
-            <span className="text-[#a3e635] font-black">{currentProof.name}</span>
+            <span className="text-[#00A0FF] font-black">{currentProof.name}</span>
             <span>•</span>
             <span className="truncate">{currentProof.location}</span>
           </div>
           
-          <h5 className="text-xs font-heading font-black text-white truncate mt-0.5">
-            a obtenu <span className="text-[#a3e635]">{currentProof.product}</span>
+          <h5 className="text-xs font-heading font-black text-white truncate mt-0.5 flex items-center gap-1 group-hover:text-[#00A0FF] transition-colors">
+            <span>a obtenu</span>
+            <span className="text-[#00A0FF] underline decoration-sky-400/40 group-hover:decoration-sky-400 truncate">{currentProof.product}</span>
           </h5>
 
           <p className="text-[10px] text-slate-400 font-medium mt-0.5 flex items-center gap-1">
-            <Sparkles className="w-2.5 h-2.5 text-purple-400" />
+            <Sparkles className="w-2.5 h-2.5 text-sky-400" />
             <span>Accès sécurisé ({currentProof.time})</span>
+            <ArrowUpRight className="w-3 h-3 text-[#00A0FF] ml-auto opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
           </p>
         </div>
 
         {/* CLOSE BUTTON */}
         <button
           type="button"
-          onClick={() => setIsDismissed(true)}
-          className="text-slate-400 hover:text-white p-1 rounded-full transition-colors shrink-0"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDismissed(true);
+          }}
+          className="text-slate-400 hover:text-white p-1 rounded-full transition-colors shrink-0 -mr-1 -mt-1 hover:bg-slate-800/80"
           title="Fermer"
         >
           <X className="w-3.5 h-3.5" />
         </button>
-
-      </div>
+      </Link>
     </div>
   );
 }
