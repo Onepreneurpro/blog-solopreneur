@@ -406,7 +406,7 @@ export function FreeEbookOptinPixel({
 
           {/* RIGHT COVER IMAGE COLUMN - ALIGNED TOP TO BOTTOM WITH LEFT COLUMN */}
           <div className="lg:col-span-5 flex justify-center items-stretch h-full">
-            <div className="relative group w-full max-w-[240px] h-full flex flex-col justify-stretch">
+            <div className="relative group w-full max-w-[320px] sm:max-w-[360px] h-full flex flex-col justify-stretch">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#a3e635] via-emerald-400 to-purple-500 rounded-2xl blur-md opacity-30 group-hover:opacity-70 transition duration-500" />
               {bookCoverUrl ? (
                 <img
@@ -632,7 +632,7 @@ export function FreeEbookOptinPixel({
 
           {/* RIGHT COVER IMAGE COLUMN - ALIGNED TOP TO BOTTOM WITH LEFT COLUMN */}
           <div className="lg:col-span-5 flex justify-center items-center h-full">
-            <div className="relative group max-w-[240px] sm:max-w-[270px] w-full h-full flex flex-col justify-stretch">
+            <div className="relative group max-w-[340px] sm:max-w-[380px] w-full h-full flex flex-col justify-stretch">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#a3e635] to-emerald-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500" />
               
               {bookCoverUrl ? (
