@@ -39,10 +39,10 @@ export function CollectionsPixel({
   };
 
   const collections = [
-    { name: s.col1Name || 'Sales Funnels', url: s.col1Url || '/boutique', icon: Layers, color: 'bg-emerald-500/20 text-[#a3e635] border-[#a3e635]/40' },
-    { name: s.col2Name || 'Email Swipes', url: s.col2Url || '/boutique', icon: Mail, color: 'bg-blue-500/20 text-blue-400 border-blue-400/40' },
-    { name: s.col3Name || 'Ebooks & Guides', url: s.col3Url || '/boutique', icon: BookOpen, color: 'bg-amber-500/20 text-amber-400 border-amber-400/40' },
-    { name: s.col4Name || 'Lead Magnets', url: s.col4Url || '/boutique', icon: Gift, color: 'bg-purple-500/20 text-purple-400 border-purple-400/40' },
+    { name: s.col1Name || 'Sales Funnels', url: s.col1Url || '/boutique', icon: Layers, color: 'col-box-cyan bg-[#00A0FF] text-white border-[#00A0FF]' },
+    { name: s.col2Name || 'Email Swipes', url: s.col2Url || '/boutique', icon: Mail, color: 'col-box-indigo bg-[#4F46E5] text-white border-[#4F46E5]' },
+    { name: s.col3Name || 'Ebooks & Guides', url: s.col3Url || '/boutique', icon: BookOpen, color: 'col-box-amber bg-[#F59E0B] text-white border-[#F59E0B]' },
+    { name: s.col4Name || 'Lead Magnets', url: s.col4Url || '/boutique', icon: Gift, color: 'col-box-purple bg-[#9333EA] text-white border-[#9333EA]' },
   ];
 
   return (
