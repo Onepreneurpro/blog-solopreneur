@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Clock, Calendar, ChevronRight, Share2, Linkedin, Twitter, ArrowRight, BookOpen, ShoppingBag, Gift } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Share2, Linkedin, Twitter, ArrowRight, BookOpen, ShoppingBag, Gift, Sparkles } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
   let activeTheme = 'modern-bento';
   let article: any = null;
   let similarArticles: any[] = [];
+  let headerFeaturedArticles: any[] = [];
   let sidebarStoreProducts: any[] = [];
   let sidebarFreeResources: any[] = [];
   let sidebarBlogArticles: any[] = [];
@@ -57,7 +58,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       notFound();
     }
 
-    // 1. Fetch 3 related articles from the same category
+    // 1. Fetch 3 related articles from the same category (for bottom cross-sell)
     similarArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
@@ -72,7 +73,6 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       },
     });
 
-    // If fewer than 3, fallback to other latest articles
     if (similarArticles.length < 3) {
       const fallbackArticles = await prisma.article.findMany({
         where: {
@@ -89,7 +89,20 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       similarArticles = [...similarArticles, ...fallbackArticles];
     }
 
-    // 2. Fetch 5 Store Products for Right Sidebar
+    // 2. Fetch 3 featured/latest articles for right side of hero cover image
+    headerFeaturedArticles = await prisma.article.findMany({
+      where: {
+        status: 'PUBLISHED',
+        id: { not: article.id },
+      },
+      take: 3,
+      orderBy: { publishedAt: 'desc' },
+      include: {
+        category: { select: { name: true, slug: true } },
+      },
+    });
+
+    // 3. Fetch 5 Store Products for Right Sidebar
     sidebarStoreProducts = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
@@ -102,7 +115,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       },
     });
 
-    // 3. Fetch 5 Free Resources for Right Sidebar
+    // 4. Fetch 5 Free Resources for Right Sidebar
     sidebarFreeResources = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
@@ -112,7 +125,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       orderBy: { downloadsCount: 'desc' },
     });
 
-    // 4. Fetch 5 Recent Blog Articles for Right Sidebar
+    // 5. Fetch 5 Recent Blog Articles for Right Sidebar
     sidebarBlogArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
@@ -142,7 +155,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       {/* FULL BLOG CONTAINER MAX-W-7XL MATCHING /BLOG */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
         
-        {/* TOP HEADER & COVER IMAGE (PROMINENT AT TOP) */}
+        {/* TOP HEADER AREA */}
         <div className="space-y-6">
           
           {/* BREADCRUMB */}
@@ -218,18 +231,86 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
             </div>
           </div>
 
-          {/* MAIN ARTICLE COVER IMAGE (PROMINENT AT TOP) */}
-          {article.coverImage && (
-            <div className={`relative aspect-[16/9] w-full rounded-md overflow-hidden shadow-2xl border ${
-              isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
-            }`}>
-              <Image src={article.coverImage} alt={article.title} fill className="object-cover" priority />
+          {/* HERO SPLIT ROW: COMPACT COVER IMAGE (LEFT 8 COLS) + 3 FEATURED ARTICLES (RIGHT 4 COLS) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2">
+            
+            {/* LEFT: COMPACT COVER IMAGE */}
+            <div className={`${headerFeaturedArticles.length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
+              {article.coverImage ? (
+                <div className={`relative h-[320px] sm:h-[360px] w-full rounded-md overflow-hidden shadow-2xl border ${
+                  isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
+                }`}>
+                  <Image src={article.coverImage} alt={article.title} fill className="object-cover" priority />
+                </div>
+              ) : (
+                <div className={`h-[240px] w-full rounded-md flex items-center justify-center border ${
+                  isDark ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-slate-100 border-slate-200 text-slate-400'
+                }`}>
+                  <span className="text-xs font-medium">Pas d image d illustration</span>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* RIGHT: 3 RECOMMENDED ARTICLES STACK */}
+            {headerFeaturedArticles.length > 0 && (
+              <div className="lg:col-span-4 flex flex-col justify-between space-y-3">
+                <div className="flex items-center justify-between border-b pb-2 border-slate-100 dark:border-white/10">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#ccff00]" />
+                    <span className="text-xs font-heading font-black uppercase text-[#ccff00] tracking-wider">
+                      À ne pas manquer
+                    </span>
+                  </div>
+                  <Link href="/blog" className="text-[10px] font-heading font-black text-[#ccff00] hover:underline uppercase">
+                    Voir tout →
+                  </Link>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-between space-y-3">
+                  {headerFeaturedArticles.slice(0, 3).map((featArt) => (
+                    <Link
+                      key={featArt.id}
+                      href={`/blog/${featArt.slug}`}
+                      className={`group flex items-center gap-3 p-2.5 rounded-md transition-all border shadow-sm ${
+                        isDark
+                          ? 'bg-[#0e1424] border-white/10 hover:border-purple-500/50 hover:bg-white/5'
+                          : 'bg-white border-slate-200 hover:border-purple-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      {featArt.coverImage ? (
+                        <div className="relative w-24 h-20 rounded-md overflow-hidden flex-shrink-0 bg-slate-950 border border-white/10">
+                          <Image src={featArt.coverImage} alt={featArt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-20 rounded-md bg-purple-950 flex items-center justify-center flex-shrink-0 text-white font-black text-[10px]">
+                          ARTICLE
+                        </div>
+                      )}
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        {featArt.category && (
+                          <span className="text-[9px] font-black uppercase text-[#ccff00] truncate block">
+                            {featArt.category.name}
+                          </span>
+                        )}
+                        <h4 className="font-heading font-bold text-xs leading-snug text-white group-hover:text-[#ccff00] transition-colors line-clamp-2">
+                          {featArt.title}
+                        </h4>
+                        <p className="text-[10px] text-slate-400 line-clamp-1">
+                          {featArt.excerpt || 'Découvrir cet article...'}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
 
         </div>
 
-        {/* 2-COLUMN LAYOUT BELOW COVER IMAGE: TEXT CONTENT (8 COLS) + SIDEBAR (4 COLS STICKY) */}
+        {/* 2-COLUMN LAYOUT BELOW HERO COVER: TEXT CONTENT (8 COLS) + SIDEBAR (4 COLS STICKY) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4">
           
           {/* MAIN READING TEXT COLUMN (8 COLS) */}
@@ -358,7 +439,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
 
           </div>
 
-          {/* RIGHT SIDEBAR COLUMN (4 COLUMNS STICKY BELOW COVER IMAGE) */}
+          {/* RIGHT SIDEBAR COLUMN (4 COLUMNS STICKY BELOW COVER ROW) */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
             
             {/* SIDEBAR BLOCK 1: 5 STORE PRODUCTS */}
