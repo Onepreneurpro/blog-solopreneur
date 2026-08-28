@@ -31,8 +31,8 @@ export function FinalYellowCTA({
       <div className="max-w-7xl mx-auto">
         <div className="!bg-[#ccff00] !text-slate-950 rounded-3xl p-10 sm:p-14 shadow-2xl text-center space-y-6 relative overflow-hidden border border-slate-900/10">
           
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black !bg-slate-950 !text-white uppercase tracking-wider shadow-md">
-            <Sparkles className="w-3.5 h-3.5 text-[#ccff00]" />
+          <div className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs sm:text-sm font-heading font-black !bg-slate-950 !text-white uppercase tracking-wider shadow-md">
+            <Sparkles className="w-4 h-4 text-[#ccff00]" />
             <span>{badgeText}</span>
           </div>
 

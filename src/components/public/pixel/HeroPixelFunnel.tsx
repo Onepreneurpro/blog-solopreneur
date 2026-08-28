@@ -112,7 +112,7 @@ export function HeroPixelFunnel({
                     borderColor: `${badgeColor}40`,
                     backgroundColor: `${badgeColor}15`,
                   }}
-                  className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm border shadow-lg font-heading font-black"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-sm border shadow-lg font-heading font-black"
                 >
                   <Zap className="w-3.5 h-3.5" style={{ fill: badgeColor, color: badgeColor }} />
                   <span>{topTickerText}</span>

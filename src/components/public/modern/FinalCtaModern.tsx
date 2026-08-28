@@ -64,7 +64,7 @@ export function FinalCtaModern({
     <section className="py-24 bg-[#ccff00] text-slate-950 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
         
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm bg-slate-950 text-[#ccff00] text-xs font-heading font-black uppercase tracking-wider shadow-lg" style={badgeStyle}>
+        <div className="inline-flex items-center gap-2 px-6 py-3.5 rounded-sm bg-slate-950 text-[#ccff00] text-xs sm:text-sm font-heading font-black uppercase tracking-wider shadow-lg" style={badgeStyle}>
           <Sparkles className="w-4 h-4 fill-[#ccff00]" />
           <span>{badgeText}</span>
         </div>
