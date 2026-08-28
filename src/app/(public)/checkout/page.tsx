@@ -118,15 +118,20 @@ function CheckoutContent() {
 
   const productGallery: string[] = React.useMemo(() => {
     if (!product) return [];
+    let gallery: string[] = [];
     if (product.images) {
       try {
         const parsed = JSON.parse(product.images);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) gallery = parsed;
       } catch {
-        if (typeof product.images === 'string' && product.images) return [product.images];
+        if (typeof product.images === 'string' && product.images) gallery = [product.images];
       }
     }
-    return product.coverImage ? [product.coverImage] : [];
+    if (product.coverImage) {
+      const rest = gallery.filter((img) => img !== product.coverImage);
+      return [product.coverImage, ...rest];
+    }
+    return gallery;
   }, [product]);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);

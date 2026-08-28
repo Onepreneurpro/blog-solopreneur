@@ -109,6 +109,16 @@ export default function AdminRessourcesPage() {
     }
   };
 
+  const selectCoverImage = (imgUrl: string, isEdit = false) => {
+    if (isEdit) {
+      setEditCoverImage(imgUrl);
+      setEditImages((prev) => [imgUrl, ...prev.filter((item) => item !== imgUrl)]);
+    } else {
+      setCoverImage(imgUrl);
+      setImages((prev) => [imgUrl, ...prev.filter((item) => item !== imgUrl)]);
+    }
+  };
+
   const removeImage = (indexToRemove: number, isEdit = false) => {
     if (isEdit) {
       setEditImages((prev) => {
@@ -357,7 +367,7 @@ export default function AdminRessourcesPage() {
                           <div key={idx} className={`relative group rounded-xl overflow-hidden border-2 transition-all ${
                             isCover ? 'border-purple-600 ring-2 ring-purple-400' : 'border-slate-200 hover:border-purple-300'
                           }`}>
-                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-16 object-cover cursor-pointer" onClick={() => setCoverImage(imgUrl)} />
+                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-16 object-cover cursor-pointer" onClick={() => selectCoverImage(imgUrl, false)} />
                             {isCover && (
                               <span className="absolute top-1 left-1 bg-purple-700 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">
                                 ★ Principal
@@ -524,7 +534,7 @@ export default function AdminRessourcesPage() {
                                           <div key={idx} className={`relative group rounded-lg overflow-hidden border-2 transition-all ${
                                             isCover ? 'border-purple-600 ring-2 ring-purple-400' : 'border-slate-200 hover:border-purple-300'
                                           }`}>
-                                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-14 object-cover cursor-pointer" onClick={() => setEditCoverImage(imgUrl)} />
+                                            <img src={imgUrl} alt={`Visuel ${idx}`} className="w-full h-14 object-cover cursor-pointer" onClick={() => selectCoverImage(imgUrl, true)} />
                                             {isCover && (
                                               <span className="absolute top-0.5 left-0.5 bg-purple-700 text-white text-[8px] font-black px-1 rounded shadow">
                                                 ★ Cover
