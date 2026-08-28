@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
 
-export type SiteThemeId = 'pixel-funnel' | 'modern-bento' | 'classic' | 'makers-purple' | 'drahmi-dark' | 'solopreneur-light' | 'minimalist-indigo';
+export type SiteThemeId = 'pixel-funnel' | 'modern-bento' | 'classic' | 'makers-purple' | 'drahmi-dark' | 'solopreneur-light' | 'minimalist-indigo' | 'blusky';
 
 export interface ThemeConfig {
   id: SiteThemeId;
@@ -19,6 +19,14 @@ export const THEMES: ThemeConfig[] = [
     previewColor: '#0b0f19',
     accentColor: '#a3e635',
     badge: 'Funnel Studio 2026 🚀',
+  },
+  {
+    id: 'blusky',
+    name: '🌐 Template BluSky Solopreneur 2026 (Épuré Blanc & Bleu Ciel #00A0FF)',
+    description: 'Design épuré et lumineux (fond blanc #ffffff, accents bleu ciel électrique #00A0FF, textes foncés ultra-lisibles, boutons à fort contraste et même structure Funnel Studio 2026).',
+    previewColor: '#ffffff',
+    accentColor: '#00A0FF',
+    badge: 'BluSky Light 2026 🌐',
   },
   {
     id: 'modern-bento',

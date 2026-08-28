@@ -131,6 +131,16 @@ export default async function HomePage() {
       take: 3,
       orderBy: { downloadsCount: 'desc' },
     });
+
+    if (activeTheme === 'blusky') {
+      heroStyles = {
+        ...heroStyles,
+        badgeColor: heroStyles.badgeColor === '#a3e635' ? '#00A0FF' : heroStyles.badgeColor,
+        titleColor: heroStyles.titleColor === '#ffffff' ? '#0f172a' : heroStyles.titleColor,
+        accentColor: heroStyles.accentColor === '#a3e635' ? '#00A0FF' : heroStyles.accentColor,
+        subtitleColor: heroStyles.subtitleColor === '#cbd5e1' ? '#475569' : heroStyles.subtitleColor,
+      };
+    }
   } catch (error) {
     console.error('Error loading homepage data:', error);
   }
@@ -175,7 +185,7 @@ export default async function HomePage() {
     : DEFAULT_SECTIONS_ORDER.map((key, i) => ({ sectionKey: key, title: '', subtitle: '', isEnabled: true, order: i, settings: {} }));
 
   const isClassic = activeTheme === 'classic' || activeTheme === 'makers-purple' || activeTheme === 'solopreneur-light';
-  const isPixelFunnel = activeTheme === 'pixel-funnel';
+  const isPixelFunnel = activeTheme === 'pixel-funnel' || activeTheme === 'blusky';
 
   return (
     <div className="flex flex-col min-h-screen">
