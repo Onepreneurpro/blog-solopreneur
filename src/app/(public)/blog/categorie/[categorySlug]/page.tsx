@@ -121,7 +121,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
 
         {/* HERO HEADER */}
         <div className="mb-10">
-          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-heading font-black mb-4 shadow-sm ${
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-heading font-black mb-4 shadow-sm ${
             isDark ? 'bg-purple-500/20 text-[#ccff00] border border-purple-400/30' : 'bg-[#ccff00] text-slate-950'
           }`}>
             <BookOpen className="w-3.5 h-3.5" />
@@ -175,7 +175,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
 
         {/* ARTICLES GRID */}
         {articles.length === 0 ? (
-          <div className={`text-center py-16 rounded-3xl border shadow-xl ${
+          <div className={`text-center py-16 rounded-md border shadow-xl ${
             isDark ? 'bg-slate-900/60 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-600'
           }`}>
             <p className="text-base">Aucun article dans la catégorie "{category.name}" pour l instant.</p>
@@ -186,7 +186,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((art) => (
-              <Card key={art.id} className={`flex flex-col h-full group transition-all duration-300 rounded-3xl overflow-hidden shadow-md hover:shadow-xl ${
+              <Card key={art.id} className={`flex flex-col h-full group transition-all duration-300 rounded-md overflow-hidden shadow-md hover:shadow-xl ${
                 isDark
                   ? 'bg-slate-900/90 border border-slate-800 hover:border-purple-500/60'
                   : 'bg-white border-2 border-slate-200 hover:border-purple-600'
@@ -210,7 +210,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
                   {/* CATEGORY BADGE */}
                   {art.category && (
                     <div className="absolute top-4 left-4 z-10">
-                      <span className={`px-3.5 py-1 backdrop-blur-md font-heading font-black text-[11px] rounded-full shadow-md ${
+                      <span className={`px-3.5 py-1 backdrop-blur-md font-heading font-black text-[11px] rounded-sm shadow-md ${
                         isDark ? 'bg-slate-950/90 text-[#ccff00] border border-[#ccff00]/30' : 'bg-white/95 text-slate-950 border border-slate-200'
                       }`}>
                         {art.category.name}
@@ -245,9 +245,9 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
                   }`}>
                     <div className="flex items-center gap-2">
                       {art.author?.avatar ? (
-                        <Image src={art.author.avatar} alt={art.author.name || 'Auteur'} width={24} height={24} className="rounded-full" />
+                        <Image src={art.author.avatar} alt={art.author.name || 'Auteur'} width={24} height={24} className="rounded-sm" />
                       ) : (
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shadow-xs ${
+                        <div className={`w-6 h-6 rounded-sm flex items-center justify-center text-[10px] font-black shadow-xs ${
                           isDark ? 'bg-[#ccff00] text-slate-950' : 'bg-purple-700 text-white'
                         }`}>
                           {(art.author?.name || 'A')[0]}

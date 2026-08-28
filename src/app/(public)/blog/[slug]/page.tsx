@@ -101,7 +101,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
         <div className="space-y-4 mb-8">
           {article.category && (
             <Link href={`/blog/categorie/${article.category.slug}`} className="inline-block">
-              <span className={`px-3.5 py-1 text-xs font-heading font-black rounded-full shadow-md ${
+              <span className={`px-3.5 py-1 text-xs font-heading font-black rounded-sm shadow-md ${
                 isDark ? 'bg-slate-900 border border-[#ccff00]/40 text-[#ccff00]' : 'bg-purple-100 text-purple-700 border border-purple-200'
               }`}>
                 {article.category.name}
@@ -126,9 +126,9 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
           }`}>
             <div className="flex items-center gap-3">
               {article.author?.avatar ? (
-                <Image src={article.author.avatar} alt={article.author.name || ''} width={40} height={40} className="rounded-full border border-slate-300" />
+                <Image src={article.author.avatar} alt={article.author.name || ''} width={40} height={40} className="rounded-sm border border-slate-300" />
               ) : (
-                <div className={`w-10 h-10 rounded-full font-black flex items-center justify-center text-sm shadow-md ${
+                <div className={`w-10 h-10 rounded-sm font-black flex items-center justify-center text-sm shadow-md ${
                   isDark ? 'bg-[#ccff00] text-slate-950' : 'bg-purple-700 text-white'
                 }`}>
                   {(article.author?.name || 'A')[0]}
@@ -156,7 +156,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
 
         {/* COVER IMAGE */}
         {article.coverImage && (
-          <div className={`relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-2xl mb-10 border ${
+          <div className={`relative aspect-[16/9] w-full rounded-md overflow-hidden shadow-2xl mb-10 border ${
             isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
           }`}>
             <Image src={article.coverImage} alt={article.title} fill className="object-cover" priority />
@@ -167,11 +167,11 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
         <ArticleBody content={article.content} isDark={isDark} />
 
         {/* CTA TO BOUTIQUE / TEMPLATES */}
-        <div className={`my-12 p-8 rounded-3xl border flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl ${
+        <div className={`my-12 p-8 rounded-md border flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl ${
           isDark ? 'bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 border-purple-500/30 text-white' : 'bg-gradient-to-r from-purple-900 to-indigo-950 border-purple-800 text-white'
         }`}>
           <div className="space-y-2">
-            <span className="px-3 py-1 bg-[#ccff00] text-slate-950 rounded-full text-xs font-heading font-black uppercase">
+            <span className="px-3 py-1 bg-[#ccff00] text-slate-950 rounded-sm text-xs font-heading font-black uppercase">
               Ressource Recommandée
             </span>
             <h3 className="text-xl font-heading font-black text-white">Besoin d un système clé en main ?</h3>
@@ -180,7 +180,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
             </p>
           </div>
           <Link href="/boutique">
-            <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-sm rounded-full px-6 py-4 shadow-xl">
+            <Button size="lg" className="bg-[#ccff00] hover:bg-[#b8e600] text-slate-950 font-heading font-black text-sm rounded-md px-6 py-4 shadow-xl">
               <span>Accéder à la boutique</span>
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
