@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Download, Gift } from 'lucide-react';
+import { CreditCard, ShieldCheck, Lock, ArrowRight, Sparkles, UserCheck, Download, Gift, CheckCircle2, Clock, Zap, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { isDarkTheme } from '@/lib/theme';
@@ -518,6 +518,35 @@ function CheckoutContent() {
                 <p className="text-[10px] opacity-75 leading-relaxed">
                   Aucune carte bancaire requise. Accès instantané à la validation.
                 </p>
+              </div>
+
+              {/* SECTION 4: BÉNÉFICES & CONCEPS INCLUS AVEC LA RESSOURCE */}
+              <div className={`p-4 rounded-2xl space-y-3 pt-3.5 border-t ${
+                isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
+              }`}>
+                <h4 className="text-[11px] font-heading font-black uppercase text-purple-600 dark:text-[#a3e635] tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Inclus avec votre ressource</span>
+                </h4>
+
+                <ul className="space-y-2 text-xs font-medium leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
+                    <span><strong>Accès direct & illimité</strong> : Téléchargement instantané au format PDF & Modèle dupliquable.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Zap className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                    <span><strong>100% Prêt à l emploi</strong> : Méthode clé en main pensée pour les solopreneurs & freelances.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <span><strong>Mises à jour à vie</strong> : Accès garanti aux futures versions enrichies.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Star className="w-4 h-4 text-[#a3e635] shrink-0 mt-0.5" />
+                    <span><strong>Sans abonnement ni CB</strong> : Téléchargement totalement gratuit et sécurisé.</span>
+                  </li>
+                </ul>
               </div>
 
             </Card>
