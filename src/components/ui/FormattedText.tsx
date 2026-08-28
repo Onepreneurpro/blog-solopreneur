@@ -59,6 +59,16 @@ export function FormattedText({
         return `<u style="text-decoration: none !important; border-bottom: ${borderSize} solid ${colorVal} !important; padding-bottom: ${offsetSize} !important; color: inherit; display: inline; font-weight: inherit; line-height: normal;">${content}</u>`;
       }
     })
+    // Replace <color color="...">word</color> or <color hex="...">word</color> or <font color="...">word</font>
+    .replace(/<(?:color|font)([^>]*)>(.*?)<\/(?:color|font)>/gi, (match, attrString, content) => {
+      const getAttr = (name: string) => {
+        const m = attrString.match(new RegExp(`${name}=["']([^"']+)["']`, 'i'));
+        return m ? m[1] : null;
+      };
+
+      const colorVal = getAttr('color') || getAttr('hex') || defaultMarkColor;
+      return `<span style="color: ${colorVal} !important; display: inline;">${content}</span>`;
+    })
     // Fallback replace for simple markdown syntax ==word== and [yellow]word[/yellow]
     .replace(/==(.*?)==/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`)
     .replace(/\[yellow\](.*?)\[\/yellow\]/gi, `<span style="background-color: ${defaultMarkColor}; color: #0f172a;" class="px-3 py-0.5 rounded-2xl shadow-2xs font-black inline-block my-0.5">$1</span>`);

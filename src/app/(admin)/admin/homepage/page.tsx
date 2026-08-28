@@ -459,7 +459,7 @@ export default function AdminHomepageBuilderPage() {
   const insertFormattedTag = (
     id: string,
     field: 'title' | 'subtitle',
-    tagType: 'mark' | 'u',
+    tagType: 'mark' | 'u' | 'color',
     overrideColor?: string,
     overrideThickness?: string,
     overrideOffset?: string
@@ -469,12 +469,14 @@ export default function AdminHomepageBuilderPage() {
         if (s.id === id) {
           const currentValue = (s as any)[field] || '';
           let tagToInsert = '';
-          const col = overrideColor || selectedColor;
+          const col = overrideColor || uColor || selectedColor;
           const thick = overrideThickness || uThickness || '4px';
           const off = overrideOffset || uOffset || '3px';
 
           if (tagType === 'mark') {
             tagToInsert = `<mark color="${col}">texte surligné</mark>`;
+          } else if (tagType === 'color') {
+            tagToInsert = `<color color="${col}">texte en couleur</color>`;
           } else {
             tagToInsert = `<u color="${col}" thickness="${thick}" offset="${off}">texte souligné</u>`;
           }
@@ -918,6 +920,13 @@ export default function AdminHomepageBuilderPage() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'color', uColor)}
+                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Couleur Texte (&lt;color&gt;)
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u')}
                       className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
                     >
@@ -1069,9 +1078,20 @@ export default function AdminHomepageBuilderPage() {
           {activeHeroTab === 'subtitle' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-extrabold text-purple-950 mb-1">
-                  Contenu du Sous-titre / Description (Modifiable librement)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-extrabold text-purple-950">
+                    Contenu du Sous-titre / Description (Modifiable librement)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'subtitle', 'color', uColor)}
+                      className="px-2 py-0.5 rounded bg-purple-100 text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Couleur Texte (&lt;color&gt;)
+                    </button>
+                  </div>
+                </div>
                 <textarea
                   rows={2}
                   value={heroSection?.subtitle || ''}
