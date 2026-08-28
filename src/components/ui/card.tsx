@@ -3,11 +3,16 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
+  const hasBg = className?.includes('bg-');
+  const hasBorder = className?.includes('border');
+
   return (
     <div
       className={twMerge(
         clsx(
-          'bg-slate-900/70 backdrop-blur-md rounded-2xl border border-slate-800/80 shadow-md hover:border-emerald-500/40 hover:shadow-emerald-500/5 transition-all duration-300 overflow-hidden',
+          !hasBg && 'bg-slate-900',
+          !hasBorder && 'border border-slate-800/80',
+          'backdrop-blur-md rounded-2xl shadow-md transition-all duration-300 overflow-hidden',
           className
         )
       )}

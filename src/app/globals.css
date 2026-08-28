@@ -210,7 +210,11 @@ body.theme-blusky .ticker-bar-lime {
   font-weight: 800 !important;
 }
 
-/* BluSky Section Background & Text Overrides */
+/* BluSky Section & Div Background Overrides */
+body.theme-blusky div.bg-\[\#050811\],
+body.theme-blusky div.bg-\[\#0b0f19\],
+body.theme-blusky div.bg-\[\#090d16\],
+body.theme-blusky div.bg-\[\#0a0915\],
 body.theme-blusky section.bg-\[\#050811\],
 body.theme-blusky section.bg-\[\#0b0f19\],
 body.theme-blusky section.bg-\[\#090d16\],
@@ -245,12 +249,15 @@ body.theme-blusky mark[color="#a3e635"] {
 body.theme-blusky .bg-slate-900,
 body.theme-blusky .bg-slate-950,
 body.theme-blusky .bg-\[\#0d1322\],
+body.theme-blusky .bg-\[\#0e1424\],
 body.theme-blusky .bg-\[\#0b0f19\],
 body.theme-blusky .bg-slate-900\/90,
 body.theme-blusky .bg-slate-900\/95,
+body.theme-blusky .bg-slate-900\/70,
 body.theme-blusky .bg-slate-900\/50,
-body.theme-blusky .bg-slate-950\/80 {
-  background-color: #f8fafc !important;
+body.theme-blusky .bg-slate-950\/80,
+body.theme-blusky .bg-slate-950\/60 {
+  background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
 }
