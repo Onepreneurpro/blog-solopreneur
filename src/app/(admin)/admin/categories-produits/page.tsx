@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Tag, Edit, Save, X, ArrowUp, ArrowDown, Move } from 'lucide-react';
+import { Plus, Trash2, Tag, Edit, Save, X, ArrowUp, ArrowDown, LayoutTemplate, CheckCircle2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -24,6 +24,14 @@ export default function AdminProductCategoriesPage() {
   const [editDescription, setEditDescription] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
+  // Store Hero Settings state
+  const [storeHeroBadge, setStoreHeroBadge] = useState('BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES');
+  const [storeHeroTitle, setStoreHeroTitle] = useState('Templates Notion & Dashboards Excel');
+  const [storeHeroTitleAccent, setStoreHeroTitleAccent] = useState('Haute Performance');
+  const [storeHeroSubtitle, setStoreHeroSubtitle] = useState('Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.');
+  const [savingHero, setSavingHero] = useState(false);
+  const [heroSuccess, setHeroSuccess] = useState('');
+
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/admin/categories-produits');
@@ -36,8 +44,24 @@ export default function AdminProductCategoriesPage() {
     }
   };
 
+  const fetchHeroSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/parametres');
+      const data = await res.json();
+      if (data.settings) {
+        if (data.settings.storeHeroBadge) setStoreHeroBadge(data.settings.storeHeroBadge);
+        if (data.settings.storeHeroTitle) setStoreHeroTitle(data.settings.storeHeroTitle);
+        if (data.settings.storeHeroTitleAccent !== undefined) setStoreHeroTitleAccent(data.settings.storeHeroTitleAccent);
+        if (data.settings.storeHeroSubtitle) setStoreHeroSubtitle(data.settings.storeHeroSubtitle);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
+    fetchHeroSettings();
   }, []);
 
   const handleNameChange = (val: string) => {
@@ -151,16 +175,43 @@ export default function AdminProductCategoriesPage() {
     }
   };
 
+  const handleSaveHeroSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingHero(true);
+    setHeroSuccess('');
+
+    try {
+      const res = await fetch('/api/admin/parametres', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storeHeroBadge,
+          storeHeroTitle,
+          storeHeroTitleAccent,
+          storeHeroSubtitle,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Erreur lors de la sauvegarde de l entête.');
+      setHeroSuccess('L entête de la boutique a été mis à jour avec succès !');
+      setTimeout(() => setHeroSuccess(''), 4000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSavingHero(false);
+    }
+  };
+
   return (
     <div className="space-y-6 w-full">
       
       <div>
         <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
           <Tag className="w-6 h-6 text-purple-600" />
-          <span>Catégories de Produits Digitaux</span>
+          <span>Catégories & Entête de la Boutique</span>
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Gérez, classez et réordonnez l affichage de vos catégories de produits. L ordre ci-dessous se reflète immédiatement dans la barre de navigation du store.
+          Gérez l entête principal du store (titre, badge, sous-titre) ainsi que le classement de vos catégories de produits.
         </p>
       </div>
 
@@ -170,6 +221,117 @@ export default function AdminProductCategoriesPage() {
         </div>
       )}
 
+      {/* 1. GESTION DE L'ENTÊTE DE LA BOUTIQUE (HERO BANNER) */}
+      <Card className="p-6 bg-white border border-slate-200 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <LayoutTemplate className="w-5 h-5 text-purple-600" />
+            <h2 className="text-base font-extrabold text-slate-900">
+              Personnalisation de l Entête de la Boutique (Hero Section)
+            </h2>
+          </div>
+          {heroSuccess && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>{heroSuccess}</span>
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSaveHeroSettings} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* BADGE TEXT */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Texte du Badge Kicker (Pill Vert) *
+              </label>
+              <input
+                type="text"
+                required
+                value={storeHeroBadge}
+                onChange={(e) => setStoreHeroBadge(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES"
+              />
+            </div>
+
+            {/* MAIN TITLE LINE */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Titre Principal (Partie 1 & 2) *
+              </label>
+              <input
+                type="text"
+                required
+                value={storeHeroTitle}
+                onChange={(e) => setStoreHeroTitle(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Templates Notion & Dashboards Excel"
+              />
+            </div>
+
+            {/* TITLE ACCENT */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Titre Accentué (Couleur Vert Neon)
+              </label>
+              <input
+                type="text"
+                value={storeHeroTitleAccent}
+                onChange={(e) => setStoreHeroTitleAccent(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-extrabold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Haute Performance"
+              />
+            </div>
+
+          </div>
+
+          {/* SUBTITLE / DESCRIPTION */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Sous-titre / Description de l entête *
+            </label>
+            <textarea
+              rows={2}
+              required
+              value={storeHeroSubtitle}
+              onChange={(e) => setStoreHeroSubtitle(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Automatisez votre organisation, suivez vos finances..."
+            />
+          </div>
+
+          {/* PREVIEW BOX */}
+          <div className="p-4 bg-[#050811] text-white rounded-xl border border-slate-800 space-y-2 text-center">
+            <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest block">Aperçu en direct du Rendu</span>
+            <div className="inline-block px-3 py-0.5 rounded text-[10px] font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30">
+              {storeHeroBadge}
+            </div>
+            <h3 className="text-lg font-black tracking-tight text-white leading-tight">
+              {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
+            </h3>
+            <p className="text-xs text-slate-300 max-w-xl mx-auto line-clamp-2">
+              {storeHeroSubtitle}
+            </p>
+          </div>
+
+          <div className="flex justify-end pt-1">
+            <Button
+              type="submit"
+              disabled={savingHero}
+              variant="primary"
+              size="md"
+              className="bg-purple-700 hover:bg-purple-800 text-white font-extrabold shadow-sm gap-2"
+            >
+              <Save className="w-4 h-4" />
+              <span>{savingHero ? 'Sauvegarde...' : 'Enregistrer l entête de la boutique'}</span>
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      {/* 2. GESTION DES CATÉGORIES ET CLASSEMENT */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
         
         {/* ADD PRODUCT CATEGORY FORM */}

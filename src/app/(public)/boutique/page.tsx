@@ -27,6 +27,10 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   let categories: any[] = [];
   let products: any[] = [];
   let activeTheme = 'modern-bento';
+  let storeHeroBadge = 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES';
+  let storeHeroTitle = 'Templates Notion & Dashboards Excel';
+  let storeHeroTitleAccent = 'Haute Performance';
+  let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
 
   try {
     activeTheme = await getActiveTheme();
@@ -51,6 +55,15 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
         { longDescription: { contains: searchQuery } },
       ];
     }
+
+    const generalSettingsRecord = await prisma.siteSetting.findUnique({
+      where: { key: 'general_settings' },
+    });
+    const settings = generalSettingsRecord ? JSON.parse(generalSettingsRecord.value) : {};
+    if (settings.storeHeroBadge) storeHeroBadge = settings.storeHeroBadge;
+    if (settings.storeHeroTitle) storeHeroTitle = settings.storeHeroTitle;
+    if (settings.storeHeroTitleAccent !== undefined) storeHeroTitleAccent = settings.storeHeroTitleAccent;
+    if (settings.storeHeroSubtitle) storeHeroSubtitle = settings.storeHeroSubtitle;
 
     products = await prisma.product.findMany({
       where: whereCondition,
@@ -85,15 +98,15 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
         <div className="mb-10 text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/30 shadow-lg backdrop-blur-md">
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES</span>
+            <span>{storeHeroBadge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight leading-tight text-white">
-            Templates Notion & Dashboards Excel <span className="text-[#a3e635]">Haute Performance</span>
+            {storeHeroTitle} {storeHeroTitleAccent && <span className="text-[#a3e635]">{storeHeroTitleAccent}</span>}
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 font-medium leading-relaxed max-w-2xl mx-auto">
-            Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.
+            {storeHeroSubtitle}
           </p>
         </div>
 
