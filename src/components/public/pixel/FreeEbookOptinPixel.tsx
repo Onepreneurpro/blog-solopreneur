@@ -448,7 +448,7 @@ export function FreeEbookOptinPixel({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* INNER DARK CARD FRAME ON WHITE CANVAS */}
-        <div className="bg-slate-950 p-5 sm:p-7 rounded-2xl border-2 border-slate-900 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="ebook-optin-card bg-slate-950 p-5 sm:p-7 rounded-2xl border-2 border-slate-900 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* LEFT FORM COLUMN */}
           <div className="lg:col-span-7 flex flex-col justify-center space-y-3">
