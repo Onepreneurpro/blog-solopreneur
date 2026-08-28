@@ -150,10 +150,10 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
         {/* LOGO */}
         <div className="flex items-center justify-between px-2 pt-2 pb-1 border-b border-slate-100">
           <Link href="/admin" className="flex items-center gap-2 font-heading font-extrabold text-base text-slate-900">
-            <span className="w-7 h-7 bg-purple-700 flex items-center justify-center text-white text-xs font-extrabold shadow-sm rounded-none">
+            <span className="w-7 h-7 bg-[#00A0FF] flex items-center justify-center text-white text-xs font-extrabold shadow-sm rounded-md">
               S
             </span>
-            <span className="font-extrabold text-purple-950">CMS Admin</span>
+            <span className="font-extrabold text-slate-900">CMS Admin</span>
           </Link>
           
           <div className="flex items-center gap-1">
@@ -180,10 +180,10 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
           {ADMIN_LINKS.map((section, idx) => (
             <div key={idx} className="space-y-1.5">
               
-              {/* MAIN SECTION HEADER WITH RICHER/DARKER VIOLET BACKGROUND */}
-              <div className="px-3.5 py-2.5 bg-purple-800 text-white border-l-4 border-purple-950 border-y border-r border-purple-900 rounded-none text-[11px] font-heading font-black tracking-wider uppercase shadow-2xs mb-2 flex items-center justify-between">
+              {/* MAIN SECTION HEADER WITH ELECTRIC SKY BLUE BACKGROUND */}
+              <div className="px-3.5 py-2.5 bg-[#00A0FF] text-white border-l-4 border-[#0077CC] border-y border-r border-[#0090EE] rounded-none text-[11px] font-heading font-black tracking-wider uppercase shadow-2xs mb-2 flex items-center justify-between">
                 <span>{section.group}</span>
-                <span className="w-2 h-2 bg-[#a3e635] rounded-none" />
+                <span className="w-2 h-2 bg-white rounded-none opacity-90" />
               </div>
 
               <div className="space-y-1">
@@ -199,12 +199,12 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
                         onClick={() => setMobileOpen(false)}
                         className={`flex items-center justify-between px-3 py-2.5 rounded-none text-xs transition-all ${
                           isActive
-                            ? 'admin-link-active bg-[#A3E635] text-slate-950 font-black border-l-4 border-slate-950 border-y border-r border-[#86efac] shadow-xs'
+                            ? 'admin-link-active bg-[#F1F5F9] text-slate-900 font-extrabold border-l-4 border-[#00A0FF] border-y border-r border-[#CBD5E1] shadow-xs'
                             : 'admin-link-inactive text-slate-800 hover:bg-slate-50 hover:text-slate-950 font-bold border border-transparent hover:border-slate-200'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-slate-950' : 'text-slate-600'}`} />
+                          <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#00A0FF]' : 'text-slate-600'}`} />
                           <span className="whitespace-normal break-words leading-snug">{item.label}</span>
                         </div>
 

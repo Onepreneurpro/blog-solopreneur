@@ -398,13 +398,19 @@ body.theme-blusky .account-user-banner button:hover {
 }
 
 body.theme-blusky .btn-purple,
-body.theme-blusky button.bg-\[\#a3e635\] {
+body.theme-blusky button.bg-\[\#a3e635\],
+body.theme-blusky .bg-purple-800,
+body.theme-blusky .bg-purple-700,
+body.theme-blusky .bg-purple-900 {
   background-color: #00A0FF !important;
   color: #ffffff !important;
 }
 
 body.theme-blusky .btn-purple:hover,
-body.theme-blusky button.bg-\[\#a3e635\]:hover {
+body.theme-blusky button.bg-\[\#a3e635\]:hover,
+body.theme-blusky .bg-purple-800:hover,
+body.theme-blusky .bg-purple-700:hover,
+body.theme-blusky .bg-purple-900:hover {
   background-color: #0082D6 !important;
   color: #ffffff !important;
 }
