@@ -70,31 +70,31 @@ export function HeroModernBento({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* TOP BADGE */}
-        <div className={`flex mb-6 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
-          <div
-            style={{
-              fontFamily: `'${badgeFont}', sans-serif`,
-              fontSize: badgeSize,
-              color: badgeColor,
-              borderColor: `${badgeColor}40`,
-              backgroundColor: `${badgeColor}15`,
-            }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm backdrop-blur-md border text-xs font-heading font-extrabold shadow-xl"
-          >
-            <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: badgeColor }} />
-            <span className="font-black" style={{ color: badgeColor }}>Nouveau Système 2026</span>
-            <span className="text-white/40">•</span>
-            <span>+5,400 Solopreneurs Équipés</span>
-          </div>
-        </div>
-
         {/* 2-COLUMN HERO MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* LEFT COLUMN: PUNCHY TYPOGRAPHY & CALL TO ACTIONS */}
           <div className={`lg:col-span-7 space-y-8 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
             
+            {/* TOP BADGE */}
+            <div className={`flex ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                style={{
+                  fontFamily: `'${badgeFont}', sans-serif`,
+                  fontSize: badgeSize,
+                  color: badgeColor,
+                  borderColor: `${badgeColor}40`,
+                  backgroundColor: `${badgeColor}15`,
+                }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-sm backdrop-blur-md border text-xs font-heading font-extrabold shadow-xl"
+              >
+                <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: badgeColor }} />
+                <span className="font-black" style={{ color: badgeColor }}>Nouveau Système 2026</span>
+                <span className="text-white/40">•</span>
+                <span>+5,400 Solopreneurs Équipés</span>
+              </div>
+            </div>
+
             <h1
               style={{
                 fontFamily: `'${titleFont}', sans-serif`,
