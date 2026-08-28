@@ -56,6 +56,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   }
 
   const isDark = isDarkTheme(activeTheme);
+  const isBluSky = activeTheme === 'blusky';
 
   return (
     <div className={`py-12 sm:py-16 min-h-screen relative overflow-hidden ${
@@ -75,7 +76,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
         {/* HEADER */}
         <div className="mb-10">
           <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-heading font-black mb-4 shadow-sm ${
-            isDark ? 'bg-purple-500/20 text-[#ccff00] border border-purple-400/30' : 'bg-[#ccff00] text-slate-950'
+            isDark ? 'bg-purple-500/20 text-[#ccff00] border border-purple-400/30' : (isBluSky ? 'bg-[#00A0FF] text-white' : 'bg-[#ccff00] text-slate-950')
           }`}>
             <BookOpen className="w-3.5 h-3.5" />
             <span>BLOG & ARTICLES SOLOPRENEUR</span>

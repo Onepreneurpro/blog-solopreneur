@@ -291,24 +291,44 @@ body.theme-blusky button.bg-\[\#a3e635\]:hover {
   color: #ffffff !important;
 }
 
-/* Green elements override to Electric Sky Blue for BluSky */
-body.theme-blusky .bg-\[\#a3e635\] {
+/* Green & Yellow badges override to Electric Sky Blue for BluSky */
+body.theme-blusky .bg-\[\#ccff00\],
+body.theme-blusky .bg-\[\#a3e635\],
+body.theme-blusky .bg-\[\#86efac\],
+body.theme-blusky .bg-emerald-500,
+body.theme-blusky .bg-emerald-600 {
   background-color: #00A0FF !important;
   color: #ffffff !important;
 }
 
+body.theme-blusky .bg-\[\#ccff00\]\/20,
+body.theme-blusky .bg-\[\#ccff00\]\/10,
 body.theme-blusky .bg-\[\#a3e635\]\/20,
-body.theme-blusky .bg-\[\#a3e635\]\/15 {
+body.theme-blusky .bg-\[\#a3e635\]\/15,
+body.theme-blusky .bg-emerald-500\/20,
+body.theme-blusky .bg-emerald-500\/10 {
   background-color: #e0f2fe !important;
   color: #00A0FF !important;
 }
 
-body.theme-blusky .text-\[\#a3e635\] {
+body.theme-blusky .text-\[\#ccff00\],
+body.theme-blusky .text-\[\#a3e635\],
+body.theme-blusky .text-emerald-500,
+body.theme-blusky .text-emerald-400 {
   color: #00A0FF !important;
 }
 
-body.theme-blusky .border-\[\#a3e635\] {
+body.theme-blusky .border-\[\#ccff00\],
+body.theme-blusky .border-\[\#a3e635\],
+body.theme-blusky .border-emerald-500 {
   border-color: #00A0FF !important;
+}
+
+body.theme-blusky .category-pill-active,
+body.theme-blusky .filter-pill-active {
+  background-color: #00A0FF !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px -2px rgba(0, 160, 255, 0.35) !important;
 }
 
 /* Footer rules for BluSky */

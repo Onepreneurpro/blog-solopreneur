@@ -94,6 +94,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
   }
 
   const isDark = isDarkTheme(activeTheme);
+  const isBluSky = activeTheme === 'blusky';
 
   return (
     <div className={`py-12 sm:py-16 min-h-screen relative overflow-hidden ${
@@ -112,17 +113,17 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
         
         {/* BREADCRUMB */}
         <nav className={`flex items-center gap-2 text-xs mb-6 overflow-x-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          <Link href="/" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Accueil</Link>
+          <Link href="/" className={isDark ? 'hover:text-[#ccff00]' : (isBluSky ? 'hover:text-[#00A0FF]' : 'hover:text-purple-700')}>Accueil</Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
-          <Link href="/blog" className={isDark ? 'hover:text-[#ccff00]' : 'hover:text-purple-700'}>Blog</Link>
+          <Link href="/blog" className={isDark ? 'hover:text-[#ccff00]' : (isBluSky ? 'hover:text-[#00A0FF]' : 'hover:text-purple-700')}>Blog</Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
-          <span className={`font-extrabold ${isDark ? 'text-[#ccff00]' : 'text-purple-700'}`}>{category.name}</span>
+          <span className={`font-extrabold ${isDark ? 'text-[#ccff00]' : (isBluSky ? 'text-[#00A0FF]' : 'text-purple-700')}`}>{category.name}</span>
         </nav>
 
         {/* HERO HEADER */}
         <div className="mb-10">
           <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-heading font-black mb-4 shadow-sm ${
-            isDark ? 'bg-purple-500/20 text-[#ccff00] border border-purple-400/30' : 'bg-[#ccff00] text-slate-950'
+            isDark ? 'bg-purple-500/20 text-[#ccff00] border border-purple-400/30' : (isBluSky ? 'bg-[#00A0FF] text-white' : 'bg-[#ccff00] text-slate-950')
           }`}>
             <BookOpen className="w-3.5 h-3.5" />
             <span>CATÉGORIE BLOG</span>
@@ -148,7 +149,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
             <Link
               href="/blog"
               className={`pb-3.5 text-xs sm:text-sm font-heading font-bold whitespace-nowrap transition-all border-b-2 border-transparent ${
-                isDark ? 'text-slate-400 hover:text-white hover:border-purple-400' : 'text-slate-600 hover:text-slate-950 hover:border-purple-300'
+                isDark ? 'text-slate-400 hover:text-white hover:border-purple-400' : (isBluSky ? 'text-slate-600 hover:text-[#00A0FF] hover:border-[#00A0FF]' : 'text-slate-600 hover:text-slate-950 hover:border-purple-300')
               }`}
             >
               Tous les articles
@@ -162,8 +163,8 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
                   href={`/blog/categorie/${cat.slug}`}
                   className={`pb-3.5 text-xs sm:text-sm font-heading whitespace-nowrap transition-all border-b-2 ${
                     isActive
-                      ? isDark ? 'border-[#ccff00] text-[#ccff00] font-black' : 'border-purple-700 text-purple-700 font-black'
-                      : isDark ? 'border-transparent text-slate-400 hover:text-white hover:border-purple-400 font-bold' : 'border-transparent text-slate-600 hover:text-slate-950 hover:border-purple-300 font-bold'
+                      ? (isDark ? 'border-[#ccff00] text-[#ccff00] font-black' : (isBluSky ? 'border-[#00A0FF] text-[#00A0FF] font-black' : 'border-purple-700 text-purple-700 font-black'))
+                      : (isDark ? 'border-transparent text-slate-400 hover:text-white hover:border-purple-400 font-bold' : (isBluSky ? 'border-transparent text-slate-600 hover:text-[#00A0FF] hover:border-[#00A0FF]/40 font-bold' : 'border-transparent text-slate-600 hover:text-slate-950 hover:border-purple-300 font-bold'))
                   }`}
                 >
                   {cat.name}
