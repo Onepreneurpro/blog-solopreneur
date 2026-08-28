@@ -12,7 +12,7 @@ export function Card({ children, className }: { children: React.ReactNode; class
         clsx(
           !hasBg && 'bg-slate-900',
           !hasBorder && 'border border-slate-800/80',
-          'backdrop-blur-md rounded-2xl shadow-md transition-all duration-300 overflow-hidden',
+          'backdrop-blur-md rounded-xl shadow-md transition-all duration-300 overflow-hidden',
           className
         )
       )}

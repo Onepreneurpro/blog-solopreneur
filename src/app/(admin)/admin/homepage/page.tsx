@@ -681,7 +681,7 @@ export default function AdminHomepageBuilderPage() {
     <div className="space-y-6 w-full max-w-none pt-2">
       
       {/* TOP HEADER BAR */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-heading font-black text-slate-950 tracking-tight">Constructeur de Page d Accueil</h1>
@@ -729,9 +729,9 @@ export default function AdminHomepageBuilderPage() {
 
       {/* PIXEL FUNNEL HIGHLEVEL THEME MODE INDICATOR BANNER */}
       {isPixelFunnelActive && (
-        <div className="p-5 bg-slate-950 text-white rounded-3xl border-2 border-[#a3e635]/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="p-5 bg-slate-950 text-white rounded-xl border-2 border-[#a3e635]/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#a3e635] text-slate-950 flex items-center justify-center font-black text-lg shadow-md shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#a3e635] text-slate-950 flex items-center justify-center font-black text-lg shadow-md shrink-0">
               🚀
             </div>
             <div>
@@ -756,13 +756,13 @@ export default function AdminHomepageBuilderPage() {
       )}
 
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-2xl text-xs font-heading font-black shadow-sm">
+        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-xl text-xs font-heading font-black shadow-sm">
           {message}
         </div>
       )}
 
       {/* ÉDITEUR ULTRA SOUPLE PAR ÉLÉMENT DE LA PAGE D'ACCUEIL */}
-      <Card className="p-6 bg-white border border-slate-200 shadow-sm space-y-6 rounded-3xl">
+      <Card className="p-6 bg-white border border-slate-200 shadow-sm space-y-6 rounded-xl">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-purple-600" />
@@ -1456,7 +1456,7 @@ export default function AdminHomepageBuilderPage() {
                   console.error(err);
                 }
               }}
-              className="space-y-6 min-h-[300px] p-2 border-2 border-dashed border-slate-200/80 rounded-3xl bg-slate-50/50"
+              className="space-y-6 min-h-[300px] p-2 border-2 border-dashed border-slate-200/80 rounded-xl bg-slate-50/50"
             >
           {sections.map((sec, index) => {
             const settings = sec.settings || {};
@@ -1465,7 +1465,7 @@ export default function AdminHomepageBuilderPage() {
             return (
               <Card
                 key={sec.id}
-                className={`p-6 bg-white transition-all rounded-3xl border ${
+                className={`p-6 bg-white transition-all rounded-xl border ${
                   sec.isEnabled ? 'border-slate-200/90 shadow-sm' : 'border-slate-200 opacity-60 bg-slate-50/50'
                 }`}
               >
