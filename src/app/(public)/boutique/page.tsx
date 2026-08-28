@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getActiveTheme, isDarkTheme } from '@/lib/theme';
-import { getFileTypeLabel } from '@/lib/product-formats';
+import { getFileTypeLabel, getProductFormatLogo } from '@/lib/product-formats';
 import SalesSocialProofToast from '@/components/public/SalesSocialProofToast';
 
 export const dynamic = 'force-dynamic';
@@ -265,6 +265,8 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {products.map((prod) => {
               const comparePrice = prod.compareAtPrice || (prod.price > 0 ? prod.price * 1.5 : 29);
+              const formatInfo = getProductFormatLogo(prod);
+
               return (
                 <Card
                   key={prod.id}
@@ -280,9 +282,9 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
-                          <Sparkles className="w-10 h-10 text-[#a3e635]" />
-                          <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{prod.name}</span>
+                        <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
+                          <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
+                          <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{prod.name}</span>
                         </div>
                       )}
 
@@ -306,8 +308,9 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
 
                     {/* CARD CONTENT */}
                     <div className="space-y-1.5 px-1">
-                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
-                        Format : {getFileTypeLabel(prod.fileType)}
+                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                        <span>Format : {formatInfo.badgeLabel}</span>
                       </div>
 
                       <Link href={`/checkout?productId=${prod.id}`}>

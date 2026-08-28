@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getActiveTheme, isDarkTheme } from '@/lib/theme';
+import { getProductFormatLogo } from '@/lib/product-formats';
 import SalesSocialProofToast from '@/components/public/SalesSocialProofToast';
 
 export const dynamic = 'force-dynamic';
@@ -67,86 +68,87 @@ export default async function FreeResourcesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {freeResources.map((res) => (
-              <Card
-                key={res.id}
-                className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10"
-              >
-                <div className="space-y-3">
-                  {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
-                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
-                    {res.coverImage ? (
-                      <img
-                        src={res.coverImage}
-                        alt={res.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : res.icon ? (
-                      <div className="w-full h-full bg-slate-900 flex items-center justify-center p-4">
-                        <img src={res.icon} alt={res.name} className="w-16 h-16 object-contain rounded-lg shadow-xl" />
+            {freeResources.map((res) => {
+              const formatInfo = getProductFormatLogo(res);
+
+              return (
+                <Card
+                  key={res.id}
+                  className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10"
+                >
+                  <div className="space-y-3">
+                    {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                    <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
+                      {res.coverImage ? (
+                        <img
+                          src={res.coverImage}
+                          alt={res.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
+                          <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
+                          <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{res.name}</span>
+                        </div>
+                      )}
+
+                      {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                      <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#00A0FF] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
+                        <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
-                        <FileText className="w-10 h-10 text-[#a3e635]" />
-                        <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{res.name}</span>
-                      </div>
-                    )}
 
-                    {/* CIRCULAR ACTION BUTTON TOP LEFT */}
-                    <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#00A0FF] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
-                      <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
-                    </div>
-
-                    {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
-                    <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-white text-slate-950 border border-slate-200 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
-                      100% OFFERT
-                    </span>
-
-                    <div className="absolute top-2.5 right-2.5 z-10">
-                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
-                        <Download className="w-2.5 h-2.5 text-[#a3e635]" />
-                        <span>{res.downloadsCount || 120}+</span>
+                      {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                      <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-white text-slate-950 border border-slate-200 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                        100% OFFERT
                       </span>
-                    </div>
-                  </Link>
 
-                  {/* CARD BODY */}
-                  <div className="space-y-1.5 px-1">
-                    <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
-                      RESSOURCE DIGITAL
+                      <div className="absolute top-2.5 right-2.5 z-10">
+                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
+                          <Download className="w-2.5 h-2.5 text-[#a3e635]" />
+                          <span>{res.downloadsCount || 120}+</span>
+                        </span>
+                      </div>
+                    </Link>
+
+                    {/* CARD BODY */}
+                    <div className="space-y-1.5 px-1">
+                      <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                        <span>{formatInfo.badgeLabel}</span>
+                      </div>
+
+                      <Link href={`/checkout?productId=${res.id}`}>
+                        <h3 className="font-heading font-black text-base text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
+                          {res.name}
+                        </h3>
+                      </Link>
+
+                      <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
+                        {res.shortDescription || 'Guide pratique et modèle dupliquable immédiatement.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* CARD FOOTER WITH HIGH IMPACT BUTTON */}
+                  <div className="space-y-3 pt-3 px-1">
+                    <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5 text-xs">
+                      <span className="text-[#a3e635] font-black uppercase">100% GRATUIT</span>
+                      <span className="text-slate-500 line-through font-semibold font-mono">19.00 €</span>
                     </div>
 
                     <Link href={`/checkout?productId=${res.id}`}>
-                      <h3 className="font-heading font-black text-base text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
-                        {res.name}
-                      </h3>
+                      <button
+                        type="button"
+                        className="w-full py-2.5 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>OBTENIR ACCÈS GRATUIT</span>
+                      </button>
                     </Link>
-
-                    <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
-                      {res.shortDescription || 'Guide pratique et modèle dupliquable immédiatement.'}
-                    </p>
                   </div>
-                </div>
-
-                {/* CARD FOOTER WITH HIGH IMPACT BUTTON */}
-                <div className="space-y-3 pt-3 px-1">
-                  <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5 text-xs">
-                    <span className="text-[#a3e635] font-black uppercase">100% GRATUIT</span>
-                    <span className="text-slate-500 line-through font-semibold font-mono">19.00 €</span>
-                  </div>
-
-                  <Link href={`/checkout?productId=${res.id}`}>
-                    <button
-                      type="button"
-                      className="w-full py-2.5 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>OBTENIR ACCÈS GRATUIT</span>
-                    </button>
-                  </Link>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
 

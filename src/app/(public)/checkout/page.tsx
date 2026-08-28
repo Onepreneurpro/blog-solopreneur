@@ -8,7 +8,7 @@ import { CreditCard, ShieldCheck, Lock, ArrowRight, ArrowUpRight, Sparkles, User
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { isDarkTheme } from '@/lib/theme';
-import { getFileTypeLabel } from '@/lib/product-formats';
+import { getFileTypeLabel, getProductFormatLogo } from '@/lib/product-formats';
 
 export const dynamic = 'force-dynamic';
 
@@ -485,29 +485,32 @@ function CheckoutContent() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    {product.icon ? (
-                      <img
-                        src={product.icon}
-                        alt={product.name}
-                        className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
-                      />
-                    ) : product.coverImage ? (
-                      <img
-                        src={product.coverImage}
-                        alt={product.name}
-                        className="w-12 h-12 rounded-md object-cover border border-slate-200 flex-shrink-0 shadow-sm"
-                      />
+                    {product.coverImage ? (
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden border border-slate-200 flex-shrink-0 shadow-sm bg-white">
+                        <img
+                          src={product.coverImage}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <img
+                          src={getProductFormatLogo(product).logoUrl}
+                          alt={getProductFormatLogo(product).alt}
+                          className="absolute bottom-0.5 right-0.5 w-4.5 h-4.5 rounded bg-white p-0.5 shadow-md border border-slate-200 object-contain"
+                        />
+                      </div>
                     ) : (
-                      <div className={`w-12 h-12 rounded-md text-white flex items-center justify-center font-black flex-shrink-0 shadow-sm ${
-                        isBluSky ? 'bg-[#00A0FF]' : 'bg-purple-700'
-                      }`}>
-                        <Download className="w-6 h-6" />
+                      <div className="w-12 h-12 rounded-md bg-white border border-slate-200 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <img
+                          src={getProductFormatLogo(product).logoUrl}
+                          alt={getProductFormatLogo(product).alt}
+                          className="w-full h-full object-contain"
+                        />
                       </div>
                     )}
                     <div>
                       <h4 className="font-heading font-black text-xs leading-snug">{product.name}</h4>
                       <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {isFree ? `Ressource offerte (${getFileTypeLabel(product.fileType)})` : `Format : ${getFileTypeLabel(product.fileType)}`}
+                        {isFree ? `Ressource offerte (${getProductFormatLogo(product).badgeLabel})` : `Format : ${getProductFormatLogo(product).badgeLabel}`}
                       </p>
                     </div>
                   </div>

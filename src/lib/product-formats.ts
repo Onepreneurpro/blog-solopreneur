@@ -22,3 +22,68 @@ export function getFileTypeLabel(fileType?: string | null): string {
   
   return fileType;
 }
+
+export function getProductFormatLogo(product?: {
+  name?: string | null;
+  fileType?: string | null;
+  category?: { slug?: string | null; name?: string | null } | string | null;
+} | null): { logoUrl: string; alt: string; badgeLabel: string } {
+  const nameStr = (product?.name || '').toLowerCase();
+  const typeStr = (product?.fileType || '').toLowerCase();
+  const catStr = typeof product?.category === 'string' 
+    ? product.category.toLowerCase() 
+    : ((product?.category?.slug || '') + ' ' + (product?.category?.name || '')).toLowerCase();
+
+  const fullSearch = `${nameStr} ${typeStr} ${catStr}`;
+
+  // 1. Notion Logo
+  if (fullSearch.includes('notion')) {
+    return {
+      logoUrl: '/images/logos/notion-logo.webp',
+      alt: 'Logo Notion',
+      badgeLabel: 'Template Notion',
+    };
+  }
+
+  // 2. Excel Logo
+  if (fullSearch.includes('excel')) {
+    return {
+      logoUrl: '/images/logos/excel-logo.png',
+      alt: 'Logo Excel',
+      badgeLabel: 'Fichier Excel',
+    };
+  }
+
+  // 3. Systeme.io Logo
+  if (fullSearch.includes('systeme') || fullSearch.includes('sio')) {
+    return {
+      logoUrl: '/images/logos/systemeio-logo.jpg',
+      alt: 'Logo Systeme.io',
+      badgeLabel: 'Template Systeme.io',
+    };
+  }
+
+  // 4. Web App / PWA Logo
+  if (
+    fullSearch.includes('web app') ||
+    fullSearch.includes('webapp') ||
+    fullSearch.includes('pwa') ||
+    fullSearch.includes('logiciel') ||
+    fullSearch.includes('saas') ||
+    fullSearch.includes('erp') ||
+    fullSearch.includes('crm web')
+  ) {
+    return {
+      logoUrl: '/images/logos/pwa-logo.png',
+      alt: 'Logo PWA',
+      badgeLabel: 'Application Web PWA',
+    };
+  }
+
+  // Default fallback (e.g. Notion / PDF)
+  return {
+    logoUrl: '/images/logos/notion-logo.webp',
+    alt: 'Logo Format',
+    badgeLabel: getFileTypeLabel(product?.fileType),
+  };
+}

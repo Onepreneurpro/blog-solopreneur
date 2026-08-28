@@ -4,6 +4,7 @@ import { Download, FileText, Gift, ArrowRight, ArrowUpRight, Sparkles, Rocket, F
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
+import { getProductFormatLogo } from '@/lib/product-formats';
 
 interface ResourceItem {
   id: string;
@@ -146,54 +147,58 @@ export function FreeResourcesSection({
 
         {/* RESOURCES GRID (3 COLUMNS) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {resources.slice(0, 3).map((res) => (
-            <Card
-              key={res.id}
-              className={`border transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl ${
-                isDark
-                  ? 'bg-[#0e1424] border-white/10 hover:border-[#a3e635]/60 hover:shadow-[#a3e635]/10 text-white'
-                  : 'bg-white border-2 border-slate-200 hover:border-purple-600 text-slate-950'
-              }`}
-            >
-              <div className="space-y-3">
-                {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
-                <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
-                  {res.coverImage ? (
-                    <img
-                      src={res.coverImage}
-                      alt={res.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-purple-900/60 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
-                      <FileText className="w-10 h-10 text-[#a3e635]" />
-                      <span className="text-xs font-heading font-black text-white uppercase tracking-wider">{res.name}</span>
+          {resources.slice(0, 3).map((res) => {
+            const formatInfo = getProductFormatLogo(res);
+
+            return (
+              <Card
+                key={res.id}
+                className={`border transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl ${
+                  isDark
+                    ? 'bg-[#0e1424] border-white/10 hover:border-[#a3e635]/60 hover:shadow-[#a3e635]/10 text-white'
+                    : 'bg-white border-2 border-slate-200 hover:border-purple-600 text-slate-950'
+                }`}
+              >
+                <div className="space-y-3">
+                  {/* INNER COVER CONTAINER WITH ROUNDED CORNERS, CIRCULAR ACTION ARROW & CATEGORY BADGE */}
+                  <Link href={`/checkout?productId=${res.id}`} className="relative block aspect-[16/11] rounded-2xl overflow-hidden bg-slate-950 group">
+                    {res.coverImage ? (
+                      <img
+                        src={res.coverImage}
+                        alt={res.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
+                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
+                        <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{res.name}</span>
+                      </div>
+                    )}
+
+                    {/* CIRCULAR ACTION BUTTON TOP LEFT */}
+                    <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#00A0FF] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
+                      <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                     </div>
-                  )}
 
-                  {/* CIRCULAR ACTION BUTTON TOP LEFT */}
-                  <div className="img-overlay-arrow absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-[#00A0FF] text-white border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
-                    <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
-                  </div>
-
-                  {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
-                  <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-white text-slate-950 border border-slate-200 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
-                    100% OFFERT
-                  </span>
-
-                  <div className="absolute top-2.5 right-2.5 z-10">
-                    <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
-                      <Download className="w-2.5 h-2.5 text-[#a3e635]" />
-                      <span>{res.downloadsCount || 100}+ dl</span>
+                    {/* FLOATING CATEGORY BADGE BOTTOM LEFT */}
+                    <span className="img-overlay-badge absolute bottom-2.5 left-2.5 px-3 py-1 bg-white text-slate-950 border border-slate-200 text-[10px] font-heading font-black uppercase tracking-wider rounded-full shadow-md z-10">
+                      100% OFFERT
                     </span>
-                  </div>
-                </Link>
 
-                {/* CARD BODY */}
-                <div className="space-y-1.5 px-1">
-                  <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider">
-                    RESSOURCE DIGITAL
-                  </div>
+                    <div className="absolute top-2.5 right-2.5 z-10">
+                      <span className="bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-lg flex items-center gap-1">
+                        <Download className="w-2.5 h-2.5 text-[#a3e635]" />
+                        <span>{res.downloadsCount || 100}+ dl</span>
+                      </span>
+                    </div>
+                  </Link>
+
+                  {/* CARD BODY */}
+                  <div className="space-y-1.5 px-1">
+                    <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                      <span>{formatInfo.badgeLabel}</span>
+                    </div>
 
                   <Link href={`/checkout?productId=${res.id}`}>
                     <h3 className={`font-heading font-black text-base transition-colors leading-snug line-clamp-2 ${
@@ -227,8 +232,9 @@ export function FreeResourcesSection({
                   </Button>
                 </Link>
               </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
 
       </div>

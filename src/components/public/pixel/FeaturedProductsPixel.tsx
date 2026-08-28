@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight, Sparkles, Rocket, Flame, Star, Diamond, Gift,
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
+import { getProductFormatLogo } from '@/lib/product-formats';
 
 interface ProductItem {
   id: string;
@@ -149,6 +150,8 @@ export function FeaturedProductsPixel({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((prod, idx) => {
             const badgeText = badgeLabels[idx % badgeLabels.length];
+            const formatInfo = getProductFormatLogo(prod);
+
             return (
               <Card key={prod.id} className="bg-[#0e1424] border border-white/10 hover:border-[#a3e635]/60 transition-all duration-300 rounded-3xl p-3.5 sm:p-4 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-[#a3e635]/10">
                 <div className="space-y-3">
@@ -162,8 +165,9 @@ export function FeaturedProductsPixel({
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-500 text-xs font-medium">
-                        Visual Produit HighLevel
+                      <div className="w-full h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-6 text-center space-y-3">
+                        <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-12 h-12 object-contain" />
+                        <span className="text-xs font-heading font-black text-slate-900 uppercase tracking-wider">{prod.name}</span>
                       </div>
                     )}
 
@@ -180,6 +184,10 @@ export function FeaturedProductsPixel({
 
                   {/* CONTENT AREA */}
                   <div className="space-y-1.5 px-1">
+                    <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <img src={formatInfo.logoUrl} alt={formatInfo.alt} className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                      <span>Format : {formatInfo.badgeLabel}</span>
+                    </div>
                     <h3 className="text-base sm:text-lg font-heading font-black text-white group-hover:text-[#a3e635] transition-colors leading-snug line-clamp-2">
                       <Link href={`/checkout?productId=${prod.id}`}>{prod.name}</Link>
                     </h3>
