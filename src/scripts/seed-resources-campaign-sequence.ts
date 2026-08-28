@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma';
 
 async function seedResourcesCampaign() {
-  console.log('🚀 Seeding COMPAGNE RESSOURCES emails & sequence...');
+  console.log('🚀 Seeding COMPAGNE RESSOURCES emails, 3 sub-emails & sequence...');
 
   // 1. Fetch all free resources from DB
   const freeResources = await prisma.product.findMany({
@@ -10,9 +10,6 @@ async function seedResourcesCampaign() {
   });
 
   console.log(`📌 Found ${freeResources.length} free resources in DB.`);
-  freeResources.forEach((res, i) => {
-    console.log(`   [${i + 1}] ID: ${res.id} | Name: ${res.name}`);
-  });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -60,7 +57,7 @@ async function seedResourcesCampaign() {
     campaign = await prisma.emailCampaign.create({
       data: {
         name: 'COMPAGNE RESSOURCES',
-        description: 'Séquence automatique de bienvenue (5 emails) et de valeur (15 emails) avec liens directs vers nos ressources gratuites.',
+        description: 'Séquence automatique de bienvenue (5 emails + 3 sous-emails variantes) et de valeur (15 emails) avec liens directs vers nos ressources gratuites.',
         status: 'ACTIVE',
         lists: {
           create: {
@@ -107,15 +104,13 @@ async function seedResourcesCampaign() {
   const r2Name = freeResources[2]?.name || 'Template Notion PARA & CRM Client';
 
   // -------------------------------------------------------------
-  // PART 1: 5 WELCOME EMAILS (DEMO BIENVENUE)
+  // PART 1: WELCOME EMAIL #1 (PARENT STEP)
   // -------------------------------------------------------------
-  const welcomeEmails = [
-    {
+  const welcomeStep1 = await prisma.emailSequenceStep.create({
+    data: {
+      campaignId: campaign.id,
       stepOrder: 1,
       subject: '🎁 [Bienvenue 1/5] Bienvenue sur Solopreneur&Co ! Voici vos accès instantanés',
-      delayHours: 0,
-      delayMinutes: 0,
-      triggerType: 'IMMEDIATE',
       content: `Bonjour {prenom},
 
 Bienvenue au sein de la communauté Solopreneur&Co !
@@ -131,7 +126,102 @@ Excellente découverte,
 L équipe Solopreneur&Co
 
 {desabonner}`,
+      triggerType: 'IMMEDIATE',
+      delayHours: 0,
+      delayMinutes: 0,
+      status: 'ACTIVE',
     },
+  });
+
+  console.log('✅ Welcome Step #1 created (Parent Step)');
+
+  // -------------------------------------------------------------
+  // PART 2: 3 SOUS-EMAILS (VARIANTS LINKED TO STEP #1)
+  // -------------------------------------------------------------
+  const subEmail1 = await prisma.emailSequenceStep.create({
+    data: {
+      campaignId: campaign.id,
+      stepOrder: 1,
+      subject: '🎁 [Sous-Email 1.1] Variante Prospection B2B : Votre Guide de Démarrage',
+      content: `Bonjour {prenom},
+
+Voici votre sous-email spécifique dédié à la prospection B2B !
+
+Si votre priorité actuelle est d acquérir de nouveaux clients sans démarchage agressif, nous avons préparé ce guide spécial :
+👉 ${makeLink(`Accéder à : ${r0Name}`, r0)}
+
+Découvrez comment identifier vos cibles idéales, rédiger des messages d approche percutants et conclure vos échanges.
+
+À très vite,
+L équipe Solopreneur&Co
+
+{desabonner}`,
+      triggerType: 'IMMEDIATE',
+      delayHours: 0,
+      delayMinutes: 0,
+      status: 'ACTIVE',
+      parentId: welcomeStep1.id,
+    },
+  });
+
+  const subEmail2 = await prisma.emailSequenceStep.create({
+    data: {
+      campaignId: campaign.id,
+      stepOrder: 1,
+      subject: '📊 [Sous-Email 1.2] Variante Finance & TJM : Votre Calculateur Excel',
+      content: `Bonjour {prenom},
+
+Voici votre sous-email spécifique dédié à la rentabilité et au TJM !
+
+Pour vous assurer que vos tarifs couvrent l ensemble de vos charges et dégagent un revenu confortable, téléchargez notre calculateur :
+👉 ${makeLink(`Accéder à : ${r1Name}`, r1)}
+
+Estimez votre Tarif Jour Moyen au centime près et pilotez votre trésorerie avec sérénité.
+
+Bon calcul,
+L équipe Solopreneur&Co
+
+{desabonner}`,
+      triggerType: 'IMMEDIATE',
+      delayHours: 0,
+      delayMinutes: 0,
+      status: 'ACTIVE',
+      parentId: welcomeStep1.id,
+    },
+  });
+
+  const subEmail3 = await prisma.emailSequenceStep.create({
+    data: {
+      campaignId: campaign.id,
+      stepOrder: 1,
+      subject: '⚡ [Sous-Email 1.3] Variante Organisation : Votre Workspace Notion',
+      content: `Bonjour {prenom},
+
+Voici votre sous-email spécifique dédié à l organisation et à la productivité !
+
+Pour regrouper tous vos projets clients, vos tâches et vos notes au même endroit, dupliquez notre modèle complet :
+👉 ${makeLink(`Accéder à : ${r2Name}`, r2)}
+
+Un espace unique pour libérer votre esprit et travailler avec efficacité.
+
+À votre succès,
+L équipe Solopreneur&Co
+
+{desabonner}`,
+      triggerType: 'IMMEDIATE',
+      delayHours: 0,
+      delayMinutes: 0,
+      status: 'ACTIVE',
+      parentId: welcomeStep1.id,
+    },
+  });
+
+  console.log('✅ 3 Sous-emails (Variantes 1.1, 1.2, 1.3) rattachés avec succès à l Étape #1 !');
+
+  // -------------------------------------------------------------
+  // PART 3: WELCOME EMAILS 2 TO 5
+  // -------------------------------------------------------------
+  const remainingWelcomeEmails = [
     {
       stepOrder: 2,
       subject: '🚀 [Bienvenue 2/5] Comment bien démarrer avec vos premiers outils gratuits',
@@ -225,7 +315,7 @@ L équipe Solopreneur&Co
   ];
 
   // -------------------------------------------------------------
-  // PART 2: 15 SEQUENCE EMAILS (VALEUR & RELATIONS RESSOURCES)
+  // PART 4: 15 SEQUENCE EMAILS (VALEUR & RELATIONS RESSOURCES)
   // -------------------------------------------------------------
   const sequenceEmails = [
     {
@@ -539,12 +629,12 @@ L équipe Solopreneur&Co
     },
   ];
 
-  // Combine welcome and sequence emails
-  const allEmails = [...welcomeEmails, ...sequenceEmails];
+  // Insert remaining welcome and sequence emails
+  const remainingEmails = [...remainingWelcomeEmails, ...sequenceEmails];
 
-  console.log(`✉️ Saving ${allEmails.length} sequence steps (5 Welcome + 15 Sequence Emails) to database...`);
+  console.log(`✉️ Saving ${remainingEmails.length} remaining sequence steps to database...`);
 
-  for (const item of allEmails) {
+  for (const item of remainingEmails) {
     await prisma.emailSequenceStep.create({
       data: {
         campaignId: campaign.id,
@@ -559,7 +649,7 @@ L équipe Solopreneur&Co
     });
   }
 
-  console.log(`✅ SUCCESS! Created ${allEmails.length} emails (5 Welcome + 15 Sequence) in COMPAGNE RESSOURCES !`);
+  console.log(`✅ SUCCESS! COMPAGNE RESSOURCES now contains 23 total emails (5 Welcome + 3 Sub-Emails + 15 Sequence Nurture) !`);
 }
 
 seedResourcesCampaign()
