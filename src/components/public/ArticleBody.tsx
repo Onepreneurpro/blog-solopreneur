@@ -30,7 +30,7 @@ export function ArticleBody({ content, isDark = false }: ArticleBodyProps) {
   if (!hasOptIn) {
     return (
       <div
-        className={`p-6 sm:p-10 rounded-3xl border shadow-xl prose max-w-none leading-relaxed space-y-6 ${
+        className={`p-6 sm:p-10 rounded-md border shadow-xl prose max-w-none leading-relaxed space-y-6 [&_img]:rounded-md [&_blockquote]:rounded-md [&_figure]:rounded-md ${
           isDark ? 'bg-slate-900/80 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
         }`}
         dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
@@ -44,7 +44,7 @@ export function ArticleBody({ content, isDark = false }: ArticleBodyProps) {
 
   return (
     <div
-      className={`p-6 sm:p-10 rounded-3xl border shadow-xl prose max-w-none leading-relaxed space-y-6 ${
+      className={`p-6 sm:p-10 rounded-md border shadow-xl prose max-w-none leading-relaxed space-y-6 [&_img]:rounded-md [&_blockquote]:rounded-md [&_figure]:rounded-md ${
         isDark ? 'bg-slate-900/80 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
       }`}
     >
