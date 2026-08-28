@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -90,6 +91,13 @@ export async function PUT(request: Request) {
       update: { value: JSON.stringify(mergedValues) },
       create: { key: 'general_settings', value: JSON.stringify(mergedValues) },
     });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/boutique');
+      revalidatePath('/admin/homepage');
+      revalidatePath('/admin/categories-produits');
+    } catch (e) {}
 
     return NextResponse.json({ success: true, settings: mergedValues });
   } catch (error: any) {

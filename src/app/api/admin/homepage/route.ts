@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -244,6 +245,12 @@ export async function PUT(request: Request) {
       const updatedSections = await prisma.homepageSection.findMany({
         orderBy: { order: 'asc' },
       });
+
+      try {
+        revalidatePath('/');
+        revalidatePath('/boutique');
+        revalidatePath('/admin/homepage');
+      } catch (e) {}
 
       return NextResponse.json({ success: true, sections: updatedSections });
     }
