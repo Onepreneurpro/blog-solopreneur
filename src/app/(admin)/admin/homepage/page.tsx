@@ -649,6 +649,7 @@ export default function AdminHomepageBuilderPage() {
   };
 
   const isPixelFunnelActive = activeSiteTheme === 'pixel-funnel';
+  const heroSection = sections.find((s) => s.sectionKey === 'HERO') || sections[0];
 
   return (
     <div className="space-y-6 w-full max-w-none pt-2">
@@ -922,32 +923,52 @@ export default function AdminHomepageBuilderPage() {
           {/* TAB 1: BADGE FLOTTANT */}
           {activeHeroTab === 'badge' && (
             <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-extrabold text-purple-950 mb-1">
+                  Contenu du Texte du Badge Flottant / Ticker
+                </label>
+                <input
+                  type="text"
+                  value={heroSection?.settings?.topTickerText || heroSection?.settings?.floatingBadge || '🚀 Nouveau Système 2026 • +5,400 Solopreneurs Équipés'}
+                  onChange={(e) => {
+                    if (heroSection) {
+                      handleSettingChange(heroSection.id, 'topTickerText', e.target.value);
+                      handleSettingChange(heroSection.id, 'floatingBadge', e.target.value);
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Texte du badge..."
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {!homeHeroFontGlobal && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
-                    <select
-                      value={homeHeroBadgeFont}
-                      onChange={(e) => setHomeHeroBadgeFont(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
-                    >
-                      {GOOGLE_FONTS_OPTIONS.map((f) => (
-                        <option key={f.name} value={f.name}>{f.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Badge</label>
+                  <select
+                    value={homeHeroBadgeFont}
+                    onChange={(e) => {
+                      setHomeHeroBadgeFont(e.target.value);
+                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
+                    }}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                  >
+                    {GOOGLE_FONTS_OPTIONS.map((f) => (
+                      <option key={f.name} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille de Police</label>
                   <select
                     value={homeHeroBadgeSize}
                     onChange={(e) => setHomeHeroBadgeSize(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     <option value="11px">Discret (11px)</option>
                     <option value="13px">Standard (13px)</option>
                     <option value="15px">Grand (15px)</option>
+                    <option value="18px">Très Grand (18px)</option>
                   </select>
                 </div>
 
@@ -978,35 +999,68 @@ export default function AdminHomepageBuilderPage() {
             </div>
           )}
 
-          {/* TAB 2: TITRE PRINCIPAL H1 */}
+          {/* TAB 2: TITRE PRINCIPAL H1 HERO */}
           {activeHeroTab === 'title' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {!homeHeroFontGlobal && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre H1</label>
-                    <select
-                      value={homeHeroTitleFont}
-                      onChange={(e) => setHomeHeroTitleFont(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-extrabold text-purple-950">
+                    Contenu du Titre Principal H1
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'mark')}
+                      className="px-2 py-0.5 rounded bg-[#a3e635] text-slate-950 text-[10px] font-black"
                     >
-                      {GOOGLE_FONTS_OPTIONS.map((f) => (
-                        <option key={f.name} value={f.name}>{f.name}</option>
-                      ))}
-                    </select>
+                      + Surligner Néon (&lt;mark&gt;)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => heroSection && insertFormattedTag(heroSection.id, 'title', 'u')}
+                      className="px-2 py-0.5 rounded bg-white text-purple-950 border border-purple-300 text-[10px] font-black"
+                    >
+                      + Souligner (&lt;u&gt;)
+                    </button>
                   </div>
-                )}
+                </div>
+                <input
+                  type="text"
+                  value={heroSection?.title || ''}
+                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'title', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Titre H1..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Titre H1</label>
+                  <select
+                    value={homeHeroTitleFont}
+                    onChange={(e) => {
+                      setHomeHeroTitleFont(e.target.value);
+                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
+                    }}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                  >
+                    {GOOGLE_FONTS_OPTIONS.map((f) => (
+                      <option key={f.name} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Titre H1</label>
                   <select
                     value={homeHeroTitleSize}
                     onChange={(e) => setHomeHeroTitleSize(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
-                    <option value="36px">Moyenne (36px)</option>
+                    <option value="32px">Moyenne (32px)</option>
                     <option value="48px">Grande (48px)</option>
                     <option value="64px">Géante (64px)</option>
+                    <option value="72px">Ultra Géante (72px)</option>
                   </select>
                 </div>
 
@@ -1037,24 +1091,52 @@ export default function AdminHomepageBuilderPage() {
             </div>
           )}
 
-          {/* TAB 3: ACCENT NEON <mark> */}
+          {/* TAB 3: MOT SURLIGNÉ & NEON */}
           {activeHeroTab === 'accent' && (
             <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-extrabold text-purple-950 mb-1">
+                  Mot ou Expression Surlignée Néon (dans &lt;mark&gt;)
+                </label>
+                <input
+                  type="text"
+                  value={
+                    (heroSection?.title?.match(/<mark[^>]*>(.*?)<\/mark>/i)?.[1]) || 'gagner plus'
+                  }
+                  onChange={(e) => {
+                    if (heroSection) {
+                      const newWord = e.target.value;
+                      const currentTitle = heroSection.title || '';
+                      let updatedTitle = '';
+                      if (currentTitle.includes('<mark')) {
+                        updatedTitle = currentTitle.replace(/<mark[^>]*>(.*?)<\/mark>/gi, `<mark color="${homeHeroAccentColor}">${newWord}</mark>`);
+                      } else {
+                        updatedTitle = `${currentTitle} <mark color="${homeHeroAccentColor}">${newWord}</mark>`;
+                      }
+                      handleFieldChange(heroSection.id, 'title', updatedTitle);
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Mot à surligner..."
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {!homeHeroFontGlobal && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Texte Accentué</label>
-                    <select
-                      value={homeHeroAccentFont}
-                      onChange={(e) => setHomeHeroAccentFont(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
-                    >
-                      {GOOGLE_FONTS_OPTIONS.map((f) => (
-                        <option key={f.name} value={f.name}>{f.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Mot Accentué</label>
+                  <select
+                    value={homeHeroAccentFont}
+                    onChange={(e) => {
+                      setHomeHeroAccentFont(e.target.value);
+                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
+                    }}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                  >
+                    {GOOGLE_FONTS_OPTIONS.map((f) => (
+                      <option key={f.name} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Couleur Neon du Surlignage (&lt;mark&gt;)</label>
@@ -1086,32 +1168,47 @@ export default function AdminHomepageBuilderPage() {
           {/* TAB 4: SOUS-TITRE / DESCRIPTION */}
           {activeHeroTab === 'subtitle' && (
             <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-extrabold text-purple-950 mb-1">
+                  Contenu du Sous-titre / Description (Modifiable librement)
+                </label>
+                <textarea
+                  rows={2}
+                  value={heroSection?.subtitle || ''}
+                  onChange={(e) => heroSection && handleFieldChange(heroSection.id, 'subtitle', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Description..."
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {!homeHeroFontGlobal && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
-                    <select
-                      value={homeHeroSubtitleFont}
-                      onChange={(e) => setHomeHeroSubtitleFont(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
-                    >
-                      {GOOGLE_FONTS_OPTIONS.map((f) => (
-                        <option key={f.name} value={f.name}>{f.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[11px] font-bold text-purple-950 mb-1">Police du Sous-titre</label>
+                  <select
+                    value={homeHeroSubtitleFont}
+                    onChange={(e) => {
+                      setHomeHeroSubtitleFont(e.target.value);
+                      if (homeHeroFontGlobal) setHomeHeroFontGlobal(false);
+                    }}
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
+                  >
+                    {GOOGLE_FONTS_OPTIONS.map((f) => (
+                      <option key={f.name} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-[11px] font-bold text-purple-950 mb-1">Taille du Sous-titre</label>
                   <select
                     value={homeHeroSubtitleSize}
                     onChange={(e) => setHomeHeroSubtitleSize(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold"
+                    className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
                   >
                     <option value="14px">Discret (14px)</option>
-                    <option value="18px">Standard (18px)</option>
-                    <option value="22px">Grand (22px)</option>
+                    <option value="16px">Standard (16px)</option>
+                    <option value="18px">Grand (18px)</option>
+                    <option value="22px">Très Grand (22px)</option>
                   </select>
                 </div>
 
