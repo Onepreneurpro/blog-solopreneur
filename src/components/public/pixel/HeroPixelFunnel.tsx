@@ -182,7 +182,7 @@ export function HeroPixelFunnel({
                 {/* CIRCULAR AVATAR PHOTO & PROFILE HEADER */}
                 <div className="flex items-center gap-3.5 border-b border-white/10 pb-3">
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-md border-2 border-[#a3e635] overflow-hidden shadow-xl shadow-[#a3e635]/30 relative">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#a3e635] overflow-hidden shadow-xl shadow-[#a3e635]/30 relative">
                       <Image
                         src={creatorAvatar}
                         alt="Photo du Créateur"
@@ -191,7 +191,7 @@ export function HeroPixelFunnel({
                         priority
                       />
                     </div>
-                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-[#a3e635] border-2 border-slate-950 shadow-md" />
+                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#a3e635] border-2 border-slate-950 shadow-md z-10" />
                   </div>
 
                   <div className="space-y-0.5">
