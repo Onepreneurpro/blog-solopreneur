@@ -507,19 +507,6 @@ function CheckoutContent() {
                 </div>
               </div>
 
-              {/* SECTION 3: COMMENTAIRE DISCRET AU BAS DU BLOC FUSIONNÉ */}
-              <div className={`p-3 rounded-xl text-xs space-y-0.5 ${
-                isDark ? 'bg-slate-950/40 text-slate-300 border border-white/5' : 'bg-purple-50/50 text-purple-950 border border-purple-100'
-              }`}>
-                <div className="font-bold text-[11px] flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#a3e635]" />
-                  <span>Accès gratuit & direct sans CB</span>
-                </div>
-                <p className="text-[10px] opacity-75 leading-relaxed">
-                  Aucune carte bancaire requise. Accès instantané à la validation.
-                </p>
-              </div>
-
               {/* SECTION 4: BÉNÉFICES & CONCEPS INCLUS AVEC LA RESSOURCE */}
               <div className={`p-4 rounded-2xl space-y-3 pt-3.5 border-t ${
                 isDark ? 'bg-slate-950/60 border-white/10 text-slate-200' : 'bg-slate-50/80 border-slate-200 text-slate-800'
