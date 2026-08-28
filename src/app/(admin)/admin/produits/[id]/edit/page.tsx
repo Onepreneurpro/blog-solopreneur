@@ -12,7 +12,7 @@ const ICON_PRESETS = [
   { label: 'Notion', url: '/images/logos/notion-logo.webp' },
   { label: 'Excel', url: '/images/logos/excel-logo.png' },
   { label: 'Systeme.io', url: '/images/logos/systemeio-logo.jpg' },
-  { label: 'PWA Web App', url: '/images/logos/pwa-logo.png' },
+  { label: 'Web App', url: '/images/logos/webapp-logo.png' },
 ];
 
 export default function EditProductAdminPage() {

@@ -8,6 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import IconCropperModal from '@/components/admin/IconCropperModal';
 
+const ICON_PRESETS = [
+  { label: 'Notion', url: '/images/logos/notion-logo.webp' },
+  { label: 'Excel', url: '/images/logos/excel-logo.png' },
+  { label: 'Systeme.io', url: '/images/logos/systemeio-logo.jpg' },
+  { label: 'Web App', url: '/images/logos/webapp-logo.png' },
+];
+
 export default function AdminRessourcesPage() {
   const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -500,6 +507,27 @@ export default function AdminRessourcesPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Icône / Logo du Récapitulatif (Optionnel)</label>
+                
+                {/* QUICK PRESET LOGOS */}
+                <div className="flex flex-wrap items-center gap-2 mb-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="text-[11px] font-bold text-slate-600">Choix rapide :</span>
+                  {ICON_PRESETS.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => setIcon(preset.url)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border flex items-center gap-1.5 transition-all ${
+                        icon === preset.url
+                          ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <img src={preset.url} alt={preset.label} className="w-4 h-4 object-contain rounded" />
+                      <span>{preset.label}</span>
+                    </button>
+                  ))}
+                </div>
+
                 <input
                   type="file"
                   accept="image/*"
@@ -510,8 +538,8 @@ export default function AdminRessourcesPage() {
                 {icon && (
                   <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-between gap-3 mt-2">
                     <div className="flex items-center gap-2.5">
-                      <img src={icon} alt="Icône" className="w-9 h-9 rounded-lg object-cover border border-purple-300 shadow-sm" />
-                      <span className="text-xs font-extrabold text-purple-950">Icône du récapitulatif activée</span>
+                      <img src={icon} alt="Icône" className="w-9 h-9 rounded-lg object-contain border border-purple-300 shadow-sm bg-white" />
+                      <span className="text-xs font-extrabold text-purple-950">Icône activée</span>
                     </div>
                     <button
                       type="button"
@@ -758,6 +786,27 @@ export default function AdminRessourcesPage() {
 
                               <div>
                                 <label className="block text-[10px] font-bold text-slate-700 mb-1">Icône / Logo du Récapitulatif (Optionnel)</label>
+                                
+                                {/* QUICK PRESET LOGOS */}
+                                <div className="flex flex-wrap items-center gap-1.5 mb-1.5 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                  <span className="text-[10px] font-bold text-slate-600">Choix rapide :</span>
+                                  {ICON_PRESETS.map((preset) => (
+                                    <button
+                                      key={preset.label}
+                                      type="button"
+                                      onClick={() => setEditIcon(preset.url)}
+                                      className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border flex items-center gap-1 transition-all ${
+                                        editIcon === preset.url
+                                          ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                                      }`}
+                                    >
+                                      <img src={preset.url} alt={preset.label} className="w-3.5 h-3.5 object-contain rounded" />
+                                      <span>{preset.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+
                                 <input
                                   type="file"
                                   accept="image/*"
@@ -768,7 +817,7 @@ export default function AdminRessourcesPage() {
                                 {editIcon && (
                                   <div className="mt-1.5 p-1.5 bg-white border border-purple-200 rounded-xl flex items-center justify-between gap-2 shadow-sm">
                                     <div className="flex items-center gap-2">
-                                      <img src={editIcon} alt="Icône" className="w-8 h-8 rounded-lg object-cover border border-purple-300 shadow-sm" />
+                                      <img src={editIcon} alt="Icône" className="w-8 h-8 rounded-lg object-contain border border-purple-300 shadow-sm bg-white" />
                                       <span className="text-xs font-extrabold text-purple-950">Icône activée</span>
                                     </div>
                                     <button
