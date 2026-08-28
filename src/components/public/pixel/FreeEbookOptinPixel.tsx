@@ -438,32 +438,32 @@ export function FreeEbookOptinPixel({
   }
 
   return (
-    <section className="py-16 sm:py-24 bg-white text-white border-b border-slate-200 relative overflow-hidden">
+    <section className="py-8 sm:py-12 bg-white text-white border-b border-slate-200 relative overflow-hidden">
       
       {/* AMBIENT GLOW */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#a3e635]/15 rounded-full blur-[200px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* INNER DARK CARD FRAME ON WHITE CANVAS */}
-        <div className="bg-slate-950 p-8 sm:p-12 rounded-3xl border-2 border-slate-900 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+        <div className="bg-slate-950 p-5 sm:p-7 rounded-2xl border-2 border-slate-900 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* LEFT FORM COLUMN */}
-          <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
-            <div className="space-y-4 text-center">
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-3.5">
+            <div className="space-y-2 text-center">
               <div className="flex justify-center w-full">
-                <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-md text-sm sm:text-base font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
-                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-4 h-4 shrink-0 animate-pulse" style={iconStyle} />}
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-heading font-black bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]/40 shadow-md uppercase tracking-wider whitespace-nowrap shrink-0" style={badgeStyle}>
+                  {SelectedBadgeIcon && <SelectedBadgeIcon className="w-3.5 h-3.5 shrink-0 animate-pulse" style={iconStyle} />}
                   <span>{badgeText}</span>
                 </div>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-white tracking-tight leading-tight text-center max-w-xl mx-auto" style={titleStyle}>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black text-white tracking-tight leading-snug text-center max-w-lg mx-auto" style={titleStyle}>
                 <FormattedText text={finalTitle} />
               </h2>
 
               {finalSubtitle && (
-                <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal text-center max-w-lg mx-auto" style={subtitleStyle}>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal text-center max-w-md mx-auto" style={subtitleStyle}>
                   <FormattedText text={finalSubtitle} />
                 </p>
               )}
@@ -481,73 +481,73 @@ export function FreeEbookOptinPixel({
               </div>
             ) : step === 'DETAILS' ? (
               /* STEP 1: INITIAL DETAILS FORM */
-              <form onSubmit={handleSendCode} className="space-y-3.5 pt-2 flex flex-col justify-between flex-grow">
-                <div className="space-y-3">
+              <form onSubmit={handleSendCode} className="space-y-2.5 pt-1 flex flex-col justify-between flex-grow">
+                <div className="space-y-2">
                   {errorMsg && (
-                    <div className="p-3 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold animate-in fade-in">
+                    <div className="p-2.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-lg text-xs font-bold animate-in fade-in">
                       {errorMsg}
                     </div>
                   )}
 
                   {/* ROW 1: PRÉNOM ET NOM CÔTE À CÔTE */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="Votre Prénom*"
                         required
-                        className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#0b0f19] border-2 border-white/10 text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-lg bg-[#0b0f19] border border-white/10 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                       />
                     </div>
                     <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         placeholder="Votre Nom"
-                        className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#0b0f19] border-2 border-white/10 text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-lg bg-[#0b0f19] border border-white/10 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* ROW 2: ADRESSE EMAIL EN DESSOUS EN PLEINE LARGEUR */}
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Votre Email Pro*"
                       required
-                      className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#0b0f19] border-2 border-white/10 text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
+                      className="w-full pl-9 pr-3.5 py-2.5 rounded-lg bg-[#0b0f19] border border-white/10 text-white placeholder-slate-400 text-xs font-medium focus:outline-none focus:border-[#a3e635] focus:ring-2 focus:ring-[#a3e635]/20 transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-2">
+                <div className="space-y-1.5 pt-1">
                   {/* BOUTON SOUMISSION STEP 1 */}
                   <Button
                     type="submit"
                     disabled={loading}
                     size="lg"
                     style={btnStyle}
-                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-lg sm:text-xl py-3.5 sm:py-4 rounded-xl shadow-xl shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
+                    className="w-full bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-base sm:text-lg py-2.5 sm:py-3 rounded-lg shadow-lg shadow-[#a3e635]/25 border-0 hover:scale-[1.01] transition-all gap-2"
                   >
                     <span>{loading ? 'Envoi du code...' : btnText}</span>
                   </Button>
 
                   {/* REASSURANCE TEXTS ON THE EXACT SAME LINE */}
-                  <div className="flex flex-row items-center justify-center gap-6 text-xs text-slate-400 pt-1 font-semibold whitespace-nowrap" style={reassuranceStyle}>
+                  <div className="flex flex-row items-center justify-center gap-5 text-[11px] text-slate-400 pt-0.5 font-semibold whitespace-nowrap" style={reassuranceStyle}>
                     <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-[#a3e635] shrink-0" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#a3e635] shrink-0" />
                       <span>{reassuranceText1}</span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4 text-[#a3e635] shrink-0" />
+                      <CheckCircle className="w-3.5 h-3.5 text-[#a3e635] shrink-0" />
                       <span>{reassuranceText2}</span>
                     </span>
                   </div>
@@ -631,28 +631,28 @@ export function FreeEbookOptinPixel({
           </div>
 
           {/* RIGHT COVER IMAGE COLUMN - ALIGNED TOP TO BOTTOM WITH LEFT COLUMN */}
-          <div className="lg:col-span-5 flex justify-center items-stretch h-full">
-            <div className="relative group max-w-[280px] sm:max-w-[320px] w-full h-full flex flex-col justify-stretch">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#a3e635] to-emerald-500 rounded-3xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500" />
+          <div className="lg:col-span-5 flex justify-center items-center h-full">
+            <div className="relative group max-w-[240px] sm:max-w-[270px] w-full h-full flex flex-col justify-stretch">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#a3e635] to-emerald-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition duration-500" />
               
               {bookCoverUrl ? (
                 <img
                   src={bookCoverUrl}
                   alt={bookTitle}
-                  className="relative rounded-2xl border-2 border-slate-800 object-cover w-full h-full min-h-[360px] shadow-2xl"
+                  className="relative rounded-xl border-2 border-slate-800 object-cover w-full h-full min-h-[250px] shadow-2xl"
                 />
               ) : (
-                <div className="relative rounded-2xl border-2 border-slate-800 bg-slate-900 p-8 h-full min-h-[360px] flex flex-col justify-between shadow-2xl text-center">
-                  <div className="space-y-2">
-                    <div className="text-[10px] font-heading font-black text-[#a3e635] uppercase tracking-widest">Guide Solopreneur</div>
-                    <h3 className="text-xl font-heading font-black text-white leading-tight uppercase">{bookTitle}</h3>
+                <div className="relative rounded-xl border-2 border-slate-800 bg-slate-900 p-6 h-full min-h-[250px] flex flex-col justify-between shadow-2xl text-center">
+                  <div className="space-y-1.5">
+                    <div className="text-[9px] font-heading font-black text-[#a3e635] uppercase tracking-widest">Guide Solopreneur</div>
+                    <h3 className="text-lg font-heading font-black text-white leading-tight uppercase">{bookTitle}</h3>
                   </div>
 
-                  <div className="w-20 h-20 rounded-full bg-[#a3e635]/20 text-[#a3e635] flex items-center justify-center mx-auto text-3xl font-black border border-[#a3e635]/30 my-auto">
+                  <div className="w-16 h-16 rounded-full bg-[#a3e635]/20 text-[#a3e635] flex items-center justify-center mx-auto text-2xl font-black border border-[#a3e635]/30 my-auto">
                     📚
                   </div>
 
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     Solopreneur & Co • Edition 2026
                   </div>
                 </div>
