@@ -79,11 +79,11 @@ export function FinalCtaModern({
           </p>
         )}
 
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link href={btnUrl} className="w-full sm:w-auto">
-            <Button size="lg" className="w-full bg-slate-950 hover:bg-slate-900 text-[#ccff00] font-heading font-black text-sm sm:text-base rounded-md px-10 py-6 hover:scale-102 transition-all shadow-2xl" style={btnStyle}>
+            <Button className="w-full sm:w-auto bg-slate-950 hover:bg-slate-900 text-[#ccff00] font-heading font-black text-xs sm:text-sm rounded-xl px-5 py-2.5 sm:px-6 sm:py-3 hover:scale-102 transition-all shadow-lg h-auto" style={btnStyle}>
               <span>{btnText}</span>
-              <ArrowRight className="w-5 h-5 ml-1" />
+              <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </Link>
         </div>

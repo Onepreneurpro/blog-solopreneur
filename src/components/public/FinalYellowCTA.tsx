@@ -46,18 +46,20 @@ export function FinalYellowCTA({
             </p>
           )}
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href={btn1Url}>
-              <Button size="lg" className="px-9 py-6 rounded-full !bg-slate-950 hover:!bg-slate-900 !text-white font-heading font-extrabold text-base shadow-xl border-0 gap-2">
+              <Button className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl !bg-slate-950 hover:!bg-slate-900 !text-white font-heading font-extrabold text-xs sm:text-sm shadow-lg border-0 gap-1.5 h-auto">
                 <span>{btn1Text}</span>
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-            <Link href={btn2Url}>
-              <Button size="lg" variant="outline" className="px-8 py-6 rounded-full !bg-white !text-slate-950 hover:!bg-slate-100 font-heading font-extrabold text-base border-2 border-slate-950 shadow-md">
-                <span>{btn2Text}</span>
-              </Button>
-            </Link>
+            {btn2Text && (
+              <Link href={btn2Url}>
+                <Button variant="outline" className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl !bg-white !text-slate-950 hover:!bg-slate-100 font-heading font-extrabold text-xs sm:text-sm border-2 border-slate-950 shadow-md h-auto">
+                  <span>{btn2Text}</span>
+                </Button>
+              </Link>
+            )}
           </div>
 
           <div className="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs font-heading font-black text-slate-950 uppercase tracking-wider">
