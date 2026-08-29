@@ -74,8 +74,8 @@ export function getProductFormatLogo(product?: {
     fullSearch.includes('crm web')
   ) {
     return {
-      logoUrl: '/images/logos/pwa-logo.png',
-      alt: 'Logo PWA',
+      logoUrl: '/images/logos/webapp-logo.png',
+      alt: 'Logo Web App',
       badgeLabel: 'Application Web PWA',
     };
   }

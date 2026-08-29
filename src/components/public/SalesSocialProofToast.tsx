@@ -3,38 +3,43 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, Sparkles, X, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { getProductFormatLogo } from '@/lib/product-formats';
 
 const RECENT_PROOF_DATA = [
   {
     name: 'Alexandre M.',
     location: 'Paris, France',
     product: 'Checklist Clôture d Exercice & URSSAF',
+    fileType: 'PDF',
     time: 'il y a 4 min',
-    image: '/uploads/1787916424805-il_1588xN.4961319796_ha1x.webp',
+    logoUrl: '/images/logos/notion-logo.webp',
     url: '/boutique/checklist-cloture-declaration-micro-entreprise',
   },
   {
     name: 'Sophie L.',
     location: 'Lyon, France',
     product: 'Dashboard Finances & Facturation Excel',
+    fileType: 'EXCEL',
     time: 'il y a 12 min',
-    image: '/uploads/1787916424842-il_1588xN.4961319862_kxit.webp',
+    logoUrl: '/images/logos/excel-logo.png',
     url: '/boutique/excel-dashboard-tresorerie-suivi-ca-2026',
   },
   {
     name: 'Thomas B.',
     location: 'Bruxelles, Belgique',
     product: 'Planner Solopreneur All-in-One Notion',
+    fileType: 'TEMPLATE NOTION',
     time: 'il y a 19 min',
-    image: '/uploads/1787916424878-il_1588xN.5009583835_bkdb.webp',
+    logoUrl: '/images/logos/notion-logo.webp',
     url: '/boutique/notion-freelance-os-second-cerveau-complete',
   },
   {
     name: 'Camille D.',
     location: 'Genève, Suisse',
     product: 'Kit Prospecting & Script Vente Freelance',
+    fileType: 'TEMPLATESIO',
     time: 'il y a 28 min',
-    image: '/uploads/1787916424914-il_1588xN.5009583857_qpur.webp',
+    logoUrl: '/images/logos/systemeio-logo.jpg',
     url: '/boutique/kit-facturation-relance-automatisee',
   },
 ];
@@ -71,6 +76,11 @@ export default function SalesSocialProofToast() {
 
   const currentProof = RECENT_PROOF_DATA[currentIndex];
   const targetUrl = currentProof.url || '/boutique';
+  const logoInfo = getProductFormatLogo({
+    name: currentProof.product,
+    fileType: currentProof.fileType,
+  });
+  const displayLogoUrl = currentProof.logoUrl || logoInfo.logoUrl;
 
   return (
     <div
@@ -88,15 +98,13 @@ export default function SalesSocialProofToast() {
         {/* NEON LEFT ACCENT BAR */}
         <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-[#00A0FF] to-sky-400"></div>
 
-        {/* THUMBNAIL / ICON */}
-        <div className="relative w-12 h-12 rounded-md overflow-hidden bg-slate-900 border border-white/10 shrink-0 mt-0.5">
-          {currentProof.image ? (
-            <img src={currentProof.image} alt={currentProof.product} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-          ) : (
-            <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5 text-[#00A0FF]" />
-            </div>
-          )}
+        {/* OFFICIAL FORMAT ICON LOGO (EXCEL, NOTION, SYSTEME.IO, WEBAPP) */}
+        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-white/95 border border-[#00A0FF]/40 shrink-0 mt-0.5 flex items-center justify-center p-2 shadow-md group-hover:border-[#00A0FF] transition-all">
+          <img
+            src={displayLogoUrl}
+            alt={logoInfo.alt || currentProof.product}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+          />
           <span className="absolute bottom-0 right-0 bg-[#00A0FF] p-0.5 rounded-tl-md">
             <CheckCircle2 className="w-2.5 h-2.5 text-white" />
           </span>
