@@ -130,18 +130,7 @@ export default function AdminCampaignsPage() {
 
       if (campData.campaigns) {
         setCampaigns(campData.campaigns);
-        setExpandedCampaignIds(campData.campaigns.map((c: EmailCampaign) => c.id));
-        
-        // Expand step #1 variants by default
-        const step1Ids: string[] = [];
-        campData.campaigns.forEach((c: EmailCampaign) => {
-          c.sequences?.forEach((s) => {
-            if (s.stepOrder === 1 || s.triggerType === 'IMMEDIATE') {
-              step1Ids.push(s.id);
-            }
-          });
-        });
-        setExpandedStepVariantIds(step1Ids);
+        // All campaigns are collapsed by default. User manual toggle is preserved.
       }
       if (campData.pendingQueueCount !== undefined) {
         setPendingQueueCount(campData.pendingQueueCount);
