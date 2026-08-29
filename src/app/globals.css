@@ -345,24 +345,23 @@ body.theme-blusky div[class*="from-purple-900"] {
   color: #0f172a !important;
 }
 
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 span,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 span:not(button span):not(.btn *),
 body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 h3,
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 span,
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 h3,
-body.theme-blusky div[class*="from-purple-900"] span,
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 span:not(button span):not(.btn *),
+body.theme-blusky div[class*="from-purple-900"] span:not(button span):not(.btn *),
 body.theme-blusky div[class*="from-purple-900"] h3 {
   color: #0f172a !important;
 }
 
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 p,
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 p,
-body.theme-blusky div[class*="from-purple-900"] p {
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 p:not(button p),
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 p:not(button p),
+body.theme-blusky div[class*="from-purple-900"] p:not(button p) {
   color: #475569 !important;
 }
 
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 svg,
-body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 svg,
-body.theme-blusky div[class*="from-purple-900"] svg {
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/60 svg:not(button svg),
+body.theme-blusky .bg-gradient-to-br.from-purple-900\/50 svg:not(button svg),
+body.theme-blusky div[class*="from-purple-900"] svg:not(button svg) {
   color: #00A0FF !important;
 }
 
@@ -412,6 +411,19 @@ body.theme-blusky .bg-purple-800:hover,
 body.theme-blusky .bg-purple-700:hover,
 body.theme-blusky .bg-purple-900:hover {
   background-color: #0082D6 !important;
+  color: #ffffff !important;
+}
+
+/* Force PURE WHITE text and icons on all blue/purple buttons */
+button.bg-\[\#00A0FF\],
+button.bg-\[\#00A0FF\] span,
+button.bg-\[\#00A0FF\] svg,
+button.btn-purple,
+button.btn-purple span,
+button.btn-purple svg,
+.btn-purple,
+.btn-purple span,
+.btn-purple svg {
   color: #ffffff !important;
 }
 
