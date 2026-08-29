@@ -214,15 +214,15 @@ export function FreeResourcesSection({
               </div>
 
               {/* CARD FOOTER WITH HIGH IMPACT BUTTON */}
-              <div className="space-y-3 pt-3 px-1">
-                <div className="flex items-baseline justify-between border-t border-white/10 pt-2.5 text-xs">
-                  <span className="text-[#a3e635] font-black uppercase">100% GRATUIT</span>
-                  <span className="text-slate-500 line-through font-semibold font-mono">19.00 €</span>
+              <div className="pt-4 pb-1 px-1 space-y-2.5">
+                <div className="flex items-baseline justify-between border-t border-slate-200 dark:border-white/10 pt-3 pb-1 text-xs">
+                  <span className="text-[#00A0FF] font-black uppercase tracking-wider">100% GRATUIT</span>
+                  <span className="text-slate-400 line-through font-semibold font-mono text-[11px]">19.00 €</span>
                 </div>
 
-                <Link href={`/checkout?productId=${res.id}`}>
-                  <Button size="sm" className={`w-full py-2.5 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 ${
-                    isDark ? 'bg-[#a3e635] hover:bg-[#b8f542] text-slate-950' : 'btn-purple'
+                <Link href={`/checkout?productId=${res.id}`} className="block pt-1">
+                  <Button size="sm" className={`w-full py-2.5 sm:py-3 font-heading font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 ${
+                    isDark ? 'bg-[#00A0FF] hover:bg-[#0080FF] text-white' : 'btn-purple !bg-[#00A0FF] hover:!bg-[#0080FF] !text-white'
                   }`}>
                     <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                     <span>Obtenir gratuitement</span>
