@@ -811,11 +811,14 @@ export default function AdminCampaignsPage() {
                         {camp.name}
                       </h2>
 
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-heading font-black border ${
-                        camp.status === 'ACTIVE'
-                          ? 'bg-[#a3e635] text-slate-950 border-[#86efac]'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                      }`}>
+                      <span
+                        className="px-2.5 py-0.5 rounded-full text-[10px] font-heading font-black border shadow-xs"
+                        style={
+                          camp.status === 'ACTIVE'
+                            ? { backgroundColor: '#00A0FF', color: '#ffffff', borderColor: '#38bdf8' }
+                            : { backgroundColor: '#fbbf24', color: '#451a03', borderColor: '#f59e0b' }
+                        }
+                      >
                         {camp.status === 'ACTIVE' ? 'Active' : 'En pause'}
                       </span>
 
@@ -900,9 +903,9 @@ export default function AdminCampaignsPage() {
                     <Button
                       onClick={() => openAddStepModal(camp)}
                       size="sm"
-                      className="bg-[#a3e635] text-slate-950 hover:bg-[#b8f542] font-heading font-black text-xs gap-1.5 shadow-md border-0"
+                      className="bg-[#00A0FF] text-white hover:bg-[#0082D6] font-heading font-black text-xs gap-1.5 shadow-md border-0"
                     >
-                      <Plus className="w-4 h-4 text-slate-950" />
+                      <Plus className="w-4 h-4 text-white" />
                       <span>+ Ajouter un email</span>
                     </Button>
 
@@ -911,22 +914,24 @@ export default function AdminCampaignsPage() {
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
                         size="sm"
-                        className="!bg-amber-500 hover:!bg-amber-600 !text-amber-950 font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-colors cursor-pointer"
+                        className="font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
+                        style={{ backgroundColor: '#f59e0b', color: '#ffffff' }}
                         title="Mettre en pause cette campagne"
                       >
-                        <Pause className="w-3.5 h-3.5 !text-amber-950 stroke-[2.5]" />
-                        <span>Pause</span>
+                        <Pause className="w-3.5 h-3.5 stroke-[2.5]" style={{ color: '#ffffff' }} />
+                        <span style={{ color: '#ffffff' }}>Pause</span>
                       </Button>
                     ) : (
                       <Button
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
                         size="sm"
-                        className="!bg-emerald-500 hover:!bg-emerald-600 !text-emerald-950 font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-colors cursor-pointer"
+                        className="font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
+                        style={{ backgroundColor: '#10b981', color: '#ffffff' }}
                         title="Reprendre et réactiver cette campagne"
                       >
-                        <Play className="w-3.5 h-3.5 !text-emerald-950 stroke-[2.5]" />
-                        <span>Reprendre</span>
+                        <Play className="w-3.5 h-3.5 stroke-[2.5]" style={{ color: '#ffffff' }} />
+                        <span style={{ color: '#ffffff' }}>Reprendre</span>
                       </Button>
                     )}
 
