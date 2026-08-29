@@ -415,6 +415,33 @@ body.theme-blusky .bg-purple-900:hover {
   color: #ffffff !important;
 }
 
+/* Explicit Action Buttons for Campaign Management (Green for Reprendre, Violet for Pause) */
+body.theme-blusky .btn-reprendre-green,
+.btn-reprendre-green {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+body.theme-blusky .btn-reprendre-green:hover,
+.btn-reprendre-green:hover {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+body.theme-blusky .btn-pause-violet,
+.btn-pause-violet {
+  background-color: #8b5cf6 !important;
+  color: #ffffff !important;
+  border-color: #8b5cf6 !important;
+}
+
+body.theme-blusky .btn-pause-violet:hover,
+.btn-pause-violet:hover {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
 /* Minimal Rounded Corners Override for Admin Management Blocks & Inner Elements */
 main .rounded-3xl,
 main .rounded-2xl,

@@ -914,24 +914,22 @@ export default function AdminCampaignsPage() {
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
                         size="sm"
-                        className="font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
-                        style={{ backgroundColor: '#f59e0b', color: '#ffffff' }}
+                        className="btn-pause-violet font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
                         title="Mettre en pause cette campagne"
                       >
-                        <Pause className="w-3.5 h-3.5 stroke-[2.5]" style={{ color: '#ffffff' }} />
-                        <span style={{ color: '#ffffff' }}>Pause</span>
+                        <Pause className="w-3.5 h-3.5 !text-white stroke-[2.5]" />
+                        <span className="!text-white">Pause</span>
                       </Button>
                     ) : (
                       <Button
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
                         size="sm"
-                        className="font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
-                        style={{ backgroundColor: '#10b981', color: '#ffffff' }}
+                        className="btn-reprendre-green font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-all cursor-pointer"
                         title="Reprendre et réactiver cette campagne"
                       >
-                        <Play className="w-3.5 h-3.5 stroke-[2.5]" style={{ color: '#ffffff' }} />
-                        <span style={{ color: '#ffffff' }}>Reprendre</span>
+                        <Play className="w-3.5 h-3.5 !text-white stroke-[2.5]" />
+                        <span className="!text-white">Reprendre</span>
                       </Button>
                     )}
 
