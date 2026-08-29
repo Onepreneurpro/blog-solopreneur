@@ -11,7 +11,7 @@ const DEFAULT_SECTIONS = [
   {
     sectionKey: 'HERO',
     title: 'Les formations & templates qui te font <mark>gagner plus</mark> en freelance.',
-    subtitle: 'Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d affaires.',
+    subtitle: "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d'affaires.",
     isEnabled: true,
     order: 0,
     settings: JSON.stringify({
@@ -62,7 +62,7 @@ const DEFAULT_SECTIONS = [
   {
     sectionKey: 'PRODUCTS',
     title: 'Boutique Digitale : Nos Meilleurs Outillages & Templates',
-    subtitle: 'Des systèmes prêts à l emploi pour structurer votre activité sans réinventer la roue.',
+    subtitle: "Des systèmes prêts à l'emploi pour structurer votre activité sans réinventer la roue.",
     isEnabled: true,
     order: 3,
     settings: JSON.stringify({
@@ -85,7 +85,7 @@ const DEFAULT_SECTIONS = [
       review1Quote: 'Le workspace Notion et le dashboard de trésorerie ont totalement changé ma gestion quotidienne. Je gagne plus de 5h par semaine et mes relances clients sont automatisées !',
       review1Author: 'Sophie C.',
       review1Role: 'Consultante Marketing & Freelance',
-      btn1Text: 'Explorer nos outillages prêts à l emploi →',
+      btn1Text: "Explorer nos outillages prêts à l'emploi →",
       btn1Url: '/boutique',
       btn1Style: 'yellow',
     }),

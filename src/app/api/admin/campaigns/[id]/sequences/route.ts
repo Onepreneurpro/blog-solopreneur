@@ -55,6 +55,6 @@ export async function POST(
     return NextResponse.json({ success: true, sequence: newStep });
   } catch (error: any) {
     console.error('Error creating sequence step:', error);
-    return NextResponse.json({ error: error?.message || 'Erreur lors de la création de la séquence d email' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Erreur lors de la création de la séquence d'email" }, { status: 500 });
   }
 }

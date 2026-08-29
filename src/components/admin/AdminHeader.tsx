@@ -45,7 +45,7 @@ const ADMIN_LINKS_MAP: Record<string, { label: string; icon: any }> = {
   '/admin/medias': { label: 'Médiathèque', icon: ImageIcon },
   '/admin/themes': { label: 'Thèmes & Templates', icon: Palette },
   '/admin/menus': { label: 'Menus Dynamiques', icon: MenuIcon },
-  '/admin/homepage': { label: 'Page d Accueil Builder', icon: Layout },
+  '/admin/homepage': { label: "Page d'Accueil Builder", icon: Layout },
   '/admin/seo': { label: 'Paramètres SEO', icon: Globe },
   '/admin/parametres': { label: 'Paramètres Généraux', icon: Settings },
 };

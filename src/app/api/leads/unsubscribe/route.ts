@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Vous avez été désabonné(e) de cette séquence d emails avec succès.',
+      message: "Vous avez été désabonné(e) de cette séquence d'emails avec succès.",
     });
   } catch (error: any) {
     console.error('Unsubscribe error:', error);

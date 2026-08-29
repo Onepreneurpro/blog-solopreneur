@@ -44,7 +44,7 @@ const BLOCK_MODELS_DEFAULT: Record<string, { label: string; title: string; subti
   HERO: {
     label: '🚀 HERO (Section Héro Complete)',
     title: "Les formations & templates qui te font <mark color='#a3e635'>gagner plus</mark> en freelance.",
-    subtitle: "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour découpler ton chiffre d affaires.",
+    subtitle: "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour découpler ton chiffre d'affaires.",
     settings: {
       topTickerText: 'Offre Limitée 2026 : Pack Tout-en-Un à -70% !',
       floatingBadge: 'Architecte IA & Solopreneur',
@@ -56,7 +56,7 @@ const BLOCK_MODELS_DEFAULT: Record<string, { label: string; title: string; subti
       creatorTitle: 'Fondateur Solopreneur&Co',
       creatorSubtitle: 'Architecte de Systèmes Notion & Excel',
       creatorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-      creatorQuote: '"Je conçois des systèmes d organisation et de vente clés en main, des templates Notion prêts à l emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu à 10h par semaine."',
+      creatorQuote: "\"Je conçois des systèmes d'organisation et de vente clés en main, des templates Notion prêts à l'emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu'à 10h par semaine.\"",
       exp1: 'Templates Notion v3',
       exp2: 'Dashboards Excel',
       exp3: 'Workflows IA 2026',
@@ -579,7 +579,7 @@ export default function AdminHomepageBuilderPage() {
   };
 
   const handleResetDefaults = async () => {
-    if (!window.confirm('Voulez-vous vraiment restaurer/réinitialiser tous les blocs par défaut de la page d accueil ?')) return;
+    if (!window.confirm("Voulez-vous vraiment restaurer/réinitialiser tous les blocs par défaut de la page d'accueil ?")) return;
     setSaving(true);
     setMessage(null);
     try {
@@ -662,7 +662,7 @@ export default function AdminHomepageBuilderPage() {
       });
 
       if (res.ok) {
-        setMessage('Configuration complète de la page d accueil enregistrée avec succès !');
+        setMessage("Configuration complète de la page d'accueil enregistrée avec succès !");
         setTimeout(() => setMessage(null), 4000);
       } else {
         setMessage('Erreur lors de l enregistrement.');
@@ -684,7 +684,7 @@ export default function AdminHomepageBuilderPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-heading font-black text-slate-950 tracking-tight">Constructeur de Page d Accueil</h1>
+            <h1 className="text-2xl font-heading font-black text-slate-950 tracking-tight">Constructeur de Page d'Accueil</h1>
             <Badge variant="emerald" className="text-xs font-heading font-black bg-[#a3e635] text-slate-950">
               {isPixelFunnelActive ? 'Studio Pixel HighLevel 🚀' : 'Studio Builder ⚡'}
             </Badge>
@@ -742,7 +742,7 @@ export default function AdminHomepageBuilderPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-300 font-medium mt-0.5">
-                Chaque champ ci-dessous commande directement les éléments de votre page d accueil.
+                Chaque champ ci-dessous commande directement les éléments de votre page d'accueil.
               </p>
             </div>
           </div>
@@ -767,7 +767,7 @@ export default function AdminHomepageBuilderPage() {
           <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-purple-600" />
             <h2 className="text-base font-extrabold text-slate-900">
-              Outils de Formatage & Polices Google Fonts (Page d Accueil)
+              Outils de Formatage & Polices Google Fonts (Page d'Accueil)
             </h2>
           </div>
           <Button
@@ -1434,7 +1434,7 @@ export default function AdminHomepageBuilderPage() {
           {/* SECTIONS LIST CANVAS DROPZONE */}
           {loading ? (
             <div className="py-12 text-center text-slate-500 font-medium bg-white rounded-3xl border border-slate-200">
-              Chargement des blocs de la page d accueil...
+              Chargement des blocs de la page d'accueil...
             </div>
           ) : (
             <div
@@ -1586,7 +1586,7 @@ export default function AdminHomepageBuilderPage() {
                                         activeTab === 'cta' ? 'bg-purple-700 text-white shadow-xs' : 'text-purple-950 hover:bg-purple-200/60'
                                       }`}
                                     >
-                                      🚀 4. Bouton d Action
+                                      🚀 4. Bouton d'Action
                                     </button>
 
                                     {['FREE_EBOOK', 'HERO', 'FINAL_CTA'].includes(sec.sectionKey) && (
@@ -2073,7 +2073,7 @@ export default function AdminHomepageBuilderPage() {
                                   {activeTab === 'cta' && (
                                     <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
                                       <label className="block text-xs font-extrabold uppercase text-purple-950">
-                                        🚀 4. Texte & Style du Bouton d Action (Bouton d Envoi)
+                                        🚀 4. Texte & Style du Bouton d'Action (Bouton d Envoi)
                                       </label>
 
                                       {/* POLICE / TAILLE / COULEUR DU BOUTON */}
@@ -2138,7 +2138,7 @@ export default function AdminHomepageBuilderPage() {
                                       </div>
 
                                       <div>
-                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">Texte du Bouton d Action (Envoi)</label>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">Texte du Bouton d'Action (Envoi)</label>
                                         <input
                                           type="text"
                                           value={sec.settings?.btnText || sec.settings?.btn1Text || ''}
@@ -2396,7 +2396,7 @@ export default function AdminHomepageBuilderPage() {
                               <label className="block text-[11px] text-slate-300 font-bold">💬 Texte de la Citation ("Ma Bibliothèques & Systèmes")</label>
                               <textarea
                                 rows={2}
-                                value={settings.creatorQuote || '"Je conçois des systèmes d organisation et de vente clés en main, des templates Notion prêts à l emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu à 10h par semaine."'}
+                                value={settings.creatorQuote || "\"Je conçois des systèmes d'organisation et de vente clés en main, des templates Notion prêts à l'emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu'à 10h par semaine.\""}
                                 onChange={(e) => handleSettingChange(sec.id, 'creatorQuote', e.target.value)}
                                 className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-normal text-xs leading-relaxed"
                               />
@@ -2697,7 +2697,7 @@ export default function AdminHomepageBuilderPage() {
                                 </Link>
                               </div>
                               <p className="text-[10px] text-slate-300 font-medium">
-                                Les personnes qui remplissent ce formulaire sur le site seront automatiquement placées dans la liste choisie ci-dessous et déclencheront sa séquence d emails d accompagnement.
+                                Les personnes qui remplissent ce formulaire sur le site seront automatiquement placées dans la liste choisie ci-dessous et déclencheront sa séquence d'emails d accompagnement.
                               </p>
                               <select
                                 value={settings.targetListId || ''}

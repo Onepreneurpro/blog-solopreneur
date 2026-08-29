@@ -72,7 +72,7 @@ export async function PUT(
     return NextResponse.json({ success: true, sequence: updated });
   } catch (error: any) {
     console.error('Error updating sequence step:', error);
-    return NextResponse.json({ error: error?.message || 'Erreur lors de la modification de la séquence d email' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Erreur lors de la modification de la séquence d'email" }, { status: 500 });
   }
 }
 

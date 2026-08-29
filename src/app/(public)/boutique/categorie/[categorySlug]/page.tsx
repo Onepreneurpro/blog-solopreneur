@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: BoutiqueCategoryPageProps): P
 
   return {
     title: `${category.name} : Produits & Outils - Boutique Solopreneur & Co`,
-    description: category.description || `Découvrez nos ${category.name} et outils prêts à l emploi pour booster votre activité de solopreneur.`,
+    description: category.description || `Découvrez nos ${category.name} et outils prêts à l'emploi pour booster votre activité de solopreneur.`,
     alternates: {
       canonical: `/boutique/categorie/${category.slug}`,
     },
@@ -53,7 +53,7 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
   let storeHeroBadge = 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES';
   let storeHeroTitle = 'Templates Notion & Dashboards Excel';
   let storeHeroTitleAccent = 'Haute Performance';
-  let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
+  let storeHeroSubtitle = "Automatisez votre organisation, suivez vos finances et développez votre activité d'indépendant avec des systèmes testés et prêts à l'emploi.";
 
   let storeHeroFontGlobal = true;
   let storeHeroFontFamily = 'Plus Jakarta Sans';
@@ -380,7 +380,7 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
                       </Link>
 
                       <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
-                        {prod.shortDescription || 'Système complet prêt à l emploi pour booster votre productivité.'}
+                        {prod.shortDescription || "Système complet prêt à l'emploi pour booster votre productivité."}
                       </p>
                     </div>
                   </div>

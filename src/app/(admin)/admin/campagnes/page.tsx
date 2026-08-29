@@ -196,7 +196,7 @@ export default function AdminCampaignsPage() {
         } else if (data.failedCount > 0) {
           setMsg(`⚠️ La relance a échoué. Vérifiez vos quotas ou serveurs SMTP dans Paramètres.`);
         } else {
-          setMsg(`ℹ️ File d attente traitée.`);
+          setMsg(`ℹ️ File d'attente traitée.`);
         }
         setTimeout(() => setMsg(null), 5000);
         fetchData();
@@ -483,7 +483,7 @@ export default function AdminCampaignsPage() {
   };
 
   const handleDeleteCampaign = async (id: string, name: string) => {
-    if (!window.confirm(`Voulez-vous vraiment supprimer la campagne "${name}" et toutes ses séquences d emails ?`)) return;
+    if (!window.confirm(`Voulez-vous vraiment supprimer la campagne "${name}" et toutes ses séquences d'emails ?`)) return;
     try {
       const res = await fetch(`/api/admin/campaigns/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -569,13 +569,13 @@ export default function AdminCampaignsPage() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-heading font-black bg-purple-100 text-purple-900 border border-purple-200 mb-2">
             <Megaphone className="w-3.5 h-3.5 text-purple-700" />
-            <span>Moteur d Email Automation & Séquences</span>
+            <span>Moteur d'Email Automation & Séquences</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-heading font-black text-slate-950 tracking-tight">
             Campagnes d Emails & Séquences
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm font-medium mt-1">
-            Créez une Campagne (avec le serveur SMTP expéditeur et les listes cibles), puis ajoutez-y vos séquences d emails et sous-emails de bienvenue.
+            Créez une Campagne (avec le serveur SMTP expéditeur et les listes cibles), puis ajoutez-y vos séquences d'emails et sous-emails de bienvenue.
           </p>
         </div>
 
@@ -661,7 +661,7 @@ export default function AdminCampaignsPage() {
         </Card>
 
         <Card className="p-5 bg-white border-slate-200 rounded-3xl shadow-sm space-y-1">
-          <div className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-wider">File d Attente & Diagnostic</div>
+          <div className="text-[10px] font-heading font-black text-slate-400 uppercase tracking-wider">File d'Attente & Diagnostic</div>
           <div className="flex items-center justify-between pt-0.5">
             <div className="text-2xl font-heading font-black text-amber-600">{pendingQueueCount}</div>
             <button
@@ -779,7 +779,7 @@ export default function AdminCampaignsPage() {
       {/* LIST OF CAMPAIGNS & THEIR SEQUENCES */}
       {loading ? (
         <div className="p-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">
-          Chargement des campagnes d emails...
+          Chargement des campagnes d'emails...
         </div>
       ) : campaigns.length === 0 ? (
         <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-4">
@@ -787,7 +787,7 @@ export default function AdminCampaignsPage() {
             📧
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-heading font-black text-slate-900">Aucune campagne d emails créée</h3>
+            <h3 className="text-lg font-heading font-black text-slate-900">Aucune campagne d'emails créée</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Créez votre première campagne pour configurer vos emails de bienvenue et vos séquences de relance.
             </p>
@@ -980,7 +980,7 @@ export default function AdminCampaignsPage() {
                     {stepCount === 0 ? (
                       <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                         <p className="text-xs text-slate-500 font-medium">
-                          Cette campagne n a pas encore de séquence d emails.
+                          Cette campagne n a pas encore de séquence d'emails.
                         </p>
                         <Button
                           onClick={() => openAddStepModal(camp)}
@@ -1164,7 +1164,7 @@ export default function AdminCampaignsPage() {
                                               <button
                                                 onClick={() => openEditStepModal(camp, vStep)}
                                                 className="px-2.5 py-1 text-purple-900 hover:bg-purple-200 rounded-lg font-bold text-[11px] flex items-center gap-1 border border-purple-200"
-                                                title="Éditer cette variante d email"
+                                                title="Éditer cette variante d'email"
                                               >
                                                 <Edit3 className="w-3 h-3" />
                                                 <span>Éditer</span>
@@ -1173,7 +1173,7 @@ export default function AdminCampaignsPage() {
                                               <button
                                                 onClick={() => handleDeleteStep(camp.id, vStep.id)}
                                                 className="px-2.5 py-1 text-rose-600 hover:bg-rose-100 rounded-lg font-bold text-[11px] border border-rose-200"
-                                                title="Supprimer cette variante d email"
+                                                title="Supprimer cette variante d'email"
                                               >
                                                 <Trash2 className="w-3 h-3" />
                                               </button>
@@ -1369,7 +1369,7 @@ export default function AdminCampaignsPage() {
                   rows={2}
                   value={campaignDesc}
                   onChange={(e) => setCampaignDesc(e.target.value)}
-                  placeholder="Objectif de cette campagne d emails..."
+                  placeholder="Objectif de cette campagne d'emails..."
                   className="w-full px-3.5 py-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-normal focus:outline-none"
                 />
               </div>

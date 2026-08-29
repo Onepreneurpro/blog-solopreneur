@@ -13,7 +13,7 @@ interface FinalYellowCTAProps {
 
 export function FinalYellowCTA({
   title = "Accède immédiatement à tous nos templates Notion & tableaux Excel.",
-  subtitle = "Profite de nos tarifs préférentiels et télécharge immédiatement l ensemble de tes outils d organisation.",
+  subtitle = "Profite de nos tarifs préférentiels et télécharge immédiatement l'ensemble de tes outils d organisation.",
   settings = {},
 }: FinalYellowCTAProps) {
   const s = safeJsonParse(settings);

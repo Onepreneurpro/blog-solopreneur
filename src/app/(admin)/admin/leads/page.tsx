@@ -140,8 +140,8 @@ export default function AdminLeadsPage() {
         );
         setMsg(
           isCurrentlyBlocked
-            ? `Contact ${lead.email} réactivé ! Sa séquence d emails reprendra normalement.`
-            : `Contact ${lead.email} bloqué ! Sa séquence d emails est suspendue.`
+            ? `Contact ${lead.email} réactivé ! Sa séquence d'emails reprendra normalement.`
+            : `Contact ${lead.email} bloqué ! Sa séquence d'emails est suspendue.`
         );
         setTimeout(() => setMsg(null), 4000);
       }
@@ -332,7 +332,7 @@ export default function AdminLeadsPage() {
 
   const exportCSV = () => {
     if (filteredLeads.length === 0) return;
-    const headers = ['Prénom', 'Email', 'Source', 'Liste Affectée', 'Date d Inscription'];
+    const headers = ['Prénom', 'Email', 'Source', 'Liste Affectée', "Date d'Inscription"];
     const rows = filteredLeads.map((l) => [
       l.firstName || '',
       l.email,

@@ -356,7 +356,7 @@ export default function AdminOrderDetailPage() {
 
               {order.customer?.storeCredit !== undefined && (
                 <div>
-                  <span className="text-slate-400 font-semibold block">Solde d Avoir Client</span>
+                  <span className="text-slate-400 font-semibold block">Solde d'Avoir Client</span>
                   <span className="font-extrabold text-emerald-700 text-xs">{order.customer.storeCredit} €</span>
                 </div>
               )}

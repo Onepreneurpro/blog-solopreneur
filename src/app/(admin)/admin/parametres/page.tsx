@@ -333,7 +333,7 @@ export default function AdminParametresPage() {
               <span>Gestion des Serveurs SMTP (Envoi d Emails Réels)</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Ajoutez vos serveurs SMTP (Brevo, Amazon SES, Mailgun, OVH, Gmail...). Liez ensuite vos campagnes d emails au serveur de votre choix.
+              Ajoutez vos serveurs SMTP (Brevo, Amazon SES, Mailgun, OVH, Gmail...). Liez ensuite vos campagnes d'emails au serveur de votre choix.
             </p>
           </div>
 

@@ -36,7 +36,7 @@ export default async function AdminDashboardPage() {
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Tableau de bord</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Vue d ensemble de l activité de votre plateforme.
+            Vue d'ensemble de l activité de votre plateforme.
           </p>
         </div>
         <div className="flex gap-3">
@@ -58,7 +58,7 @@ export default async function AdminDashboardPage() {
         
         <Card className="p-5 flex items-center justify-between bg-white">
           <div>
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Chiffre d affaires</div>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Chiffre d'affaires</div>
             <div className="text-2xl font-extrabold text-slate-900 mt-1">{totalRevenue.toFixed(2)} €</div>
             <div className="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" /> +12% ce mois

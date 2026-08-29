@@ -69,7 +69,7 @@ async function main() {
       slug: 'finance',
       description: 'Trésorerie, facturation et gestion financière des solopreneurs.',
       seoTitle: 'Gestion Financière & Trésorerie Freelance',
-      seoDescription: 'Maîtrisez votre chiffre d affaires et votre trésorerie.',
+      seoDescription: "Maîtrisez votre chiffre d'affaires et votre trésorerie.",
     },
   });
 
@@ -104,7 +104,7 @@ async function main() {
     create: {
       name: 'Templates Notion',
       slug: 'notion',
-      description: 'Workspaces et dashboards Notion prêts à l emploi.',
+      description: "Workspaces et dashboards Notion prêts à l'emploi.",
     },
   });
 
@@ -232,7 +232,7 @@ async function main() {
     create: {
       name: 'Dashboard Excel Trésorerie & Suivi Financier',
       slug: 'dashboard-excel-tresorerie-suivi',
-      shortDescription: 'Visualisez en temps réel votre cashflow, vos charges et vos prévisions de chiffre d affaires.',
+      shortDescription: "Visualisez en temps réel votre cashflow, vos charges et vos prévisions de chiffre d'affaires.",
       longDescription: `
 <h3>Prenez le contrôle total de vos finances indépendantes</h3>
 <p>Ce tableau de bord automatique sur Excel & Google Sheets inclut :</p>
@@ -285,7 +285,7 @@ async function main() {
       content: `
 <h2>Notre Mission</h2>
 <p>Solopreneur & Co a été créé pour donner aux freelances, consultants et créateurs indépendants les mêmes armes et outils d organisation que les grandes entreprises, en plus simple et plus efficace.</p>
-<p>Nous croyons qu une activité indépendante florissante repose sur 3 piliers : un contenu à forte valeur ajoutée, des systèmes d organisation épurés et une liberté totale dans sa gestion au quotidien.</p>
+<p>Nous croyons qu une activité indépendante florissante repose sur 3 piliers : un contenu à forte valeur ajoutée, des systèmes d'organisation épurés et une liberté totale dans sa gestion au quotidien.</p>
       `,
       status: 'PUBLISHED',
     },
@@ -365,7 +365,7 @@ async function main() {
 
   // 10. Homepage Sections
   const sections = [
-    { sectionKey: 'HERO', title: 'Les outils et ressources pour développer votre activité indépendante.', subtitle: 'Articles, templates Notion et dashboards Excel prêts à l emploi pour freelances, solopreneurs et coachs.', isEnabled: true, order: 1 },
+    { sectionKey: 'HERO', title: 'Les outils et ressources pour développer votre activité indépendante.', subtitle: "Articles, templates Notion et dashboards Excel prêts à l'emploi pour freelances, solopreneurs et coachs.", isEnabled: true, order: 1 },
     { sectionKey: 'CATEGORIES', title: 'Explorez par thématique', subtitle: 'Des guides et ressources ciblés pour chaque étape de votre croissance.', isEnabled: true, order: 2 },
     { sectionKey: 'ARTICLES', title: 'Derniers articles du blog', subtitle: 'Des conseils pratiques sans langue de bois pour optimiser votre quotidien.', isEnabled: true, order: 3 },
     { sectionKey: 'RESOURCES', title: 'Ressources gratuites', subtitle: 'Téléchargez nos guides et checklists 100% offerts.', isEnabled: true, order: 4 },

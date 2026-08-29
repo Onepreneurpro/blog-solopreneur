@@ -432,7 +432,7 @@ function CheckoutContent() {
                       <p className={`text-xs font-medium ${
                         isDark ? 'text-slate-300' : 'text-slate-600'
                       }`}>
-                        Format digital immédiatement disponible & prêt à l emploi.
+                        Format digital immédiatement disponible & prêt à l'emploi.
                       </p>
                     </div>
                   </div>
@@ -911,7 +911,7 @@ function CheckoutContent() {
                           </Link>
 
                           <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
-                            {recProd.shortDescription || 'Système complet prêt à l emploi.'}
+                            {recProd.shortDescription || "Système complet prêt à l'emploi."}
                           </p>
                         </div>
                       </div>

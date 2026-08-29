@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     });
 
     if (!smtpServer) {
-      return NextResponse.json({ error: 'Aucun serveur SMTP n est configuré dans l administration' }, { status: 500 });
+      return NextResponse.json({ error: "Aucun serveur SMTP n est configuré dans l'administration" }, { status: 500 });
     }
 
     const smtpConfig: SmtpServerConfig = {

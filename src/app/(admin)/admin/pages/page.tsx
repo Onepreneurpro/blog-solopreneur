@@ -62,7 +62,7 @@ export default function AdminPagesPage() {
             <span>Gestion des Pages Statiques</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Créez et modifiez vos pages d information avec l éditeur visuel avancé et associez-les aux Menus Dynamiques du site.
+            Créez et modifiez vos pages d'information avec l éditeur visuel avancé et associez-les aux Menus Dynamiques du site.
           </p>
         </div>
 

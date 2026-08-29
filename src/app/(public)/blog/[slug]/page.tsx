@@ -474,7 +474,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
                           <span className="text-xs font-heading font-black text-white shrink-0">{prod.price > 0 ? `${prod.price.toFixed(2)} €` : 'Gratuit'}</span>
                         </div>
                         <h4 className="font-heading font-black text-xs sm:text-sm leading-snug text-white group-hover:text-[#a3e635] transition-colors line-clamp-1">{prod.name}</h4>
-                        <p className="text-xs text-slate-400 font-normal line-clamp-1 leading-normal">{prod.shortDescription || 'Système prêt à l emploi.'}</p>
+                        <p className="text-xs text-slate-400 font-normal line-clamp-1 leading-normal">{prod.shortDescription || "Système prêt à l'emploi."}</p>
                       </div>
                     </Link>
                   ))}

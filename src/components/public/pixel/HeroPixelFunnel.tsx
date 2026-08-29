@@ -17,7 +17,7 @@ interface HeroPixelFunnelProps {
 
 export function HeroPixelFunnel({
   title = "Les formations & templates qui te font <mark color='#a3e635'>gagner plus</mark> en freelance.",
-  subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour découpler ton chiffre d affaires.",
+  subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour découpler ton chiffre d'affaires.",
   settings = {},
   heroStyles = {},
 }: HeroPixelFunnelProps) {
@@ -31,7 +31,7 @@ export function HeroPixelFunnel({
   const creatorAvatar = s.creatorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
   const creatorTitle = s.creatorTitle || 'Fondateur Solopreneur&Co';
   const creatorSubtitle = s.creatorSubtitle || 'Architecte de Systèmes Notion & Excel';
-  const creatorQuote = s.creatorQuote || '"Je conçois des systèmes d organisation et de vente clés en main, des templates Notion prêts à l emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu à 10h par semaine."';
+  const creatorQuote = s.creatorQuote || "\"Je conçois des systèmes d'organisation et de vente clés en main, des templates Notion prêts à l'emploi et des dashboards Excel automatisés pour aider les freelances à maximiser leur TJM et gagner jusqu'à 10h par semaine.\"";
   const floatingBadge = s.floatingBadge || 'Architecte IA & Solopreneur';
   const solopreneursCount = s.solopreneursCount || '+5,400 Solopreneurs Équipés';
   const ratingText = s.ratingText || '5.0 / 5';

@@ -11,7 +11,7 @@ interface CategoryGridModernProps {
 
 export function CategoryGridModern({
   title = "Tout ce dont tu as besoin pour <mark color='#ccff00'>structurer ton activité</mark>",
-  subtitle = "Accède à des outillages prêts à l emploi créés spécifiquement pour répondre aux enjeux concrets des solopreneurs.",
+  subtitle = "Accède à des outillages prêts à l'emploi créés spécifiquement pour répondre aux enjeux concrets des solopreneurs.",
   settings = {},
 }: CategoryGridModernProps) {
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});

@@ -158,7 +158,7 @@ export default function NewArticlePage() {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-2">
-                Éditeur d Article (Mise en forme, Liens, Médias, Vidéos, Tableaux, CTA) *
+                Éditeur d'Article (Mise en forme, Liens, Médias, Vidéos, Tableaux, CTA) *
               </label>
               <RichTextEditor value={content} onChange={setContent} />
             </div>

@@ -19,7 +19,7 @@ export function HeroModernBento({
 }: HeroModernBentoProps) {
   const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
 
-  const btn1Text = btnSettings.btn1Text || 'Explorer nos outillages prêts à l emploi ⚡';
+  const btn1Text = btnSettings.btn1Text || "Explorer nos outillages prêts à l'emploi ⚡";
   const btn1Url = btnSettings.btn1Url || '/boutique';
   const btn1Style = btnSettings.btn1Style || 'yellow';
 

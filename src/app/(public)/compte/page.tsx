@@ -211,7 +211,7 @@ export default function CustomerAccountPage() {
 
   // Close / Resolve Ticket by Customer
   const handleCloseTicket = async (ticketId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir fermer ce ticket d assistance ?')) return;
+    if (!confirm("Êtes-vous sûr de vouloir fermer ce ticket d'assistance ?")) return;
 
     try {
       const res = await fetch('/api/account/tickets', {
@@ -345,7 +345,7 @@ export default function CustomerAccountPage() {
               
               {/* STORE CREDIT BADGE */}
               <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 text-xs font-bold">
-                <span>Solde d Avoir : {user.storeCredit || 0} €</span>
+                <span>Solde d'Avoir : {user.storeCredit || 0} €</span>
               </div>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function CustomerAccountPage() {
             }`}
           >
             <LifeBuoy className="w-4 h-4 text-purple-600" />
-            <span>Tickets d Assistance ({tickets.length})</span>
+            <span>Tickets d'Assistance ({tickets.length})</span>
             {unreadTicketRepliesCount > 0 && (
               <span className="w-2 h-2 bg-amber-500 rounded-full animate-ping" />
             )}
@@ -580,7 +580,7 @@ export default function CustomerAccountPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Mes Tickets d Assistance</h2>
+                <h2 className="text-lg font-bold text-slate-900">Mes Tickets d'Assistance</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Posez vos questions et échangez avec l assistance technique.</p>
               </div>
 
@@ -591,7 +591,7 @@ export default function CustomerAccountPage() {
                 className="gap-1.5 font-bold btn-purple"
               >
                 <Plus className="w-4 h-4" />
-                <span>Ouvrir un Ticket d Assistance</span>
+                <span>Ouvrir un Ticket d'Assistance</span>
               </Button>
             </div>
 
@@ -602,7 +602,7 @@ export default function CustomerAccountPage() {
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                       <LifeBuoy className="w-5 h-5 text-purple-600" />
-                      <span>Ouvrir un Ticket d Assistance</span>
+                      <span>Ouvrir un Ticket d'Assistance</span>
                     </h3>
                   </div>
 
@@ -667,7 +667,7 @@ export default function CustomerAccountPage() {
 
             {tickets.length === 0 ? (
               <Card className="p-10 text-center text-slate-500 bg-white">
-                <p className="text-sm">Vous n avez aucun ticket d assistance ouvert.</p>
+                <p className="text-sm">Vous n avez aucun ticket d'assistance ouvert.</p>
               </Card>
             ) : (
               <div className="space-y-4">
@@ -773,7 +773,7 @@ export default function CustomerAccountPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Messages Privés & Offres Administrateurs</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Consultez vos messages et répondez directement à l administration.</p>
+                <p className="text-xs text-slate-500 mt-0.5">Consultez vos messages et répondez directement à l'administration.</p>
               </div>
 
               {/* CUSTOMER MARQUER TOUT COMME LU BUTTON */}
@@ -793,7 +793,7 @@ export default function CustomerAccountPage() {
 
             {directMessages.length === 0 ? (
               <Card className="p-10 text-center text-slate-500 bg-white">
-                <p className="text-sm">Aucun message privé reçu de l administration pour le moment.</p>
+                <p className="text-sm">Aucun message privé reçu de l'administration pour le moment.</p>
               </Card>
             ) : (
               <div className="space-y-4">
@@ -865,7 +865,7 @@ export default function CustomerAccountPage() {
                       {/* DIRECT MESSAGE REPLIES THREAD */}
                       {msg.replies && msg.replies.length > 0 && (
                         <div className="space-y-2 pt-2 border-t border-slate-100">
-                          <div className="text-[11px] font-bold text-slate-400 uppercase">Discussion avec l administration :</div>
+                          <div className="text-[11px] font-bold text-slate-400 uppercase">Discussion avec l'administration :</div>
                           {msg.replies.map((r: any) => (
                             <div key={r.id} className={`p-3.5 rounded-2xl text-xs ${r.sender === 'CUSTOMER' ? 'bg-purple-100 text-purple-950 border border-purple-200 font-medium ml-4' : 'bg-slate-100 text-slate-900 border border-slate-200 mr-4'}`}>
                               <div className="font-bold text-[10px] text-purple-700 mb-1 flex justify-between">

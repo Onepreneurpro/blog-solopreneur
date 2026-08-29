@@ -52,7 +52,7 @@ export default function AdminProductCategoriesPage() {
   const [storeHeroBadge, setStoreHeroBadge] = useState('BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES');
   const [storeHeroTitle, setStoreHeroTitle] = useState('Templates Notion & Dashboards Excel');
   const [storeHeroTitleAccent, setStoreHeroTitleAccent] = useState('Haute Performance');
-  const [storeHeroSubtitle, setStoreHeroSubtitle] = useState('Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.');
+  const [storeHeroSubtitle, setStoreHeroSubtitle] = useState("Automatisez votre organisation, suivez vos finances et développez votre activité d'indépendant avec des systèmes testés et prêts à l'emploi.");
 
   // Flexible Formatting Parameters
   const [storeHeroFontGlobal, setStoreHeroFontGlobal] = useState(true);

@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS = {
   storeHeroBadge: 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES',
   storeHeroTitle: 'Templates Notion & Dashboards Excel',
   storeHeroTitleAccent: 'Haute Performance',
-  storeHeroSubtitle: 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.',
+  storeHeroSubtitle: "Automatisez votre organisation, suivez vos finances et développez votre activité d'indépendant avec des systèmes testés et prêts à l'emploi.",
 
   storeHeroFontGlobal: true,
   storeHeroFontFamily: 'Plus Jakarta Sans',

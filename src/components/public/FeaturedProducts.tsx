@@ -29,7 +29,7 @@ interface FeaturedProductsProps {
 export function FeaturedProducts({
   products = [],
   title = "Boutique Digitale : Nos Meilleurs Outillages & Templates",
-  subtitle = "Des systèmes prêts à l emploi pour structurer votre activité sans réinventer la roue.",
+  subtitle = "Des systèmes prêts à l'emploi pour structurer votre activité sans réinventer la roue.",
   settings = {},
 }: FeaturedProductsProps) {
   if (!products || products.length === 0) return null;

@@ -177,7 +177,7 @@ export default function NewTemplateAdminPage() {
                 onChange={(e) => setIsFeatured(e.target.checked)}
                 className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
               />
-              <span>Mettre en avant sur la page d accueil (Best-seller)</span>
+              <span>Mettre en avant sur la page d'accueil (Best-seller)</span>
             </label>
           </div>
 

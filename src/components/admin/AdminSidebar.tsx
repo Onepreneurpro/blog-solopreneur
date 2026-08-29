@@ -86,7 +86,7 @@ const ADMIN_LINKS: SidebarGroup[] = [
     items: [
       { label: 'Thèmes & Templates', href: '/admin/themes', icon: Palette },
       { label: 'Menus Dynamiques', href: '/admin/menus', icon: MenuIcon },
-      { label: 'Page d Accueil Builder', href: '/admin/homepage', icon: Layout },
+      { label: "Page d'Accueil Builder", href: '/admin/homepage', icon: Layout },
     ],
   },
   {

@@ -31,7 +31,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
   let storeHeroBadge = 'BOUTIQUE PRO POUR SOLOPRENEURS & FREELANCES';
   let storeHeroTitle = 'Templates Notion & Dashboards Excel';
   let storeHeroTitleAccent = 'Haute Performance';
-  let storeHeroSubtitle = 'Automatisez votre organisation, suivez vos finances et développez votre activité d indépendant avec des systèmes testés et prêts à l emploi.';
+  let storeHeroSubtitle = "Automatisez votre organisation, suivez vos finances et développez votre activité d'indépendant avec des systèmes testés et prêts à l'emploi.";
 
   let storeHeroFontGlobal = true;
   let storeHeroFontFamily = 'Plus Jakarta Sans';
@@ -327,7 +327,7 @@ export default async function BoutiqueListingPage({ searchParams }: BoutiquePage
                       </Link>
 
                       <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
-                        {prod.shortDescription || 'Système complet prêt à l emploi pour booster votre productivité.'}
+                        {prod.shortDescription || "Système complet prêt à l'emploi pour booster votre productivité."}
                       </p>
                     </div>
                   </div>

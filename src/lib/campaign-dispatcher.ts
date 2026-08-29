@@ -165,7 +165,7 @@ export async function triggerCampaignSequencesForLead({
             <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; text-align: center;">
               Cet email vous a été envoyé automatiquement suite à votre inscription sur Solopreneur&Co.<br />
               <a href="${unsubUrl}" style="color: #64748b; text-decoration: underline; font-weight: bold; margin-top: 6px; display: inline-block;">
-                Se désabonner de cette séquence d emails
+                Se désabonner de cette séquence d'emails
               </a>
             </div>
           </div>
@@ -371,7 +371,7 @@ export async function processPendingSequenceQueue() {
           <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; text-align: center;">
             Cet email vous a été envoyé automatiquement suite à votre inscription sur Solopreneur&Co.<br />
             <a href="${unsubUrl}" style="color: #64748b; text-decoration: underline; font-weight: bold; margin-top: 6px; display: inline-block;">
-              Se désabonner de cette séquence d emails
+              Se désabonner de cette séquence d'emails
             </a>
           </div>
           <img src="${baseUrl}/api/track/open?queueId=${item.id}&email=${encodeURIComponent(item.leadEmail)}" width="1" height="1" style="display:none; width:1px; height:1px;" alt="" />
@@ -470,7 +470,7 @@ export async function processPendingSequenceQueue() {
       }
     }
   } catch (err) {
-    console.error('[Queue Processor] Erreur lors du traitement de la file d attente:', err);
+    console.error("[Queue Processor] Erreur lors du traitement de la file d'attente:", err);
   }
 
   return { processed: sentCount + failedCount, sentCount, failedCount };

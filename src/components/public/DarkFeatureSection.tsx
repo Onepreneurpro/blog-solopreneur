@@ -12,12 +12,12 @@ interface DarkFeatureSectionProps {
 
 export function DarkFeatureSection({
   title = "Tout ce dont vous avez besoin pour structurer et faire décoller votre activité.",
-  subtitle = "Ne perdez plus des heures à configurer des outils bancales. Accédez à nos systèmes complets, testés et approuvés par des milliers d indépendants.",
+  subtitle = "Ne perdez plus des heures à configurer des outils bancales. Accédez à nos systèmes complets, testés et approuvés par des milliers d'indépendants.",
   settings = {},
 }: DarkFeatureSectionProps) {
   const btnSettings = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
   
-  const btn1Text = btnSettings.btn1Text || 'Explorer nos outillages prêts à l emploi →';
+  const btn1Text = btnSettings.btn1Text || "Explorer nos outillages prêts à l'emploi →";
   const btn1Url = btnSettings.btn1Url || '/boutique';
   const btn1Style = btnSettings.btn1Style || 'yellow';
 

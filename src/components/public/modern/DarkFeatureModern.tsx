@@ -17,7 +17,7 @@ export function DarkFeatureModern({
 }: DarkFeatureModernProps) {
   const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
 
-  const check1 = s.check1 || 'Des templates 100% prêts à l emploi et duplicables en 1 clic';
+  const check1 = s.check1 || "Des templates 100% prêts à l'emploi et duplicables en 1 clic";
   const check2 = s.check2 || 'Aucun abonnement récurrent : vous achetez une fois, c est à vous à vie';
   const check3 = s.check3 || 'Mises à jour régulières et support réactif par notre équipe d experts';
 

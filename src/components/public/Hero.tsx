@@ -13,7 +13,7 @@ interface HeroProps {
 
 export function Hero({
   title = "Les formations & templates qui te font <mark>gagner plus</mark> en freelance.",
-  subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d affaires.",
+  subtitle = "Des automatisations sur mesure, des templates Notion optimisés et des tableaux Excel conçus pour décupler ton chiffre d'affaires.",
   settings = {},
   heroStyles = {},
 }: HeroProps) {

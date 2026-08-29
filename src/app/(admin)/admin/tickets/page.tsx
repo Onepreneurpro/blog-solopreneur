@@ -64,7 +64,7 @@ export default function AdminTicketsPage() {
       },
       {
         customerEmail: 'thomas.dubois@freelance.io',
-        subject: 'Demande de lien d accès au Workspace Notion Freelance OS',
+        subject: "Demande de lien d'accès au Workspace Notion Freelance OS",
         message: 'Bonjour l équipe, est-il possible d obtenir le lien direct pour dupliquer le template dans mon Notion ? Merci !',
         priority: 'MEDIUM',
       },
@@ -111,7 +111,7 @@ export default function AdminTicketsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur d envoi de réponse.');
+      if (!res.ok) throw new Error(data.error || "Erreur d'envoi de réponse.");
 
       setReplyMessage('');
       fetchTickets();
@@ -295,7 +295,7 @@ export default function AdminTicketsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Problème d accès au fichier Excel"
+                  placeholder="Ex: Problème d'accès au fichier Excel"
                   value={newSubject}
                   onChange={(e) => setNewSubject(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold"

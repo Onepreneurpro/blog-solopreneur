@@ -189,7 +189,7 @@ export default function AdminCrmPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur d envoi de la réponse.');
+      if (!res.ok) throw new Error(data.error || "Erreur d'envoi de la réponse.");
 
       setInlineReplyText('');
       setReplyingMessageId(null);
@@ -312,7 +312,7 @@ export default function AdminCrmPage() {
   const handleRelanceMessage = (msg: any) => {
     const subjectPrefix = msg.subject.startsWith('[Relance]') ? '' : '[Relance] ';
     setContactSubject(`${subjectPrefix}${msg.subject}`);
-    setContactMessage(`Bonjour ${contactModalCustomer?.name || 'Client'},\n\nJe me permets de vous relancer concernant notre précédent message :\n\n-----------------------------\nMessage d origine du ${new Date(msg.createdAt).toLocaleDateString('fr-FR')} :\n"${msg.content}"\n-----------------------------\n\nRestant à votre disposition,\nL équipe Solopreneur&Co`);
+    setContactMessage(`Bonjour ${contactModalCustomer?.name || 'Client'},\n\nJe me permets de vous relancer concernant notre précédent message :\n\n-----------------------------\nMessage d'origine du ${new Date(msg.createdAt).toLocaleDateString('fr-FR')} :\n"${msg.content}"\n-----------------------------\n\nRestant à votre disposition,\nL'équipe Solopreneur&Co`);
     if (msg.promoCode) setContactPromoCode(msg.promoCode);
     setModalViewMode('COMPOSE');
   };
@@ -336,7 +336,7 @@ export default function AdminCrmPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur d envoi.');
+      if (!res.ok) throw new Error(data.error || "Erreur d'envoi.");
 
       alert(data.message);
       fetchCustomerHistory(contactModalCustomer.email);
@@ -423,7 +423,7 @@ export default function AdminCrmPage() {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Erreur d import.');
+        if (!res.ok) throw new Error(data.error || "Erreur d'import.");
 
         setImportCount(data.importedCount);
         fetchCustomers();
@@ -474,7 +474,7 @@ export default function AdminCrmPage() {
         }),
       });
 
-      if (!res.ok) throw new Error('Erreur d ajout d avoir.');
+      if (!res.ok) throw new Error("Erreur d'ajout d avoir.");
       setCreditModalCustomer(null);
       fetchCustomers();
     } catch (err: any) {
@@ -1081,7 +1081,7 @@ export default function AdminCrmPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Rôle d accès</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Rôle d'accès</label>
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
@@ -1185,7 +1185,7 @@ export default function AdminCrmPage() {
               <span>Ajouter un Avoir Client</span>
             </h2>
             <p className="text-xs text-slate-500">
-              Ajouter un avoir / bon d achat au compte de <strong>{creditModalCustomer.email}</strong>.
+              Ajouter un avoir / bon d'achat au compte de <strong>{creditModalCustomer.email}</strong>.
             </p>
 
             <form onSubmit={handleAddCredit} className="space-y-4">
