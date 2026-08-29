@@ -175,45 +175,45 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
               })}
             </nav>
 
-            {/* DESKTOP ACTIONS WITH LIVE UNREAD BADGE */}
-            <div className="hidden md:flex items-center gap-3">
-              {user ? (
-                <div className="flex items-center gap-2">
-                  <Link href="/compte">
-                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 rounded-md font-extrabold px-4 py-2 shadow-md relative">
-                      <User className="w-4 h-4" />
-                      <span>Mon Compte</span>
-                      {unreadNotificationsCount > 0 && (
-                        <span className="ml-1 px-2 py-0.5 text-[10px] font-black bg-amber-400 text-amber-950 rounded-full animate-bounce shadow-sm">
-                          {unreadNotificationsCount}
-                        </span>
-                      )}
-                    </Button>
-                  </Link>
+              {/* DESKTOP ACTIONS WITH LIVE UNREAD BADGE */}
+              <div className="hidden md:flex items-center gap-3">
+                {user ? (
+                  <div className="flex items-center gap-2">
+                    <Link href="/compte">
+                      <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 rounded-xl font-extrabold px-4 py-2 shadow-md relative !text-white focus:ring-0 focus:ring-offset-0">
+                        <User className="w-4 h-4 text-white" />
+                        <span className="text-white">Mon Compte</span>
+                        {unreadNotificationsCount > 0 && (
+                          <span className="ml-1 px-2 py-0.5 text-[10px] font-black bg-amber-400 text-amber-950 rounded-full animate-bounce shadow-sm">
+                            {unreadNotificationsCount}
+                          </span>
+                        )}
+                      </Button>
+                    </Link>
 
-                  <form action="/api/auth/logout" method="POST">
-                    <Button type="submit" variant="danger" size="sm" className="header-logout-btn flex items-center gap-1.5 rounded-md font-bold px-4 py-2 text-xs">
-                      <LogOut className="w-4 h-4 text-red-600" />
-                      <span>Déconnexion</span>
-                    </Button>
-                  </form>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm" className="font-semibold text-slate-200 hover:text-white hover:bg-slate-800 rounded-md">
-                      Connexion
-                    </Button>
-                  </Link>
-                  <Link href="/boutique">
-                    <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 font-extrabold rounded-md px-5">
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>Les Produits</span>
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
+                    <form action="/api/auth/logout" method="POST">
+                      <Button type="submit" size="sm" className="flex items-center gap-1.5 rounded-xl font-bold px-4 py-2 text-xs !text-red-400 !bg-red-950/40 border border-red-800/50 hover:!bg-red-900/60 hover:!text-red-200 focus:ring-0 focus:ring-offset-0 transition-colors">
+                        <LogOut className="w-4 h-4 text-red-400" />
+                        <span className="text-red-300">Déconnexion</span>
+                      </Button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link href="/login">
+                      <Button variant="outline" size="sm" className="font-extrabold !text-white border border-slate-700 bg-slate-900/80 hover:!bg-slate-800 hover:!border-slate-500 rounded-xl px-4 py-2 focus:ring-0 focus:ring-offset-0 transition-all shadow-sm">
+                        Connexion
+                      </Button>
+                    </Link>
+                    <Link href="/boutique">
+                      <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 font-extrabold rounded-xl px-5 py-2 !text-white focus:ring-0 focus:ring-offset-0 shadow-md">
+                        <ShoppingBag className="w-4 h-4 text-white" />
+                        <span className="text-white">Les Produits</span>
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
 
             {/* MOBILE MENU TOGGLE BUTTON */}
             <div className="md:hidden flex items-center gap-2">
