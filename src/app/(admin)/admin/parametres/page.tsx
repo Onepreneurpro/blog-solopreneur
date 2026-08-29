@@ -52,6 +52,103 @@ export default function AdminParametresPage() {
   const [smtpSaving, setSmtpSaving] = useState(false);
   const [testingSmtpId, setTestingSmtpId] = useState<string | null>(null);
 
+  // DEFAULT GRANULAR PERMISSIONS MATRIX
+  const DEFAULT_MODULE_PERMISSIONS = [
+    {
+      moduleKey: 'blog',
+      moduleName: '📄 Blog & Articles',
+      description: 'Lecture publique, commentaires, création et publication des articles.',
+      permissions: {
+        LEAD: { view: true, download: false, edit: false, admin: false },
+        CLIENT: { view: true, download: false, edit: false, admin: false },
+        SUPPORT: { view: true, download: false, edit: false, admin: false },
+        EDITOR: { view: true, download: true, edit: true, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+    {
+      moduleKey: 'resources',
+      moduleName: '🎁 Ressources Gratuites & Checklists',
+      description: 'Consultation du catalogue, opt-in lead, téléchargement d\'ebooks.',
+      permissions: {
+        LEAD: { view: true, download: true, edit: false, admin: false },
+        CLIENT: { view: true, download: true, edit: false, admin: false },
+        SUPPORT: { view: true, download: true, edit: false, admin: false },
+        EDITOR: { view: true, download: true, edit: true, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+    {
+      moduleKey: 'store',
+      moduleName: '🛍️ Produits Boutique (Notion & Excel)',
+      description: 'Accès au catalogue payant, téléchargement des fichiers et modification des prix.',
+      permissions: {
+        LEAD: { view: true, download: false, edit: false, admin: false },
+        CLIENT: { view: true, download: true, edit: false, admin: false },
+        SUPPORT: { view: true, download: true, edit: false, admin: false },
+        EDITOR: { view: true, download: false, edit: true, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+    {
+      moduleKey: 'account',
+      moduleName: '🔐 Espace Client & Historique Achats',
+      description: 'Accès au profil personnel, tickets d\'assistance et liens de téléchargement.',
+      permissions: {
+        LEAD: { view: false, download: false, edit: false, admin: false },
+        CLIENT: { view: true, download: true, edit: true, admin: false },
+        SUPPORT: { view: true, download: true, edit: true, admin: false },
+        EDITOR: { view: true, download: false, edit: false, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+    {
+      moduleKey: 'crm',
+      moduleName: '📩 Campagnes Emails, Séquences & CRM',
+      description: 'Inscriptions aux listes, envoi d\'emails automatisés, export de leads.',
+      permissions: {
+        LEAD: { view: false, download: false, edit: false, admin: false },
+        CLIENT: { view: false, download: false, edit: false, admin: false },
+        SUPPORT: { view: true, download: false, edit: false, admin: false },
+        EDITOR: { view: true, download: false, edit: true, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+    {
+      moduleKey: 'system',
+      moduleName: '⚙️ Paramètres Système & Serveurs SMTP',
+      description: 'Configuration du nom du site, devises, thèmes, clés API et équipe.',
+      permissions: {
+        LEAD: { view: false, download: false, edit: false, admin: false },
+        CLIENT: { view: false, download: false, edit: false, admin: false },
+        SUPPORT: { view: false, download: false, edit: false, admin: false },
+        EDITOR: { view: false, download: false, edit: false, admin: false },
+        ADMIN: { view: true, download: true, edit: true, admin: true },
+      },
+    },
+  ];
+
+  const [granularPermissions, setGranularPermissions] = useState(DEFAULT_MODULE_PERMISSIONS);
+
+  const handleTogglePermission = (moduleKey: string, roleKey: string, permType: 'view' | 'download' | 'edit' | 'admin') => {
+    setGranularPermissions((prev) =>
+      prev.map((mod) => {
+        if (mod.moduleKey !== moduleKey) return mod;
+        const currentRolePerms = mod.permissions[roleKey as keyof typeof mod.permissions] || { view: false, download: false, edit: false, admin: false };
+        return {
+          ...mod,
+          permissions: {
+            ...mod.permissions,
+            [roleKey]: {
+              ...currentRolePerms,
+              [permType]: !currentRolePerms[permType],
+            },
+          },
+        };
+      })
+    );
+  };
+
   // ROLE PERMISSIONS MATRIX (ADMIN, EDITOR, SUPPORT)
   const [rolePermissions, setRolePermissions] = useState<{
     [role: string]: {
@@ -105,6 +202,9 @@ export default function AdminParametresPage() {
           setFooterCopyright(data.settings.footerCopyright || '');
           if (data.settings.rolePermissions) {
             setRolePermissions(data.settings.rolePermissions);
+          }
+          if (data.settings.granularPermissions && data.settings.granularPermissions.length > 0) {
+            setGranularPermissions(data.settings.granularPermissions);
           }
           if (data.settings.teamMembers && data.settings.teamMembers.length > 0) {
             setTeamMembers(data.settings.teamMembers);
@@ -272,6 +372,7 @@ export default function AdminParametresPage() {
           bannerTickerLink,
           footerCopyright,
           rolePermissions,
+          granularPermissions,
           teamMembers,
         }),
       });
@@ -514,24 +615,39 @@ export default function AdminParametresPage() {
         </div>
       </Card>
 
-      {/* SECTION 3: RÔLES D'ÉQUIPE & PERMISSIONS */}
-      <Card className="p-6 bg-white border border-slate-200 rounded-3xl shadow-xs space-y-6">
-        <h2 className="text-lg font-heading font-black text-slate-950 flex items-center gap-2 border-b border-slate-100 pb-3">
-          <ShieldCheck className="w-5 h-5 text-purple-700" />
-          <span>Matrice des Permissions & Équipe</span>
-        </h2>
-
-        {/* TEAM MEMBERS TABLE */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading font-black text-sm text-slate-900">Membres de l Équipe Administrateur ({teamMembers.length})</h3>
+      {/* SECTION 3: RÔLES D'ÉQUIPE & MATRICE DE PERMISSIONS GRANULAIRE */}
+      <Card className="p-6 sm:p-8 bg-white border border-slate-200 rounded-3xl shadow-xs space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h2 className="text-lg font-heading font-black text-slate-950 flex items-center gap-2">
+              <ShieldCheck className="w-5.5 h-5.5 text-purple-700" />
+              <span>Matrice des Permissions & Droits d'Accès Équipe</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Gérez les membres de l'équipe et attribuez les droits de visualisation, téléchargement, modification et administration pour chaque rôle.
+            </p>
           </div>
 
+          <Badge variant="indigo" className="text-xs font-mono font-extrabold bg-purple-100 text-purple-950 self-start sm:self-auto">
+            Sécurité & Contrôle RBAC 🔒
+          </Badge>
+        </div>
+
+        {/* 1. MEMBRES DE L'ÉQUIPE ADMINISTRATEUR */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-heading font-black text-sm text-slate-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-purple-600" />
+              <span>Membres de l'Équipe Administrateur ({teamMembers.length})</span>
+            </h3>
+          </div>
+
+          {/* LISTE DES MEMBRES */}
           <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
             {teamMembers.map((member) => (
-              <div key={member.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+              <div key={member.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white hover:bg-purple-50/20 transition-colors">
                 <div className="flex items-center gap-3">
-                  <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full border border-slate-200 object-cover" />
+                  <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full border border-purple-200 object-cover shadow-xs" />
                   <div>
                     <div className="font-bold text-xs text-slate-900">{member.name}</div>
                     <div className="text-[11px] text-slate-500 font-mono">{member.email}</div>
@@ -542,22 +658,160 @@ export default function AdminParametresPage() {
                   <select
                     value={member.role}
                     onChange={(e) => handleTeamRoleChange(member.id, e.target.value)}
-                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
+                    className="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="ADMIN">ADMINISTRATEUR (Accès Total)</option>
-                    <option value="SUPPORT">SUPPORT (Accès Boutique & Tickets)</option>
-                    <option value="EDITOR">ÉDITEUR (Accès Blog & Contenu)</option>
+                    <option value="ADMIN">👑 ADMINISTRATEUR (Accès Total)</option>
+                    <option value="SUPPORT">💬 SUPPORT (Accès Boutique & Tickets)</option>
+                    <option value="EDITOR">✍️ ÉDITEUR (Accès Blog & Contenu)</option>
                   </select>
 
                   <button
+                    type="button"
                     onClick={() => handleDeleteTeamMember(member.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                    className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 transition-colors"
+                    title="Supprimer ce membre"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* FORMULAIRE D'AJOUT D'UN NOUVEAU MEMBRE */}
+          <form onSubmit={handleAddTeamMember} className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <input
+              type="text"
+              placeholder="Nom complet (ex. Thomas Dupont)"
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+              required
+              className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <input
+              type="email"
+              placeholder="Adresse email (ex. thomas@solopreneur.io)"
+              value={newMemberEmail}
+              onChange={(e) => setNewMemberEmail(e.target.value)}
+              required
+              className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <select
+              value={newMemberRole}
+              onChange={(e) => setNewMemberRole(e.target.value)}
+              className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="ADMIN">👑 ADMINISTRATEUR (Accès Total)</option>
+              <option value="SUPPORT">💬 SUPPORT (Accès Boutique & Tickets)</option>
+              <option value="EDITOR">✍️ ÉDITEUR (Accès Blog & Contenu)</option>
+            </select>
+            <Button type="submit" variant="primary" size="sm" className="btn-purple font-extrabold gap-1.5 rounded-xl py-2">
+              <UserPlus className="w-4 h-4" />
+              <span>Ajouter au Membres</span>
+            </Button>
+          </form>
+        </div>
+
+        {/* 2. MATRICE INTERACTIVE DES DROITS D'ACCÈS & PERMISSIONS PAR RÔLE */}
+        <div className="space-y-4 pt-4 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-heading font-black text-sm text-slate-900 flex items-center gap-2">
+                <Key className="w-4 h-4 text-purple-600" />
+                <span>Matrice des Droits d'Accès par Ressource & Rôle</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Cochez ou décochez les permissions spécifiques attribuées aux Leads, Clients, Support, Éditeurs et Administrateurs.
+              </p>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setGranularPermissions(DEFAULT_MODULE_PERMISSIONS)}
+              className="text-xs font-bold border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl gap-1.5 self-start sm:self-auto"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Réinitialiser les permissions recommandées</span>
+            </Button>
+          </div>
+
+          {/* TABLEAU DE MATRICE DE PERMISSIONS */}
+          <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-xs">
+            <table className="w-full text-left border-collapse bg-white">
+              <thead>
+                <tr className="bg-slate-900 text-white text-[11px] font-heading font-black uppercase tracking-wider divide-x divide-slate-800">
+                  <th className="p-3.5 min-w-[220px]">Ressource / Module</th>
+                  <th className="p-3.5 text-center min-w-[130px] bg-purple-950/60 text-purple-200">🚀 Lead (Opt-in)</th>
+                  <th className="p-3.5 text-center min-w-[130px] bg-sky-950/60 text-sky-200">🛍️ Client (Compte)</th>
+                  <th className="p-3.5 text-center min-w-[130px] bg-indigo-950/60 text-indigo-200">💬 Support Team</th>
+                  <th className="p-3.5 text-center min-w-[130px] bg-emerald-950/60 text-emerald-200">✍️ Éditeur Blog</th>
+                  <th className="p-3.5 text-center min-w-[130px] bg-violet-950/80 text-violet-200">👑 Administrateur</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-xs">
+                {granularPermissions.map((mod) => (
+                  <tr key={mod.moduleKey} className="hover:bg-purple-50/30 transition-colors divide-x divide-slate-100">
+                    {/* MODULE TITLE & DESCRIPTION */}
+                    <td className="p-4 bg-slate-50/50">
+                      <div className="font-heading font-extrabold text-slate-900 text-xs">{mod.moduleName}</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{mod.description}</div>
+                    </td>
+
+                    {/* PERMISSION CHECKBOXES PER ROLE */}
+                    {['LEAD', 'CLIENT', 'SUPPORT', 'EDITOR', 'ADMIN'].map((roleKey) => {
+                      const perms = (mod.permissions as Record<string, any>)[roleKey] || { view: false, download: false, edit: false, admin: false };
+                      return (
+                        <td key={roleKey} className="p-3 text-center align-top bg-white">
+                          <div className="flex flex-col items-start gap-1.5 text-[11px] font-semibold text-slate-700 max-w-[115px] mx-auto">
+                            <label className="flex items-center gap-1.5 cursor-pointer hover:text-purple-700 transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={perms.view}
+                                onChange={() => handleTogglePermission(mod.moduleKey, roleKey, 'view')}
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                              />
+                              <span>👁️ Lecture</span>
+                            </label>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer hover:text-purple-700 transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={perms.download}
+                                onChange={() => handleTogglePermission(mod.moduleKey, roleKey, 'download')}
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                              />
+                              <span>📥 Télécharg.</span>
+                            </label>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer hover:text-purple-700 transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={perms.edit}
+                                onChange={() => handleTogglePermission(mod.moduleKey, roleKey, 'edit')}
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                              />
+                              <span>✏️ Édition</span>
+                            </label>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer hover:text-purple-700 transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={perms.admin}
+                                onChange={() => handleTogglePermission(mod.moduleKey, roleKey, 'admin')}
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                              />
+                              <span>🔒 Gestion</span>
+                            </label>
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
