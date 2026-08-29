@@ -513,7 +513,7 @@ export default function CustomerAccountPage() {
           <Card className="p-6 sm:p-8 bg-white max-w-xl space-y-6 shadow-sm border border-slate-200">
             <div>
               <h2 className="text-lg font-bold text-slate-900">Vos Informations Personnelles</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Mettez à jour votre nom d affichage et votre avatar.</p>
+              <p className="text-xs text-slate-500 mt-0.5">Mettez à jour votre nom d'affichage et votre avatar.</p>
             </div>
 
             {profileSuccess && (
@@ -527,9 +527,9 @@ export default function CustomerAccountPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Avatar / Photo de profil</label>
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center font-bold text-purple-700 text-lg overflow-hidden flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center font-bold text-purple-700 text-lg overflow-hidden flex-shrink-0">
                     {avatar ? (
-                      <Image src={avatar} alt="Avatar" width={56} height={56} className="w-full h-full object-cover" />
+                      <Image src={avatar} alt="Avatar" width={56} height={56} className="w-full h-full object-cover rounded-full" />
                     ) : (
                       (name || user.email).substring(0, 2).toUpperCase()
                     )}
@@ -537,7 +537,7 @@ export default function CustomerAccountPage() {
                   <div className="flex-1">
                     <input
                       type="text"
-                      placeholder="Ou collez l URL de l image..."
+                      placeholder="Ou collez l'URL de l'image..."
                       value={avatar}
                       onChange={(e) => setAvatar(e.target.value)}
                       className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
