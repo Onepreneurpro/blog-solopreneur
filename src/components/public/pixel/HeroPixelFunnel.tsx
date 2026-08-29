@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowRight, Zap, TrendingUp, DollarSign, Repeat, Star, CheckCircle, Award, Layers, Sparkles, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
+import { safeJsonParse } from '@/lib/json-utils';
 
 interface HeroPixelFunnelProps {
   title?: string;
@@ -20,7 +21,7 @@ export function HeroPixelFunnel({
   settings = {},
   heroStyles = {},
 }: HeroPixelFunnelProps) {
-  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const s = safeJsonParse(settings);
   const btn1Text = s.btn1Text || 'Voir la boutique & les templates';
   const btn1Url = s.btn1Url || '/boutique';
   const btn2Text = s.btn2Text || 'Ressources Gratuites';

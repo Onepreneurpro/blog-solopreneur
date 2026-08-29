@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
 import { getFileTypeLabel } from '@/lib/product-formats';
+import { safeJsonParse } from '@/lib/json-utils';
 
 interface ProductItem {
   id: string;
@@ -54,7 +55,7 @@ export function FeaturedProductsPixel({
 }: FeaturedProductsPixelProps) {
   if (!products || products.length === 0) return null;
 
-  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const s = safeJsonParse(settings);
   const rawLinkText = s.btnText || s.btn1Text || 'Voir toute la boutique';
   const linkText = rawLinkText.replace(/→|\s*→/g, '').trim();
   const linkUrl = s.btn1Url || '/boutique';

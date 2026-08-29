@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Zap, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
+import { safeJsonParse } from '@/lib/json-utils';
 
 interface FinalCtaModernProps {
   title?: string;
@@ -11,11 +12,11 @@ interface FinalCtaModernProps {
 }
 
 export function FinalCtaModern({
-  title = "Prêt à propulser ton activité de <mark color='#ffffff'>solopreneur au niveau supérieur</mark> ?",
-  subtitle = "Rejoins dès aujourd hui les milliers de freelances qui utilisent nos automatisations et templates pour gagner du temps et augmenter leur TJM.",
+  title = "Prêt à décupler ton efficacité et tes revenus en freelance ?",
+  subtitle = "Accède instantanément à tous nos templates Notion, tableaux Excel automatisés et guides pratiques.",
   settings = {},
 }: FinalCtaModernProps) {
-  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const s = safeJsonParse(settings);
   const badgeText = s.badgeText || 'ACCÈS IMMÉDIAT EN 1 CLIC';
   const btnText = s.btnText || s.btn1Text || 'Accéder à la boutique & aux templates ⚡';
   const btnUrl = s.btnUrl || s.btn1Url || '/boutique';

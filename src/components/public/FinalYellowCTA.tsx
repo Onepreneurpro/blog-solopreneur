@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormattedText } from '@/components/ui/FormattedText';
+import { safeJsonParse } from '@/lib/json-utils';
 
 interface FinalYellowCTAProps {
   title?: string;
@@ -11,11 +12,11 @@ interface FinalYellowCTAProps {
 }
 
 export function FinalYellowCTA({
-  title = "Prêt à décupler ton efficacité et tes revenus en freelance ?",
-  subtitle = "Accède instantanément à tous nos templates Notion, tableaux Excel automatisés et guides pratiques.",
+  title = "Accède immédiatement à tous nos templates Notion & tableaux Excel.",
+  subtitle = "Profite de nos tarifs préférentiels et télécharge immédiatement l ensemble de tes outils d organisation.",
   settings = {},
 }: FinalYellowCTAProps) {
-  const s = typeof settings === 'string' ? (JSON.parse(settings || '{}') || {}) : (settings || {});
+  const s = safeJsonParse(settings);
   const badgeText = s.badgeText || 'ACCÈS IMMÉDIAT EN 1 CLIC';
   const btn1Text = s.btnText || s.btn1Text || 'Accéder à la boutique & aux templates ⚡';
   const btn1Url = s.btnUrl || s.btn1Url || '/boutique';
