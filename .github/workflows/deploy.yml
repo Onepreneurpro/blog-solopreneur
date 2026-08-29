@@ -1,0 +1,50 @@
+name: Auto Deploy to Contabo VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Production VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Execute Remote SSH Commands for Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          script: |
+            # Detect project directory
+            if [ -d "/root/blog-solopreneur" ]; then
+              cd /root/blog-solopreneur
+            elif [ -d "$HOME/blog-solopreneur" ]; then
+              cd $HOME/blog-solopreneur
+            else
+              echo "Error: Project directory not found"
+              exit 1
+            fi
+
+            echo "🚀 Pulling latest changes from GitHub..."
+            git pull origin main
+
+            echo "📦 Installing npm dependencies & Prisma..."
+            npm install
+            npx prisma db push
+            npx prisma generate
+
+            echo "🏗️ Building Next.js application..."
+            npm run build
+
+            echo "⚡ Restarting PM2 process..."
+            pm2 restart solopreneur-blog || pm2 start npm --name "solopreneur-blog" -- start -- -p 3000
+
+            echo "🎉 Automatic deployment completed successfully!"
