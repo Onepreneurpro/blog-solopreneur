@@ -10,13 +10,15 @@ interface PageProps {
 }
 
 export default async function StaticCustomPage({ params }: PageProps) {
+  const pageSlug = params?.pageSlug;
   let activeTheme = 'modern-bento';
   let page: any = null;
 
   try {
     activeTheme = await getActiveTheme();
+    if (!pageSlug) notFound();
     page = await prisma.page.findUnique({
-      where: { slug: params.pageSlug },
+      where: { slug: pageSlug },
     });
 
     if (!page || page.status !== 'PUBLISHED') {
