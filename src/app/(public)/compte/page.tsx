@@ -322,10 +322,10 @@ export default function CustomerAccountPage() {
         {/* HEADER CUSTOMER BANNER & NOTIFICATION ALERT (HIGH CONTRAST WHITE TEXT) */}
         <div className="account-user-banner p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-slate-800">
           <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 p-0.5 shadow-lg flex-shrink-0">
-              <div className="w-full h-full bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center font-extrabold text-2xl text-purple-300">
+            <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 p-0.5 shadow-lg flex-shrink-0">
+              <div className="w-full h-full bg-slate-900 rounded-full overflow-hidden flex items-center justify-center font-extrabold text-2xl text-purple-300">
                 {user.avatar ? (
-                  <Image src={user.avatar} alt={user.name || 'Avatar'} width={64} height={64} className="w-full h-full object-cover" />
+                  <Image src={user.avatar} alt={user.name || 'Avatar'} width={64} height={64} className="w-full h-full object-cover rounded-full" />
                 ) : (
                   (user.name || user.email).substring(0, 2).toUpperCase()
                 )}
@@ -345,7 +345,6 @@ export default function CustomerAccountPage() {
               
               {/* STORE CREDIT BADGE */}
               <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 text-xs font-bold">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Solde d Avoir : {user.storeCredit || 0} €</span>
               </div>
             </div>
