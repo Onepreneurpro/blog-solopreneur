@@ -55,9 +55,16 @@ const ADMIN_LINKS: SidebarGroup[] = [
     ],
   },
   {
-    group: 'PRODUITS ET RESSOURCES',
+    group: 'TUNNELS DE VENTE & AUTOMATISATION',
     items: [
       { label: 'Tunnels de Vente', href: '/admin/tunnels', icon: Zap },
+      { label: 'Contacts Leads', href: '/admin/leads', icon: UserCheck },
+      { label: 'Campagnes d Emails', href: '/admin/campagnes', icon: Megaphone },
+    ],
+  },
+  {
+    group: 'PRODUITS ET RESSOURCES',
+    items: [
       { label: 'Commandes & Ventes', href: '/admin/commandes', icon: ShoppingCart },
       { label: 'Ressources & Guides', href: '/admin/ressources', icon: BookOpen },
       { label: 'Boutique des Produits', href: '/admin/produits', icon: ShoppingBag },
@@ -68,8 +75,6 @@ const ADMIN_LINKS: SidebarGroup[] = [
     group: 'GESTION CRM & CLIENTS',
     items: [
       { label: 'Gestion des clients', href: '/admin/crm', icon: Users },
-      { label: 'Contacts Leads', href: '/admin/leads', icon: UserCheck },
-      { label: 'Campagnes d Emails', href: '/admin/campagnes', icon: Megaphone },
       { label: 'Tickets Support', href: '/admin/tickets', icon: LifeBuoy },
     ],
   },
