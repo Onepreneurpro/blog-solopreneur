@@ -441,3 +441,55 @@ model VerificationCode {
 
   @@index([email])
 }
+
+model Funnel {
+  id              String                 @id @default(uuid())
+  name            String
+  slug            String                 @unique
+  domain          String?
+  objective       String                 @default("AUDIENCE") // AUDIENCE, SALES, CUSTOM, WEBINAR
+  currency        String                 @default("EUR")
+  status          String                 @default("ACTIVE")   // ACTIVE, PAUSED, DRAFT
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @default(now())
+
+  steps           FunnelStep[]
+  automationRules FunnelAutomationRule[]
+}
+
+model FunnelStep {
+  id              String                 @id @default(uuid())
+  funnelId        String
+  funnel          Funnel                 @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  name            String
+  slug            String
+  type            String                 @default("OPTIN_PAGE") // OPTIN_PAGE, THANK_YOU_PAGE, SALES_PAGE, ORDER_FORM, INACTIVE_PAGE
+  position        Int                    @default(0)
+  templateId      String?
+  templateName    String?
+  content         String?                // HTML or JSON content of the step
+  isActive        Boolean                @default(true)
+  viewsCount      Int                    @default(0)
+  conversionsCount Int                   @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @default(now())
+
+  automationRules FunnelAutomationRule[]
+
+  @@unique([funnelId, slug])
+}
+
+model FunnelAutomationRule {
+  id            String      @id @default(uuid())
+  funnelId      String
+  funnel        Funnel      @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  stepId        String?
+  step          FunnelStep? @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  triggerType   String      @default("OPTIN") // OPTIN, PAGE_VIEW
+  actionType    String      @default("SUBSCRIBE_CAMPAIGN") // SUBSCRIBE_CAMPAIGN, UNSUBSCRIBE_CAMPAIGN, ADD_TAG, REMOVE_TAG, SEND_EMAIL
+  targetId      String?     // ID of Campaign, Tag, or Email step
+  targetName    String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
+}
+

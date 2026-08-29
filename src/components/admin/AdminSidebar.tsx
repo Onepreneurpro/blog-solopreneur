@@ -57,6 +57,7 @@ const ADMIN_LINKS: SidebarGroup[] = [
   {
     group: 'PRODUITS ET RESSOURCES',
     items: [
+      { label: 'Tunnels de Vente', href: '/admin/tunnels', icon: Zap },
       { label: 'Commandes & Ventes', href: '/admin/commandes', icon: ShoppingCart },
       { label: 'Ressources & Guides', href: '/admin/ressources', icon: BookOpen },
       { label: 'Boutique des Produits', href: '/admin/produits', icon: ShoppingBag },
