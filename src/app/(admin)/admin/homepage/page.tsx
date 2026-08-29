@@ -1301,7 +1301,7 @@ export default function AdminHomepageBuilderPage() {
                       className="w-full px-3 py-2 bg-slate-50 border border-purple-200 rounded-lg text-xs font-bold text-slate-900 focus:bg-white"
                     >
                       <option value="yellow">⚡ Fluo Néon (Jaune/Vert - Recommandé)</option>
-                      <option value="purple">🩵 Bleu Ciel Solopreneur</option>
+                      <option value="purple">🔵 Bleu Ciel Solopreneur</option>
                       <option value="white">⚪ Blanc Moderne</option>
                       <option value="dark">⚫ Sombre Élégant</option>
                     </select>
@@ -1351,7 +1351,7 @@ export default function AdminHomepageBuilderPage() {
                     >
                       <option value="transparent">🔲 Contour Translucide (Recommandé)</option>
                       <option value="yellow">⚡ Fluo Néon (Jaune/Vert)</option>
-                      <option value="purple">🩵 Bleu Ciel Solopreneur</option>
+                      <option value="purple">🔵 Bleu Ciel Solopreneur</option>
                       <option value="white">⚪ Blanc Moderne</option>
                       <option value="dark">⚫ Sombre Élégant</option>
                     </select>
