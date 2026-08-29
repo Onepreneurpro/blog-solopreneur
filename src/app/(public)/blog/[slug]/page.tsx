@@ -34,6 +34,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 }
 
 export default async function SingleArticlePage({ params }: ArticlePageProps) {
+  const slug = params?.slug;
   let activeTheme = 'modern-bento';
   let article: any = null;
   let similarArticles: any[] = [];
@@ -45,8 +46,10 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
   try {
     activeTheme = await getActiveTheme();
 
-    article = await prisma.article.findUnique({
-      where: { slug: params.slug },
+    if (!slug) notFound();
+
+    const rawArticle = await prisma.article.findUnique({
+      where: { slug },
       include: {
         category: true,
         author: { select: { name: true, avatar: true } },
@@ -54,12 +57,14 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       },
     });
 
-    if (!article || article.status !== 'PUBLISHED') {
+    if (!rawArticle || rawArticle.status !== 'PUBLISHED') {
       notFound();
     }
 
+    article = JSON.parse(JSON.stringify(rawArticle));
+
     // 1. Fetch 3 related articles from the same category (for bottom cross-sell)
-    similarArticles = await prisma.article.findMany({
+    const rawSimilarArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         id: { not: article.id },
@@ -73,24 +78,8 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
       },
     });
 
-    if (similarArticles.length < 3) {
-      const fallbackArticles = await prisma.article.findMany({
-        where: {
-          status: 'PUBLISHED',
-          id: { notIn: [article.id, ...similarArticles.map((a) => a.id)] },
-        },
-        take: 3 - similarArticles.length,
-        orderBy: { publishedAt: 'desc' },
-        include: {
-          category: { select: { name: true, slug: true } },
-          author: { select: { name: true, avatar: true } },
-        },
-      });
-      similarArticles = [...similarArticles, ...fallbackArticles];
-    }
-
-    // 2. Fetch 3 featured/latest articles for right side of hero cover image
-    headerFeaturedArticles = await prisma.article.findMany({
+    // 2. Fetch 3 Featured Articles for Header Mega Menu Preview
+    const rawHeaderFeaturedArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         id: { not: article.id },
@@ -103,7 +92,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
     });
 
     // 3. Fetch 3 Store Products for Right Sidebar
-    sidebarStoreProducts = await prisma.product.findMany({
+    const rawSidebarStoreProducts = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
         isFreeResource: false,
@@ -116,7 +105,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
     });
 
     // 4. Fetch 3 Free Resources for Right Sidebar
-    sidebarFreeResources = await prisma.product.findMany({
+    const rawSidebarFreeResources = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
         isFreeResource: true,
@@ -126,7 +115,7 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
     });
 
     // 5. Fetch 3 Recent Blog Articles for Right Sidebar
-    sidebarBlogArticles = await prisma.article.findMany({
+    const rawSidebarBlogArticles = await prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         id: { not: article.id },
@@ -137,6 +126,12 @@ export default async function SingleArticlePage({ params }: ArticlePageProps) {
         category: { select: { name: true, slug: true } },
       },
     });
+
+    similarArticles = JSON.parse(JSON.stringify(rawSimilarArticles));
+    headerFeaturedArticles = JSON.parse(JSON.stringify(rawHeaderFeaturedArticles));
+    sidebarStoreProducts = JSON.parse(JSON.stringify(rawSidebarStoreProducts));
+    sidebarFreeResources = JSON.parse(JSON.stringify(rawSidebarFreeResources));
+    sidebarBlogArticles = JSON.parse(JSON.stringify(rawSidebarBlogArticles));
 
   } catch (err) {
     if (!article) notFound();

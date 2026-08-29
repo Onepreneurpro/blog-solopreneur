@@ -108,7 +108,9 @@ export default async function HomePage() {
       } catch (e) {}
     }
 
-    articles = await prisma.article.findMany({
+    activeSections = JSON.parse(JSON.stringify(activeSections));
+
+    const rawArticles = await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
       take: 3,
       orderBy: { publishedAt: 'desc' },
@@ -117,7 +119,7 @@ export default async function HomePage() {
       },
     });
 
-    products = await prisma.product.findMany({
+    const rawProducts = await prisma.product.findMany({
       where: { status: 'PUBLISHED', isFreeResource: false },
       take: 6,
       orderBy: { downloadsCount: 'desc' },
@@ -126,11 +128,15 @@ export default async function HomePage() {
       },
     });
 
-    freeResources = await prisma.product.findMany({
+    const rawFreeResources = await prisma.product.findMany({
       where: { status: 'PUBLISHED', isFreeResource: true },
       take: 3,
       orderBy: { downloadsCount: 'desc' },
     });
+
+    articles = JSON.parse(JSON.stringify(rawArticles));
+    products = JSON.parse(JSON.stringify(rawProducts));
+    freeResources = JSON.parse(JSON.stringify(rawFreeResources));
 
     if (activeTheme === 'blusky') {
       heroStyles = {
