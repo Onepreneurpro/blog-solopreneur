@@ -1,0 +1,594 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  Undo,
+  Redo,
+  Sliders,
+  Smartphone,
+  Monitor,
+  Save,
+  LogOut,
+  Type,
+  Heading,
+  List,
+  Box,
+  Image as ImageIcon,
+  Video,
+  Music,
+  Columns,
+  Rows,
+  LayoutGrid,
+  CheckSquare,
+  Calendar,
+  Share2,
+  HelpCircle,
+  Code,
+  Clock,
+  Menu as MenuIcon,
+  Minus,
+  CheckCircle2,
+  Trash2,
+  Copy,
+  Lock,
+  Plus,
+  Sparkles,
+  ArrowLeft,
+  X,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+interface CanvasElement {
+  id: string;
+  type: string;
+  category: string;
+  content: string;
+  styles?: any;
+}
+
+export default function VisualPageBuilderPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const stepId = searchParams?.get('stepId');
+
+  const [funnel, setFunnel] = useState<any>(null);
+  const [step, setStep] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS'>('ELEMENTS');
+  const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+
+  // Canvas elements state
+  const [elements, setElements] = useState<CanvasElement[]>([
+    {
+      id: 'el-1',
+      type: 'Heading',
+      category: 'Texte',
+      content: 'Votre emploi de rêve n est qu à un clic',
+    },
+    {
+      id: 'el-2',
+      type: 'Text',
+      category: 'Texte',
+      content: 'Découvrez nos méthodes prouvées, nos templates d organisation et nos automations pour développer un business rentable.',
+    },
+    {
+      id: 'el-3',
+      type: 'OptinForm',
+      category: 'Formulaire',
+      content: 'Formulaire de Capture Email',
+    },
+  ]);
+
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchStepData = async () => {
+      try {
+        const res = await fetch(`/api/admin/funnels/${params.id}`);
+        const data = await res.json();
+        if (data.funnel) {
+          setFunnel(data.funnel);
+          const targetStep = data.funnel.steps.find((s: any) => s.id === stepId) || data.funnel.steps[0];
+          setStep(targetStep);
+
+          if (targetStep?.content) {
+            try {
+              const parsed = JSON.parse(targetStep.content);
+              if (Array.isArray(parsed)) setElements(parsed);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStepData();
+  }, [params.id, stepId]);
+
+  const handleAddElement = (type: string, category: string, defaultContent: string) => {
+    const newEl: CanvasElement = {
+      id: `el-${Date.now()}`,
+      type,
+      category,
+      content: defaultContent,
+    };
+    setElements((prev) => [...prev, newEl]);
+    setSelectedElementId(newEl.id);
+  };
+
+  const handleDuplicateElement = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const el = elements.find((item) => item.id === id);
+    if (!el) return;
+    const duplicated: CanvasElement = {
+      ...el,
+      id: `el-${Date.now()}`,
+    };
+    setElements((prev) => [...prev, duplicated]);
+  };
+
+  const handleDeleteElement = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setElements((prev) => prev.filter((item) => item.id !== id));
+    if (selectedElementId === id) setSelectedElementId(null);
+  };
+
+  const handleSavePage = async () => {
+    if (!step) return;
+    setSaving(true);
+
+    try {
+      const res = await fetch(`/api/admin/funnels/${params.id}/steps`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stepId: step.id,
+          content: JSON.stringify(elements),
+        }),
+      });
+
+      if (res.ok) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-12 text-center text-xs text-slate-400 font-bold">Chargement de l éditeur visuel...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-hidden">
+      
+      {/* 1. TOP BUILDER TOOLBAR (INDEPENDENT WORKSPACE MODE) */}
+      <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
+        
+        {/* LEFT TOOLBAR CONTROLS */}
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/tunnels/${params.id}`}
+            className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center font-extrabold text-sm shadow-md"
+            title="Logo Onepreneur"
+          >
+            O
+          </Link>
+
+          <div className="h-5 w-px bg-slate-800" />
+
+          {/* UNDO / REDO */}
+          <div className="flex items-center gap-1">
+            <button
+              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              title="Annuler (Ctrl+Z)"
+            >
+              <Undo className="w-4 h-4" />
+            </button>
+            <button
+              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              title="Rétablir (Ctrl+Y)"
+            >
+              <Redo className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="h-5 w-px bg-slate-800" />
+
+          {/* POPUP & PARAMÈTRES */}
+          <button className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>Popup</span>
+          </button>
+          <button className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors flex items-center gap-1.5">
+            <Sliders className="w-3.5 h-3.5 text-blue-400" />
+            <span>Paramètres</span>
+          </button>
+        </div>
+
+        {/* CENTER STEP NAME INDICATOR */}
+        <div className="hidden md:flex items-center gap-2 text-xs font-bold text-slate-300">
+          <span className="text-slate-500">{funnel?.name}</span>
+          <span>/</span>
+          <span className="text-[#00A0FF] font-black">{step?.name}</span>
+        </div>
+
+        {/* RIGHT ACTION BUTTONS */}
+        <div className="flex items-center gap-3">
+          
+          {/* DESKTOP / MOBILE PREVIEW TOGGLE */}
+          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setPreviewMode('DESKTOP')}
+              className={`p-1.5 rounded-lg transition-all ${
+                previewMode === 'DESKTOP' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Aperçu Ordinateur"
+            >
+              <Monitor className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPreviewMode('MOBILE')}
+              className={`p-1.5 rounded-lg transition-all ${
+                previewMode === 'MOBILE' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Aperçu Mobile"
+            >
+              <Smartphone className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* SAVE BUTTON */}
+          <Button
+            onClick={handleSavePage}
+            disabled={saving}
+            className="bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-xs gap-1.5 px-4 py-2 rounded-xl shadow-md"
+          >
+            <Save className="w-4 h-4 !text-white stroke-[2.5]" />
+            <span>{saving ? 'Enregistrement...' : saveSuccess ? '✅ Enregistré' : 'Sauvegarder'}</span>
+          </Button>
+
+          {/* EXIT BUTTON */}
+          <Link href={`/admin/tunnels/${params.id}`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 font-bold text-xs gap-1.5 rounded-xl"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sortir</span>
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* 2. MAIN BUILDER BODY (PALETTE SIDEBAR & CANVAS) */}
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* LEFT PALETTE PANEL (SCREENS 1, 2, 3) */}
+        <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-y-auto">
+          
+          {/* TABS: ÉLÉMENTS / BLOCS */}
+          <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950">
+            <button
+              onClick={() => setActiveTab('ELEMENTS')}
+              className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                activeTab === 'ELEMENTS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Éléments
+            </button>
+            <button
+              onClick={() => setActiveTab('BLOCKS')}
+              className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                activeTab === 'BLOCKS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Blocs
+            </button>
+          </div>
+
+          {/* PALETTE CONTENT (SCREENS 1, 2, 3) */}
+          <div className="p-4 space-y-6 text-xs">
+            
+            {/* CATEGORY 1: TEXTE (SCREEN 1) */}
+            <div className="space-y-2.5">
+              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                Texte
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                
+                <button
+                  onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Texte</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Titre</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
+                </button>
+
+              </div>
+              
+              <button
+                onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
+                className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-pointer"
+              >
+                <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
+              </button>
+            </div>
+
+            {/* CATEGORY 2: MÉDIA (SCREEN 1) */}
+            <div className="space-y-2.5">
+              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                Média
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                
+                <button
+                  onClick={() => handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <ImageIcon className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Image</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Video className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Vidéo</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Audio', 'Média', 'Fichier Audio')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Music className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Audio</span>
+                </button>
+
+              </div>
+            </div>
+
+            {/* CATEGORY 3: DISPOSITION DES COLONNES (SCREEN 2) */}
+            <div className="space-y-2.5">
+              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                Disposition des colonnes
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                
+                <button
+                  onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <LayoutGrid className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Rows className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
+                </button>
+
+              </div>
+            </div>
+
+            {/* CATEGORY 4: FORMULAIRE (SCREEN 2) */}
+            <div className="space-y-2.5">
+              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                Formulaire
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                
+                <button
+                  onClick={() => handleAddElement('FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Champ</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <CheckSquare className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Bouton</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Case à cocher</span>
+                </button>
+
+              </div>
+            </div>
+
+            {/* CATEGORY 5: AUTRE & COUNTDOWN (SCREEN 3) */}
+            <div className="space-y-2.5">
+              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                Autre & Temps Forts
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                
+                <button
+                  onClick={() => handleAddElement('Countdown', 'Autre', '24:00:00')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Clock className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Countdown</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('Divider', 'Autre', 'Ligne horizontale')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Minus className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Ligne</span>
+                </button>
+
+                <button
+                  onClick={() => handleAddElement('HTMLCode', 'Autre', '<!-- Code HTML -->')}
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                >
+                  <Code className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                  <span className="text-[10px] font-bold text-slate-300">Code HTML</span>
+                </button>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* RIGHT LIVE CANVAS WORKSPACE */}
+        <div className="flex-1 bg-slate-950 p-6 overflow-y-auto flex justify-center">
+          <div
+            className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl transition-all space-y-6 ${
+              previewMode === 'MOBILE' ? 'max-w-sm' : 'max-w-4xl'
+            }`}
+          >
+            <div className="text-center text-xs text-slate-500 border-b border-slate-800 pb-3 flex items-center justify-between">
+              <span>🎯 Zone de travail en direct</span>
+              <span className="text-[11px] text-emerald-400 font-mono">Modèle : {step?.templateName || step?.name}</span>
+            </div>
+
+            {/* CANVAS RENDERED ELEMENTS */}
+            <div className="space-y-4 min-h-[400px]">
+              {elements.map((el) => {
+                const isSelected = el.id === selectedElementId;
+
+                return (
+                  <div
+                    key={el.id}
+                    onClick={() => setSelectedElementId(el.id)}
+                    className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer group ${
+                      isSelected
+                        ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30'
+                        : 'border-transparent hover:border-slate-700'
+                    }`}
+                  >
+                    {/* ELEMENT CONTROLS TOOLBAR (PARAMS, DUPLICATE, DELETE) */}
+                    {isSelected && (
+                      <div className="absolute -top-3 right-4 bg-[#00A0FF] text-white px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-2 shadow-lg z-20">
+                        <span className="uppercase">{el.type}</span>
+                        <div className="h-3 w-px bg-white/40" />
+                        <button onClick={(e) => handleDuplicateElement(el.id, e)} title="Dupliquer">
+                          <Copy className="w-3.5 h-3.5 hover:text-amber-300" />
+                        </button>
+                        <button onClick={(e) => handleDeleteElement(el.id, e)} title="Supprimer">
+                          <Trash2 className="w-3.5 h-3.5 hover:text-rose-300" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* ELEMENT TYPE CONTENT RENDERERS */}
+                    {el.type === 'Heading' && (
+                      <h1 className="text-2xl sm:text-4xl font-heading font-black text-white leading-tight">
+                        {el.content}
+                      </h1>
+                    )}
+
+                    {el.type === 'Text' && (
+                      <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                        {el.content}
+                      </p>
+                    )}
+
+                    {el.type === 'BulletList' && (
+                      <ul className="space-y-2 text-xs font-bold text-emerald-400">
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4" /> <span>{el.content}</span>
+                        </li>
+                      </ul>
+                    )}
+
+                    {el.type === 'Image' && (
+                      <div className="aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
+                        <img src={el.content} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {el.type === 'OptinForm' && (
+                      <div className="p-6 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                        <div className="text-xs font-bold text-slate-300">Adresse Email *</div>
+                        <div className="px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-500">
+                          votre.email@exemple.com
+                        </div>
+                        <Button className="w-full bg-[#00A0FF] !text-white font-black text-xs py-3 rounded-xl">
+                          Recevoir mon accès gratuit →
+                        </Button>
+                      </div>
+                    )}
+
+                    {el.type === 'Countdown' && (
+                      <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-center space-y-1">
+                        <div className="text-[10px] font-black text-amber-400 uppercase">Offre limitée</div>
+                        <div className="text-2xl font-heading font-black text-amber-300">{el.content}</div>
+                      </div>
+                    )}
+
+                    {el.type === 'Divider' && <hr className="border-slate-800 my-4" />}
+
+                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'Countdown', 'Divider'].includes(el.type) && (
+                      <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-bold text-slate-300">
+                        [{el.type}] : {el.content}
+                      </div>
+                    )}
+
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}

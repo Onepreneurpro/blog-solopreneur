@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins, Archivo_Black, Bebas_Neue } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { RootLayoutWrapper } from '@/components/layout/RootLayoutWrapper';
 import { getCurrentUser } from '@/lib/auth';
 import { getActiveTheme } from '@/lib/theme';
 import { prisma } from '@/lib/prisma';
@@ -75,9 +74,9 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={`h-full ${poppins.variable} ${archivoBlack.variable} ${bebasNeue.variable}`}>
       <body className={`flex flex-col min-h-full antialiased theme-${activeTheme} font-sans`}>
-        <Header user={user} menuItems={menuItems} />
-        <main className="flex-grow">{children}</main>
-        <Footer footerMenus={footerMenusMap} />
+        <RootLayoutWrapper user={user} menuItems={menuItems} footerMenusMap={footerMenusMap}>
+          {children}
+        </RootLayoutWrapper>
       </body>
     </html>
   );

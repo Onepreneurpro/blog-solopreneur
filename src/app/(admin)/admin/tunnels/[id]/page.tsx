@@ -462,17 +462,98 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
             </button>
           </div>
 
-          {/* TAB 1: TEMPLATE GALLERY (SCREEN 2) */}
+          {/* TAB 1: PARAMÈTRES ET CONFIGURATION DE L ÉTAPE (SCREEN 4 & TEMPLATE GALLERY) */}
           {activeTab === 'SETTINGS' && (
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-6">
-              <div>
-                <h3 className="font-heading font-black text-lg text-slate-900">
-                  Modèles disponibles pour : {selectedStep?.name}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Choisissez un modèle de page haute conversion ou partez d un modèle vierge.
-                </p>
-              </div>
+            <div className="space-y-6">
+              
+              {/* SCREEN 4: STEP CONFIGURATION CARD WITH ACTION BUTTONS */}
+              {selectedStep && (
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-start justify-between gap-6">
+                  
+                  {/* LEFT INPUTS */}
+                  <div className="space-y-4 flex-1">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-700">Nom *</label>
+                      <input
+                        type="text"
+                        value={selectedStep.name}
+                        readOnly
+                        className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-700">Chemin de l URL *</label>
+                      <div className="flex items-center">
+                        <span className="px-3 py-2.5 bg-slate-100 border border-r-0 border-slate-200 text-[11px] text-slate-500 rounded-l-xl font-mono">
+                          https://{funnel.domain || 'solopreneur.pro'}/funnel/{funnel.slug}/
+                        </span>
+                        <input
+                          type="text"
+                          value={selectedStep.slug}
+                          readOnly
+                          className="flex-1 px-3.5 py-2.5 text-xs rounded-r-xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RIGHT ACTION BUTTONS (SCREEN 4) */}
+                  <div className="flex flex-col gap-3 shrink-0 w-full md:w-56">
+                    <Link
+                      href={`/funnel/${funnel.slug}/${selectedStep.slug}`}
+                      target="_blank"
+                      className="w-full"
+                    >
+                      <Button
+                        size="sm"
+                        className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-xs gap-2 py-2.5 rounded-xl shadow-md justify-center"
+                      >
+                        <ExternalLink className="w-4 h-4 !text-white stroke-[2.5]" />
+                        <span>Voir la page</span>
+                      </Button>
+                    </Link>
+
+                    {/* MODIFIER LA PAGE BUTTON (OPENS INDEPENDENT BUILDER MODE) */}
+                    <Link
+                      href={`/admin/tunnels/${funnel.id}/builder?stepId=${selectedStep.id}`}
+                      className="w-full"
+                    >
+                      <Button
+                        size="sm"
+                        className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-xs gap-2 py-2.5 rounded-xl shadow-md justify-center"
+                      >
+                        <Edit3 className="w-4 h-4 !text-white stroke-[2.5]" />
+                        <span>Modifier la page</span>
+                      </Button>
+                    </Link>
+
+                    <Button
+                      onClick={() => {
+                        const el = document.getElementById('template-gallery-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      size="sm"
+                      className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-xs gap-2 py-2.5 rounded-xl shadow-md justify-center"
+                    >
+                      <Sparkles className="w-4 h-4 !text-white stroke-[2.5]" />
+                      <span>Changer le modèle de la page</span>
+                    </Button>
+                  </div>
+
+                </div>
+              )}
+
+              {/* TEMPLATE GALLERY SECTION */}
+              <div id="template-gallery-section" className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-6">
+                <div>
+                  <h3 className="font-heading font-black text-lg text-slate-900">
+                    Modèles disponibles pour : {selectedStep?.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Choisissez un modèle de page haute conversion ou partez d un modèle vierge.
+                  </p>
+                </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {CAPTURE_TEMPLATES.map((tmpl) => {
@@ -532,6 +613,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                 })}
               </div>
             </div>
+          </div>
           )}
 
           {/* TAB 2: AUTOMATION RULES ENGINE (SCREENS 3, 4 & 5) */}
