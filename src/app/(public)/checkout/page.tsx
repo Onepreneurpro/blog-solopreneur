@@ -812,7 +812,7 @@ function CheckoutContent() {
                       </li>
                       <li className="flex items-start gap-2">
                         <Zap className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
-                        <span><strong>100% Prêt à l emploi</strong> : Méthode clé en main pensée pour les solopreneurs & freelances.</span>
+                        <span><strong>100% Prêt à l'emploi</strong> : Méthode clé en main pensée pour les solopreneurs & freelances.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
