@@ -158,13 +158,17 @@ export default async function BoutiqueCategoryPage({ params, searchParams }: Bou
       if (storeHeroAccentColor === '#a3e635' || storeHeroAccentColor === '#ccff00' || !s.storeHeroAccentColor) storeHeroAccentColor = '#00A0FF';
     }
 
-    products = await prisma.product.findMany({
+    const rawProducts = await prisma.product.findMany({
       where: whereCondition,
       orderBy: { isFeatured: 'desc' },
       include: {
         category: { select: { name: true, slug: true } },
       },
     });
+
+    products = JSON.parse(JSON.stringify(rawProducts));
+    categories = JSON.parse(JSON.stringify(categories));
+    if (category) category = JSON.parse(JSON.stringify(category));
   } catch (err) {
     if (!category) notFound();
   }

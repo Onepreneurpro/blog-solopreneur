@@ -14,7 +14,7 @@ export default async function FreeResourcesPage() {
   let freeResources: any[] = [];
 
   try {
-    freeResources = await prisma.product.findMany({
+    const rawResources = await prisma.product.findMany({
       where: {
         status: 'PUBLISHED',
         isFreeResource: true,
@@ -24,6 +24,8 @@ export default async function FreeResourcesPage() {
         category: true,
       },
     });
+
+    freeResources = JSON.parse(JSON.stringify(rawResources));
   } catch (err) {
     console.error('Failed to load free resources:', err);
   }

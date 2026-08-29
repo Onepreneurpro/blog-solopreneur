@@ -44,7 +44,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
       ];
     }
 
-    articles = await prisma.article.findMany({
+    const rawArticles = await prisma.article.findMany({
       where: whereCondition,
       orderBy: { publishedAt: 'desc' },
       include: {
@@ -52,6 +52,9 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
         author: { select: { name: true, avatar: true } },
       },
     });
+
+    articles = JSON.parse(JSON.stringify(rawArticles));
+    categories = JSON.parse(JSON.stringify(categories));
   } catch (err) {
     console.error('Failed to load blog articles:', err);
   }

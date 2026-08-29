@@ -82,7 +82,7 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
       ];
     }
 
-    articles = await prisma.article.findMany({
+    const rawArticles = await prisma.article.findMany({
       where: whereCondition,
       orderBy: { publishedAt: 'desc' },
       include: {
@@ -90,6 +90,10 @@ export default async function BlogCategoryPage({ params, searchParams }: BlogCat
         author: { select: { name: true, avatar: true } },
       },
     });
+
+    articles = JSON.parse(JSON.stringify(rawArticles));
+    categories = JSON.parse(JSON.stringify(categories));
+    if (category) category = JSON.parse(JSON.stringify(category));
   } catch (err) {
     if (!category) notFound();
   }

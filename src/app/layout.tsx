@@ -44,7 +44,10 @@ export default async function RootLayout({
   let activeTheme = 'drahmi-dark';
 
   try {
-    user = await getCurrentUser();
+    const rawUser = await getCurrentUser();
+    if (rawUser) {
+      user = JSON.parse(JSON.stringify(rawUser));
+    }
     activeTheme = await getActiveTheme();
 
     const allMenus = await prisma.menu.findMany({
@@ -55,12 +58,14 @@ export default async function RootLayout({
       },
     });
 
-    const headerMenu = allMenus.find((m) => m.location === 'HEADER');
+    const safeAllMenus = JSON.parse(JSON.stringify(allMenus));
+
+    const headerMenu = safeAllMenus.find((m: any) => m.location === 'HEADER');
     if (headerMenu) {
-      menuItems = headerMenu.items;
+      menuItems = headerMenu.items || [];
     }
 
-    allMenus.forEach((m) => {
+    safeAllMenus.forEach((m: any) => {
       footerMenusMap[m.location] = { title: m.title, items: m.items || [] };
     });
   } catch (error) {
