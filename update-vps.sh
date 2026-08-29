@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# SCRIPT DE MISE À JOUR RAPIDE SOLOPRENEUR&CO SUR VPS CONTABO
+# SCRIPT DE MISE À JOUR RAPIDE SOLOPRENEUR&CO SUR VPS CONTABO (AUTO-DEPLOY ENABLED)
 # ==============================================================================
 
 set -e
