@@ -35,6 +35,7 @@ import {
   ChevronUp,
   ChevronDown,
   GripVertical,
+  Plus,
   Sparkles,
   ArrowLeft,
   X,
@@ -369,218 +370,355 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             </button>
           </div>
 
-          {/* PALETTE CONTENT (SCREENS 1, 2, 3) */}
+          {/* PALETTE CONTENT FOR ELEMENTS AND BLOCS TABS */}
           <div className="p-4 space-y-6 text-xs">
             
-            {/* CATEGORY 1: TEXTE (SCREEN 1) */}
-            <div className="space-y-2.5">
-              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                Texte
-              </div>
-              <div className="grid grid-cols-3 gap-2">
+            {activeTab === 'ELEMENTS' && (
+              <>
+                {/* CATEGORY 1: TEXTE (SCREEN 1) */}
+                <div className="space-y-2.5">
+                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                    Texte
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Text', 'Texte', 'Insérez votre texte ici...')}
+                      onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Texte</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Heading', 'Texte', 'Titre de la Page de Capture')}
+                      onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Titre</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
+                      onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
+                    </button>
+                  </div>
+                  
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Texte', 'Conteneur d éléments...')}
+                    onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
+                    className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-grab active:cursor-grabbing"
+                  >
+                    <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                    <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
+                  </button>
+                </div>
+
+                {/* CATEGORY 2: MÉDIA */}
+                <div className="space-y-2.5">
+                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                    Média
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
+                      onClick={() => handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <ImageIcon className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Image</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
+                      onClick={() => handleAddElement('Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Video className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Vidéo</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Audio', 'Média', 'Fichier Audio')}
+                      onClick={() => handleAddElement('Audio', 'Média', 'Fichier Audio')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Music className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Audio</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* CATEGORY 3: DISPOSITION DES COLONNES */}
+                <div className="space-y-2.5">
+                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                    Disposition des colonnes
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Col4', 'Disposition', '4 Colonnes')}
+                      onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <LayoutGrid className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Col3', 'Disposition', '3 Colonnes')}
+                      onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Col2', 'Disposition', '2 Colonnes')}
+                      onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Rows className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* CATEGORY 4: FORMULAIRE */}
+                <div className="space-y-2.5">
+                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                    Formulaire
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
+                      onClick={() => handleAddElement('FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Champ</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
+                      onClick={() => handleAddElement('ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <CheckSquare className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Bouton</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
+                      onClick={() => handleAddElement('CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Case à cocher</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* CATEGORY 5: AUTRE & COUNTDOWN */}
+                <div className="space-y-2.5">
+                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                    Autre & Temps Forts
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Countdown', 'Autre', '24:00:00')}
+                      onClick={() => handleAddElement('Countdown', 'Autre', '24:00:00')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Clock className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Countdown</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'Divider', 'Autre', 'Ligne horizontale')}
+                      onClick={() => handleAddElement('Divider', 'Autre', 'Ligne horizontale')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Minus className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Ligne</span>
+                    </button>
+
+                    <button
+                      draggable
+                      onDragStart={(e) => handlePaletteDragStart(e, 'HTMLCode', 'Autre', '<!-- Code HTML -->')}
+                      onClick={() => handleAddElement('HTMLCode', 'Autre', '<!-- Code HTML -->')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                    >
+                      <Code className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                      <span className="text-[10px] font-bold text-slate-300">Code HTML</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* TAB 2: BLOCS PRE-DESIGNED SECTIONS (THE 8 SUB-MENUS) */}
+            {activeTab === 'BLOCKS' && (
+              <div className="space-y-3">
                 
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Text', 'Texte', 'Insérez votre texte ici...')}
-                  onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Texte</span>
-                </button>
+                {/* 1. FONCTIONNALITÉS */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>👍</span>
+                    <span>Fonctionnalités</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockFeatures', 'Blocs', 'Features Section (3 Colonnes)')}
+                    onClick={() => handleAddElement('BlockFeatures', 'Blocs', 'Features Section (3 Colonnes)')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Section 3 Avantages</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Heading', 'Texte', 'Titre de la Page de Capture')}
-                  onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Titre</span>
-                </button>
+                {/* 2. PIEDS DE PAGE */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>📄</span>
+                    <span>Pieds de page</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
+                    onClick={() => handleAddElement('BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Footer Minimaliste</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
-                  onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
-                </button>
+                {/* 3. FORMULAIRES D INSCRIPTION */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>📝</span>
+                    <span>Formulaires d inscription</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
+                    onClick={() => handleAddElement('BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Opt-in Héro Haute Conversion</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-              </div>
-              
-              <button
-                draggable
-                onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Texte', 'Conteneur d éléments...')}
-                onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
-                className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-grab active:cursor-grabbing"
-              >
-                <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
-                <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
-              </button>
-            </div>
+                {/* 4. EN-TÊTES DE PAGE */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>📑</span>
+                    <span>En-têtes de page</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockHeader', 'Blocs', 'En-tête de page & Logo')}
+                    onClick={() => handleAddElement('BlockHeader', 'Blocs', 'En-tête de page & Logo')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Header Banner & Logo</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-            {/* CATEGORY 2: MÉDIA (SCREEN 1) */}
-            <div className="space-y-2.5">
-              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                Média
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
-                  onClick={() => handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <ImageIcon className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Image</span>
-                </button>
+                {/* 5. PRÉSENTATION DE L ÉQUIPE */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>👥</span>
+                    <span>Présentation de l équipe</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
+                    onClick={() => handleAddElement('BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Cartes Fondateurs</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
-                  onClick={() => handleAddElement('Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Video className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Vidéo</span>
-                </button>
+                {/* 6. TÉMOIGNAGES */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>💬</span>
+                    <span>Témoignages</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
+                    onClick={() => handleAddElement('BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Grille d Avis Clients</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Audio', 'Média', 'Fichier Audio')}
-                  onClick={() => handleAddElement('Audio', 'Média', 'Fichier Audio')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Music className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Audio</span>
-                </button>
+                {/* 7. TARIFS */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>💲</span>
+                    <span>Tarifs</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
+                    onClick={() => handleAddElement('BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Tableau de Tarifs</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
-              </div>
-            </div>
-
-            {/* CATEGORY 3: DISPOSITION DES COLONNES (SCREEN 2) */}
-            <div className="space-y-2.5">
-              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                Disposition des colonnes
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Col4', 'Disposition', '4 Colonnes')}
-                  onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <LayoutGrid className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Col3', 'Disposition', '3 Colonnes')}
-                  onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Col2', 'Disposition', '2 Colonnes')}
-                  onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Rows className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
-                </button>
-
-              </div>
-            </div>
-
-            {/* CATEGORY 4: FORMULAIRE (SCREEN 2) */}
-            <div className="space-y-2.5">
-              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                Formulaire
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
-                  onClick={() => handleAddElement('FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Champ</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
-                  onClick={() => handleAddElement('ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <CheckSquare className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Bouton</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
-                  onClick={() => handleAddElement('CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Case à cocher</span>
-                </button>
+                {/* 8. BIENVENUE */}
+                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                    <span>👋</span>
+                    <span>Bienvenue</span>
+                  </div>
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
+                    onClick={() => handleAddElement('BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
+                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                  >
+                    <span>Section Hero Bienvenue</span>
+                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                  </button>
+                </div>
 
               </div>
-            </div>
-
-            {/* CATEGORY 5: AUTRE & COUNTDOWN (SCREEN 3) */}
-            <div className="space-y-2.5">
-              <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                Autre & Temps Forts
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Countdown', 'Autre', '24:00:00')}
-                  onClick={() => handleAddElement('Countdown', 'Autre', '24:00:00')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Clock className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Countdown</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'Divider', 'Autre', 'Ligne horizontale')}
-                  onClick={() => handleAddElement('Divider', 'Autre', 'Ligne horizontale')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Minus className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Ligne</span>
-                </button>
-
-                <button
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, 'HTMLCode', 'Autre', '<!-- Code HTML -->')}
-                  onClick={() => handleAddElement('HTMLCode', 'Autre', '<!-- Code HTML -->')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                >
-                  <Code className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                  <span className="text-[10px] font-bold text-slate-300">Code HTML</span>
-                </button>
-
-              </div>
-            </div>
+            )}
 
           </div>
         </div>
