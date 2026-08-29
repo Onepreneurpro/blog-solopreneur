@@ -910,24 +910,22 @@ export default function AdminCampaignsPage() {
                       <Button
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
-                        variant="outline"
                         size="sm"
-                        className="text-amber-300 border-amber-500/40 bg-amber-950/40 hover:bg-amber-900/60 font-bold text-xs gap-1.5 cursor-pointer"
+                        className="!bg-amber-500 hover:!bg-amber-600 !text-amber-950 font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-colors cursor-pointer"
                         title="Mettre en pause cette campagne"
                       >
-                        <Pause className="w-3.5 h-3.5 text-amber-400" />
+                        <Pause className="w-3.5 h-3.5 !text-amber-950 stroke-[2.5]" />
                         <span>Pause</span>
                       </Button>
                     ) : (
                       <Button
                         type="button"
                         onClick={() => handleTogglePauseCampaign(camp)}
-                        variant="outline"
                         size="sm"
-                        className="text-[#a3e635] border-[#a3e635]/40 bg-[#a3e635]/10 hover:bg-[#a3e635]/20 font-bold text-xs gap-1.5 cursor-pointer"
+                        className="!bg-emerald-500 hover:!bg-emerald-600 !text-emerald-950 font-heading font-black text-xs gap-1.5 shadow-md border-0 transition-colors cursor-pointer"
                         title="Reprendre et réactiver cette campagne"
                       >
-                        <Play className="w-3.5 h-3.5 text-[#a3e635]" />
+                        <Play className="w-3.5 h-3.5 !text-emerald-950 stroke-[2.5]" />
                         <span>Reprendre</span>
                       </Button>
                     )}

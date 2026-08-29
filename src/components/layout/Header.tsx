@@ -179,10 +179,11 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
               <div className="hidden md:flex items-center gap-3">
                 {user ? (
                   <div className="flex items-center gap-2">
+                    {/* MON COMPTE BUTTON - Electric Blue Pill with PURE WHITE text */}
                     <Link href="/compte">
-                      <Button variant="primary" size="sm" className="btn-purple flex items-center gap-1.5 rounded-xl font-extrabold px-4 py-2 shadow-md relative !text-white focus:ring-0 focus:ring-offset-0">
-                        <User className="w-4 h-4 text-white" />
-                        <span className="text-white">Mon Compte</span>
+                      <Button variant="primary" size="sm" className="flex items-center gap-1.5 rounded-xl font-extrabold px-4 py-2 shadow-md relative !bg-[#00A0FF] hover:!bg-[#0082D6] !text-white border-0 focus:ring-0 focus:ring-offset-0 transition-all">
+                        <User className="w-4 h-4 !text-white stroke-[2.5]" />
+                        <span className="!text-white font-extrabold">Mon Compte</span>
                         {unreadNotificationsCount > 0 && (
                           <span className="ml-1 px-2 py-0.5 text-[10px] font-black bg-amber-400 text-amber-950 rounded-full animate-bounce shadow-sm">
                             {unreadNotificationsCount}
@@ -191,10 +192,11 @@ export function Header({ user, menuItems: initialMenuItems = [] }: HeaderProps) 
                       </Button>
                     </Link>
 
+                    {/* DÉCONNEXION BUTTON - Vibrant Rose/Red Pill with PURE WHITE text */}
                     <form action="/api/auth/logout" method="POST">
-                      <Button type="submit" size="sm" className="flex items-center gap-1.5 rounded-xl font-bold px-4 py-2 text-xs !text-red-400 !bg-red-950/40 border border-red-800/50 hover:!bg-red-900/60 hover:!text-red-200 focus:ring-0 focus:ring-offset-0 transition-colors">
-                        <LogOut className="w-4 h-4 text-red-400" />
-                        <span className="text-red-300">Déconnexion</span>
+                      <Button type="submit" size="sm" className="flex items-center gap-1.5 rounded-xl font-bold px-4 py-2 text-xs !bg-rose-600 hover:!bg-rose-700 !text-white border-0 shadow-md focus:ring-0 focus:ring-offset-0 transition-colors">
+                        <LogOut className="w-4 h-4 !text-white stroke-[2.5]" />
+                        <span className="!text-white font-bold">Déconnexion</span>
                       </Button>
                     </form>
                   </div>
