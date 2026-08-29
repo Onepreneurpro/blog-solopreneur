@@ -171,13 +171,13 @@ export function HeroPixelFunnel({
           <div className="lg:col-span-5 relative flex flex-col justify-between">
             
             {/* FLOATING BADGE TOP */}
-            <div className="absolute -top-4 -right-2 z-20 bg-[#a3e635] text-slate-950 px-3.5 py-1 rounded-sm shadow-2xl font-heading font-black text-[11px] border border-slate-950/10 flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-slate-950" />
+            <div className="absolute -top-4 -right-2 z-20 bg-[#00A0FF] text-white px-3.5 py-1 rounded-sm shadow-2xl font-heading font-black text-[11px] border border-white/20 flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5 text-white" />
               <span>{floatingBadge}</span>
             </div>
 
             {/* MAIN CREATOR BIO CARD */}
-            <div className="creator-bio-card bg-[#0e1424]/95 backdrop-blur-xl border border-white/15 rounded-md p-5 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between h-full space-y-3">
+            <div className="creator-bio-card bg-[#0e1424]/95 backdrop-blur-xl border border-[#00A0FF]/30 rounded-md p-5 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between h-full space-y-3">
               
               {/* TOP CONTENT WRAPPER */}
               <div className="space-y-3">
@@ -185,7 +185,7 @@ export function HeroPixelFunnel({
                 {/* CIRCULAR AVATAR PHOTO & PROFILE HEADER */}
                 <div className="flex items-center gap-3.5 border-b border-white/10 pb-3">
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#a3e635] overflow-hidden shadow-xl shadow-[#a3e635]/30 relative">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#00A0FF] overflow-hidden shadow-xl shadow-[#00A0FF]/30 relative">
                       <Image
                         src={creatorAvatar}
                         alt="Photo du Créateur"
@@ -194,16 +194,16 @@ export function HeroPixelFunnel({
                         priority
                       />
                     </div>
-                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#a3e635] border-2 border-slate-950 shadow-md z-10" />
+                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#00A0FF] border-2 border-slate-950 shadow-md z-10" />
                   </div>
 
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-1.5">
                       <h3 className="text-base font-heading font-black text-white">{creatorName}</h3>
-                      <CheckCircle className="w-4 h-4 text-[#a3e635] fill-[#a3e635]/20" />
+                      <CheckCircle className="w-4 h-4 text-[#00A0FF] fill-[#00A0FF]/20" />
                     </div>
                     <div className="text-xs text-slate-300 font-bold">{creatorTitle}</div>
-                    <div className="text-[11px] text-[#a3e635] font-heading font-black flex items-center gap-1">
+                    <div className="text-[11px] text-[#00A0FF] font-heading font-black flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
                       <span>{creatorSubtitle}</span>
                     </div>
@@ -211,10 +211,10 @@ export function HeroPixelFunnel({
                 </div>
 
                 {/* ENRICHED BIO & MISSION BOX */}
-                <div className="creator-quote-box bg-slate-950/80 p-3.5 sm:p-4 rounded-md border border-white/10 space-y-1.5 shadow-inner">
-                  <div className="text-[10px] font-heading font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <div className="creator-quote-box bg-[#00A0FF]/10 p-3.5 sm:p-4 rounded-md border border-[#00A0FF]/25 space-y-1.5 shadow-inner">
+                  <div className="text-[10px] font-heading font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
                     <span>Ma Bibliothèques & Systèmes</span>
-                    <span className="text-[#a3e635] font-black">100% Éprouvés</span>
+                    <span className="text-[#00A0FF] font-black">100% ÉPROUVÉS</span>
                   </div>
                   <p className="text-[11px] text-slate-200 leading-relaxed font-normal italic">
                     {creatorQuote}
@@ -228,28 +228,28 @@ export function HeroPixelFunnel({
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-white/10 text-[11px] font-bold text-white">
-                      <span className="w-5 h-5 rounded-sm bg-[#a3e635]/20 text-[#a3e635] flex items-center justify-center font-black">
+                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-[#00A0FF]/20 text-[11px] font-bold text-white">
+                      <span className="w-5 h-5 rounded-sm bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-black">
                         <Layers className="w-3 h-3" />
                       </span>
                       <span>{exp1}</span>
                     </div>
 
-                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-white/10 text-[11px] font-bold text-white">
-                      <span className="w-5 h-5 rounded-sm bg-blue-500/20 text-blue-400 flex items-center justify-center font-black">
+                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-[#00A0FF]/20 text-[11px] font-bold text-white">
+                      <span className="w-5 h-5 rounded-sm bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-black">
                         <DollarSign className="w-3 h-3" />
                       </span>
                       <span>{exp2}</span>
                     </div>
 
-                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-white/10 text-[11px] font-bold text-white">
+                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-[#00A0FF]/20 text-[11px] font-bold text-white">
                       <span className="w-5 h-5 rounded-sm bg-amber-500/20 text-amber-400 flex items-center justify-center font-black">
                         <Zap className="w-3 h-3" />
                       </span>
                       <span>{exp3}</span>
                     </div>
 
-                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-white/10 text-[11px] font-bold text-white">
+                    <div className="creator-skill-pill flex items-center gap-2 p-2 rounded-md bg-slate-950/60 border border-[#00A0FF]/20 text-[11px] font-bold text-white">
                       <span className="w-5 h-5 rounded-sm bg-purple-500/20 text-purple-400 flex items-center justify-center font-black">
                         <UserCheck className="w-3 h-3" />
                       </span>
@@ -268,7 +268,7 @@ export function HeroPixelFunnel({
                   ))}
                   <span className="font-heading font-black text-white ml-1">{ratingText}</span>
                 </div>
-                <span className="text-[#a3e635] font-heading font-black">
+                <span className="text-[#00A0FF] font-heading font-black">
                   {solopreneursCount}
                 </span>
               </div>
