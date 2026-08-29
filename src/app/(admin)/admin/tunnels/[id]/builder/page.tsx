@@ -32,8 +32,9 @@ import {
   CheckCircle2,
   Trash2,
   Copy,
-  Lock,
-  Plus,
+  ChevronUp,
+  ChevronDown,
+  GripVertical,
   Sparkles,
   ArrowLeft,
   X,
@@ -113,6 +114,74 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     fetchStepData();
   }, [params.id, stepId]);
+
+  const handlePaletteDragStart = (e: React.DragEvent, type: string, category: string, defaultContent: string) => {
+    e.dataTransfer.setData(
+      'application/json',
+      JSON.stringify({ type, category, defaultContent, isNew: true })
+    );
+  };
+
+  const handleCanvasElementDragStart = (e: React.DragEvent, index: number, id: string) => {
+    e.dataTransfer.setData(
+      'application/json',
+      JSON.stringify({ draggedIndex: index, draggedElementId: id, isNew: false })
+    );
+  };
+
+  const handleCanvasDrop = (e: React.DragEvent, targetIndex?: number) => {
+    e.preventDefault();
+    const dataStr = e.dataTransfer.getData('application/json');
+    if (!dataStr) return;
+
+    try {
+      const data = JSON.parse(dataStr);
+      if (data.isNew) {
+        const newEl: CanvasElement = {
+          id: `el-${Date.now()}`,
+          type: data.type,
+          category: data.category,
+          content: data.defaultContent,
+        };
+        setElements((prev) => {
+          if (targetIndex !== undefined) {
+            const updated = [...prev];
+            updated.splice(targetIndex, 0, newEl);
+            return updated;
+          }
+          return [...prev, newEl];
+        });
+        setSelectedElementId(newEl.id);
+      } else if (data.draggedElementId !== undefined) {
+        const fromIndex = data.draggedIndex;
+        const toIndex = targetIndex !== undefined ? targetIndex : elements.length - 1;
+        if (fromIndex !== undefined && fromIndex !== toIndex) {
+          setElements((prev) => {
+            const updated = [...prev];
+            const [moved] = updated.splice(fromIndex, 1);
+            updated.splice(toIndex, 0, moved);
+            return updated;
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const moveElement = (index: number, direction: -1 | 1, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= elements.length) return;
+
+    setElements((prev) => {
+      const updated = [...prev];
+      const temp = updated[index];
+      updated[index] = updated[targetIndex];
+      updated[targetIndex] = temp;
+      return updated;
+    });
+  };
 
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
     const newEl: CanvasElement = {
@@ -311,24 +380,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="grid grid-cols-3 gap-2">
                 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Text', 'Texte', 'Insérez votre texte ici...')}
                   onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Texte</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Heading', 'Texte', 'Titre de la Page de Capture')}
                   onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Titre</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
                   onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
@@ -337,8 +412,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               </div>
               
               <button
+                draggable
+                onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Texte', 'Conteneur d éléments...')}
                 onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
-                className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-pointer"
+                className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-grab active:cursor-grabbing"
               >
                 <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
                 <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
@@ -353,24 +430,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="grid grid-cols-3 gap-2">
                 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
                   onClick={() => handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <ImageIcon className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Image</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
                   onClick={() => handleAddElement('Video', 'Média', 'https://www.youtube.com/embed/dQw4w9WgXcQ')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Video className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Vidéo</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Audio', 'Média', 'Fichier Audio')}
                   onClick={() => handleAddElement('Audio', 'Média', 'Fichier Audio')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Music className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Audio</span>
@@ -387,24 +470,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="grid grid-cols-3 gap-2">
                 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Col4', 'Disposition', '4 Colonnes')}
                   onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <LayoutGrid className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Col3', 'Disposition', '3 Colonnes')}
                   onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Col2', 'Disposition', '2 Colonnes')}
                   onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Rows className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
@@ -421,24 +510,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="grid grid-cols-3 gap-2">
                 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
                   onClick={() => handleAddElement('FormInput', 'Formulaire', 'Champ de formulaire (Email)')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Champ</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
                   onClick={() => handleAddElement('ButtonCTA', 'Formulaire', 'Recevoir mon accès gratuit')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <CheckSquare className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Bouton</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
                   onClick={() => handleAddElement('CheckboxOptin', 'Formulaire', 'J accepte la politique de confidentialité')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <CheckCircle2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Case à cocher</span>
@@ -455,24 +550,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="grid grid-cols-3 gap-2">
                 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Countdown', 'Autre', '24:00:00')}
                   onClick={() => handleAddElement('Countdown', 'Autre', '24:00:00')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Clock className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Countdown</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'Divider', 'Autre', 'Ligne horizontale')}
                   onClick={() => handleAddElement('Divider', 'Autre', 'Ligne horizontale')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Minus className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Ligne</span>
                 </button>
 
                 <button
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, 'HTMLCode', 'Autre', '<!-- Code HTML -->')}
                   onClick={() => handleAddElement('HTMLCode', 'Autre', '<!-- Code HTML -->')}
-                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-pointer"
+                  className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
                 >
                   <Code className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                   <span className="text-[10px] font-bold text-slate-300">Code HTML</span>
@@ -485,36 +586,67 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         </div>
 
         {/* RIGHT LIVE CANVAS WORKSPACE */}
-        <div className="flex-1 bg-slate-950 p-6 overflow-y-auto flex justify-center">
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => handleCanvasDrop(e)}
+          className="flex-1 bg-slate-950 p-6 overflow-y-auto flex justify-center"
+        >
           <div
             className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl transition-all space-y-6 ${
               previewMode === 'MOBILE' ? 'max-w-sm' : 'max-w-4xl'
             }`}
           >
             <div className="text-center text-xs text-slate-500 border-b border-slate-800 pb-3 flex items-center justify-between">
-              <span>🎯 Zone de travail en direct</span>
+              <span className="flex items-center gap-1.5 font-bold">
+                <GripVertical className="w-4 h-4 text-purple-400" />
+                <span>Zone de travail (Glisser-déposer d éléments actif)</span>
+              </span>
               <span className="text-[11px] text-emerald-400 font-mono">Modèle : {step?.templateName || step?.name}</span>
             </div>
 
             {/* CANVAS RENDERED ELEMENTS */}
             <div className="space-y-4 min-h-[400px]">
-              {elements.map((el) => {
+              {elements.map((el, idx) => {
                 const isSelected = el.id === selectedElementId;
 
                 return (
                   <div
                     key={el.id}
+                    draggable
+                    onDragStart={(e) => handleCanvasElementDragStart(e, idx, el.id)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.stopPropagation();
+                      handleCanvasDrop(e, idx);
+                    }}
                     onClick={() => setSelectedElementId(el.id)}
-                    className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer group ${
+                    className={`relative p-4 rounded-2xl border-2 transition-all cursor-move group ${
                       isSelected
                         ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30'
-                        : 'border-transparent hover:border-slate-700'
+                        : 'border-slate-800/80 hover:border-slate-700 bg-slate-950/40'
                     }`}
                   >
-                    {/* ELEMENT CONTROLS TOOLBAR (PARAMS, DUPLICATE, DELETE) */}
+                    {/* ELEMENT CONTROLS TOOLBAR (UP, DOWN, PARAMS, DUPLICATE, DELETE) */}
                     {isSelected && (
                       <div className="absolute -top-3 right-4 bg-[#00A0FF] text-white px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-2 shadow-lg z-20">
                         <span className="uppercase">{el.type}</span>
+                        <div className="h-3 w-px bg-white/40" />
+                        <button
+                          onClick={(e) => moveElement(idx, -1, e)}
+                          disabled={idx === 0}
+                          title="Déplacer vers le haut (▲)"
+                          className="disabled:opacity-40"
+                        >
+                          <ChevronUp className="w-3.5 h-3.5 hover:text-amber-300" />
+                        </button>
+                        <button
+                          onClick={(e) => moveElement(idx, 1, e)}
+                          disabled={idx === elements.length - 1}
+                          title="Déplacer vers le bas (▼)"
+                          className="disabled:opacity-40"
+                        >
+                          <ChevronDown className="w-3.5 h-3.5 hover:text-amber-300" />
+                        </button>
                         <div className="h-3 w-px bg-white/40" />
                         <button onClick={(e) => handleDuplicateElement(el.id, e)} title="Dupliquer">
                           <Copy className="w-3.5 h-3.5 hover:text-amber-300" />
