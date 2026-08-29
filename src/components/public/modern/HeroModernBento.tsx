@@ -52,7 +52,9 @@ export function HeroModernBento({
       case 'yellow':
         return '!bg-[#ccff00] hover:!bg-[#b8e600] !text-slate-950 font-black shadow-2xl shadow-[#ccff00]/40 border-0 hover:scale-[1.02] transition-all duration-300';
       case 'purple':
-        return 'bg-purple-700 hover:bg-purple-800 text-white font-extrabold shadow-xl shadow-purple-600/30 border-0 hover:scale-[1.02] transition-all duration-300';
+      case 'blue':
+      case 'bluesky':
+        return '!bg-[#00A0FF] hover:!bg-[#0080FF] !text-white font-extrabold shadow-lg shadow-[#00A0FF]/30 border-0 hover:scale-105 transition-all duration-200';
       case 'white':
         return 'bg-white hover:bg-slate-50 text-slate-950 font-extrabold border border-slate-200 shadow-md hover:scale-[1.02] transition-all duration-300';
       default:

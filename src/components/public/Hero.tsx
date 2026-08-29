@@ -54,7 +54,9 @@ export function Hero({
       case 'yellow':
         return '!bg-[#ccff00] hover:!bg-[#b8e600] !text-slate-950 font-black shadow-xl shadow-[#ccff00]/30 border-0 hover:scale-105 transition-all duration-200';
       case 'purple':
-        return '!bg-purple-700 hover:!bg-purple-800 !text-white font-extrabold shadow-lg shadow-purple-600/20 border-0 hover:scale-105 transition-all duration-200';
+      case 'blue':
+      case 'bluesky':
+        return '!bg-[#00A0FF] hover:!bg-[#0080FF] !text-white font-extrabold shadow-lg shadow-[#00A0FF]/30 border-0 hover:scale-105 transition-all duration-200';
       case 'white':
         return '!bg-white hover:!bg-slate-100 !text-slate-950 font-extrabold border border-slate-300 shadow-sm hover:scale-105 transition-all duration-200';
       default:

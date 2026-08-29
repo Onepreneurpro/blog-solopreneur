@@ -76,7 +76,9 @@ export function HeroPixelFunnel({
       case 'yellow':
         return 'bg-[#a3e635] hover:bg-[#86efac] text-slate-950 font-black shadow-xl shadow-[#a3e635]/25 border-0 hover:scale-[1.02] transition-all';
       case 'purple':
-        return 'bg-purple-700 hover:bg-purple-800 text-white font-extrabold shadow-xl shadow-purple-600/30 border-0 hover:scale-[1.02] transition-all';
+      case 'blue':
+      case 'bluesky':
+        return '!bg-[#00A0FF] hover:!bg-[#0080FF] !text-white font-extrabold shadow-lg shadow-[#00A0FF]/30 border-0 hover:scale-105 transition-all duration-200';
       case 'white':
         return 'bg-white hover:bg-slate-100 text-slate-950 font-black border border-slate-200 shadow-md hover:scale-[1.02] transition-all';
       case 'dark':
