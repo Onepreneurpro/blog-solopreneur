@@ -26,6 +26,7 @@ import {
   X,
   Pin,
   PanelLeftClose,
+  ChevronDown,
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -102,15 +103,21 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pinnedHrefs, setPinnedHrefs] = useState<string[]>([]);
+  const [collapsedGroups, setCollapsedGroups] = useState<string[]>([]);
 
-  // Load pinned links from localStorage
-  const loadPinned = () => {
+  // Load pinned links and collapsed section state from localStorage
+  const loadPreferences = () => {
     try {
-      const saved = localStorage.getItem('pinnedAdminLinks');
-      if (saved) {
-        setPinnedHrefs(JSON.parse(saved));
+      const savedPins = localStorage.getItem('pinnedAdminLinks');
+      if (savedPins) {
+        setPinnedHrefs(JSON.parse(savedPins));
       } else {
         setPinnedHrefs(['/admin/campagnes', '/admin/leads']);
+      }
+
+      const savedCollapsed = localStorage.getItem('adminCollapsedSidebarGroups');
+      if (savedCollapsed) {
+        setCollapsedGroups(JSON.parse(savedCollapsed));
       }
     } catch (e) {
       console.error(e);
@@ -118,11 +125,25 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
   };
 
   useEffect(() => {
-    loadPinned();
-    const handleUpdate = () => loadPinned();
+    loadPreferences();
+    const handleUpdate = () => loadPreferences();
     window.addEventListener('pinnedAdminLinksUpdated', handleUpdate);
     return () => window.removeEventListener('pinnedAdminLinksUpdated', handleUpdate);
   }, []);
+
+  const toggleGroupCollapse = (groupName: string) => {
+    setCollapsedGroups((prev) => {
+      const updated = prev.includes(groupName)
+        ? prev.filter((g) => g !== groupName)
+        : [...prev, groupName];
+      try {
+        localStorage.setItem('adminCollapsedSidebarGroups', JSON.stringify(updated));
+      } catch (err) {
+        console.error(err);
+      }
+      return updated;
+    });
+  };
 
   const togglePin = (href: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -175,57 +196,81 @@ export function AdminSidebar({ onToggleSidebar }: AdminSidebarProps = {}) {
           </div>
         </div>
 
-        {/* NAVIGATION LINKS */}
-        <nav className="space-y-6 text-xs">
-          {ADMIN_LINKS.map((section, idx) => (
-            <div key={idx} className="space-y-1.5">
-              
-              {/* MAIN SECTION HEADER WITH ELECTRIC SKY BLUE BACKGROUND */}
-              <div className="px-3.5 py-2.5 bg-[#00A0FF] text-white border-l-4 border-[#0077CC] border-y border-r border-[#0090EE] rounded-none text-[11px] font-heading font-black tracking-wider uppercase shadow-2xs mb-2 flex items-center justify-between">
-                <span>{section.group}</span>
-                <span className="w-2 h-2 bg-white rounded-none opacity-90" />
-              </div>
+        {/* NAVIGATION LINKS WITH COLLAPSIBLE SECTIONS */}
+        <nav className="space-y-4 text-xs">
+          {ADMIN_LINKS.map((section, idx) => {
+            const isGroupCollapsed = collapsedGroups.includes(section.group);
+            const hasActiveChild = section.items.some(
+              (item) => pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+            );
 
-              <div className="space-y-1">
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-                  const isPinned = pinnedHrefs.includes(item.href);
+            return (
+              <div key={idx} className="space-y-1">
+                
+                {/* MAIN SECTION HEADER WITH TOGGLE EXTENSION/REDUCTION */}
+                <button
+                  type="button"
+                  onClick={() => toggleGroupCollapse(section.group)}
+                  className="w-full text-left px-3.5 py-2 bg-[#00A0FF] hover:bg-[#008CE0] text-white border-l-4 border-[#0077CC] border-y border-r border-[#0090EE] rounded-md text-[11px] font-heading font-black tracking-wider uppercase shadow-2xs mb-1.5 flex items-center justify-between cursor-pointer transition-colors group"
+                  title={isGroupCollapsed ? 'Cliquer pour agrandir cette section' : 'Cliquer pour réduire cette section'}
+                >
+                  <span className="truncate pr-2">{section.group}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {hasActiveChild && (
+                      <span className="w-2 h-2 bg-amber-300 rounded-full animate-pulse" title="Page active dans cette section" />
+                    )}
+                    <ChevronDown
+                      className={`w-4 h-4 text-white transition-transform duration-200 ${
+                        isGroupCollapsed ? '-rotate-90 opacity-80' : 'rotate-0 opacity-100'
+                      }`}
+                    />
+                  </div>
+                </button>
 
-                  return (
-                    <div key={item.href} className="relative group">
-                      <Link
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={`flex items-center justify-between px-3 py-2.5 rounded-none text-xs transition-all ${
-                          isActive
-                            ? 'admin-link-active bg-[#F1F5F9] text-slate-900 font-extrabold border-l-4 border-[#00A0FF] border-y border-r border-[#CBD5E1] shadow-xs'
-                            : 'admin-link-inactive text-slate-800 hover:bg-slate-50 hover:text-slate-950 font-bold border border-transparent hover:border-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#00A0FF]' : 'text-slate-600'}`} />
-                          <span className="whitespace-normal break-words leading-snug">{item.label}</span>
+                {/* RENDER INNER LINKS WHEN EXPANDED */}
+                {!isGroupCollapsed && (
+                  <div className="space-y-1 pl-0.5 animate-in fade-in duration-200">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+                      const isPinned = pinnedHrefs.includes(item.href);
+
+                      return (
+                        <div key={item.href} className="relative group">
+                          <Link
+                            href={item.href}
+                            onClick={() => setMobileOpen(false)}
+                            className={`flex items-center justify-between px-3 py-2 rounded-md text-xs transition-all ${
+                              isActive
+                                ? 'admin-link-active bg-[#F1F5F9] text-slate-900 font-extrabold border-l-4 border-[#00A0FF] border-y border-r border-[#CBD5E1] shadow-xs'
+                                : 'admin-link-inactive text-slate-800 hover:bg-slate-50 hover:text-slate-950 font-bold border border-transparent hover:border-slate-200'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#00A0FF]' : 'text-slate-600'}`} />
+                              <span className="whitespace-normal break-words leading-snug">{item.label}</span>
+                            </div>
+
+                            <button
+                              onClick={(e) => togglePin(item.href, e)}
+                              title={isPinned ? 'Désépingler du bandeau haut' : 'Épingler au bandeau haut'}
+                              className={`p-1 rounded-none transition-opacity flex-shrink-0 ml-1 ${
+                                isPinned
+                                  ? 'text-amber-500 opacity-100'
+                                  : 'text-slate-400 opacity-0 group-hover:opacity-100 hover:text-purple-900'
+                              }`}
+                            >
+                              <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-500 text-amber-600' : ''}`} />
+                            </button>
+                          </Link>
                         </div>
-
-                        <button
-                          onClick={(e) => togglePin(item.href, e)}
-                          title={isPinned ? 'Désépingler du bandeau haut' : 'Épingler au bandeau haut'}
-                          className={`p-1 rounded-none transition-opacity flex-shrink-0 ml-1 ${
-                            isPinned
-                              ? 'text-amber-500 opacity-100'
-                              : 'text-slate-400 opacity-0 group-hover:opacity-100 hover:text-purple-900'
-                          }`}
-                        >
-                          <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-500 text-amber-600' : ''}`} />
-                        </button>
-                      </Link>
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </nav>
       </div>
 
