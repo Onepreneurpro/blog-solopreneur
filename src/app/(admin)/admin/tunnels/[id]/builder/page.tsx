@@ -529,13 +529,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
         
         {/* LEFT TOOLBAR CONTROLS */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/admin/tunnels"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+            title="Revenir à la liste de tous vos Tunnels de Vente"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-[#00A0FF]" />
+            <span className="hidden sm:inline">Tunnels</span>
+          </Link>
+
           <Link
             href={`/admin/tunnels/${params.id}`}
-            className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center font-extrabold text-sm shadow-md"
-            title="Logo Onepreneur"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00A0FF]/20 hover:bg-[#00A0FF]/30 text-[#00A0FF] border border-[#00A0FF]/40 text-xs font-extrabold rounded-xl transition-colors"
+            title="Revenir aux étapes du tunnel actuel (Screen 2)"
           >
-            O
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Retour au Tunnel</span>
           </Link>
 
           <div className="h-5 w-px bg-slate-800" />
@@ -624,14 +634,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <span>{saving ? 'Enregistrement...' : saveSuccess ? '✅ Enregistré' : 'Sauvegarder'}</span>
           </Button>
 
-          {/* EXIT BUTTON */}
+          {/* EXIT BUTTON (RETOUR AU TUNNEL) */}
           <Link href={`/admin/tunnels/${params.id}`}>
             <Button
               variant="outline"
               size="sm"
               className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 font-bold text-xs gap-1.5 rounded-xl"
+              title="Quitter le builder et revenir aux étapes du tunnel (Screen 2)"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 text-rose-400" />
               <span>Sortir</span>
             </Button>
           </Link>
