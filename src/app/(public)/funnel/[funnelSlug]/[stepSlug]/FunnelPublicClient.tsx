@@ -130,7 +130,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   // RENDER WEBSTUDIO PROJECT PUBLICLY
   if (webstudioProject) {
     const renderNode = (node: any): React.ReactNode => {
-      const Tag = (node.tag || 'div') as keyof JSX.IntrinsicElements;
+      const safeTag = (node.tag === 'body' || node.tag === 'html') ? 'div' : (node.tag || 'div');
+      const Tag = safeTag as keyof JSX.IntrinsicElements;
       return (
         <Tag key={node.id} style={node.style}>
           {node.content}

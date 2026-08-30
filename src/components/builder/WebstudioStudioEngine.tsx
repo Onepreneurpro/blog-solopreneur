@@ -63,7 +63,7 @@ export const DEFAULT_WEBSTUDIO_PROJECT: WebstudioProjectData = {
     id: 'ws-root-page',
     type: 'Page',
     name: 'Body / Main Page',
-    tag: 'body',
+    tag: 'div',
     style: {
       backgroundColor: '#0F172A',
       color: '#F8FAFC',
@@ -389,7 +389,8 @@ export default function WebstudioStudioEngine({
   // Recursive Node Canvas Renderer
   const renderCanvasNode = (node: WebstudioNode) => {
     const isSel = node.id === selectedNodeId;
-    const Tag = (node.tag || 'div') as keyof JSX.IntrinsicElements;
+    const safeTag = (node.tag === 'body' || node.tag === 'html') ? 'div' : (node.tag || 'div');
+    const Tag = safeTag as keyof JSX.IntrinsicElements;
 
     const inlineStyle: React.CSSProperties = {
       ...node.style,
