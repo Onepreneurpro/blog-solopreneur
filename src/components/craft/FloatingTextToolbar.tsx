@@ -1,25 +1,71 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bold, Italic, Highlighter, Underline, Palette, RemoveFormatting, X } from 'lucide-react';
+import {
+  Undo,
+  Redo,
+  Bold,
+  Italic,
+  Underline,
+  Type,
+  Palette,
+  Highlighter,
+  Eraser,
+} from 'lucide-react';
 
 export const FloatingTextToolbar = () => {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
-  const [openUpward, setOpenUpward] = useState(false);
-  const [showHighlightMenu, setShowHighlightMenu] = useState(false);
-  const [showUnderlineMenu, setShowUnderlineMenu] = useState(false);
-  const [showTextColorMenu, setShowTextColorMenu] = useState(false);
+  const [openPopover, setOpenPopover] = useState<'underline' | 'text' | 'neon' | null>(null);
 
-  // UNDERLINE OPTIONS STATE
-  const [underlineStyle, setUnderlineStyle] = useState<'solid' | 'wavy' | 'dotted' | 'dashed' | 'double'>('wavy');
-  const [underlineColor, setUnderlineColor] = useState('#00A0FF');
-  const [underlineThickness, setUnderlineThickness] = useState(4);
-  const [underlineOffset, setUnderlineOffset] = useState(-2);
+  const [underlineThickness, setUnderlineThickness] = useState('3px');
+  const [underlineOffset, setUnderlineOffset] = useState('0px');
 
-  // HIGHLIGHT CUSTOM COLOR STATE
-  const [customHighlightColor, setCustomHighlightColor] = useState('#fef08a');
-  // TEXT COLOR CUSTOM STATE
-  const [customTextColor, setCustomTextColor] = useState('#00A0FF');
+  const underlineColors = [
+    { label: 'Vert Néon', color: '#a3e635' },
+    { label: 'Jaune Fluo', color: '#facc15' },
+    { label: 'Cyan Fluo', color: '#22d3ee' },
+    { label: 'Violet Électrique', color: '#a855f7' },
+    { label: 'Bleu Vif', color: '#00A0FF' },
+    { label: 'Rose Magenta', color: '#ec4899' },
+    { label: 'Orange Feu', color: '#f97316' },
+    { label: 'Rouge Vif', color: '#ef4444' },
+    { label: 'Émeraude', color: '#10b981' },
+    { label: 'Blanc', color: '#ffffff' },
+    { label: 'Gris Slate', color: '#64748b' },
+    { label: 'Noir Profond', color: '#0f172a' },
+  ];
+
+  const textColors = [
+    { label: 'Vert Néon', color: '#a3e635' },
+    { label: 'Jaune Fluo', color: '#facc15' },
+    { label: 'Cyan Fluo', color: '#06b6d4' },
+    { label: 'Bleu Royal', color: '#2563eb' },
+    { label: 'Violet Impérial', color: '#9333ea' },
+    { label: 'Rose Néon', color: '#f43f5e' },
+    { label: 'Orange', color: '#f97316' },
+    { label: 'Rouge', color: '#dc2626' },
+    { label: 'Émeraude', color: '#059669' },
+    { label: 'Doré', color: '#d97706' },
+    { label: 'Blanc', color: '#ffffff' },
+    { label: 'Gris Clair', color: '#cbd5e1' },
+    { label: 'Gris Slate', color: '#64748b' },
+    { label: 'Noir Obsidian', color: '#0f172a' },
+  ];
+
+  const neonColors = [
+    { label: 'Vert Néon', color: '#a3e635' },
+    { label: 'Jaune Néon', color: '#facc15' },
+    { label: 'Cyan Fluo', color: '#22d3ee' },
+    { label: 'Rose Fluo', color: '#f472b6' },
+    { label: 'Orange Fluo', color: '#fb923c' },
+    { label: 'Violet Fluo', color: '#c084fc' },
+    { label: 'Corail Fluo', color: '#ff6b6b' },
+    { label: 'Menthe Fluo', color: '#51cf66' },
+    { label: 'Bleu Ciel', color: '#339af0' },
+    { label: 'Ambre', color: '#f59e0b' },
+    { label: 'Lavande', color: '#e0e7ff' },
+    { label: 'Blanc Pur', color: '#ffffff' },
+  ];
 
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -54,31 +100,11 @@ export const FloatingTextToolbar = () => {
       const rect = range.getBoundingClientRect();
 
       if (rect && rect.width > 0 && rect.height > 0) {
-        const spaceBelow = window.innerHeight - rect.bottom;
-        setOpenUpward(spaceBelow < 340);
-
-        const clampedLeft = Math.max(160, Math.min(window.innerWidth - 160, rect.left + rect.width / 2));
-
+        const clampedLeft = Math.max(200, Math.min(window.innerWidth - 200, rect.left + rect.width / 2));
         setPosition({
           top: Math.max(12, rect.top - 58),
           left: clampedLeft,
         });
-
-        // Detect current underline properties if selecting an existing underline
-        let parent = range.commonAncestorContainer;
-        if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
-        const existingUnderline = (parent as HTMLElement).closest('span[style*="text-decoration"], u') as HTMLElement | null;
-        if (existingUnderline) {
-          const comp = window.getComputedStyle(existingUnderline);
-          const computedThickness = parseFloat(comp.textDecorationThickness);
-          if (!isNaN(computedThickness) && computedThickness > 0) {
-            setUnderlineThickness(Math.round(computedThickness));
-          }
-          const computedOffset = parseFloat(comp.textUnderlineOffset);
-          if (!isNaN(computedOffset)) {
-            setUnderlineOffset(Math.round(computedOffset));
-          }
-        }
       }
     };
 
@@ -93,29 +119,11 @@ export const FloatingTextToolbar = () => {
 
   if (!position) return null;
 
-  const applyFormat = (command: string, value?: string) => {
+  const executeCommand = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
   };
 
-  const removeAllFormattingFromSelection = () => {
-    document.execCommand('removeFormat', false);
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    let container = range.commonAncestorContainer;
-    if (container.nodeType === Node.TEXT_NODE) container = container.parentElement!;
-
-    const elem = container as HTMLElement;
-    const styledSpans = elem.querySelectorAll('span[style], u');
-    styledSpans.forEach((sp) => {
-      const parent = sp.parentNode;
-      while (sp.firstChild) parent?.insertBefore(sp.firstChild, sp);
-      parent?.removeChild(sp);
-    });
-  };
-
-  const applyCurrentHighlight = (color: string) => {
+  const handleApplyHighlight = (color: string) => {
     if (typeof window === 'undefined') return;
     document.execCommand('styleWithCSS', false, 'true');
     document.execCommand('hiliteColor', false, color);
@@ -137,9 +145,8 @@ export const FloatingTextToolbar = () => {
     }
   };
 
-  const applyCurrentUnderline = (
-    style = underlineStyle,
-    color = underlineColor,
+  const handleApplyUnderline = (
+    color: string,
     thickness = underlineThickness,
     offset = underlineOffset
   ) => {
@@ -152,7 +159,6 @@ export const FloatingTextToolbar = () => {
     let parent = range.commonAncestorContainer;
     if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
 
-    // Check if selection is inside an existing styled span
     let targetSpan = (parent as HTMLElement).closest('span[style*="text-decoration"], u, font') as HTMLElement | null;
 
     if (!targetSpan) {
@@ -165,15 +171,45 @@ export const FloatingTextToolbar = () => {
 
     if (targetSpan) {
       targetSpan.style.setProperty('text-decoration-line', 'underline', 'important');
-      targetSpan.style.setProperty('text-decoration-style', style, 'important');
+      targetSpan.style.setProperty('text-decoration-style', 'solid', 'important');
       targetSpan.style.setProperty('text-decoration-color', color, 'important');
-      targetSpan.style.setProperty('text-decoration-thickness', `${thickness}px`, 'important');
-      targetSpan.style.setProperty('text-underline-offset', `${offset}px`, 'important');
+      targetSpan.style.setProperty('text-decoration-thickness', thickness, 'important');
+      targetSpan.style.setProperty('text-underline-offset', offset, 'important');
       targetSpan.style.setProperty('text-decoration-skip-ink', 'none', 'important');
     }
   };
 
-  const menuPosClass = openUpward ? 'bottom-full mb-3' : 'top-full mt-3';
+  const handleApplyTextColor = (color: string) => {
+    executeCommand('foreColor', color);
+  };
+
+  const handleApplyFontSize = (sizePx: string) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
+
+    const span = (parent as HTMLElement).closest('span[style*="font-size"]') as HTMLElement | null;
+    if (span) {
+      span.style.fontSize = sizePx;
+    } else {
+      const newSpan = document.createElement('span');
+      newSpan.style.fontSize = sizePx;
+      try {
+        range.surroundContents(newSpan);
+      } catch (e) {
+        const contents = range.extractContents();
+        newSpan.appendChild(contents);
+        range.insertNode(newSpan);
+      }
+    }
+  };
+
+  const handleRemoveHighlightAndUnderline = () => {
+    document.execCommand('removeFormat', false);
+  };
 
   return (
     <div
@@ -182,27 +218,41 @@ export const FloatingTextToolbar = () => {
         left: `${position.left}px`,
         transform: 'translateX(-50%)',
       }}
-      className="fixed z-[99999] bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1.5 border-2 border-slate-200 animate-in fade-in zoom-in-95 duration-150 select-none"
+      className="fixed z-[99999] bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1.5 border-2 border-slate-200 animate-in fade-in zoom-in-95 select-none"
     >
-      {/* BOLD */}
+      {/* UNDO / REDO */}
       <button
-        onMouseDown={(e) => {
-          e.preventDefault();
-          applyFormat('bold');
-        }}
-        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
+        type="button"
+        onClick={() => executeCommand('undo')}
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 cursor-pointer"
+        title="Annuler (Ctrl+Z)"
+      >
+        <Undo className="w-4 h-4 text-slate-900" />
+      </button>
+      <button
+        type="button"
+        onClick={() => executeCommand('redo')}
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 cursor-pointer"
+        title="Rétablir (Ctrl+Y)"
+      >
+        <Redo className="w-4 h-4 text-slate-900" />
+      </button>
+
+      <div className="w-px h-5 bg-slate-200 my-auto" />
+
+      {/* BOLD / ITALIC */}
+      <button
+        type="button"
+        onClick={() => executeCommand('bold')}
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 font-extrabold cursor-pointer"
         title="Mettre en Gras"
       >
         <Bold className="w-4 h-4 text-slate-900" />
       </button>
-
-      {/* ITALIC */}
       <button
-        onMouseDown={(e) => {
-          e.preventDefault();
-          applyFormat('italic');
-        }}
-        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
+        type="button"
+        onClick={() => executeCommand('italic')}
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 italic font-extrabold cursor-pointer"
         title="Mettre en Italique"
       >
         <Italic className="w-4 h-4 text-slate-900" />
@@ -210,315 +260,265 @@ export const FloatingTextToolbar = () => {
 
       <div className="w-px h-5 bg-slate-200 my-auto" />
 
-      {/* HIGHLIGHT (FEUTRE SURLIGNEUR) */}
-      <div className="relative">
+      {/* SOULIGNÉ POPOVER */}
+      <div className="relative shrink-0">
         <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setShowHighlightMenu(!showHighlightMenu);
-            setShowUnderlineMenu(false);
-            setShowTextColorMenu(false);
-          }}
-          className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-full transition-colors flex items-center gap-1.5 text-xs font-black text-amber-950"
-          title="Surligner avec du Feutre"
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setOpenPopover((prev) => (prev === 'underline' ? null : 'underline'))}
+          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs"
+          title="Soulignage Personnalisé"
         >
-          <Highlighter className="w-4 h-4 text-amber-600" />
-          <span>Feutre</span>
+          <Underline className="w-4 h-4 text-sky-600 shrink-0" />
+          <span>Souligné</span>
+          <span className="w-2.5 h-2.5 rounded-full border border-sky-400 bg-[#00A0FF] shrink-0 inline-block" />
+          <span className="text-[10px] text-sky-700 shrink-0">▾</span>
         </button>
 
-        {showHighlightMenu && (
-          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3 z-50 min-w-[220px] ${menuPosClass}`}>
-            <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur de Feutre</span>
-            <div className="grid grid-cols-5 gap-2">
-              {[
-                { color: '#fef08a', label: 'Jaune' },
-                { color: '#bbf7d0', label: 'Vert' },
-                { color: '#fbcfe8', label: 'Rose' },
-                { color: '#bae6fd', label: 'Bleu' },
-                { color: '#fed7aa', label: 'Orange' },
-                { color: '#e9d5ff', label: 'Violet' },
-                { color: '#fecdd3', label: 'Rouge' },
-                { color: '#cff4fc', label: 'Turquoise' },
-                { color: '#dcfce7', label: 'Menthe' },
-                { color: '#fef3c7', label: 'Or' },
-              ].map((c) => (
-                <button
-                  key={c.color}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    applyCurrentHighlight(c.color);
-                    setShowHighlightMenu(false);
-                  }}
-                  className="w-7 h-7 rounded-xl border border-slate-300 transition-transform hover:scale-115 shadow-xs cursor-pointer"
-                  style={{ backgroundColor: c.color }}
-                  title={c.label}
-                />
-              ))}
+        {openPopover === 'underline' && (
+          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                <Underline className="w-4 h-4 text-[#00A0FF]" />
+                <span>Soulignage Personnalisé</span>
+              </span>
             </div>
 
-            {/* CUSTOM HIGHLIGHT COLOR PICKER */}
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-              <input
-                type="color"
-                value={customHighlightColor}
-                onChange={(e) => setCustomHighlightColor(e.target.value)}
-                onMouseDown={(e) => e.stopPropagation()}
-                className="w-8 h-8 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
-              />
-              <button
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  applyCurrentHighlight(customHighlightColor);
-                  setShowHighlightMenu(false);
-                }}
-                className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
-              >
-                Appliquer couleur
-              </button>
-            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-black text-slate-800 mb-1">Épaisseur :</label>
+                <select
+                  value={underlineThickness}
+                  onChange={(e) => setUnderlineThickness(e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none cursor-pointer"
+                >
+                  <option value="1px">1px (Fin)</option>
+                  <option value="2px">2px (Normal)</option>
+                  <option value="3px">3px (Épais)</option>
+                  <option value="4px">4px (Fort)</option>
+                  <option value="6px">6px (Bandeau)</option>
+                  <option value="8px">8px (Surbrillance)</option>
+                </select>
+              </div>
 
-            <button
-              onMouseDown={(e) => {
-                e.preventDefault();
-                removeAllFormattingFromSelection();
-                setShowHighlightMenu(false);
-              }}
-              className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
-            >
-              ❌ Retirer le feutre
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* SOULIGNAGE (STYLE, ÉPAISSEUR, POSITION ET COULEURS) */}
-      <div className="relative">
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setShowUnderlineMenu(!showUnderlineMenu);
-            setShowHighlightMenu(false);
-            setShowTextColorMenu(false);
-          }}
-          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 rounded-full transition-colors flex items-center gap-1.5 text-xs font-black text-sky-950"
-          title="Réglages du Soulignement"
-        >
-          <Underline className="w-4 h-4 text-sky-600" />
-          <span>Souligner</span>
-        </button>
-
-        {showUnderlineMenu && (
-          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 z-50 min-w-[280px] ${menuPosClass}`}>
-            {/* STYLE SELECTOR */}
-            <div className="space-y-1.5">
-              <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Style de Trait</span>
-              <div className="grid grid-cols-3 gap-1.5">
-                {[
-                  { key: 'solid', label: 'Solide' },
-                  { key: 'wavy', label: 'Ondulé 🌊' },
-                  { key: 'dotted', label: 'Points •' },
-                  { key: 'dashed', label: 'Tirets -' },
-                  { key: 'double', label: 'Double =' },
-                ].map((st) => (
-                  <button
-                    key={st.key}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      const style = st.key as any;
-                      setUnderlineStyle(style);
-                      applyCurrentUnderline(style);
-                    }}
-                    className={`py-1.5 px-2 rounded-xl border-2 font-black text-xs transition-colors ${
-                      underlineStyle === st.key
-                        ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {st.label}
-                  </button>
-                ))}
+              <div>
+                <label className="block text-xs font-black text-slate-800 mb-1">Hauteur / Position :</label>
+                <select
+                  value={underlineOffset}
+                  onChange={(e) => setUnderlineOffset(e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none cursor-pointer"
+                >
+                  <option value="-2px">⚡ Haute (Collée)</option>
+                  <option value="0px">📍 Support direct (0px)</option>
+                  <option value="2px">✨ Normal (2px)</option>
+                  <option value="4px">📏 Espacée (4px)</option>
+                  <option value="6px">🔻 Basse (6px)</option>
+                </select>
               </div>
             </div>
 
-            {/* COLOR SWATCHES FOR UNDERLINE */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-100">
-              <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur du Trait</span>
-              <div className="flex items-center gap-2">
-                {[
-                  { color: '#00A0FF', label: 'Bleu' },
-                  { color: '#ef4444', label: 'Rouge' },
-                  { color: '#22c55e', label: 'Vert' },
-                  { color: '#eab308', label: 'Jaune' },
-                  { color: '#a855f7', label: 'Violet' },
-                  { color: '#0f172a', label: 'Sombre' },
-                ].map((c) => (
+            <div>
+              <label className="block text-xs font-black text-slate-800 mb-1.5">Choisir la couleur :</label>
+              <div className="grid grid-cols-6 gap-1.5">
+                {underlineColors.map((c) => (
                   <button
                     key={c.color}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setUnderlineColor(c.color);
-                      applyCurrentUnderline(underlineStyle, c.color);
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      handleApplyUnderline(c.color, underlineThickness, underlineOffset);
+                      setOpenPopover(null);
                     }}
-                    className={`w-7 h-7 rounded-xl border-2 transition-transform ${
-                      underlineColor === c.color ? 'ring-2 ring-sky-500 scale-110 border-white' : 'border-slate-300'
-                    }`}
                     style={{ backgroundColor: c.color }}
+                    className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                    title={c.label}
                   />
                 ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+              <div className="flex items-center gap-2">
                 <input
                   type="color"
-                  value={underlineColor}
-                  onChange={(e) => {
-                    const color = e.target.value;
-                    setUnderlineColor(color);
-                    applyCurrentUnderline(underlineStyle, color);
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  className="w-7 h-7 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
+                  defaultValue="#a3e635"
+                  onChange={(e) => handleApplyUnderline(e.target.value, underlineThickness, underlineOffset)}
+                  className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                  title="Glissez le curseur pour explorer toutes les nuances"
                 />
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => setOpenPopover(null)}
+                  className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                >
+                  OK
+                </button>
               </div>
             </div>
-
-            {/* THICKNESS SLIDER */}
-            <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <div className="flex justify-between font-black text-xs text-slate-800">
-                <span>Épaisseur du Trait</span>
-                <span className="text-[#00A0FF] font-mono">{underlineThickness}px</span>
-              </div>
-              <input
-                type="range"
-                min={1}
-                max={14}
-                step={1}
-                value={underlineThickness}
-                onChange={(e) => {
-                  const thickness = parseInt(e.target.value, 10);
-                  setUnderlineThickness(thickness);
-                  applyCurrentUnderline(underlineStyle, underlineColor, thickness, underlineOffset);
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-                className="w-full accent-[#00A0FF] cursor-pointer"
-              />
-            </div>
-
-            {/* POSITION / OVERLAP SLIDER */}
-            <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <div className="flex justify-between font-black text-xs text-slate-800">
-                <span>↕️ Position / Recouvrement</span>
-                <span className="text-[#00A0FF] font-mono">{underlineOffset}px</span>
-              </div>
-              <input
-                type="range"
-                min={-8}
-                max={10}
-                step={1}
-                value={underlineOffset}
-                onChange={(e) => {
-                  const offset = parseInt(e.target.value, 10);
-                  setUnderlineOffset(offset);
-                  applyCurrentUnderline(underlineStyle, underlineColor, underlineThickness, offset);
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-                className="w-full accent-[#00A0FF] cursor-pointer"
-              />
-              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-0.5">
-                <span>⬆️ Sur les lettres (-8px)</span>
-                <span>Sous le texte (10px) ⬇️</span>
-              </div>
-            </div>
-
-            <button
-              onMouseDown={(e) => {
-                e.preventDefault();
-                removeAllFormattingFromSelection();
-                setShowUnderlineMenu(false);
-              }}
-              className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
-            >
-              Effacer le soulignage
-            </button>
           </div>
         )}
       </div>
 
-      {/* COULEUR DE TEXTE AVEC PALETTE */}
-      <div className="relative">
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setShowTextColorMenu(!showTextColorMenu);
-            setShowHighlightMenu(false);
-            setShowUnderlineMenu(false);
+      {/* TAILLE SELECTOR */}
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+        <Type className="w-4 h-4 text-slate-700 ml-1 shrink-0" />
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              handleApplyFontSize(e.target.value);
+              e.target.value = '';
+            }
           }}
-          className="p-2 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-full transition-colors font-black text-xs flex items-center gap-1 text-emerald-950"
-          title="Couleur du texte"
+          className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer pr-1"
+          title="Taille du texte"
         >
-          <Palette className="w-4 h-4 text-emerald-600" />
+          <option value="" className="bg-white text-slate-900">Taille</option>
+          <option value="12px" className="bg-white text-slate-900">12px</option>
+          <option value="14px" className="bg-white text-slate-900">14px</option>
+          <option value="18px" className="bg-white text-slate-900">18px</option>
+          <option value="24px" className="bg-white text-slate-900">24px</option>
+          <option value="32px" className="bg-white text-slate-900">32px</option>
+        </select>
+      </div>
+
+      {/* COULEUR POPOVER */}
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setOpenPopover((prev) => (prev === 'text' ? null : 'text'))}
+          className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs"
+          title="Palette de Couleurs de Texte"
+        >
+          <Palette className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>Couleur</span>
+          <span className="text-[10px] text-emerald-700 shrink-0">▾</span>
         </button>
 
-        {showTextColorMenu && (
-          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3 z-50 min-w-[200px] ${menuPosClass}`}>
-            <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur de Texte</span>
-            <div className="grid grid-cols-5 gap-2">
-              {[
-                { color: '#00A0FF', label: 'Bleu' },
-                { color: '#ef4444', label: 'Rouge' },
-                { color: '#16a34a', label: 'Vert' },
-                { color: '#ea580c', label: 'Orange' },
-                { color: '#9333ea', label: 'Violet' },
-                { color: '#0f172a', label: 'Sombre' },
-                { color: '#ffffff', label: 'Blanc' },
-                { color: '#eab308', label: 'Jaune' },
-                { color: '#ec4899', label: 'Rose' },
-                { color: '#06b6d4', label: 'Cyan' },
-              ].map((c) => (
+        {openPopover === 'text' && (
+          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                <Palette className="w-4 h-4 text-emerald-600" />
+                <span>Couleur du Texte</span>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1.5">
+              {textColors.map((c) => (
                 <button
                   key={c.color}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    applyFormat('foreColor', c.color);
-                    setShowTextColorMenu(false);
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    handleApplyTextColor(c.color);
+                    setOpenPopover(null);
                   }}
-                  className="w-7 h-7 rounded-xl border border-slate-300 transition-transform hover:scale-115 shadow-xs cursor-pointer"
                   style={{ backgroundColor: c.color }}
+                  className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
                   title={c.label}
                 />
               ))}
             </div>
 
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-              <input
-                type="color"
-                value={customTextColor}
-                onChange={(e) => setCustomTextColor(e.target.value)}
-                onMouseDown={(e) => e.stopPropagation()}
-                className="w-8 h-8 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
-              />
-              <button
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  applyFormat('foreColor', customTextColor);
-                  setShowTextColorMenu(false);
-                }}
-                className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
-              >
-                Appliquer
-              </button>
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  defaultValue="#a3e635"
+                  onChange={(e) => handleApplyTextColor(e.target.value)}
+                  className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                  title="Glissez le curseur pour explorer toutes les nuances"
+                />
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => setOpenPopover(null)}
+                  className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                >
+                  OK
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* REMOVE FORMATTING */}
+      {/* ✨ NÉON HIGHLIGHT POPOVER */}
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setOpenPopover((prev) => (prev === 'neon' ? null : 'neon'))}
+          className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs"
+          title="Palette de Surlignage Néon"
+        >
+          <Highlighter className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>✨ Néon</span>
+          <span className="text-[10px] text-amber-700 shrink-0">▾</span>
+        </button>
+
+        {openPopover === 'neon' && (
+          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                <Highlighter className="w-4 h-4 text-amber-600" />
+                <span>Surlignage Néon Fluo</span>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-6 gap-1.5">
+              {neonColors.map((c) => (
+                <button
+                  key={c.color}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    handleApplyHighlight(c.color);
+                    setOpenPopover(null);
+                  }}
+                  style={{ backgroundColor: c.color }}
+                  className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                  title={c.label}
+                />
+              ))}
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  defaultValue="#a3e635"
+                  onChange={(e) => handleApplyHighlight(e.target.value)}
+                  className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                  title="Glissez le curseur pour explorer toutes les nuances"
+                />
+                <button
+                  type="button"
+                  onClick={() => setOpenPopover(null)}
+                  className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ERASE FORMATTING */}
       <button
-        onMouseDown={(e) => {
-          e.preventDefault();
-          removeAllFormattingFromSelection();
-        }}
-        className="p-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded-full transition-colors text-rose-700 font-black text-xs flex items-center gap-1"
+        type="button"
+        onClick={handleRemoveHighlightAndUnderline}
+        className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-2xs"
         title="Effacer les mises en forme"
       >
-        <RemoveFormatting className="w-4 h-4" />
+        <Eraser className="w-4 h-4 text-rose-600" />
+        <span>Effacer</span>
       </button>
     </div>
   );
