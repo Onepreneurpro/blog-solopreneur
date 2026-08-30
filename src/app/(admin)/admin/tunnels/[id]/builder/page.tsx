@@ -39,6 +39,7 @@ import {
   Plus,
   Sparkles,
   ArrowLeft,
+  Eye,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -623,6 +624,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <span>Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
             </button>
           </div>
+
+          {/* VOIR LA PAGE (PUBLIC VIEW) BUTTON */}
+          <a
+            href={
+              funnel?.slug && step?.slug
+                ? `/funnel/${funnel.slug}/${step.slug}`
+                : funnel?.slug
+                ? `/funnel/${funnel.slug}`
+                : '#'
+            }
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-[#00A0FF] hover:text-white font-heading font-black text-xs rounded-xl border border-slate-700 transition-colors shadow-xs"
+            title="Ouvrir la page publique du tunnel dans un nouvel onglet"
+          >
+            <Eye className="w-4 h-4 text-[#00A0FF]" />
+            <span>Voir la page</span>
+          </a>
 
           {/* SAVE BUTTON */}
           <Button
