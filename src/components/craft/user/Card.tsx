@@ -161,6 +161,16 @@ export const Card = ({
           <span
             contentEditable
             suppressContentEditableWarning
+            onFocus={() => {
+              setProp((props: CardProps) => {
+                props.targetText = 'title';
+              });
+            }}
+            onClick={() => {
+              setProp((props: CardProps) => {
+                props.targetText = 'title';
+              });
+            }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
                 props.title = e.currentTarget.innerHTML;
@@ -184,6 +194,16 @@ export const Card = ({
           <span
             contentEditable
             suppressContentEditableWarning
+            onFocus={() => {
+              setProp((props: CardProps) => {
+                props.targetText = 'content';
+              });
+            }}
+            onClick={() => {
+              setProp((props: CardProps) => {
+                props.targetText = 'content';
+              });
+            }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
                 props.content = e.currentTarget.innerHTML;
