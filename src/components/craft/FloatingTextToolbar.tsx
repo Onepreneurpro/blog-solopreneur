@@ -169,6 +169,7 @@ export const FloatingTextToolbar = () => {
       targetSpan.style.setProperty('text-decoration-color', color, 'important');
       targetSpan.style.setProperty('text-decoration-thickness', `${thickness}px`, 'important');
       targetSpan.style.setProperty('text-underline-offset', `${offset}px`, 'important');
+      targetSpan.style.setProperty('text-decoration-skip-ink', 'none', 'important');
     }
   };
 
