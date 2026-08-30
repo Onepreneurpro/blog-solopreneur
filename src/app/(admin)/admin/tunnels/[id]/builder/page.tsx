@@ -219,9 +219,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [editingBlock, setEditingBlock] = useState<CanvasElement | null>(null);
 
   const getDefaultBlockData = (type: string, name: string) => {
-    if (type === 'BlockFeat4ColImg') {
+    if (type === 'BlockFeat4ColImg' || type === 'Col4') {
       return {
-        title: 'BASES ET NUTRITION',
+        title: 'GRILLE 4 COLONNES (SECTION DÉMONSTRATION)',
         items: [
           { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
           { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
@@ -230,9 +230,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         ],
       };
     }
-    if (type === 'BlockFeat3ColImg') {
+    if (type === 'BlockFeat3ColImg' || type === 'Col3') {
       return {
-        title: 'Le Savoir-Faire des Experts à Votre Portée',
+        title: 'Le Savoir-Faire des Experts à Votre Portée (3 Colonnes)',
         subtitle: 'CE QUE VOUS OBTENEZ',
         items: [
           { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
@@ -241,9 +241,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         ],
       };
     }
-    if (type === 'BlockFeat2ColIconsLeft') {
+    if (type === 'BlockFeat2ColIconsLeft' || type === 'Col2') {
       return {
-        title: 'Nos Services & Garanties',
+        title: 'Nos Services & Garanties (2 Colonnes)',
         items: [
           { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
           { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
@@ -1378,7 +1378,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {el.type === 'Divider' && <hr className="border-slate-800 my-4" />}
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
-                    {el.type === 'BlockFeat4ColImg' && (
+                    {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (
                       <div
                         className={`space-y-4 p-6 rounded-3xl shadow-xl relative transition-all ${
                           showCanvasGrid
@@ -1559,7 +1559,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {el.type === 'BlockFeat3ColImg' && (
+                    {(el.type === 'BlockFeat3ColImg' || el.type === 'Col3') && (
                       <div
                         className={`p-6 rounded-3xl shadow-xl space-y-6 relative transition-all ${
                           showCanvasGrid
@@ -1742,7 +1742,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {el.type === 'BlockFeat2ColIconsLeft' && (
+                    {(el.type === 'BlockFeat2ColIconsLeft' || el.type === 'Col2') && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-6">
                         <div className="text-center">
                           <input
@@ -1851,7 +1851,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {/* DEFAULT FALLBACK RENDERER FOR UNHANDLED CUSTOM BLOCKS */}
-                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark'].includes(el.type) && (
+                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark', 'Col4', 'Col3', 'Col2'].includes(el.type) && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
