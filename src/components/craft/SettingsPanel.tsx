@@ -101,6 +101,76 @@ export const SettingsPanel = () => {
             </div>
           </div>
         )}
+
+        {/* IMAGE HEIGHT CONTROL */}
+        {props.height !== undefined && (
+          <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
+            <div className="flex justify-between font-black text-slate-900 text-xs">
+              <span>↕️ Hauteur de l Image (Height)</span>
+              <span className="text-[#00A0FF] font-mono">{props.height}px</span>
+            </div>
+            <input
+              type="range"
+              min={80}
+              max={650}
+              step={10}
+              value={props.height}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.height = parseInt(e.target.value, 10);
+                })
+              }
+              className="w-full accent-[#00A0FF]"
+            />
+          </div>
+        )}
+
+        {/* BUTTON HEIGHT CONTROL (PADDING Y) */}
+        {props.paddingY !== undefined && (
+          <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
+            <div className="flex justify-between font-black text-slate-900 text-xs">
+              <span>↕️ Hauteur du Bouton</span>
+              <span className="text-[#00A0FF] font-mono">{props.paddingY}px</span>
+            </div>
+            <input
+              type="range"
+              min={6}
+              max={36}
+              step={2}
+              value={props.paddingY}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.paddingY = parseInt(e.target.value, 10);
+                })
+              }
+              className="w-full accent-[#00A0FF]"
+            />
+          </div>
+        )}
+
+        {/* CONTAINER / CARD PADDING (VERTICAL HEIGHT & SPACING) */}
+        {props.padding !== undefined && (
+          <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
+            <div className="flex justify-between font-black text-slate-900 text-xs">
+              <span>↕️ Hauteur Interne (Padding / Épaisseur)</span>
+              <span className="text-[#00A0FF] font-mono">{props.padding}px</span>
+            </div>
+            <input
+              type="range"
+              min={4}
+              max={120}
+              step={4}
+              value={props.padding}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.padding = parseInt(e.target.value, 10);
+                })
+              }
+              className="w-full accent-[#00A0FF]"
+            />
+          </div>
+        )}
+
         {/* GRID COLUMNS SELECTOR (2, 3, 4 COLUMNS) */}
         {props.columns !== undefined && (
           <div className="space-y-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200">
@@ -272,66 +342,19 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* IMAGE SRC & HEIGHT */}
+        {/* IMAGE SRC */}
         {props.src !== undefined && (
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <label className="font-bold text-slate-700">URL ou Fichier Image</label>
-              <input
-                type="text"
-                value={props.src}
-                onChange={(e) =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.src = e.target.value;
-                  })
-                }
-                className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs"
-              />
-            </div>
-
-            {props.height !== undefined && (
-              <div className="space-y-1.5">
-                <div className="flex justify-between font-bold text-slate-700">
-                  <span>Hauteur d Image</span>
-                  <span>{props.height}px</span>
-                </div>
-                <input
-                  type="range"
-                  min={100}
-                  max={600}
-                  step={10}
-                  value={props.height}
-                  onChange={(e) =>
-                    actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.height = parseInt(e.target.value, 10);
-                    })
-                  }
-                  className="w-full accent-[#00A0FF]"
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* CONTAINER PADDING */}
-        {props.padding !== undefined && (
           <div className="space-y-1.5">
-            <div className="flex justify-between font-bold text-slate-700">
-              <span>Remplissage Interne (Padding)</span>
-              <span>{props.padding}px</span>
-            </div>
+            <label className="font-bold text-slate-700">URL ou Fichier Image</label>
             <input
-              type="range"
-              min={0}
-              max={100}
-              step={4}
-              value={props.padding}
+              type="text"
+              value={props.src}
               onChange={(e) =>
                 actions.setProp(id, (nodeProps: any) => {
-                  nodeProps.padding = parseInt(e.target.value, 10);
+                  nodeProps.src = e.target.value;
                 })
               }
-              className="w-full accent-[#00A0FF]"
+              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs"
             />
           </div>
         )}
