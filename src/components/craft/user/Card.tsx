@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, iconMap } from './Text';
+import { getBoxShadow, getBackgroundStyles } from './Text';
 
 export interface CardProps {
   title?: string;
@@ -19,9 +19,8 @@ export interface CardProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
-  icon?: string;
-  iconPosition?: 'left' | 'right';
-  iconColor?: string;
+  emoji?: string;
+  emojiPosition?: 'left' | 'right';
 }
 
 export const Card = ({
@@ -39,9 +38,8 @@ export const Card = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
-  icon = 'lightbulb',
-  iconPosition = 'left',
-  iconColor = '#00A0FF',
+  emoji = '💡',
+  emojiPosition = 'left',
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -58,8 +56,6 @@ export const Card = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
-  const IconComponent = icon && icon !== 'none' ? iconMap[icon] : null;
-
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -75,15 +71,15 @@ export const Card = ({
           boxShadow,
         }}
       >
-        <div className="flex items-center gap-2 px-1">
-          {IconComponent && iconPosition === 'left' && (
-            <IconComponent style={{ color: iconColor }} className="w-5 h-5 shrink-0" />
+        <div className="flex items-center gap-2.5 px-1">
+          {emoji && emojiPosition === 'left' && (
+            <span className="text-2xl leading-none shrink-0">{emoji}</span>
           )}
           <h3 className="font-heading font-black text-lg text-slate-900">
             {title}
           </h3>
-          {IconComponent && iconPosition === 'right' && (
-            <IconComponent style={{ color: iconColor }} className="w-5 h-5 shrink-0" />
+          {emoji && emojiPosition === 'right' && (
+            <span className="text-2xl leading-none shrink-0">{emoji}</span>
           )}
         </div>
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
@@ -112,9 +108,9 @@ export const Card = ({
         boxShadow,
       }}
     >
-      <div className="flex items-center gap-2 px-1">
-        {IconComponent && iconPosition === 'left' && (
-          <IconComponent style={{ color: iconColor }} className="w-5 h-5 shrink-0 pointer-events-none" />
+      <div className="flex items-center gap-2.5 px-1">
+        {emoji && emojiPosition === 'left' && (
+          <span className="text-2xl leading-none shrink-0 select-none">{emoji}</span>
         )}
         <h3
           contentEditable
@@ -128,8 +124,8 @@ export const Card = ({
         >
           {title}
         </h3>
-        {IconComponent && iconPosition === 'right' && (
-          <IconComponent style={{ color: iconColor }} className="w-5 h-5 shrink-0 pointer-events-none" />
+        {emoji && emojiPosition === 'right' && (
+          <span className="text-2xl leading-none shrink-0 select-none">{emoji}</span>
         )}
       </div>
 
@@ -159,8 +155,8 @@ export const Card = ({
     width: 100,
     borderRadius: 0,
     shadowPreset: 'none',
-    icon: 'lightbulb',
-    iconColor: '#00A0FF',
+    emoji: '💡',
+    emojiPosition: 'left',
   },
   rules: {
     canDrag: () => true,

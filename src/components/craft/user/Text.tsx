@@ -2,37 +2,6 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import {
-  Lightbulb,
-  Rocket,
-  Flame,
-  Zap,
-  Star,
-  Gift,
-  Target,
-  CheckCircle2,
-  Lock,
-  MousePointer,
-  Trophy,
-  Gem,
-  Heart,
-} from 'lucide-react';
-
-export const iconMap: Record<string, React.ElementType> = {
-  lightbulb: Lightbulb,
-  rocket: Rocket,
-  flame: Flame,
-  zap: Zap,
-  star: Star,
-  gift: Gift,
-  target: Target,
-  check: CheckCircle2,
-  lock: Lock,
-  pointer: MousePointer,
-  trophy: Trophy,
-  gem: Gem,
-  heart: Heart,
-};
 
 export interface TextProps {
   text?: string;
@@ -52,9 +21,8 @@ export interface TextProps {
   shadowOpacity?: number;
   bgColor?: string;
   bgImage?: string;
-  icon?: string;
-  iconPosition?: 'left' | 'right';
-  iconColor?: string;
+  emoji?: string;
+  emojiPosition?: 'left' | 'right';
 }
 
 export const getBoxShadow = (
@@ -107,9 +75,8 @@ export const Text = ({
   shadowOpacity = 20,
   bgColor,
   bgImage,
-  icon = 'none',
-  iconPosition = 'left',
-  iconColor,
+  emoji,
+  emojiPosition = 'left',
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -126,9 +93,6 @@ export const Text = ({
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
-
-  const IconComponent = icon && icon !== 'none' ? iconMap[icon] : null;
-  const finalIconColor = iconColor || textColor;
 
   const flexJustify =
     textAlign === 'left'
@@ -151,11 +115,10 @@ export const Text = ({
         }}
       >
         <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
-          {IconComponent && iconPosition === 'left' && (
-            <IconComponent
-              style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
-              className="shrink-0 inline-block"
-            />
+          {emoji && emojiPosition === 'left' && (
+            <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none">
+              {emoji}
+            </span>
           )}
 
           <Tag
@@ -171,11 +134,10 @@ export const Text = ({
             {text}
           </Tag>
 
-          {IconComponent && iconPosition === 'right' && (
-            <IconComponent
-              style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
-              className="shrink-0 inline-block"
-            />
+          {emoji && emojiPosition === 'right' && (
+            <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none">
+              {emoji}
+            </span>
           )}
         </div>
       </div>
@@ -200,11 +162,10 @@ export const Text = ({
       }}
     >
       <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
-        {IconComponent && iconPosition === 'left' && (
-          <IconComponent
-            style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
-            className="shrink-0 inline-block"
-          />
+        {emoji && emojiPosition === 'left' && (
+          <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none select-none">
+            {emoji}
+          </span>
         )}
 
         <Tag
@@ -229,11 +190,10 @@ export const Text = ({
           {text}
         </Tag>
 
-        {IconComponent && iconPosition === 'right' && (
-          <IconComponent
-            style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
-            className="shrink-0 inline-block"
-          />
+        {emoji && emojiPosition === 'right' && (
+          <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none select-none">
+            {emoji}
+          </span>
         )}
       </div>
     </div>
@@ -253,8 +213,7 @@ export const Text = ({
     width: 100,
     borderRadius: 0,
     shadowPreset: 'none',
-    icon: 'none',
-    iconPosition: 'left',
+    emojiPosition: 'left',
   },
   rules: {
     canDrag: () => true,

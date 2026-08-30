@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, iconMap } from './Text';
+import { getBoxShadow, getBackgroundStyles } from './Text';
 
 export interface ButtonProps {
   text?: string;
@@ -22,13 +22,12 @@ export interface ButtonProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
-  icon?: string;
-  iconPosition?: 'left' | 'right';
-  iconColor?: string;
+  emoji?: string;
+  emojiPosition?: 'left' | 'right';
 }
 
 export const Button = ({
-  text = 'Commencer maintenant 🚀',
+  text = 'Commencer maintenant',
   bgColor = '#00A0FF',
   bgImage,
   textColor = '#ffffff',
@@ -45,9 +44,8 @@ export const Button = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
-  icon = 'none',
-  iconPosition = 'left',
-  iconColor,
+  emoji = '🚀',
+  emojiPosition = 'right',
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -70,9 +68,6 @@ export const Button = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
-  const IconComponent = icon && icon !== 'none' ? iconMap[icon] : null;
-  const finalIconColor = iconColor || textColor;
-
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -90,13 +85,9 @@ export const Button = ({
           }}
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden gap-2"
         >
-          {IconComponent && iconPosition === 'left' && (
-            <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0" />
-          )}
+          {emoji && emojiPosition === 'left' && <span className="text-lg leading-none shrink-0">{emoji}</span>}
           <span>{text}</span>
-          {IconComponent && iconPosition === 'right' && (
-            <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0" />
-          )}
+          {emoji && emojiPosition === 'right' && <span className="text-lg leading-none shrink-0">{emoji}</span>}
         </a>
       </div>
     );
@@ -127,9 +118,7 @@ export const Button = ({
         }}
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden gap-2"
       >
-        {IconComponent && iconPosition === 'left' && (
-          <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0 pointer-events-none" />
-        )}
+        {emoji && emojiPosition === 'left' && <span className="text-lg leading-none shrink-0 select-none">{emoji}</span>}
         <span
           contentEditable
           suppressContentEditableWarning
@@ -142,9 +131,7 @@ export const Button = ({
         >
           {text}
         </span>
-        {IconComponent && iconPosition === 'right' && (
-          <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0 pointer-events-none" />
-        )}
+        {emoji && emojiPosition === 'right' && <span className="text-lg leading-none shrink-0 select-none">{emoji}</span>}
       </button>
     </div>
   );
@@ -153,7 +140,7 @@ export const Button = ({
 (Button as any).craft = {
   displayName: 'Bouton d Action',
   props: {
-    text: 'Commencer maintenant 🚀',
+    text: 'Commencer maintenant',
     bgColor: '#00A0FF',
     textColor: '#ffffff',
     fontFamily: 'Inter',
@@ -164,7 +151,8 @@ export const Button = ({
     paddingX: 28,
     width: 100,
     shadowPreset: 'none',
-    icon: 'none',
+    emoji: '🚀',
+    emojiPosition: 'right',
   },
   rules: {
     canDrag: () => true,

@@ -144,6 +144,94 @@ export const SettingsPanel = () => {
           </div>
         )}
 
+        {/* EMOJI PICKER & CUSTOM EMOJI INPUT */}
+        {(props.emoji !== undefined || name === 'Carte d Information' || name === 'Texte / Titre' || name === 'Bouton d Action') && (
+          <div className="space-y-2.5 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
+            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+              <span>😀 Icône Émoji du Titre / Bloc</span>
+              <span className="text-amber-600 font-mono text-base font-bold">{props.emoji || 'Aucun'}</span>
+            </div>
+
+            {/* EMOJI QUICK PRESETS GRID */}
+            <div className="grid grid-cols-6 gap-1 bg-white p-2 rounded-xl border border-amber-200 shadow-xs">
+              {[
+                '💡', '🚀', '🔥', '⚡', '⭐', '🎁',
+                '🎯', '✅', '🔒', '👉', '🏆', '💎',
+                '❤️', '💼', '💰', '📌', '✨', '🎉',
+                '🔑', '📢', '📈', '🎓', '🥇', '👑',
+              ].map((emo) => (
+                <button
+                  key={emo}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.emoji = emo;
+                    })
+                  }
+                  className={`p-1 rounded-lg text-lg text-center transition-transform hover:scale-125 ${
+                    props.emoji === emo ? 'bg-amber-200 ring-2 ring-amber-400' : 'hover:bg-slate-100'
+                  }`}
+                >
+                  {emo}
+                </button>
+              ))}
+            </div>
+
+            {/* CUSTOM EMOJI INPUT & POSITION */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Coller n importe quel émoji..."
+                  value={props.emoji || ''}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.emoji = e.target.value;
+                    })
+                  }
+                  className="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs"
+                />
+                {props.emoji && (
+                  <button
+                    onClick={() =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.emoji = '';
+                      })
+                    }
+                    className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100"
+                  >
+                    Effacer
+                  </button>
+                )}
+              </div>
+
+              {props.emoji && (
+                <div className="flex items-center justify-between pt-1">
+                  <label className="font-bold text-slate-700 text-[11px]">Position d émoji</label>
+                  <div className="grid grid-cols-2 gap-1 w-36">
+                    {['left', 'right'].map((pos) => (
+                      <button
+                        key={pos}
+                        onClick={() =>
+                          actions.setProp(id, (nodeProps: any) => {
+                            nodeProps.emojiPosition = pos;
+                          })
+                        }
+                        className={`py-1 rounded-lg border font-extrabold text-[10px] capitalize transition-colors ${
+                          (props.emojiPosition || 'left') === pos
+                            ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
+                        }`}
+                      >
+                        {pos === 'left' ? 'Gauche' : 'Droite'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* GOOGLE FONTS SELECTOR */}
         {props.fontFamily !== undefined && (
           <div className="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200">
@@ -172,101 +260,6 @@ export const SettingsPanel = () => {
               <option value="Caveat">Caveat (Écriture Script / Manuscrite)</option>
               <option value="Plus Jakarta Sans">Plus Jakarta Sans (Tech Bold)</option>
             </select>
-          </div>
-        )}
-
-        {/* ICON SELECTOR & COLOR */}
-        {props.icon !== undefined && (
-          <div className="space-y-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
-            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
-              <span>💡 Icône du Bloc</span>
-              <span className="text-amber-600 font-mono text-[10px] uppercase font-bold">
-                {props.icon || 'none'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <label className="font-bold text-slate-700 text-[11px]">Choisir une icône</label>
-                <select
-                  value={props.icon || 'none'}
-                  onChange={(e) =>
-                    actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.icon = e.target.value;
-                    })
-                  }
-                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-xs outline-none focus:ring-2 focus:ring-amber-500"
-                >
-                  <option value="none">Sans icône</option>
-                  <option value="lightbulb">💡 Ampoule / Conseil</option>
-                  <option value="rocket">🚀 Fusée / Offre</option>
-                  <option value="flame">🔥 Feu / Tendance</option>
-                  <option value="zap">⚡ Éclair / Rapide</option>
-                  <option value="star">⭐ Étoile / Premium</option>
-                  <option value="gift">🎁 Cadeau / Offert</option>
-                  <option value="target">🎯 Cible / Objectif</option>
-                  <option value="check">✅ Validé / Check</option>
-                  <option value="lock">🔒 Cadenas / Sécurisé</option>
-                  <option value="pointer">👉 Main / Clic</option>
-                  <option value="trophy">🏆 Trophée / Vainqueur</option>
-                  <option value="gem">💎 Diamant / Luxe</option>
-                  <option value="heart">❤️ Cœur / Coup de Cœur</option>
-                </select>
-              </div>
-
-              {props.icon && props.icon !== 'none' && (
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Position d icône</label>
-                  <div className="grid grid-cols-2 gap-1 pt-0.5">
-                    {['left', 'right'].map((pos) => (
-                      <button
-                        key={pos}
-                        onClick={() =>
-                          actions.setProp(id, (nodeProps: any) => {
-                            nodeProps.iconPosition = pos;
-                          })
-                        }
-                        className={`py-1.5 rounded-lg border font-extrabold text-[10px] capitalize transition-colors ${
-                          (props.iconPosition || 'left') === pos
-                            ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
-                        }`}
-                      >
-                        {pos === 'left' ? 'Gauche' : 'Droite'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {props.icon && props.icon !== 'none' && (
-              <div className="space-y-1 pt-1.5 border-t border-amber-200/80">
-                <label className="font-bold text-slate-700 text-[11px]">Couleur de l icône</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={props.iconColor || '#00A0FF'}
-                    onChange={(e) =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.iconColor = e.target.value;
-                      })
-                    }
-                    className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
-                  />
-                  <input
-                    type="text"
-                    value={props.iconColor || '#00A0FF'}
-                    onChange={(e) =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.iconColor = e.target.value;
-                      })
-                    }
-                    className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
-                  />
-                </div>
-              </div>
-            )}
           </div>
         )}
 
