@@ -236,6 +236,79 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
+            if (el.type === 'Section' || el.type === 'BlockSectionFull') {
+              const mainBg = el.data?.bgColor || '#0F172A';
+              const bgImage = el.data?.bgImage || '';
+              const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
+              const bgSize = el.data?.bgSize || 'cover';
+              const bgPos = el.data?.bgPosition || 'center';
+              const textColor = el.data?.textColor || '#ffffff';
+              const innerWidth = el.data?.innerContentWidth || 'standard';
+
+              const innerWidthClass =
+                innerWidth === 'full'
+                  ? 'w-full'
+                  : innerWidth === 'wide'
+                  ? 'max-w-6xl mx-auto'
+                  : 'max-w-4xl mx-auto';
+
+              return (
+                <div
+                  key={el.id}
+                  style={{
+                    backgroundColor: mainBg,
+                    backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+                    backgroundSize: bgSize,
+                    backgroundPosition: bgPos,
+                    color: textColor,
+                  }}
+                  className="relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all my-8 overflow-hidden"
+                >
+                  {/* OVERLAY TINT FOR READABILITY */}
+                  {bgOverlay > 0 && (
+                    <div
+                      className="absolute inset-0 pointer-events-none z-0"
+                      style={{ backgroundColor: `rgba(0,0,0,${bgOverlay / 100})` }}
+                    />
+                  )}
+
+                  <div className={`relative z-10 ${innerWidthClass} space-y-8`}>
+                    {el.data?.title && (
+                      <h2 className="text-2xl sm:text-4xl font-heading font-black text-center" style={{ color: textColor }}>
+                        {el.data.title}
+                      </h2>
+                    )}
+                    <div className="space-y-6">
+                      {(el.data?.children || []).map((child: any, cIdx: number) => {
+                        if (child.type === 'Heading') {
+                          return (
+                            <h3 key={child.id || cIdx} className="text-xl sm:text-3xl font-heading font-black leading-tight text-center">
+                              {child.content}
+                            </h3>
+                          );
+                        }
+                        if (child.type === 'Text') {
+                          return (
+                            <div key={child.id || cIdx} className="text-base leading-relaxed font-medium text-center" dangerouslySetInnerHTML={{ __html: child.content }} />
+                          );
+                        }
+                        if (child.type === 'Image') {
+                          return (
+                            <div key={child.id || cIdx} className="flex justify-center my-4">
+                              <div className="max-w-xl rounded-2xl overflow-hidden shadow-xl">
+                                <img src={child.data?.img || child.content} alt="Content" className="w-full h-full object-cover" />
+                              </div>
+                            </div>
+                          );
+                        }
+                        return <div key={child.id || cIdx} className="text-sm font-medium">{child.content}</div>;
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             if (el.type === 'BlockHeroArizona') {
               return (
                 <div key={el.id} className="bg-[#FEF5D7] p-6 sm:p-10 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800 my-6">

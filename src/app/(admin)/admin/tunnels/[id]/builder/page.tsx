@@ -41,6 +41,7 @@ import {
   ArrowLeft,
   Eye,
   X,
+  Maximize2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -381,6 +382,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           { id: 'c1', type: 'Heading', category: 'Texte', content: 'Votre Titre dans le Conteneur' },
           { id: 'c2', type: 'Image', category: 'Média', content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' },
           { id: 'c3', type: 'Text', category: 'Texte', content: 'Insérez vos paragraphes, images et boutons dans cette boîte flexible par simple glisser-déposer.' },
+        ],
+      };
+    }
+    if (type === 'Section' || type === 'BlockSectionFull') {
+      return {
+        title: 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)',
+        isFullWidth: true,
+        bgColor: '#0F172A',
+        bgImage: '',
+        bgOverlay: 0,
+        bgSize: 'cover',
+        bgPosition: 'center',
+        textColor: '#ffffff',
+        children: [
+          { id: 's1', type: 'Heading', category: 'Texte', content: 'VOTRE TITRE DE SECTION PRINCIPALE' },
+          { id: 's2', type: 'Text', category: 'Texte', content: 'Cette section s étend sur toute la largeur de l écran. Vous pouvez y déposer vos colonnes, formulaires, conteneurs, images et textes.' },
         ],
       };
     }
@@ -1012,11 +1029,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                 </div>
 
-                {/* CATEGORY 3: DISPOSITION DES COLONNES */}
+                {/* CATEGORY 3: DISPOSITION DES COLONNES & SECTIONS FULL-WIDTH */}
                 <div className="space-y-2.5">
                   <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                    Disposition des colonnes
+                    Disposition & Sections Full-Width
                   </div>
+
+                  {/* FULL-WIDTH SECTION BUTTON */}
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
+                    onClick={() => handleAddElement('Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
+                    className="w-full p-3 bg-gradient-to-r from-purple-900/60 to-blue-900/60 hover:from-purple-800 hover:to-blue-800 border border-purple-500/50 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-lg mb-2"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Maximize2 className="w-5 h-5 text-purple-300 group-hover:text-white shrink-0" />
+                      <div>
+                        <div className="text-xs font-black text-white">Section Principale (100% Plein Écran)</div>
+                        <div className="text-[10px] text-purple-200 font-medium leading-tight">Fond & image bord à bord pour colonnes & éléments</div>
+                      </div>
+                    </div>
+                    <Plus className="w-4 h-4 text-purple-300 shrink-0" />
+                  </button>
+
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       draggable
@@ -2042,6 +2077,185 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           </div>
                         );
                       })()}
+                        </div>
+                      );
+                    })()}
+
+                    {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
+                    {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
+                      const mainBg = el.data?.bgColor || '#0F172A';
+                      const bgImage = el.data?.bgImage || '';
+                      const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
+                      const bgSize = el.data?.bgSize || 'cover';
+                      const bgPos = el.data?.bgPosition || 'center';
+                      const textColor = el.data?.textColor || '#ffffff';
+                      const innerWidth = el.data?.innerContentWidth || 'standard';
+
+                      const innerWidthClass =
+                        innerWidth === 'full'
+                          ? 'w-full'
+                          : innerWidth === 'wide'
+                          ? 'max-w-6xl mx-auto'
+                          : 'max-w-4xl mx-auto';
+
+                      return (
+                        <div
+                          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          onDrop={(e) => handleBlockDrop(e, el.id)}
+                          style={{
+                            backgroundColor: mainBg,
+                            backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+                            backgroundSize: bgSize,
+                            backgroundPosition: bgPos,
+                            color: textColor,
+                          }}
+                          className="relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-12 shadow-2xl transition-all my-6 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400"
+                        >
+                          {/* OVERLAY TINT FOR READABILITY */}
+                          {bgOverlay > 0 && (
+                            <div
+                              className="absolute inset-0 pointer-events-none z-0"
+                              style={{ backgroundColor: `rgba(0,0,0,${bgOverlay / 100})` }}
+                            />
+                          )}
+
+                          <div className={`relative z-10 ${innerWidthClass} space-y-6`}>
+                            <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                              <input
+                                type="text"
+                                value={el.data?.title || el.content || 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  handleUpdateElementData(el.id, { title: val });
+                                  handleUpdateElementContent(el.id, val);
+                                }}
+                                style={{ color: textColor }}
+                                className="text-xl sm:text-2xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF] w-full max-w-xl"
+                                placeholder="Titre de la Section..."
+                              />
+                              <span className="text-[10px] font-bold text-purple-300 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-700 shrink-0 flex items-center gap-1.5 shadow-sm">
+                                🏛️ Section Principale (100% Plein Écran)
+                              </span>
+                            </div>
+
+                            {/* RENDER NESTED CHILDREN INSIDE THE FULL SECTION */}
+                            {(!el.data?.children || el.data.children.length === 0) ? (
+                              <div className="p-12 border-2 border-dashed border-purple-400/40 bg-purple-950/30 rounded-3xl text-center space-y-3">
+                                <div className="w-14 h-14 bg-purple-500/20 text-purple-300 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
+                                  🏛️
+                                </div>
+                                <div className="text-lg font-black text-white">
+                                  Glissez-déposez n importe quel élément ou colonne ici
+                                </div>
+                                <div className="text-xs text-purple-200 font-medium max-w-md mx-auto leading-relaxed">
+                                  Glissez vos colonnes (4, 3, 2 colonnes), votre conteneur d éléments, vos formulaires, images ou textes. Cette section s étendra à 100% sur toute la largeur de l écran de vos visiteurs !
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-6">
+                                {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
+                                  <div key={child.id || cIdx} className="relative group/child bg-slate-900/40 p-4 rounded-2xl border border-white/10 shadow-md">
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400 border-b border-white/10 pb-2 mb-3">
+                                      <span className="font-bold text-purple-300 uppercase">Élément #{cIdx + 1} : {child.type}</span>
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            if (cIdx > 0) {
+                                              const updated = [...el.data.children];
+                                              const temp = updated[cIdx - 1];
+                                              updated[cIdx - 1] = updated[cIdx];
+                                              updated[cIdx] = temp;
+                                              handleUpdateElementData(el.id, { children: updated });
+                                            }
+                                          }}
+                                          className="hover:text-white"
+                                          title="Monter"
+                                        >
+                                          ▲
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            if (cIdx < el.data.children.length - 1) {
+                                              const updated = [...el.data.children];
+                                              const temp = updated[cIdx + 1];
+                                              updated[cIdx + 1] = updated[cIdx];
+                                              updated[cIdx] = temp;
+                                              handleUpdateElementData(el.id, { children: updated });
+                                            }
+                                          }}
+                                          className="hover:text-white"
+                                          title="Descendre"
+                                        >
+                                          ▼
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
+                                            handleUpdateElementData(el.id, { children: updated });
+                                          }}
+                                          className="text-rose-400 hover:text-rose-300 font-bold"
+                                        >
+                                          Supprimer
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {child.type === 'Heading' && (
+                                      <input
+                                        type="text"
+                                        value={child.content}
+                                        onChange={(e) => {
+                                          const updated = el.data.children.map((ch: any, i: number) =>
+                                            i === cIdx ? { ...ch, content: e.target.value } : ch
+                                          );
+                                          handleUpdateElementData(el.id, { children: updated });
+                                        }}
+                                        className="w-full text-xl sm:text-2xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                      />
+                                    )}
+
+                                    {child.type === 'Text' && (
+                                      <textarea
+                                        rows={3}
+                                        value={child.content}
+                                        onChange={(e) => {
+                                          const updated = el.data.children.map((ch: any, i: number) =>
+                                            i === cIdx ? { ...ch, content: e.target.value } : ch
+                                          );
+                                          handleUpdateElementData(el.id, { children: updated });
+                                        }}
+                                        className="w-full text-sm leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-y"
+                                      />
+                                    )}
+
+                                    {child.type === 'Image' && (
+                                      <div className="space-y-2">
+                                        <div className="max-w-sm rounded-xl overflow-hidden shadow-md border border-white/10 max-h-56">
+                                          <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
+                                        </div>
+                                        <input
+                                          type="text"
+                                          value={child.data?.img || child.content}
+                                          onChange={(e) => {
+                                            const val = e.target.value;
+                                            const updated = el.data.children.map((ch: any, i: number) =>
+                                              i === cIdx ? { ...ch, content: val, data: { ...ch.data, img: val } } : ch
+                                            );
+                                            handleUpdateElementData(el.id, { children: updated });
+                                          }}
+                                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono"
+                                          placeholder="URL de l image..."
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })()}
