@@ -1466,11 +1466,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </button>
                           </div>
                           <div className="flex justify-center">
-                            <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-amber-50 max-w-xs">
+                            <div className={`overflow-hidden shadow-xl border-4 border-amber-50 max-w-xs ${el.data?.imgShape === 'arcade' ? 'rounded-t-[100px]' : el.data?.imgShape === 'circle' ? 'rounded-full' : el.data?.imgShape === 'square' ? 'rounded-none' : 'rounded-3xl'}`}>
                               <img
                                 src={el.data?.img || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'}
                                 alt="Claire"
-                                className="w-full h-80 object-cover"
+                                className={`w-full ${el.data?.imgHeight || 'h-80'} ${el.data?.imgObjectFit || 'object-cover'}`}
+                                style={{ objectPosition: el.data?.imgObjectPosition || 'center' }}
                               />
                             </div>
                           </div>
@@ -1481,11 +1482,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {el.type === 'BlockSoulSistersArizona' && (
                       <div className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                          <div className="rounded-2xl overflow-hidden shadow-md border border-slate-100">
+                          <div className={`overflow-hidden shadow-md border border-slate-100 ${el.data?.imgShape === 'arcade' ? 'rounded-t-[80px]' : el.data?.imgShape === 'circle' ? 'rounded-full' : el.data?.imgShape === 'square' ? 'rounded-none' : 'rounded-2xl'}`}>
                             <img
                               src={el.data?.img || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80'}
                               alt="Workspace"
-                              className="w-full h-64 object-cover"
+                              className={`w-full ${el.data?.imgHeight || 'h-64'} ${el.data?.imgObjectFit || 'object-cover'}`}
+                              style={{ objectPosition: el.data?.imgObjectPosition || 'center' }}
                             />
                           </div>
                           <div className="bg-[#E6F7F5] border border-[#BCEEE6] p-6 rounded-2xl space-y-3 text-left">
@@ -1543,10 +1545,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             const bgHeader = col.theme === 'mint' ? 'bg-[#52C2A5]' : col.theme === 'yellow' ? 'bg-[#F3C035]' : 'bg-[#40B5A6]';
                             const textColor = col.theme === 'mint' ? 'text-[#52C2A5]' : col.theme === 'yellow' ? 'text-[#F3C035]' : 'text-[#40B5A6]';
 
+                            const imgHeight = col.imgHeight || el.data?.imgHeight || 'h-48';
+                            const imgShape = col.imgShape || el.data?.imgShape || 'arcade';
+                            const shapeClass = imgShape === 'arcade' ? 'rounded-t-[80px]' : imgShape === 'circle' ? 'rounded-full' : imgShape === 'square' ? 'rounded-none' : 'rounded-3xl';
+                            const imgFit = col.imgObjectFit || el.data?.imgObjectFit || 'object-cover';
+                            const imgPos = col.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
                             return (
                               <div key={i} className="flex flex-col items-center">
-                                <div className="w-full h-48 rounded-t-[80px] overflow-hidden shadow-sm border border-slate-100">
-                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm border border-slate-100 flex items-center justify-center`}>
+                                  <img src={col.img} alt={col.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
                                 </div>
                                 <div className={`text-[10px] font-serif font-extrabold ${textColor} italic my-1.5`}>{col.subtitle}</div>
                                 <div className={`w-full ${bgHeader} text-white p-4 rounded-b-2xl text-center space-y-1 shadow-md`}>
@@ -3041,6 +3049,121 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                           </>
                         )}
+
+                    {/* 4.5 CONTRÔLE AVANCÉ DES IMAGES DU BLOC */}
+                    {(elData.img !== undefined || elData.items || ['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona', 'Image', 'BlockFeat4ColImg', 'BlockFeat3ColImg'].includes(selectedEl.type)) && (
+                      <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                        <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                          <span>🖼️ Contrôle des Images du Bloc</span>
+                        </div>
+
+                        {/* 1. HAUTEUR DE L'IMAGE */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Hauteur des Images du Bloc
+                          </label>
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {[
+                              { key: 'h-36', label: '144px' },
+                              { key: 'h-48', label: '192px' },
+                              { key: 'h-64', label: '256px' },
+                              { key: 'h-80', label: '320px' },
+                            ].map((h) => (
+                              <button
+                                key={h.key}
+                                onClick={() => handleUpdateElementData(selectedEl.id, { imgHeight: h.key })}
+                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
+                                  (elData.imgHeight || 'h-48') === h.key
+                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                }`}
+                              >
+                                {h.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 2. FORME & DÉCOUPE */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Forme & Découpe de l Image
+                          </label>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {[
+                              { key: 'arcade', label: '🏛️ Arche Arizona' },
+                              { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
+                              { key: 'circle', label: '⚪ Cercle' },
+                              { key: 'square', label: '⬛ Droit' },
+                            ].map((s) => (
+                              <button
+                                key={s.key}
+                                onClick={() => handleUpdateElementData(selectedEl.id, { imgShape: s.key })}
+                                className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all flex items-center justify-center gap-1 ${
+                                  (elData.imgShape || 'arcade') === s.key
+                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                }`}
+                              >
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 3. AJUSTEMENT (OBJECT FIT) */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Ajustement Image (Object Fit)
+                          </label>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {[
+                              { key: 'object-cover', label: 'Couvrir' },
+                              { key: 'object-contain', label: 'Contenir' },
+                              { key: 'object-fill', label: 'Étirer' },
+                            ].map((fit) => (
+                              <button
+                                key={fit.key}
+                                onClick={() => handleUpdateElementData(selectedEl.id, { imgObjectFit: fit.key })}
+                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
+                                  (elData.imgObjectFit || 'object-cover') === fit.key
+                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                }`}
+                              >
+                                {fit.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 4. CADRAGE VERTICAL */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Cadrage Vertical (Position)
+                          </label>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {[
+                              { key: 'top', label: 'Haut' },
+                              { key: 'center', label: 'Centre' },
+                              { key: 'bottom', label: 'Bas' },
+                            ].map((pos) => (
+                              <button
+                                key={pos.key}
+                                onClick={() => handleUpdateElementData(selectedEl.id, { imgObjectPosition: pos.key })}
+                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
+                                  (elData.imgObjectPosition || 'center') === pos.key
+                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                }`}
+                              >
+                                {pos.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* 5. ALIGNER (LEFT, CENTER, RIGHT - SCREENSHOT 3) */}
                     <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">

@@ -260,10 +260,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       const bgHeader = col.theme === 'mint' ? 'bg-[#52C2A5]' : col.theme === 'yellow' ? 'bg-[#F3C035]' : 'bg-[#40B5A6]';
                       const textColor = col.theme === 'mint' ? 'text-[#52C2A5]' : col.theme === 'yellow' ? 'text-[#F3C035]' : 'text-[#40B5A6]';
 
+                      const imgHeight = col.imgHeight || el.data?.imgHeight || 'h-56';
+                      const imgShape = col.imgShape || el.data?.imgShape || 'arcade';
+                      const shapeClass = imgShape === 'arcade' ? 'rounded-t-[80px]' : imgShape === 'circle' ? 'rounded-full' : imgShape === 'square' ? 'rounded-none' : 'rounded-3xl';
+                      const imgFit = col.imgObjectFit || el.data?.imgObjectFit || 'object-cover';
+                      const imgPos = col.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
                       return (
                         <div key={i} className="flex flex-col items-center">
-                          <div className="w-full h-56 rounded-t-[80px] overflow-hidden shadow-sm border border-slate-100">
-                            <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                          <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm border border-slate-100 flex items-center justify-center`}>
+                            <img src={col.img} alt={col.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
                           </div>
                           <div className={`text-[10px] font-serif font-extrabold ${textColor} italic my-1.5`}>{col.subtitle}</div>
                           <div className={`w-full ${bgHeader} text-white p-5 rounded-b-2xl text-center space-y-1.5 shadow-md`}>
