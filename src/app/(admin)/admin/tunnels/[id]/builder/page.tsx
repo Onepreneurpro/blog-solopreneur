@@ -309,16 +309,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       let rawH = startH;
 
       if (dir.startsWith('corner')) {
-        // PROPORTIONAL CORNER SCALING (KEEPS 100% EXACT ASPECT RATIO)
-        let scale = 1;
-        if (dir === 'corner-br') scale = (startW + deltaX) / startW;
-        else if (dir === 'corner-bl') scale = (startW - deltaX) / startW;
-        else if (dir === 'corner-tr') scale = (startW + deltaX) / startW;
-        else if (dir === 'corner-tl') scale = (startW - deltaX) / startW;
+        // SMOOTH PROPORTIONAL CORNER SCALING BASED ON LARGEST MOUSE DELTA
+        let delta = deltaY;
+        if (dir === 'corner-br') delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
+        else if (dir === 'corner-bl') delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : -deltaX;
+        else if (dir === 'corner-tr') delta = Math.abs(deltaY) > Math.abs(deltaX) ? -deltaY : deltaX;
+        else if (dir === 'corner-tl') delta = Math.abs(deltaY) > Math.abs(deltaX) ? -deltaY : -deltaX;
 
-        scale = Math.max(0.2, Math.min(3, scale));
-        rawW = Math.round(startW * scale);
-        rawH = Math.round(rawW / aspectRatio);
+        rawH = Math.max(50, Math.min(800, Math.round(startH + delta)));
+        rawW = Math.round(rawH * aspectRatio);
       } else if (dir === 'edge-r') {
         rawW = startW + deltaX;
       } else if (dir === 'edge-l') {
@@ -332,12 +331,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       rawW = Math.max(50, Math.min(800, Math.round(rawW)));
       rawH = Math.max(50, Math.min(800, Math.round(rawH)));
 
-      // MAGNETIC SNAP ALIGNMENT LOGIC (STRONG 24px THRESHOLD)
+      // GENTLE CONTROLLED MAGNETIC SNAP ALIGNMENT LOGIC (NATURAL 10px THRESHOLD)
       let finalH = rawH;
       let finalW = rawW;
       let snappedH = false;
       for (const targetH of targetHeights) {
-        if (Math.abs(rawH - targetH) <= 24) {
+        if (Math.abs(rawH - targetH) <= 10) {
           finalH = targetH;
           if (dir.startsWith('corner')) {
             finalW = Math.round(finalH * aspectRatio);
@@ -350,7 +349,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       let snappedW = false;
       if (!snappedH) {
         for (const targetW of targetWidths) {
-          if (Math.abs(rawW - targetW) <= 24) {
+          if (Math.abs(rawW - targetW) <= 10) {
             finalW = targetW;
             if (dir.startsWith('corner')) {
               finalH = Math.round(finalW / aspectRatio);
@@ -2023,47 +2022,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
                         )}
 
-                        {/* 📌 SINGLE INTELLIGENT REFERENCE & MAGNETIC SNAP LINE */}
-                        {(() => {
-                          const itemsList = el.data?.items || getDefaultBlockData(el.type, el.content).items;
-                          const fixedItem = itemsList.find((it: any) => it.isFixedReference);
-                          const fixedH = fixedItem ? (fixedItem.imgSize || 280) : null;
-                          const isDraggingInThisBlock = selectedSubItem?.blockId === el.id && snapGuide?.active && snapGuide.val !== undefined;
 
-                          const targetLineH = isDraggingInThisBlock ? snapGuide.val : fixedH;
-                          if (targetLineH === null || targetLineH === undefined) return null;
-
-                          const isSnappedToRef = isDraggingInThisBlock && fixedH !== null && Math.abs((snapGuide?.val || 0) - fixedH) <= 2;
-                          const isGeneralSnap = isDraggingInThisBlock && !isSnappedToRef;
-
-                          return (
-                            <div
-                              className={`absolute left-6 right-6 h-[3.5px] transition-all pointer-events-none flex items-center justify-center ${
-                                isSnappedToRef
-                                  ? 'bg-[#FF007F] shadow-[0_0_18px_#FF007F] animate-pulse z-50'
-                                  : isGeneralSnap
-                                  ? 'bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] animate-pulse z-50'
-                                  : 'bg-[#00A0FF] shadow-[0_0_14px_#00A0FF] z-40'
-                              }`}
-                              style={{ top: `${targetLineH + (el.data?.title ? 68 : 28)}px` }}
-                            >
-                              <span
-                                className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5 ${
-                                  isSnappedToRef ? 'bg-[#FF007F]' : 'bg-[#00A0FF]'
-                                }`}
-                              >
-                                <span>{isSnappedToRef ? '🧲' : isGeneralSnap ? '🧲' : '📌'}</span>
-                                <span>
-                                  {isSnappedToRef
-                                    ? `Aimanté sur la ligne de référence (${targetLineH}px)`
-                                    : isGeneralSnap
-                                    ? `Aligné sur l image voisine (${targetLineH}px)`
-                                    : `Ligne de Référence Fixée (${targetLineH}px)`}
-                                </span>
-                              </span>
-                            </div>
-                          );
-                        })()}
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
                           {(el.data?.items || [
@@ -2109,6 +2068,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         transform: `scale(${(col.imgZoom || 100) / 100})`,
                                       }}
                                     />
+
+                                    {/* 📌 PERMANENT BLUE REFERENCE LINE (100% EXACTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
+                                    {col.isFixedReference && (
+                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>📌</span>
+                                          <span>Ligne de Référence Fixée ({col.imgSize || 280}px)</span>
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
+                                    {isImgSel && snapGuide?.active && !col.isFixedReference && (
+                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>🧲</span>
+                                          <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
+                                        </span>
+                                      </div>
+                                    )}
 
                                     {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
@@ -2217,47 +2196,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <h2 className="text-xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
                         </div>
 
-                        {/* 📌 SINGLE INTELLIGENT REFERENCE & MAGNETIC SNAP LINE */}
-                        {(() => {
-                          const itemsList = el.data?.items || getDefaultBlockData(el.type, el.content).items;
-                          const fixedItem = itemsList.find((it: any) => it.isFixedReference);
-                          const fixedH = fixedItem ? (fixedItem.imgSize || 220) : null;
-                          const isDraggingInThisBlock = selectedSubItem?.blockId === el.id && snapGuide?.active && snapGuide.val !== undefined;
 
-                          const targetLineH = isDraggingInThisBlock ? snapGuide.val : fixedH;
-                          if (targetLineH === null || targetLineH === undefined) return null;
-
-                          const isSnappedToRef = isDraggingInThisBlock && fixedH !== null && Math.abs((snapGuide?.val || 0) - fixedH) <= 2;
-                          const isGeneralSnap = isDraggingInThisBlock && !isSnappedToRef;
-
-                          return (
-                            <div
-                              className={`absolute left-6 right-6 h-[3.5px] transition-all pointer-events-none flex items-center justify-center ${
-                                isSnappedToRef
-                                  ? 'bg-[#FF007F] shadow-[0_0_18px_#FF007F] animate-pulse z-50'
-                                  : isGeneralSnap
-                                  ? 'bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] animate-pulse z-50'
-                                  : 'bg-[#00A0FF] shadow-[0_0_14px_#00A0FF] z-40'
-                              }`}
-                              style={{ top: `${targetLineH + 78}px` }}
-                            >
-                              <span
-                                className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5 ${
-                                  isSnappedToRef ? 'bg-[#FF007F]' : 'bg-[#00A0FF]'
-                                }`}
-                              >
-                                <span>{isSnappedToRef ? '🧲' : isGeneralSnap ? '🧲' : '📌'}</span>
-                                <span>
-                                  {isSnappedToRef
-                                    ? `Aimanté sur la ligne de référence (${targetLineH}px)`
-                                    : isGeneralSnap
-                                    ? `Aligné sur l image voisine (${targetLineH}px)`
-                                    : `Ligne de Référence Fixée (${targetLineH}px)`}
-                                </span>
-                              </span>
-                            </div>
-                          );
-                        })()}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                           {(el.data?.items || [
                             { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
@@ -2300,22 +2239,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* PERMANENT BLUE MAGNETIC REFERENCE LINE ON FIXED IMAGE */}
+                                    {/* 📌 PERMANENT BLUE REFERENCE LINE (100% EXACTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
                                     {col.isFixedReference && (
-                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
+                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
                                         <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
                                           <span>📌</span>
-                                          <span>Image Référence Fixée ({col.imgSize || 220}px)</span>
+                                          <span>Ligne de Référence Fixée ({col.imgSize || 220}px)</span>
                                         </span>
                                       </div>
                                     )}
 
-                                    {/* DYNAMIC SNAP LINE WHEN ALIGNING ANOTHER IMAGE */}
-                                    {isImgSel && !col.isFixedReference && snapGuide?.active && (
-                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] z-50 animate-pulse pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                    {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
+                                    {isImgSel && snapGuide?.active && !col.isFixedReference && (
+                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
                                           <span>🧲</span>
-                                          <span>Aimanté à la ligne de référence bleue ({snapGuide.val}px)</span>
+                                          <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
                                         </span>
                                       </div>
                                     )}
