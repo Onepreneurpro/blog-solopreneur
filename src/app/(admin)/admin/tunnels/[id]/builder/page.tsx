@@ -76,6 +76,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     val?: number;
   } | null>(null);
 
+  // CANVAS BACKGROUND ALIGNMENT GRID STATE (GRILLAGE À CARREAUX ON/OFF)
+  const [showCanvasGrid, setShowCanvasGrid] = useState<boolean>(true);
+
   // Canvas elements state
   const [elements, setElements] = useState<CanvasElement[]>([
     {
@@ -564,8 +567,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         {/* RIGHT ACTION BUTTONS */}
         <div className="flex items-center gap-3">
           
-          {/* DESKTOP / MOBILE PREVIEW TOGGLE */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+          {/* DESKTOP / MOBILE / GRID TOGGLE BUTTONS */}
+          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
             <button
               onClick={() => setPreviewMode('DESKTOP')}
               className={`p-1.5 rounded-lg transition-all ${
@@ -583,6 +586,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               title="Aperçu Mobile"
             >
               <Smartphone className="w-4 h-4" />
+            </button>
+            <div className="h-4 w-px bg-slate-800 my-auto" />
+            <button
+              onClick={() => setShowCanvasGrid(!showCanvasGrid)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                showCanvasGrid
+                  ? 'bg-[#00A0FF]/20 text-[#00A0FF] border border-[#00A0FF]/50 shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Activer/Désactiver le grillage à carreaux pour l alignement"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
             </button>
           </div>
 
@@ -1862,6 +1878,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           <div
             className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl transition-all space-y-6 ${
               previewMode === 'MOBILE' ? 'max-w-sm' : 'max-w-4xl'
+            } ${
+              showCanvasGrid
+                ? 'bg-[linear-gradient(to_right,rgba(0,160,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.08)_1px,transparent_1px)] bg-[size:20px_20px]'
+                : ''
             }`}
           >
             <div className="text-center text-xs text-slate-500 border-b border-slate-800 pb-3 flex items-center justify-between">
@@ -1992,9 +2012,48 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {el.type === 'BlockFeat4ColImg' && (
-                      <div className="space-y-4 p-6 bg-white text-slate-900 rounded-3xl shadow-xl relative">
+                      <div
+                        className={`space-y-4 p-6 rounded-3xl shadow-xl relative transition-all ${
+                          showCanvasGrid
+                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.06)_1px,transparent_1px)] bg-[size:20px_20px]'
+                            : 'bg-white'
+                        }`}
+                      >
                         {el.data?.title && (
                           <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
+                        )}
+
+                        {/* 📌 PERMANENT BLUE REFERENCE LINE SPANNING ACROSS ALL COLUMNS EXACTLY AS DRAWN IN USER SKETCH */}
+                        {(() => {
+                          const itemsList = el.data?.items || getDefaultBlockData(el.type, el.content).items;
+                          const fixedItem = itemsList.find((it: any) => it.isFixedReference);
+                          if (!fixedItem) return null;
+                          const refH = fixedItem.imgSize || 280;
+
+                          return (
+                            <div
+                              className="absolute left-6 right-6 h-[3px] bg-[#00A0FF] shadow-[0_0_14px_#00A0FF] z-40 pointer-events-none flex items-center justify-center"
+                              style={{ top: `${refH + (el.data?.title ? 68 : 28)}px` }}
+                            >
+                              <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                <span>📌</span>
+                                <span>Ligne de Référence Fixée ({refH}px)</span>
+                              </span>
+                            </div>
+                          );
+                        })()}
+
+                        {/* 🧲 DYNAMIC SNAP LINE WHEN ANOTHER IMAGE IS RESIZED */}
+                        {selectedSubItem?.blockId === el.id && snapGuide?.active && snapGuide.val !== undefined && (
+                          <div
+                            className="absolute left-6 right-6 h-[3.5px] bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] z-50 animate-pulse pointer-events-none flex items-center justify-center"
+                            style={{ top: `${snapGuide.val + (el.data?.title ? 68 : 28)}px` }}
+                          >
+                            <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                              <span>🧲</span>
+                              <span>Aimanté sur la ligne de référence bleue ({snapGuide.val}px)</span>
+                            </span>
+                          </div>
                         )}
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
