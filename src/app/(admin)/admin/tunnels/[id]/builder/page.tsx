@@ -2584,120 +2584,190 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           />
                         </div>
 
-                        {/* 1. FICHIER DE L IMAGE (IMAGE UPLOAD & URL - SCREENSHOT 3) */}
-                        {(selectedEl.type === 'Image' || selectedEl.type.includes('Img') || elData.items) && (
+                        {/* FORM INPUT SPECIFIC CONTROLS */}
+                        {(selectedEl.type === 'OptinForm' || selectedEl.type === 'FormInput') && (
                           <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
-                              Fichier de l image
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              ⚙️ Configuration du Champ de Formulaire
                             </label>
                             <div className="space-y-2">
-                              <div className="flex items-center gap-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400">Texte indicatif (Placeholder)</label>
                                 <input
                                   type="text"
-                                  value={elData.img || selectedEl.content || ''}
+                                  value={elData.placeholder || selectedEl.content || 'Entrez votre adresse email...'}
                                   onChange={(e) => {
-                                    const val = e.target.value;
-                                    handleUpdateElementData(selectedEl.id, { img: val });
-                                    handleUpdateElementContent(selectedEl.id, val);
+                                    handleUpdateElementData(selectedEl.id, { placeholder: e.target.value });
+                                    handleUpdateElementContent(selectedEl.id, e.target.value);
                                   }}
-                                  placeholder="https://..."
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
                                 />
-                                <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
-                                  <span>📤</span>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (uploadEv) => {
-                                          const url = uploadEv.target?.result as string;
-                                          handleUpdateElementData(selectedEl.id, { img: url });
-                                          handleUpdateElementContent(selectedEl.id, url);
-                                        };
-                                        reader.readAsDataURL(file);
-                                      }
-                                    }}
-                                  />
-                                </label>
                               </div>
-                              <p className="text-[10px] text-slate-500">
-                                Cliquez sur une image spécifique ci-contre pour la modifier.
-                              </p>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400">Type de saisie</label>
+                                <select
+                                  value={elData.inputType || 'email'}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { inputType: e.target.value })}
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                                >
+                                  <option value="email">Adresse Email</option>
+                                  <option value="text">Nom complet / Texte</option>
+                                  <option value="tel">Numéro de téléphone</option>
+                                </select>
+                              </div>
                             </div>
                           </div>
                         )}
-                      </>
-                    )}
 
-                    {/* 2. ACTION SUR UNE IMAGE CLIQUÉE (SCREENSHOT 3) */}
-                    <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Action sur une image cliquée
-                      </label>
-                      <select
-                        value={elData.clickAction || 'None'}
-                        onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                      >
-                        <option value="None">Aucune (None)</option>
-                        <option value="OpenURL">Ouvrir l URL de redirection</option>
-                        <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
-                      </select>
-                    </div>
+                        {/* BUTTON CTA SPECIFIC CONTROLS */}
+                        {selectedEl.type === 'ButtonCTA' && (
+                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              🎯 Action & Style du Bouton
+                            </label>
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400">Texte du Bouton (CTA)</label>
+                                <input
+                                  type="text"
+                                  value={elData.buttonText || selectedEl.content || 'Recevoir mon accès gratuit →'}
+                                  onChange={(e) => {
+                                    handleUpdateElementData(selectedEl.id, { buttonText: e.target.value });
+                                    handleUpdateElementContent(selectedEl.id, e.target.value);
+                                  }}
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
+                                />
+                              </div>
 
-                    {/* 3. ATTRIBUT ALT & REMPLIR À 100% (SCREENSHOT 3) */}
-                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                          Attribut Alt
-                        </label>
-                        <input
-                          type="text"
-                          value={elData.alt || ''}
-                          onChange={(e) => handleUpdateElementData(selectedEl.id, { alt: e.target.value })}
-                          placeholder="Texte alternatif..."
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
-                        />
-                      </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400">Action au clic</label>
+                                <select
+                                  value={elData.clickAction || 'Submit'}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                                >
+                                  <option value="Submit">Soumettre le formulaire</option>
+                                  <option value="OpenURL">Ouvrir l URL de redirection</option>
+                                  <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
-                      <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
-                        <input
-                          type="checkbox"
-                          checked={elData.fullWidth || false}
-                          onChange={(e) => handleUpdateElementData(selectedEl.id, { fullWidth: e.target.checked })}
-                          className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
-                        />
-                        <span>Remplir à 100% en largeur</span>
-                      </label>
-                    </div>
+                        {/* IMAGE EXCLUSIVE CONTROLS (ONLY SHOW WHEN ELEMENT IS AN IMAGE) */}
+                        {selectedEl.type === 'Image' && (
+                          <>
+                            {/* 1. FICHIER DE L IMAGE */}
+                            <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                                Fichier de l image
+                              </label>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={elData.img || selectedEl.content || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      handleUpdateElementData(selectedEl.id, { img: val });
+                                      handleUpdateElementContent(selectedEl.id, val);
+                                    }}
+                                    placeholder="https://..."
+                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                                  />
+                                  <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
+                                    <span>📤</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (uploadEv) => {
+                                            const url = uploadEv.target?.result as string;
+                                            handleUpdateElementData(selectedEl.id, { img: url });
+                                            handleUpdateElementContent(selectedEl.id, url);
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
 
-                    {/* 4. TAILLE DE L IMAGE (SLIDER + NUMBER INPUT - SCREENSHOT 3) */}
-                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                      <div className="flex items-center justify-between text-xs font-bold">
-                        <span className="text-slate-400">Taille de l image</span>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            value={elData.imgSize || 240}
-                            onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
-                            className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                          />
-                          <span className="text-slate-500 text-[10px]">px</span>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min={50}
-                        max={800}
-                        value={elData.imgSize || 240}
-                        onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
-                        className="w-full accent-[#00A0FF]"
-                      />
-                    </div>
+                            {/* 2. ACTION SUR UNE IMAGE CLIQUÉE */}
+                            <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                Action sur une image cliquée
+                              </label>
+                              <select
+                                value={elData.clickAction || 'None'}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                              >
+                                <option value="None">Aucune (None)</option>
+                                <option value="OpenURL">Ouvrir l URL de redirection</option>
+                                <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
+                              </select>
+                            </div>
+
+                            {/* 3. ATTRIBUT ALT */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  Attribut Alt
+                                </label>
+                                <input
+                                  type="text"
+                                  value={elData.alt || ''}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { alt: e.target.value })}
+                                  placeholder="Texte alternatif..."
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
+                                />
+                              </div>
+
+                              <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
+                                <input
+                                  type="checkbox"
+                                  checked={elData.fullWidth || false}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { fullWidth: e.target.checked })}
+                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
+                                />
+                                <span>Remplir à 100% en largeur</span>
+                              </label>
+                            </div>
+
+                            {/* 4. TAILLE DE L IMAGE */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-400">Taille de l image</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    value={elData.imgSize || 240}
+                                    onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
+                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                                  />
+                                  <span className="text-slate-500 text-[10px]">px</span>
+                                </div>
+                              </div>
+                              <input
+                                type="range"
+                                min={50}
+                                max={800}
+                                value={elData.imgSize || 240}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
+                                className="w-full accent-[#00A0FF]"
+                              />
+                            </div>
+                          </>
+                        )}
 
                     {/* 5. ALIGNER (LEFT, CENTER, RIGHT - SCREENSHOT 3) */}
                     <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
@@ -2891,12 +2961,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         </div>
                       </div>
                     )}
+                  </>
+                )}
 
                   </div>
                 </div>
               );
-            })()
-}
+            })()}
           </div>
         )}
       </div>
