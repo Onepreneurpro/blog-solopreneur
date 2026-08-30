@@ -137,6 +137,45 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
+            if (el.type === 'ContentBox') {
+              return (
+                <div key={el.id} className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border border-slate-100 my-6 text-slate-800">
+                  {el.data?.title && (
+                    <h3 className="text-2xl font-heading font-black text-slate-900 border-b border-slate-100 pb-3">
+                      {el.data.title}
+                    </h3>
+                  )}
+                  <div className="space-y-4">
+                    {(el.data?.children || []).map((child: any, cIdx: number) => {
+                      if (child.type === 'Heading') {
+                        return <h4 key={child.id || cIdx} className="text-xl font-heading font-bold text-slate-900">{child.content}</h4>;
+                      }
+                      if (child.type === 'Text') {
+                        return <p key={child.id || cIdx} className="text-sm text-slate-600 font-medium leading-relaxed">{child.content}</p>;
+                      }
+                      if (child.type === 'Image') {
+                        return (
+                          <div key={child.id || cIdx} className="w-full rounded-2xl overflow-hidden shadow-md max-h-96">
+                            <img src={child.content} alt="Content" className="w-full h-full object-cover" />
+                          </div>
+                        );
+                      }
+                      if (child.type === 'ButtonCTA') {
+                        return (
+                          <div key={child.id || cIdx} className="text-[#00A0FF] text-center pt-2">
+                            <button type="button" className="px-8 py-3.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-bold text-sm rounded-xl shadow-lg transition-all hover:scale-[1.02]">
+                              {child.content || 'Bouton d action'}
+                            </button>
+                          </div>
+                        );
+                      }
+                      return <div key={child.id || cIdx} className="text-sm text-slate-700">{child.content}</div>;
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             if (el.type === 'BlockHeroArizona') {
               return (
                 <div key={el.id} className="bg-[#FEF5D7] p-6 sm:p-10 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800 my-6">

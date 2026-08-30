@@ -243,6 +243,42 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     try {
       const data = JSON.parse(dataStr);
+      const targetEl = elements.find((item) => item.id === blockId);
+      if (!targetEl) return;
+
+      // Special handling for ContentBox container (stores children: CanvasElement[])
+      if (targetEl.type === 'ContentBox') {
+        const newChild: CanvasElement = {
+          id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
+          category: data.category || 'Texte',
+          content: data.defaultContent || data.content || (data.type === 'Image' ? 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' : 'Nouveau texte inséré...'),
+          data: getDefaultBlockData(data.type, data.defaultContent),
+        };
+
+        setElements((prev) =>
+          prev.map((el) => {
+            if (el.id !== blockId) return el;
+            const currentChildren = el.data?.children || [];
+            return {
+              ...el,
+              data: {
+                ...el.data,
+                children: [...currentChildren, newChild],
+              },
+            };
+          })
+        );
+
+        if (!data.isNew && data.draggedElementId) {
+          setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
+        }
+
+        setSelectedElementId(blockId);
+        return;
+      }
+
+      // Default card-based block drop
       const imageUrl = data.defaultContent || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
 
       setElements((prev) =>
@@ -319,14 +355,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         ],
       };
     }
-    if (type === 'BlockFeat4ColDark') {
+    if (type === 'ContentBox') {
       return {
-        title: 'Votre titre accrocheur ici pour attirer l attention',
-        items: [
-          { id: '1', title: 'Rapidité', desc: 'Déploiement en 1 clic.' },
-          { id: '2', title: 'Sécurité', desc: 'Données protégées.' },
-          { id: '3', title: 'Performance', desc: 'Vitesse maximale.' },
-          { id: '4', title: 'Support', desc: '24/7 disponible.' },
+        title: 'Conteneur d éléments...',
+        children: [
+          { id: 'c1', type: 'Heading', category: 'Texte', content: 'Votre Titre dans le Conteneur' },
+          { id: 'c2', type: 'Image', category: 'Média', content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' },
+          { id: 'c3', type: 'Text', category: 'Texte', content: 'Insérez vos paragraphes, images et boutons dans cette boîte flexible par simple glisser-déposer.' },
         ],
       };
     }
@@ -489,10 +524,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     // If a container block is selected on the canvas, insert element (Text, Heading, Image, Video, Button, etc.) directly into the container!
     if (selectedElementId) {
       const selectedEl = elements.find((e) => e.id === selectedElementId);
+      if (selectedEl && selectedEl.type === 'ContentBox') {
+        const newChild: CanvasElement = {
+          id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          type,
+          category,
+          content: defaultContent,
+          data: getDefaultBlockData(type, defaultContent),
+        };
+        const currentChildren = selectedEl.data?.children || [];
+        handleUpdateElementData(selectedEl.id, { children: [...currentChildren, newChild] });
+        return;
+      }
+
       if (
         selectedEl &&
         (selectedEl.data?.items ||
-          ['Col4', 'Col3', 'Col2', 'ContentBox', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type))
+          ['Col4', 'Col3', 'Col2', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type))
       ) {
         // If a specific sub-card in the container is selected:
         if (selectedSubItem && selectedSubItem.blockId === selectedEl.id) {
@@ -1734,7 +1782,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={(e) => handleBlockDrop(e, el.id)}
-                        className="bg-white p-6 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/40 hover:border-[#00A0FF] relative transition-all"
+                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
                       >
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                           <input
@@ -1748,71 +1796,121 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             className="text-xl font-heading font-black text-slate-800 bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
                           />
                           <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 flex items-center gap-1">
-                            <span>📦 Boîte flexible réceptrice</span>
+                            <span>📦 Boîte Conteneur Réceptrice</span>
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          {(el.data?.items || [
-                            { id: '1', title: 'Élément #1', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80' },
-                            { id: '2', title: 'Élément #2', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80' },
-                            { id: '3', title: 'Élément #3', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80' },
-                          ]).map((col: any, i: number) => (
-                            <div
-                              key={col.id || i}
-                              className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative group/card hover:shadow-md transition-all"
-                            >
+                        {/* RENDER NESTED CHILDREN IN THE CONTAINER */}
+                        {(!el.data?.children || el.data.children.length === 0) ? (
+                          <div className="p-10 border-2 border-dashed border-[#00A0FF]/40 bg-blue-50/40 rounded-2xl text-center space-y-3">
+                            <div className="w-12 h-12 bg-[#00A0FF]/10 text-[#00A0FF] rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">
+                              📥
+                            </div>
+                            <div className="text-base font-extrabold text-slate-800">
+                              Glissez-déposez n importe quel élément ici
+                            </div>
+                            <div className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
+                              Glissez des images, titres, paragraphes ou boutons depuis le menu à gauche pour les empiler dans ce conteneur.
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {el.data.children.map((child: CanvasElement, cIdx: number) => (
                               <div
-                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                onDrop={(e) => handleCardDrop(e, el.id, i)}
-                                className="w-full h-40 rounded-xl overflow-hidden bg-slate-200 relative cursor-pointer group/img"
+                                key={child.id || cIdx}
+                                className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all"
                               >
-                                {col.img ? (
-                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">
-                                    📷 Déposer une image ici
+                                <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-200/60 pb-1">
+                                  <span className="uppercase text-[#00A0FF] font-black">{child.type || 'Élément'}</span>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = [...el.data.children];
+                                        if (cIdx > 0) {
+                                          const temp = updated[cIdx];
+                                          updated[cIdx] = updated[cIdx - 1];
+                                          updated[cIdx - 1] = temp;
+                                          handleUpdateElementData(el.id, { children: updated });
+                                        }
+                                      }}
+                                      className="hover:text-slate-700"
+                                      title="Monter"
+                                    >
+                                      ▲
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = [...el.data.children];
+                                        if (cIdx < updated.length - 1) {
+                                          const temp = updated[cIdx];
+                                          updated[cIdx] = updated[cIdx + 1];
+                                          updated[cIdx + 1] = temp;
+                                          handleUpdateElementData(el.id, { children: updated });
+                                        }
+                                      }}
+                                      className="hover:text-slate-700"
+                                      title="Descendre"
+                                    >
+                                      ▼
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
+                                        handleUpdateElementData(el.id, { children: updated });
+                                      }}
+                                      className="text-rose-500 hover:text-rose-700 font-bold"
+                                    >
+                                      Supprimer
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {child.type === 'Heading' && (
+                                  <input
+                                    type="text"
+                                    value={child.content}
+                                    onChange={(e) => {
+                                      const updated = el.data.children.map((ch: any, i: number) =>
+                                        i === cIdx ? { ...ch, content: e.target.value } : ch
+                                      );
+                                      handleUpdateElementData(el.id, { children: updated });
+                                    }}
+                                    className="w-full text-xl font-heading font-black text-slate-800 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                  />
+                                )}
+
+                                {child.type === 'Text' && (
+                                  <textarea
+                                    rows={2}
+                                    value={child.content}
+                                    onChange={(e) => {
+                                      const updated = el.data.children.map((ch: any, i: number) =>
+                                        i === cIdx ? { ...ch, content: e.target.value } : ch
+                                      );
+                                      handleUpdateElementData(el.id, { children: updated });
+                                    }}
+                                    className="w-full text-sm text-slate-600 font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                                  />
+                                )}
+
+                                {child.type === 'Image' && (
+                                  <div className="w-full h-56 rounded-xl overflow-hidden bg-slate-100 relative">
+                                    <img src={child.content} alt="Child" className="w-full h-full object-cover" />
                                   </div>
                                 )}
-                                <div className="absolute inset-0 bg-[#00A0FF]/30 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white font-bold text-xs pointer-events-none transition-opacity">
-                                  🎯 Déposer l image
-                                </div>
+
+                                {child.type === 'ButtonCTA' && (
+                                  <button type="button" className="w-full py-3 bg-[#00A0FF] text-white rounded-xl font-bold text-sm shadow-md">
+                                    {child.content || 'Bouton d action'}
+                                  </button>
+                                )}
                               </div>
-
-                              <input
-                                type="text"
-                                value={col.title}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  const updatedItems = (el.data?.items || []).map((it: any, idx: number) =>
-                                    idx === i ? { ...it, title: val } : it
-                                  );
-                                  handleUpdateElementData(el.id, { items: updatedItems });
-                                }}
-                                className="w-full font-bold text-sm text-slate-800 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
-                              />
-
-                              <textarea
-                                rows={2}
-                                value={col.desc}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  const updatedItems = (el.data?.items || []).map((it: any, idx: number) =>
-                                    idx === i ? { ...it, desc: val } : it
-                                  );
-                                  handleUpdateElementData(el.id, { items: updatedItems });
-                                }}
-                                className="w-full text-xs text-slate-600 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
-                              />
-
-                              {col.buttonText && (
-                                <button type="button" className="w-full py-2 bg-[#00A0FF] text-white rounded-xl font-bold text-xs">
-                                  {col.buttonText}
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 
