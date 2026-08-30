@@ -634,6 +634,105 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               />
                             </div>
 
+                            {/* ZOOM & ÉCHELLE DE L IMAGE INTERNE */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-[#00A0FF]">🔍 Zoom / Échelle interne</span>
+                                <span className="text-xs font-mono text-white">
+                                  {currentSubItem.imgZoom || 100}%
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={100}
+                                max={300}
+                                value={currentSubItem.imgZoom || 100}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  const updatedItems = elItems.map((it: any, idx: number) =>
+                                    idx === selectedSubItem.itemIndex ? { ...it, imgZoom: val } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full accent-[#00A0FF]"
+                              />
+                            </div>
+
+                            {/* POSITIONMENT INTERNE (RECADRAGE HAUT/BAS & GAUCHE/DROITE) */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                                🎯 Recadrage & Position Interne
+                              </div>
+
+                              {/* POSITION X (HORIZONTALE) */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                  <span>Position Horizontale (X)</span>
+                                  <span className="font-mono text-slate-400">
+                                    {currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={100}
+                                  value={currentSubItem.posX !== undefined ? currentSubItem.posX : 50}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, posX: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full accent-[#00A0FF]"
+                                />
+                              </div>
+
+                              {/* POSITION Y (VERTICALE) */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                  <span>Position Verticale (Y)</span>
+                                  <span className="font-mono text-slate-400">
+                                    {currentSubItem.posY !== undefined ? currentSubItem.posY : 50}%
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={100}
+                                  value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, posY: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full accent-[#00A0FF]"
+                                />
+                              </div>
+
+                              {/* MODE D AJUSTEMENT (OBJECT-FIT) */}
+                              <div className="space-y-1 pt-1">
+                                <label className="text-[10px] font-bold text-slate-400">Mode d ajustement</label>
+                                <select
+                                  value={currentSubItem.objectFit || 'cover'}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, objectFit: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                                >
+                                  <option value="cover">Remplir le cadre (Cover)</option>
+                                  <option value="contain">Ajuster sans rogner (Contain)</option>
+                                  <option value="fill">Étirer (Fill)</option>
+                                </select>
+                              </div>
+                            </div>
+
                             {/* ARRONDISSEMENT DES COINS */}
                             <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                               <div className="flex items-center justify-between text-xs font-bold">
@@ -1732,7 +1831,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
                                   }}
                                 >
-                                  <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
+                                  <img
+                                    src={col.img}
+                                    alt={col.alt || col.title}
+                                    className="w-full h-full transition-transform duration-100"
+                                    style={{
+                                      objectFit: (col.objectFit as any) || 'cover',
+                                      objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                      transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                    }}
+                                  />
                                 </div>
 
                                 {/* CLICKABLE TITLE WITH HIGHLIGHT */}
@@ -1807,7 +1915,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
                                   }}
                                 >
-                                  <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
+                                  <img
+                                    src={col.img}
+                                    alt={col.alt || col.title}
+                                    className="w-full h-full transition-transform duration-100"
+                                    style={{
+                                      objectFit: (col.objectFit as any) || 'cover',
+                                      objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                      transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                    }}
+                                  />
                                 </div>
                                 <h4
                                   onClick={(e) => {
