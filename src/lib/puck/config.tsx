@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Config } from '@measured/puck';
+import { Trash2, Upload } from 'lucide-react';
 
 export type PuckProps = {
   Hero: {
@@ -42,6 +43,8 @@ export type PuckProps = {
     item4Img: string;
     imgHeight: number;
     borderRadius: number;
+    padding: number;
+    margin: number;
   };
   Feature3ColImg: {
     item1Title: string;
@@ -55,6 +58,8 @@ export type PuckProps = {
     item3Img: string;
     imgHeight: number;
     borderRadius: number;
+    padding: number;
+    margin: number;
   };
   Card: {
     title: string;
@@ -111,7 +116,7 @@ export const puckConfig: Config<PuckProps> = {
             { label: 'Émeraude Succès', value: 'from-emerald-800 to-teal-950' },
           ],
         },
-        imageUrl: { type: 'text', label: "URL de l'image illustrative" },
+        imageUrl: { type: 'text', label: "URL de l'image illustrative (Double-cliquez l'image pour charger un fichier PC)" },
       },
       defaultProps: {
         title: 'Transformez vos visiteurs en clients fidèles',
@@ -122,6 +127,8 @@ export const puckConfig: Config<PuckProps> = {
         imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
       },
       render: ({ title, subtitle, buttonText, buttonLink, bgGradient, imageUrl, ...props }: any) => {
+        const fileInputRef = React.useRef<HTMLInputElement>(null);
+
         const updateProp = (key: string, value: any) => {
           if (props.onChange) {
             props.onChange({ [key]: value });
@@ -170,37 +177,58 @@ export const puckConfig: Config<PuckProps> = {
                 </div>
               </div>
 
-              {/* INLINE IMAGE UPLOAD ON CANVAS */}
+              {/* INLINE IMAGE FRAME WITH DOUBLE-CLICK UPLOAD & SINGLE-CLICK TRASH */}
               <div className="w-full md:w-1/2 flex justify-center">
-                <div className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto">
+                <div
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  title="Double-cliquez pour ouvrir l explorateur de fichiers (PC)"
+                  className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto"
+                >
                   {imageUrl ? (
-                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px]" />
+                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none pointer-events-none" />
                   ) : (
-                    <div className="w-full h-64 bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-xs">
-                      Aucune image
+                    <div className="w-full h-64 bg-slate-800 flex flex-col items-center justify-center text-slate-400 font-bold text-xs gap-2 p-4">
+                      <span>🖼️ Aucune image</span>
+                      <span className="text-[10px] font-normal text-slate-300">Double-cliquez pour charger une photo</span>
                     </div>
                   )}
 
-                  <label
-                    {...stopProps}
-                    className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-2 p-4 z-20"
-                  >
-                    <span className="text-xl">📤</span>
-                    <span>Changer l image (PC)</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => updateProp('imageUrl', ev.target?.result as string);
-                          reader.readAsDataURL(file);
-                        }
+                  {/* TRASH ICON BUTTON AT BOTTOM RIGHT */}
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateProp('imageUrl', '');
                       }}
-                    />
-                  </label>
+                      title="Supprimer l image"
+                      className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+
+                  {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => updateProp('imageUrl', ev.target?.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -401,7 +429,7 @@ export const puckConfig: Config<PuckProps> = {
       fields: {
         item1Title: { type: 'text', label: 'Titre Col 1' },
         item1Desc: { type: 'textarea', label: 'Desc Col 1' },
-        item1Img: { type: 'text', label: 'Image Col 1' },
+        item1Img: { type: 'text', label: 'Image Col 1 (URL ou Double-cliquez sur le bloc pour choisir un fichier PC)' },
         item2Title: { type: 'text', label: 'Titre Col 2' },
         item2Desc: { type: 'textarea', label: 'Desc Col 2' },
         item2Img: { type: 'text', label: 'Image Col 2' },
@@ -413,6 +441,8 @@ export const puckConfig: Config<PuckProps> = {
         item4Img: { type: 'text', label: 'Image Col 4' },
         imgHeight: { type: 'number', label: 'Hauteur des images (px)' },
         borderRadius: { type: 'number', label: 'Arrondissement (px)' },
+        padding: { type: 'number', label: 'Remplissage Interne (Padding px)' },
+        margin: { type: 'number', label: 'Marge Externe (Margin px)' },
       },
       defaultProps: {
         item1Title: 'BASES',
@@ -429,15 +459,19 @@ export const puckConfig: Config<PuckProps> = {
         item4Img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80',
         imgHeight: 240,
         borderRadius: 16,
+        padding: 0,
+        margin: 0,
       },
       render: ({
         item1Title, item1Desc, item1Img,
         item2Title, item2Desc, item2Img,
         item3Title, item3Desc, item3Img,
         item4Title, item4Desc, item4Img,
-        imgHeight, borderRadius,
+        imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
+        const fileInputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -457,36 +491,109 @@ export const puckConfig: Config<PuckProps> = {
         ];
 
         return (
-          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto">
+          <div
+            className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto"
+            style={{
+              padding: padding !== undefined ? `${padding}px` : undefined,
+              margin: margin !== undefined ? `${margin}px 0` : undefined,
+            }}
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {items.map((col, i) => (
-                <div key={i} className="flex flex-col items-center text-center space-y-3">
-                  {/* INLINE IMAGE UPLOAD BUTTON DIRECTLY ON CANVAS BLOCK */}
+                <div
+                  key={i}
+                  draggable
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    e.dataTransfer.setData('text/plain', i.toString());
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const fromIdxStr = e.dataTransfer.getData('text/plain');
+                    const fromIdx = parseInt(fromIdxStr, 10);
+                    if (!isNaN(fromIdx) && fromIdx !== i) {
+                      const newItems = [...items];
+                      const temp = { ...newItems[fromIdx] };
+                      newItems[fromIdx] = { ...newItems[i] };
+                      newItems[i] = temp;
+
+                      updateProp(items[0].titleKey, newItems[0].title);
+                      updateProp(items[0].descKey, newItems[0].desc);
+                      updateProp(items[0].imgKey, newItems[0].img);
+
+                      updateProp(items[1].titleKey, newItems[1].title);
+                      updateProp(items[1].descKey, newItems[1].desc);
+                      updateProp(items[1].imgKey, newItems[1].img);
+
+                      updateProp(items[2].titleKey, newItems[2].title);
+                      updateProp(items[2].descKey, newItems[2].desc);
+                      updateProp(items[2].imgKey, newItems[2].img);
+
+                      updateProp(items[3].titleKey, newItems[3].title);
+                      updateProp(items[3].descKey, newItems[3].desc);
+                      updateProp(items[3].imgKey, newItems[3].img);
+                    }
+                  }}
+                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-grab active:cursor-grabbing"
+                  title="Glissez-déposez cette colonne pour réorganiser"
+                >
+                  {/* IMAGE FRAME WITH DOUBLE CLICK FILE PICKER & SINGLE CLICK TRASH ICON */}
                   <div
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRefs.current[i]?.click();
+                    }}
+                    title="Clic simple pour voir les options dans la barre droite. Double-clic pour ouvrir l explorateur PC."
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
-                    <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                    <label
-                      {...stopProps}
-                      className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2 z-20"
-                    >
-                      <span className="text-lg">📤</span>
-                      <span>Changer l image (PC)</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
-                            reader.readAsDataURL(file);
-                          }
+                    {col.img ? (
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                    ) : (
+                      <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
+                        <span>🖼️ Aucune image</span>
+                        <span className="text-[10px] text-slate-400 font-normal">Double-clic pour charger</span>
+                      </div>
+                    )}
+
+                    {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
+                    {col.img && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateProp(col.imgKey, '');
                         }}
-                      />
-                    </label>
+                        title="Supprimer l image (1 clic)"
+                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                    <input
+                      type="file"
+                      ref={(el) => { fileInputRefs.current[i] = el; }}
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
                   </div>
 
                   {/* INLINE EDITABLE TITLE DIRECTLY ON CANVAS BLOCK */}
@@ -529,6 +636,8 @@ export const puckConfig: Config<PuckProps> = {
         item3Img: { type: 'text', label: 'Image Col 3' },
         imgHeight: { type: 'number', label: 'Hauteur des images (px)' },
         borderRadius: { type: 'number', label: 'Arrondissement (px)' },
+        padding: { type: 'number', label: 'Remplissage Interne (Padding px)' },
+        margin: { type: 'number', label: 'Marge Externe (Margin px)' },
       },
       defaultProps: {
         item1Title: 'STRATÉGIE CLAIRE',
@@ -542,14 +651,18 @@ export const puckConfig: Config<PuckProps> = {
         item3Img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80',
         imgHeight: 260,
         borderRadius: 20,
+        padding: 0,
+        margin: 0,
       },
       render: ({
         item1Title, item1Desc, item1Img,
         item2Title, item2Desc, item2Img,
         item3Title, item3Desc, item3Img,
-        imgHeight, borderRadius,
+        imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
+        const fileInputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -568,35 +681,104 @@ export const puckConfig: Config<PuckProps> = {
         ];
 
         return (
-          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto">
+          <div
+            className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto"
+            style={{
+              padding: padding !== undefined ? `${padding}px` : undefined,
+              margin: margin !== undefined ? `${margin}px 0` : undefined,
+            }}
+          >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {items.map((col, i) => (
-                <div key={i} className="flex flex-col items-center text-center space-y-3">
+                <div
+                  key={i}
+                  draggable
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    e.dataTransfer.setData('text/plain', i.toString());
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const fromIdxStr = e.dataTransfer.getData('text/plain');
+                    const fromIdx = parseInt(fromIdxStr, 10);
+                    if (!isNaN(fromIdx) && fromIdx !== i) {
+                      const newItems = [...items];
+                      const temp = { ...newItems[fromIdx] };
+                      newItems[fromIdx] = { ...newItems[i] };
+                      newItems[i] = temp;
+
+                      updateProp(items[0].titleKey, newItems[0].title);
+                      updateProp(items[0].descKey, newItems[0].desc);
+                      updateProp(items[0].imgKey, newItems[0].img);
+
+                      updateProp(items[1].titleKey, newItems[1].title);
+                      updateProp(items[1].descKey, newItems[1].desc);
+                      updateProp(items[1].imgKey, newItems[1].img);
+
+                      updateProp(items[2].titleKey, newItems[2].title);
+                      updateProp(items[2].descKey, newItems[2].desc);
+                      updateProp(items[2].imgKey, newItems[2].img);
+                    }
+                  }}
+                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-grab active:cursor-grabbing"
+                  title="Glissez-déposez cette colonne pour réorganiser"
+                >
                   <div
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRefs.current[i]?.click();
+                    }}
+                    title="Clic simple pour voir les options dans la barre droite. Double-clic pour ouvrir l explorateur PC."
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
-                    <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                    <label
-                      {...stopProps}
-                      className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2 z-20"
-                    >
-                      <span className="text-lg">📤</span>
-                      <span>Changer l image (PC)</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
-                            reader.readAsDataURL(file);
-                          }
+                    {col.img ? (
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                    ) : (
+                      <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
+                        <span>🖼️ Aucune image</span>
+                        <span className="text-[10px] text-slate-400 font-normal">Double-clic pour charger</span>
+                      </div>
+                    )}
+
+                    {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
+                    {col.img && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateProp(col.imgKey, '');
                         }}
-                      />
-                    </label>
+                        title="Supprimer l image (1 clic)"
+                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                    <input
+                      type="file"
+                      ref={(el) => { fileInputRefs.current[i] = el; }}
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
                   </div>
 
                   <input
