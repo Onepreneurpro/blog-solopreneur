@@ -145,6 +145,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type: data.type,
           category: data.category,
           content: data.defaultContent,
+          data: getDefaultBlockData(data.type, data.defaultContent),
         };
         setElements((prev) => {
           if (targetIndex !== undefined) {
@@ -968,7 +969,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setEditingBlock(el);
+                            const targetData = el.data && el.data.items && el.data.items.length > 0
+                              ? el.data
+                              : getDefaultBlockData(el.type, el.content);
+                            const updatedEl = { ...el, data: targetData };
+                            handleUpdateElementData(el.id, targetData);
+                            setEditingBlock(updatedEl);
                           }}
                           title="Personnaliser le bloc (Texte, Images, Colonnes...)"
                           className="flex items-center gap-1 hover:text-amber-300 bg-white/10 px-1.5 py-0.5 rounded-lg"
