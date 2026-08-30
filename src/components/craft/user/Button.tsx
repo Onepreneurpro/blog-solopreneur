@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay } from './Text';
+import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay, splitEmojiAndText } from './Text';
 
 export interface ButtonProps {
   text?: string;
@@ -83,6 +83,7 @@ export const Button = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const { emoji, text: cleanText } = splitEmojiAndText(text);
 
   const highlightStyles: React.CSSProperties =
     highlightColor && highlightColor !== 'transparent'
@@ -115,6 +116,7 @@ export const Button = ({
           }}
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
+          {emoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{emoji}</span>}
           <span className="relative inline-block" style={{ ...highlightStyles }}>
             <CreativeUnderlineOverlay
               enabled={underlineEnabled}
@@ -123,7 +125,7 @@ export const Button = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10">{text}</span>
+            <span className="relative z-10">{cleanText}</span>
           </span>
         </a>
       </div>
@@ -157,6 +159,7 @@ export const Button = ({
         }}
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >
+        {emoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{emoji}</span>}
         <span className="relative inline-block" style={{ ...highlightStyles }}>
           <CreativeUnderlineOverlay
             enabled={underlineEnabled}
@@ -170,13 +173,13 @@ export const Button = ({
             suppressContentEditableWarning
             onBlur={(e) => {
               setProp((props: ButtonProps) => {
-                props.text = e.currentTarget.innerText;
+                props.text = emoji ? `${emoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
               });
             }}
             className="relative z-10"
             style={{ outline: 'none' }}
           >
-            {text}
+            {cleanText}
           </span>
         </span>
       </button>

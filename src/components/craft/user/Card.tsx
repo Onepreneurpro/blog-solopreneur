@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay } from './Text';
+import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay, splitEmojiAndText } from './Text';
 
 export interface CardProps {
   title?: string;
@@ -74,6 +74,9 @@ export const Card = ({
   const isTitleTargeted = targetText === 'title' || targetText === 'both';
   const isContentTargeted = targetText === 'content' || targetText === 'both';
 
+  const { emoji: titleEmoji, text: titleCleanText } = splitEmojiAndText(title);
+  const { emoji: contentEmoji, text: contentCleanText } = splitEmojiAndText(content);
+
   const highlightStyles: React.CSSProperties =
     highlightColor && highlightColor !== 'transparent'
       ? {
@@ -102,6 +105,7 @@ export const Card = ({
         }}
       >
         <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
+          {titleEmoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{titleEmoji}</span>}
           <span className="relative inline-block" style={{ ...(isTitleTargeted ? highlightStyles : {}) }}>
             <CreativeUnderlineOverlay
               enabled={isTitleTargeted && underlineEnabled}
@@ -110,11 +114,12 @@ export const Card = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: title }} />
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: titleCleanText }} />
           </span>
         </h3>
 
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
+          {contentEmoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{contentEmoji}</span>}
           <span className="relative inline-block" style={{ ...(isContentTargeted ? highlightStyles : {}) }}>
             <CreativeUnderlineOverlay
               enabled={isContentTargeted && underlineEnabled}
@@ -123,7 +128,7 @@ export const Card = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: content }} />
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: contentCleanText }} />
           </span>
         </p>
       </div>
@@ -150,6 +155,7 @@ export const Card = ({
       }}
     >
       <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
+        {titleEmoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{titleEmoji}</span>}
         <span className="relative inline-block" style={{ ...(isTitleTargeted ? highlightStyles : {}) }}>
           <CreativeUnderlineOverlay
             enabled={isTitleTargeted && underlineEnabled}
@@ -173,16 +179,17 @@ export const Card = ({
             }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.title = e.currentTarget.innerHTML;
+                props.title = titleEmoji ? `${titleEmoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
               });
             }}
-            dangerouslySetInnerHTML={{ __html: title }}
+            dangerouslySetInnerHTML={{ __html: titleCleanText }}
             className="relative z-10 outline-none cursor-text inline-block min-w-[30px]"
           />
         </span>
       </h3>
 
       <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
+        {contentEmoji && <span className="mr-2 inline-block select-none bg-transparent no-underline font-normal">{contentEmoji}</span>}
         <span className="relative inline-block" style={{ ...(isContentTargeted ? highlightStyles : {}) }}>
           <CreativeUnderlineOverlay
             enabled={isContentTargeted && underlineEnabled}
@@ -206,10 +213,10 @@ export const Card = ({
             }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.content = e.currentTarget.innerHTML;
+                props.content = contentEmoji ? `${contentEmoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
               });
             }}
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: contentCleanText }}
             className="relative z-10 outline-none cursor-text inline-block min-w-[50px]"
           />
         </span>

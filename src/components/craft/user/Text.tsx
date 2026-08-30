@@ -33,6 +33,21 @@ export interface TextProps {
   underlineOffset?: number;
 }
 
+export const splitEmojiAndText = (str: string = '') => {
+  if (!str) return { emoji: '', text: '' };
+
+  const emojiRegex = /^([\p{Extended_Pictographic}\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}])\s*/u;
+
+  const match = str.match(emojiRegex);
+  if (match) {
+    const emoji = match[1];
+    const text = str.substring(match[0].length);
+    return { emoji, text };
+  }
+
+  return { emoji: '', text: str };
+};
+
 export const getBoxShadow = (
   preset?: string,
   blur = 15,
@@ -165,6 +180,7 @@ export const Text = ({
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const { emoji, text: cleanText } = splitEmojiAndText(text);
 
   const highlightStyles: React.CSSProperties =
     highlightColor && highlightColor !== 'transparent'
@@ -202,6 +218,7 @@ export const Text = ({
           }}
           className="tracking-tight leading-tight w-full inline-block"
         >
+          {emoji && <span className="mr-2.5 inline-block select-none bg-transparent no-underline font-normal">{emoji}</span>}
           <span className="relative inline-block" style={{ ...highlightStyles }}>
             <CreativeUnderlineOverlay
               enabled={underlineEnabled}
@@ -210,7 +227,7 @@ export const Text = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: text }} />
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: cleanText }} />
           </span>
         </Tag>
       </div>
@@ -245,6 +262,7 @@ export const Text = ({
         }}
         className="tracking-tight leading-tight w-full min-w-[50px] inline-block"
       >
+        {emoji && <span className="mr-2.5 inline-block select-none bg-transparent no-underline font-normal">{emoji}</span>}
         <span className="relative inline-block" style={{ ...highlightStyles }}>
           <CreativeUnderlineOverlay
             enabled={underlineEnabled}
@@ -258,10 +276,10 @@ export const Text = ({
             suppressContentEditableWarning
             onBlur={(e) => {
               setProp((props: TextProps) => {
-                props.text = e.currentTarget.innerHTML;
+                props.text = emoji ? `${emoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
               });
             }}
-            dangerouslySetInnerHTML={{ __html: text }}
+            dangerouslySetInnerHTML={{ __html: cleanText }}
             className="relative z-10 outline-none cursor-text inline-block min-w-[30px]"
           />
         </span>
