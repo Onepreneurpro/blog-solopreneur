@@ -300,6 +300,33 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
+            if (el.type === 'Image') {
+              return (
+                <div key={el.id} className="max-w-3xl mx-auto flex justify-center">
+                  <div
+                    className="overflow-hidden shadow-lg transition-all"
+                    style={{
+                      width: el.data?.imgWidth ? `${el.data.imgWidth}px` : '100%',
+                      maxWidth: '100%',
+                      height: el.data?.imgSize ? `${el.data.imgSize}px` : 'auto',
+                      borderRadius: `${el.data?.borderRadius !== undefined ? el.data.borderRadius : 16}px`,
+                    }}
+                  >
+                    <img
+                      src={el.data?.img || el.content}
+                      alt={el.data?.alt || 'Image'}
+                      className="w-full h-full"
+                      style={{
+                        objectFit: (el.data?.objectFit as any) || 'cover',
+                        objectPosition: `${el.data?.posX !== undefined ? el.data.posX : 50}% ${el.data?.posY !== undefined ? el.data.posY : 50}%`,
+                        transform: `scale(${(el.data?.imgZoom || 100) / 100})`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            }
+
             if (el.type === 'BlockFeat4ColImg' || el.type === 'Col4' || el.type === 'BlockFeat3ColImg' || el.type === 'Col3') {
               const defaultData = el.type.includes('4') || el.type === 'Col4'
                 ? {
@@ -335,8 +362,27 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     {items.map((it: any, idx: number) => (
                       <div key={idx} className="space-y-3 flex flex-col items-center text-center bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
                         {it.img && (
-                          <div className="w-full h-36 rounded-xl overflow-hidden shadow-md">
-                            <img src={it.img} alt={it.title} className="w-full h-full object-cover" />
+                          <div className="w-full flex justify-center">
+                            <div
+                              className="relative overflow-hidden shadow-md transition-all w-full"
+                              style={{
+                                width: it.imgWidth ? `${it.imgWidth}px` : '100%',
+                                maxWidth: '100%',
+                                height: it.imgSize ? `${it.imgSize}px` : '220px',
+                                borderRadius: `${it.borderRadius !== undefined ? it.borderRadius : 16}px`,
+                              }}
+                            >
+                              <img
+                                src={it.img}
+                                alt={it.alt || it.title}
+                                className="w-full h-full transition-transform duration-100 select-none"
+                                style={{
+                                  objectFit: (it.objectFit as any) || 'cover',
+                                  objectPosition: `${it.posX !== undefined ? it.posX : 50}% ${it.posY !== undefined ? it.posY : 50}%`,
+                                  transform: `scale(${(it.imgZoom || 100) / 100})`,
+                                }}
+                              />
+                            </div>
                           </div>
                         )}
                         <h4 className="font-heading font-extrabold text-sm text-white uppercase">{it.title}</h4>
