@@ -1328,40 +1328,41 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         <div
           id="floating-bubble-menu"
           style={{ top: `${bubbleMenu.y}px`, left: `${bubbleMenu.x}px` }}
-          className="fixed z-[99999] bg-slate-900 text-white rounded-2xl shadow-2xl p-2 flex items-center gap-1.5 border border-slate-700 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95"
+          className="fixed z-[99999] bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1.5 border-2 border-slate-200 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
         >
           <button
             type="button"
             onClick={() => executeCommand('undo')}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs cursor-pointer"
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
             title="Annuler (Ctrl+Z / Revenir)"
           >
-            <Undo className="w-3.5 h-3.5" />
+            <Undo className="w-4 h-4 text-slate-900" />
           </button>
           <button
             type="button"
             onClick={() => executeCommand('redo')}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs cursor-pointer"
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
             title="Rétablir (Ctrl+Y / Avancer)"
           >
-            <Redo className="w-3.5 h-3.5" />
+            <Redo className="w-4 h-4 text-slate-900" />
           </button>
           <button
             type="button"
             onClick={() => executeCommand('bold')}
-            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white font-extrabold rounded-lg text-xs"
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 font-extrabold"
             title="Gras (B)"
           >
-            B
+            <Bold className="w-4 h-4 text-slate-900" />
           </button>
           <button
             type="button"
             onClick={() => executeCommand('italic')}
-            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white font-extrabold italic rounded-lg text-xs"
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900 italic font-extrabold"
             title="Italique (I)"
           >
-            I
+            <Italic className="w-4 h-4 text-slate-900" />
           </button>
+
           {/* UNDERLINE POPOVER IN BUBBLE */}
           <div className="relative color-popover-container shrink-0">
             <button
@@ -1371,31 +1372,31 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 saveSelection();
                 setOpenBubblePopover((prev) => (prev === 'underline' ? null : 'underline'));
               }}
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white font-extrabold rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 h-7 border border-slate-700 cursor-pointer"
+              className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
               title="Soulignage Personnalisé"
             >
-              <Underline className="w-3.5 h-3.5 text-slate-200 shrink-0" />
+              <Underline className="w-4 h-4 text-sky-600 shrink-0" />
               <span>Souligné</span>
-              <span className="w-2.5 h-2.5 rounded-full border border-slate-600 bg-[#a3e635] shrink-0 inline-block" />
-              <span className="text-[10px] text-slate-400 shrink-0">▾</span>
+              <span className="w-2.5 h-2.5 rounded-full border border-sky-400 bg-[#00A0FF] shrink-0 inline-block" />
+              <span className="text-[10px] text-sky-700 shrink-0">▾</span>
             </button>
 
             {openBubblePopover === 'underline' && (
-              <div className="absolute left-0 top-full mt-1.5 z-[100000] bg-slate-950 text-white rounded-2xl shadow-2xl p-3 border border-slate-700 w-64 space-y-3 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="text-[11px] font-extrabold text-[#a3e635] uppercase tracking-wider flex items-center gap-1">
-                    <Underline className="w-3.5 h-3.5" />
+              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                    <Underline className="w-4 h-4 text-[#00A0FF]" />
                     <span>Soulignage Personnalisé</span>
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Épaisseur :</label>
+                    <label className="block text-xs font-black text-slate-800 mb-1">Épaisseur :</label>
                     <select
                       value={underlineThickness}
                       onChange={(e) => setUnderlineThickness(e.target.value)}
-                      className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none cursor-pointer"
+                      className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none cursor-pointer"
                     >
                       <option value="1px">1px (Fin)</option>
                       <option value="2px">2px (Normal)</option>
@@ -1407,11 +1408,11 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Hauteur / Position :</label>
+                    <label className="block text-xs font-black text-slate-800 mb-1">Hauteur / Position :</label>
                     <select
                       value={underlineOffset}
                       onChange={(e) => setUnderlineOffset(e.target.value)}
-                      className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none cursor-pointer"
+                      className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none cursor-pointer"
                     >
                       <option value="-2px">⚡ Haute (Collée)</option>
                       <option value="0px">📍 Support direct (0px)</option>
@@ -1423,7 +1424,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1.5">Choisir la couleur :</label>
+                  <label className="block text-xs font-black text-slate-800 mb-1.5">Choisir la couleur :</label>
                   <div className="grid grid-cols-6 gap-1.5">
                     {underlineColors.map((c) => (
                       <button
@@ -1435,29 +1436,29 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                           setOpenBubblePopover(null);
                         }}
                         style={{ backgroundColor: c.color }}
-                        className="w-7 h-7 rounded-lg border border-slate-700 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                        className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
                         title={c.label}
                       />
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-slate-400">Glisser pour choisir :</span>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       defaultValue="#a3e635"
                       onInput={(e) => handleApplyUnderline((e.target as HTMLInputElement).value, underlineThickness, underlineOffset, true)}
                       onChange={(e) => handleApplyUnderline(e.target.value, underlineThickness, underlineOffset, true)}
-                      className="w-8 h-8 bg-transparent cursor-pointer rounded-lg border border-slate-700 p-0.5"
+                      className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
                       title="Glissez le curseur pour explorer toutes les nuances"
                     />
                     <button
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => setOpenBubblePopover(null)}
-                      className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] rounded-md cursor-pointer shadow-xs"
+                      className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
                     >
                       OK
                     </button>
@@ -1468,8 +1469,8 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           </div>
 
           {/* FONT SIZE SELECTOR IN FLOATING BUBBLE */}
-          <div className="flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg border border-slate-700 shrink-0">
-            <Type className="w-3.5 h-3.5 text-slate-300 ml-1 shrink-0" />
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+            <Type className="w-4 h-4 text-slate-700 ml-1 shrink-0" />
             <select
               onChange={(e) => {
                 if (e.target.value) {
@@ -1477,15 +1478,15 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                   e.target.value = '';
                 }
               }}
-              className="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer pr-1"
+              className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer pr-1"
               title="Taille du texte"
             >
-              <option value="" className="bg-slate-900 text-white">Taille</option>
-              <option value="12px" className="bg-slate-900 text-white">12px</option>
-              <option value="14px" className="bg-slate-900 text-white">14px</option>
-              <option value="18px" className="bg-slate-900 text-white">18px</option>
-              <option value="24px" className="bg-slate-900 text-white">24px</option>
-              <option value="32px" className="bg-slate-900 text-white">32px</option>
+              <option value="" className="bg-white text-slate-900">Taille</option>
+              <option value="12px" className="bg-white text-slate-900">12px</option>
+              <option value="14px" className="bg-white text-slate-900">14px</option>
+              <option value="18px" className="bg-white text-slate-900">18px</option>
+              <option value="24px" className="bg-white text-slate-900">24px</option>
+              <option value="32px" className="bg-white text-slate-900">32px</option>
             </select>
           </div>
 
@@ -1498,19 +1499,19 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 saveSelection();
                 setOpenBubblePopover((prev) => (prev === 'text' ? null : 'text'));
               }}
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white font-extrabold rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 h-7 border border-slate-700 cursor-pointer"
+              className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
               title="Palette de Couleurs de Texte"
             >
-              <Palette className="w-3.5 h-3.5 text-slate-200 shrink-0" />
+              <Palette className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>Couleur</span>
-              <span className="text-[10px] text-slate-400 shrink-0">▾</span>
+              <span className="text-[10px] text-emerald-700 shrink-0">▾</span>
             </button>
 
             {openBubblePopover === 'text' && (
-              <div className="absolute left-0 top-full mt-1.5 z-[100000] bg-slate-950 text-white rounded-2xl shadow-2xl p-3 border border-slate-700 w-64 space-y-3 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="text-[11px] font-extrabold text-[#a3e635] uppercase tracking-wider flex items-center gap-1">
-                    <Palette className="w-3.5 h-3.5" />
+              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                    <Palette className="w-4 h-4 text-emerald-600" />
                     <span>Couleur du Texte</span>
                   </span>
                 </div>
@@ -1526,28 +1527,28 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                         setOpenBubblePopover(null);
                       }}
                       style={{ backgroundColor: c.color }}
-                      className="w-7 h-7 rounded-lg border border-slate-700 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                      className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
                       title={c.label}
                     />
                   ))}
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-slate-400">Glisser pour choisir :</span>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       defaultValue="#a3e635"
                       onInput={(e) => handleApplyTextColor((e.target as HTMLInputElement).value, true)}
                       onChange={(e) => handleApplyTextColor(e.target.value, true)}
-                      className="w-8 h-8 bg-transparent cursor-pointer rounded-lg border border-slate-700 p-0.5"
+                      className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
                       title="Glissez le curseur pour explorer toutes les nuances"
                     />
                     <button
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => setOpenBubblePopover(null)}
-                      className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] rounded-md cursor-pointer shadow-xs"
+                      className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
                     >
                       OK
                     </button>
@@ -1566,19 +1567,19 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 saveSelection();
                 setOpenBubblePopover((prev) => (prev === 'neon' ? null : 'neon'));
               }}
-              className="px-2.5 py-1 bg-[#a3e635] hover:bg-[#b8f542] text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 h-7 border border-[#86efac] cursor-pointer shadow-sm"
+              className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
               title="Palette de Surlignage Néon (<mark>)"
             >
-              <Highlighter className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+              <Highlighter className="w-4 h-4 text-amber-600 shrink-0" />
               <span>Néon</span>
-              <span className="text-[10px] text-slate-800 shrink-0">▾</span>
+              <span className="text-[10px] text-amber-700 shrink-0">▾</span>
             </button>
 
             {openBubblePopover === 'neon' && (
-              <div className="absolute left-0 top-full mt-1.5 z-[100000] bg-slate-950 text-white rounded-2xl shadow-2xl p-3 border border-slate-700 w-64 space-y-3 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="text-[11px] font-extrabold text-[#a3e635] uppercase tracking-wider flex items-center gap-1">
-                    <Highlighter className="w-3.5 h-3.5" />
+              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                    <Highlighter className="w-4 h-4 text-amber-600" />
                     <span>Surlignage Néon Fluo</span>
                   </span>
                 </div>
@@ -1594,27 +1595,27 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                         setOpenBubblePopover(null);
                       }}
                       style={{ backgroundColor: c.color }}
-                      className="w-7 h-7 rounded-lg border border-slate-700 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                      className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
                       title={c.label}
                     />
                   ))}
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-slate-400">Glisser pour choisir :</span>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       defaultValue="#a3e635"
                       onInput={(e) => handleApplyHighlight((e.target as HTMLInputElement).value, true)}
                       onChange={(e) => handleApplyHighlight(e.target.value, true)}
-                      className="w-8 h-8 bg-transparent cursor-pointer rounded-lg border border-slate-700 p-0.5"
+                      className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
                       title="Glissez le curseur pour explorer toutes les nuances"
                     />
                     <button
                       type="button"
                       onClick={() => setOpenBubblePopover(null)}
-                      className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] rounded-md cursor-pointer shadow-xs"
+                      className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
                     >
                       OK
                     </button>
@@ -1628,19 +1629,19 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           <button
             type="button"
             onClick={handleRemoveHighlightAndUnderline}
-            className="p-1.5 bg-rose-900/60 hover:bg-rose-800 text-rose-200 font-extrabold rounded-lg text-xs flex items-center gap-1 border border-rose-700/50 cursor-pointer"
+            className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-2xs"
             title="Effacer surlignage et soulignage (conserve la taille et le style)"
           >
-            <Eraser className="w-3.5 h-3.5 text-rose-400" />
-            <span className="text-[11px]">Effacer</span>
+            <Eraser className="w-4 h-4 text-rose-600" />
+            <span>Effacer</span>
           </button>
 
-          <div className="h-4 w-[1px] bg-slate-700 mx-0.5" />
+          <div className="h-5 w-[1px] bg-slate-200 mx-0.5" />
 
           <button
             type="button"
             onClick={() => executeCommand('formatBlock', 'h2')}
-            className="px-2 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-lg text-xs"
+            className="px-2.5 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-xl text-xs"
             title="Titre H2"
           >
             H2
@@ -1648,57 +1649,57 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           <button
             type="button"
             onClick={() => executeCommand('formatBlock', 'h3')}
-            className="px-2 py-1 bg-amber-300 hover:bg-amber-200 text-slate-950 font-black rounded-lg text-xs"
+            className="px-2.5 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs"
             title="Sous-titre H3"
           >
             H3
           </button>
 
-          <div className="h-4 w-[1px] bg-slate-700 mx-0.5" />
+          <div className="h-5 w-[1px] bg-slate-200 mx-0.5" />
 
           <button
             type="button"
             onClick={() => handleOpenModal('link')}
-            className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs flex items-center gap-1 shadow-sm"
+            className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-1 shadow-xs"
             title="Insérer un lien hypertexte"
           >
-            <LinkIcon className="w-3.5 h-3.5 text-white" />
+            <LinkIcon className="w-4 h-4 text-white" />
             <span>Lien</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleOpenModal('image')}
-            className="px-2.5 py-1 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-xs flex items-center gap-1 shadow-sm"
+            className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold rounded-xl text-xs flex items-center gap-1 shadow-xs"
             title="Insérer une image / photo"
           >
-            <ImageIcon className="w-3.5 h-3.5 text-white" />
+            <ImageIcon className="w-4 h-4 text-white" />
             <span>Photo</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleOpenModal('video')}
-            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1 shadow-sm"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-1 shadow-xs"
             title="Insérer une vidéo"
           >
-            <Video className="w-3.5 h-3.5 text-white" />
+            <Video className="w-4 h-4 text-white" />
             <span>Vidéo</span>
           </button>
 
           <button
             type="button"
             onClick={handleAddTable}
-            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-xs"
+            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold rounded-xl text-xs"
             title="Insérer un tableau"
           >
-            <TableIcon className="w-3.5 h-3.5 text-slate-200" />
+            <TableIcon className="w-4 h-4 text-slate-800" />
           </button>
 
           <button
             type="button"
             onClick={handleAddCTA}
-            className="px-2.5 py-1 bg-gradient-to-r from-purple-600 via-orange-500 to-amber-500 text-white rounded-lg text-xs font-black shadow-sm"
+            className="px-3 py-1.5 bg-gradient-to-r from-purple-600 via-orange-500 to-amber-500 text-white rounded-xl text-xs font-black shadow-xs"
             title="Insérer un CTA"
           >
             CTA
@@ -1707,19 +1708,19 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           <button
             type="button"
             onClick={handleAddOptInEbook}
-            className="px-2.5 py-1 bg-[#a3e635] text-slate-950 rounded-lg text-xs font-black shadow-sm hover:bg-[#b8f542] whitespace-nowrap shrink-0 flex items-center gap-1"
+            className="px-3 py-1.5 bg-[#a3e635] text-slate-950 rounded-xl text-xs font-black shadow-xs hover:bg-[#b8f542] whitespace-nowrap shrink-0 flex items-center gap-1"
             title="Insérer le Bloc Opt-in eBook Gratuit"
           >
-            <BookOpen className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+            <BookOpen className="w-4 h-4 text-slate-950 shrink-0" />
             <span>eBook</span>
           </button>
 
-          <div className="h-4 w-[1px] bg-slate-700 mx-0.5" />
+          <div className="h-5 w-[1px] bg-slate-200 mx-0.5" />
 
           <button
             type="button"
             onClick={() => setBubbleMenu((prev) => ({ ...prev, visible: false }))}
-            className="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg"
+            className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-900 rounded-xl"
             title="Fermer"
           >
             <X className="w-4 h-4" />
