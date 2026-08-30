@@ -701,62 +701,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 )}
                               </div>
 
-                              <div className="space-y-2.5">
-                                {/* BOUTON D IMPORTATION DIRECTE DEPUIS LE PC AVEC APERÇU */}
-                                <div className="flex items-center gap-2">
-                                  {currentSubItem.img && (
-                                    <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
-                                      <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
-                                    </div>
-                                  )}
+                              {/* BOUTON D IMPORTATION UNIQUE DEPUIS LE PC AVEC APERÇU (SANS URL EXPOSÉE) */}
+                              <div className="flex items-center gap-2 pt-1">
+                                {currentSubItem.img && (
+                                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
+                                    <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
 
-                                  <label className="flex-1 py-2 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
-                                    <span>📤</span>
-                                    <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = (uploadEv) => {
-                                            const url = uploadEv.target?.result as string;
-                                            const updatedItems = elItems.map((it: any, idx: number) =>
-                                              idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
-                                            );
-                                            handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-
-                                {/* LIEN / URL PROPRE SANS CODE RAW BASE64 ENCOMBRANT */}
-                                <div className="space-y-1 pt-1">
-                                  <span className="text-[10px] text-slate-400 font-medium block">Adresse / URL de l image web :</span>
+                                <label className="flex-1 py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                  <span>📤</span>
+                                  <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
                                   <input
-                                    type="text"
-                                    value={
-                                      currentSubItem.img?.startsWith('data:')
-                                        ? '[ Image locale téléversée depuis votre PC ]'
-                                        : currentSubItem.img || ''
-                                    }
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
                                     onChange={(e) => {
-                                      const val = e.target.value;
-                                      if (val === '[ Image locale téléversée depuis votre PC ]') return;
-                                      const updatedItems = elItems.map((it: any, idx: number) =>
-                                        idx === selectedSubItem.itemIndex ? { ...it, img: val } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = (uploadEv) => {
+                                          const url = uploadEv.target?.result as string;
+                                          const updatedItems = elItems.map((it: any, idx: number) =>
+                                            idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
+                                          );
+                                          handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                        };
+                                        reader.readAsDataURL(file);
+                                      }
                                     }}
-                                    placeholder="https://..."
-                                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono focus:border-[#00A0FF] outline-none"
                                   />
-                                </div>
+                                </label>
                               </div>
                             </div>
 
@@ -1013,6 +988,61 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 }}
                                 className="w-full accent-[#00A0FF]"
                               />
+                            </div>
+
+                            {/* 📏 ESPACEMENTS & MARGES DE L ÉLÉMENT (PADDING & MARGIN) */}
+                            <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                                📏 Espacements & Marges (Padding / Margin)
+                              </div>
+
+                              {/* MARGE EXTERNE (MARGIN Y) */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                  <span>Marge Externe Haut/Bas (Margin Y)</span>
+                                  <span className="font-mono text-slate-400">
+                                    {currentSubItem.marginY || 0}px
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={80}
+                                  value={currentSubItem.marginY || 0}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, marginY: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full accent-[#00A0FF]"
+                                />
+                              </div>
+
+                              {/* REMPLISSAGE INTERNE (PADDING) */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                  <span>Remplissage Interne (Padding)</span>
+                                  <span className="font-mono text-slate-400">
+                                    {currentSubItem.padding || 0}px
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={60}
+                                  value={currentSubItem.padding || 0}
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, padding: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full accent-[#00A0FF]"
+                                />
+                              </div>
                             </div>
 
                             {/* ACTION SUR UNE IMAGE CLIQUÉE (WITH URL INPUT) */}
@@ -1298,28 +1328,60 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     </div>
 
-                    {/* 6. MARGES (HAUT, DROITE, BAS, GAUCHE - SCREENSHOT 4) */}
-                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Taille et position / Marges (px)
-                      </label>
-                      <div className="grid grid-cols-4 gap-2 text-center">
-                        {[
-                          { key: 'marginTop', label: 'Haut' },
-                          { key: 'marginRight', label: 'Droite' },
-                          { key: 'marginBottom', label: 'Bas' },
-                          { key: 'marginLeft', label: 'Gauche' },
-                        ].map((m) => (
-                          <div key={m.key} className="space-y-1">
-                            <input
-                              type="number"
-                              value={elData[m.key] || 0}
-                              onChange={(e) => handleUpdateElementData(selectedEl.id, { [m.key]: Number(e.target.value) })}
-                              className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono"
-                            />
-                            <span className="text-[9px] font-bold text-slate-500">{m.label}</span>
-                          </div>
-                        ))}
+                    {/* 6. MARGES EXTERNES & REMPLISSAGE INTERNE (PADDING / MARGIN) */}
+                    <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                      <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                        📏 Marges Externes (Margin) & Remplissage (Padding)
+                      </div>
+
+                      {/* MARGES EXTERNES (MARGIN) */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                          Marges Externes (Margin px)
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          {[
+                            { key: 'marginTop', label: 'Haut' },
+                            { key: 'marginRight', label: 'Droite' },
+                            { key: 'marginBottom', label: 'Bas' },
+                            { key: 'marginLeft', label: 'Gauche' },
+                          ].map((m) => (
+                            <div key={m.key} className="space-y-1">
+                              <input
+                                type="number"
+                                value={elData[m.key] || 0}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { [m.key]: Number(e.target.value) })}
+                                className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono focus:border-[#00A0FF] outline-none"
+                              />
+                              <span className="text-[9px] font-bold text-slate-500">{m.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* REMPLISSAGE INTERNE (PADDING) */}
+                      <div className="space-y-1.5 border-t border-slate-900 pt-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                          Remplissage Interne (Padding px)
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          {[
+                            { key: 'paddingTop', label: 'Haut', def: 16 },
+                            { key: 'paddingRight', label: 'Droite', def: 16 },
+                            { key: 'paddingBottom', label: 'Bas', def: 16 },
+                            { key: 'paddingLeft', label: 'Gauche', def: 16 },
+                          ].map((p) => (
+                            <div key={p.key} className="space-y-1">
+                              <input
+                                type="number"
+                                value={elData[p.key] !== undefined ? elData[p.key] : p.def}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { [p.key]: Number(e.target.value) })}
+                                className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono focus:border-[#00A0FF] outline-none"
+                              />
+                              <span className="text-[9px] font-bold text-slate-500">{p.label}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
@@ -1953,11 +2015,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       handleCanvasDrop(e, idx);
                     }}
                     onClick={() => setSelectedElementId(el.id)}
-                    className={`relative p-4 rounded-2xl border-2 transition-all cursor-move group ${
+                    className={`relative rounded-2xl border-2 transition-all cursor-move group ${
                       isSelected
                         ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30'
                         : 'border-slate-800/80 hover:border-slate-700 bg-slate-950/40'
                     }`}
+                    style={{
+                      marginTop: `${el.data?.marginTop || 0}px`,
+                      marginRight: `${el.data?.marginRight || 0}px`,
+                      marginBottom: `${el.data?.marginBottom || 0}px`,
+                      marginLeft: `${el.data?.marginLeft || 0}px`,
+                      paddingTop: `${el.data?.paddingTop !== undefined ? el.data.paddingTop : 16}px`,
+                      paddingRight: `${el.data?.paddingRight !== undefined ? el.data.paddingRight : 16}px`,
+                      paddingBottom: `${el.data?.paddingBottom !== undefined ? el.data.paddingBottom : 16}px`,
+                      paddingLeft: `${el.data?.paddingLeft !== undefined ? el.data.paddingLeft : 16}px`,
+                    }}
                   >
                     {/* ELEMENT CONTROLS TOOLBAR (UP, DOWN, SETTINGS, DUPLICATE, DELETE) */}
                     {isSelected && (
