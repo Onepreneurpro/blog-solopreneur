@@ -40,6 +40,31 @@ export const Image = ({
     right: 'justify-end',
   };
 
+  const handleHeightResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const startY = e.clientY;
+    const startHeight = height || 250;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - startY;
+      const newHeight = Math.min(800, Math.max(80, startHeight + deltaY));
+
+      setProp((props: ImageProps) => {
+        props.height = Math.round(newHeight);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -56,7 +81,7 @@ export const Image = ({
     );
   }
 
-  // BUILDER EDITOR VIEW: 1 CLICK = SELECT ELEMENT / DOUBLE CLICK = FILE EXPLORER
+  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER / BOTTOM DRAG = HEIGHT RESIZE
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -71,7 +96,7 @@ export const Image = ({
           e.stopPropagation();
           fileInputRef.current?.click();
         }}
-        title="1 clic : Sélectionner l image | Double-clic : Choisir un fichier PC"
+        title="1 clic : Sélectionner | Double-clic : Choisir photo | Bord bas : Redimensionner la hauteur"
         className="relative group/img max-w-full overflow-hidden shadow-xl cursor-pointer"
         style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
       >
@@ -111,11 +136,20 @@ export const Image = ({
               });
             }}
             title="Supprimer l image (1 clic)"
-            className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+            className="absolute bottom-4 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         )}
+
+        {/* BOTTOM HEIGHT RESIZER HANDLE BAR */}
+        <div
+          onMouseDown={handleHeightResizeMouseDown}
+          title="Tirez vers le bas ou le haut pour modifier la hauteur de l image"
+          className="absolute bottom-0 left-0 right-0 h-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-row-resize flex items-center justify-center transition-colors group/bottom-resizer z-40 rounded-b-xl select-none"
+        >
+          <div className="w-12 h-1 bg-[#00A0FF] group-hover/bottom-resizer:bg-white rounded-full transition-colors" />
+        </div>
 
         {/* HIDDEN FILE INPUT */}
         <input

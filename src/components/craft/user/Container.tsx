@@ -27,6 +27,7 @@ export const Container = ({
   const {
     connectors: { connect, drag },
     selected,
+    actions: { setProp },
   } = useNode((node) => ({
     selected: node.events.selected,
   }));
@@ -35,6 +36,31 @@ export const Container = ({
     bgGradient && bgGradient !== 'none'
       ? bgGradient
       : { backgroundColor: bgColor };
+
+  const handlePaddingResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const startY = e.clientY;
+    const startPadding = padding || 32;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - startY;
+      const newPadding = Math.min(120, Math.max(8, startPadding + Math.round(deltaY / 2)));
+
+      setProp((props: ContainerProps) => {
+        props.padding = Math.round(newPadding);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -53,7 +79,7 @@ export const Container = ({
     );
   }
 
-  // BUILDER EDITOR VIEW
+  // BUILDER EDITOR VIEW WITH BOTTOM PADDING RESIZER
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -70,6 +96,15 @@ export const Container = ({
       }}
     >
       {children}
+
+      {/* BOTTOM PADDING RESIZER HANDLE BAR */}
+      <div
+        onMouseDown={handlePaddingResizeMouseDown}
+        title="Tirez vers le bas ou le haut pour modifier le remplissage (padding) du conteneur"
+        className="absolute bottom-0 left-0 right-0 h-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-row-resize flex items-center justify-center transition-colors group/bottom-resizer z-40 rounded-b-xl select-none"
+      >
+        <div className="w-12 h-1 bg-[#00A0FF] group-hover/bottom-resizer:bg-white rounded-full transition-colors" />
+      </div>
     </div>
   );
 };
