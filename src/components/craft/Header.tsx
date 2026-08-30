@@ -141,17 +141,22 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
           </span>
         )}
 
-        {stepData?.funnel && (
-          <a
-            href={`/funnel/${stepData.funnel.slug}/${stepData.slug}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
-          >
-            <Eye className="w-4 h-4 text-purple-400" />
-            <span>Aperçu Public</span>
-          </a>
-        )}
+        <a
+          href={
+            stepData?.funnel
+              ? `/funnel/${stepData.funnel.slug}/${stepData.slug}`
+              : stepData?.slug
+              ? `/funnel/preview/${stepData.slug}`
+              : '#'
+          }
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+          title="Ouvrir la page publique dans un nouvel onglet"
+        >
+          <Eye className="w-4 h-4 text-purple-400" />
+          <span>Voir la page</span>
+        </a>
 
         <button
           onClick={handleSave}
