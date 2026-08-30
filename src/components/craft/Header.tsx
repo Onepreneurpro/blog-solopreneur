@@ -46,7 +46,19 @@ export const Header = ({
     setSaving(true);
     setSaveSuccess(false);
     try {
-      const json = query.serialize();
+      const rawJson = query.serialize();
+      const parsed = JSON.parse(rawJson);
+
+      // Inject current pageLayoutMode into ROOT node props before saving
+      if (parsed && parsed.ROOT) {
+        parsed.ROOT.props = {
+          ...parsed.ROOT.props,
+          pageLayoutMode,
+        };
+      }
+
+      const json = JSON.stringify(parsed);
+
       const res = await fetch(`/api/admin/funnel-steps/${stepId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -107,7 +119,7 @@ export const Header = ({
                   ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-slate-400 hover:bg-slate-800'
               }`}
-              title="Affichage Mode Centré Boîte (1024px)"
+              title="Mode Centré Boîte (1024px)"
             >
               <Minimize2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Mode Centré</span>
@@ -119,7 +131,7 @@ export const Header = ({
                   ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-slate-400 hover:bg-slate-800'
               }`}
-              title="Affichage Mode Pleine Page (100% Full Width)"
+              title="Mode Pleine Page (100% Full Width)"
             >
               <Maximize2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Pleine Page (Fill)</span>

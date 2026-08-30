@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, ArrowRight, Mail, ShieldCheck, Sparkles, Clock } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Editor, Frame } from '@craftjs/core';
 import { Container } from '@/components/craft/user/Container';
@@ -31,6 +31,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   // Check if content is saved Craft.js JSON structure or legacy array
   let craftData: string | null = null;
   let customElements: any[] | null = null;
+  let isFullWidth = false;
 
   if (step?.content) {
     try {
@@ -40,6 +41,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           customElements = parsed;
         } else {
           craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
+          if (parsed?.ROOT?.props?.pageLayoutMode === 'full') {
+            isFullWidth = true;
+          }
         }
       }
     } catch (e) {
@@ -122,6 +126,29 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
   // RENDER CRAFT.JS SAVED CANVAS CONTENT PUBLICLY
   if (craftData) {
+    if (isFullWidth) {
+      return (
+        <div className="min-h-screen bg-white text-slate-900 w-full overflow-x-hidden">
+          <Editor
+            resolver={{
+              Container,
+              Text,
+              Button: CraftButton,
+              Image: CraftImage,
+              FeatureGrid,
+              Card,
+              LeadForm,
+              Video,
+              Grid,
+            }}
+            enabled={false}
+          >
+            <Frame data={craftData} />
+          </Editor>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col items-center justify-center py-6 px-4">
         <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[800px]">
