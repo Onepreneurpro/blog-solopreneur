@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow } from './Text';
+import { getBoxShadow, getBackgroundStyles } from './Text';
 
 export interface ButtonProps {
   text?: string;
   bgColor?: string;
+  bgImage?: string;
   textColor?: string;
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
@@ -25,6 +26,7 @@ export interface ButtonProps {
 export const Button = ({
   text = 'Commencer maintenant 🚀',
   bgColor = '#00A0FF',
+  bgImage,
   textColor = '#ffffff',
   borderRadius = 16,
   align = 'center',
@@ -58,6 +60,7 @@ export const Button = ({
   };
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+  const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -66,14 +69,14 @@ export const Button = ({
         <a
           href={href || '#'}
           style={{
-            backgroundColor: bgColor,
+            ...bgStyles,
             color: textColor,
             borderRadius: `${borderRadius}px`,
             padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
           }}
-          className="w-full font-black text-sm hover:opacity-90 transition-all font-heading flex items-center justify-center text-center"
+          className="w-full font-black text-sm hover:opacity-90 transition-all font-heading flex items-center justify-center text-center overflow-hidden"
         >
           {text}
         </a>
@@ -102,7 +105,7 @@ export const Button = ({
           });
         }}
         style={{
-          backgroundColor: bgColor,
+          ...bgStyles,
           color: textColor,
           borderRadius: `${borderRadius}px`,
           padding: `${paddingY}px ${paddingX}px`,
@@ -110,7 +113,7 @@ export const Button = ({
           boxShadow,
           outline: 'none',
         }}
-        className="w-full font-black text-sm hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center"
+        className="w-full font-black text-sm hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center overflow-hidden"
       >
         {text}
       </button>

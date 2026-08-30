@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow } from './Text';
+import { getBoxShadow, getBackgroundStyles } from './Text';
 
 export interface CardProps {
   title?: string;
   content?: string;
   bgColor?: string;
+  bgImage?: string;
   padding?: number;
   width?: number;
   height?: number;
@@ -23,6 +24,7 @@ export const Card = ({
   title = '💡 Conseil Pro',
   content = 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
   bgColor = '#ffffff',
+  bgImage,
   padding = 24,
   width = 100,
   height,
@@ -46,14 +48,15 @@ export const Card = ({
   }));
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+  const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div
-        className="my-4 border border-slate-200 space-y-2 mx-auto"
+        className="my-4 border border-slate-200 space-y-2 mx-auto overflow-hidden"
         style={{
-          backgroundColor: bgColor,
+          ...bgStyles,
           padding: `${padding}px`,
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
@@ -77,11 +80,11 @@ export const Card = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-4 relative border border-slate-200 space-y-2 transition-all mx-auto ${
+      className={`my-4 relative border border-slate-200 space-y-2 transition-all mx-auto overflow-hidden ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
       style={{
-        backgroundColor: bgColor,
+        ...bgStyles,
         padding: `${padding}px`,
         width: `${width}%`,
         minHeight: height ? `${height}px` : undefined,

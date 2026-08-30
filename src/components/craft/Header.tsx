@@ -12,6 +12,8 @@ import {
   Smartphone,
   CheckCircle2,
   Eye,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -19,10 +21,19 @@ interface HeaderProps {
   stepData?: any;
   deviceMode: 'desktop' | 'tablet' | 'mobile';
   setDeviceMode: (mode: 'desktop' | 'tablet' | 'mobile') => void;
+  pageLayoutMode?: 'centered' | 'full';
+  setPageLayoutMode?: (mode: 'centered' | 'full') => void;
   stepId: string;
 }
 
-export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderProps) => {
+export const Header = ({
+  stepData,
+  deviceMode,
+  setDeviceMode,
+  pageLayoutMode = 'centered',
+  setPageLayoutMode,
+  stepId,
+}: HeaderProps) => {
   const { actions, query, canUndo, canRedo } = useEditor((state, query) => ({
     canUndo: query.history.canUndo(),
     canRedo: query.history.canRedo(),
@@ -63,7 +74,7 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
       : '#';
 
   return (
-    <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40 text-slate-100">
+    <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40 text-slate-100 select-none">
       <div className="flex items-center gap-3">
         <Link
           href="/admin/tunnels-beta2"
@@ -76,7 +87,7 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
         <div className="h-4 w-px bg-slate-800" />
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black text-white font-heading">
+          <span className="text-xs font-black text-white font-heading truncate max-w-[160px] sm:max-w-xs">
             {stepData?.name || 'Étape Tunnel Beta 2'}
           </span>
           <span className="text-[9px] font-mono font-bold bg-[#00A0FF]/20 text-[#00A0FF] border border-[#00A0FF]/40 px-2 py-0.5 rounded-full">
@@ -85,58 +96,90 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
         </div>
       </div>
 
-      {/* DEVICE PREVIEW TOGGLE & UNDO/REDO */}
-      <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-xl">
-        <button
-          onClick={() => actions.history.undo()}
-          disabled={!canUndo}
-          title="Annuler (Ctrl+Z)"
-          className={`p-1.5 rounded-lg transition-colors ${
-            canUndo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
-          }`}
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => actions.history.redo()}
-          disabled={!canRedo}
-          title="Rétablir (Ctrl+Y)"
-          className={`p-1.5 rounded-lg transition-colors ${
-            canRedo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
-          }`}
-        >
-          <RotateCw className="w-4 h-4" />
-        </button>
+      {/* PAGE LAYOUT MODE (CENTRED VS PLEINE PAGE) & DEVICE PREVIEW */}
+      <div className="flex items-center gap-2">
+        {setPageLayoutMode && (
+          <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl">
+            <button
+              onClick={() => setPageLayoutMode('centered')}
+              className={`px-2.5 py-1 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors ${
+                pageLayoutMode === 'centered'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:bg-slate-800'
+              }`}
+              title="Affichage Mode Centré Boîte (1024px)"
+            >
+              <Minimize2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Mode Centré</span>
+            </button>
+            <button
+              onClick={() => setPageLayoutMode('full')}
+              className={`px-2.5 py-1 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors ${
+                pageLayoutMode === 'full'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:bg-slate-800'
+              }`}
+              title="Affichage Mode Pleine Page (100% Full Width)"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Pleine Page (Fill)</span>
+            </button>
+          </div>
+        )}
 
-        <div className="h-4 w-px bg-slate-800 my-auto" />
+        {/* DEVICE PREVIEW TOGGLE & UNDO/REDO */}
+        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          <button
+            onClick={() => actions.history.undo()}
+            disabled={!canUndo}
+            title="Annuler (Ctrl+Z)"
+            className={`p-1.5 rounded-lg transition-colors ${
+              canUndo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
+            }`}
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => actions.history.redo()}
+            disabled={!canRedo}
+            title="Rétablir (Ctrl+Y)"
+            className={`p-1.5 rounded-lg transition-colors ${
+              canRedo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
+            }`}
+          >
+            <RotateCw className="w-4 h-4" />
+          </button>
 
-        <button
-          onClick={() => setDeviceMode('desktop')}
-          className={`p-1.5 rounded-lg transition-colors ${
-            deviceMode === 'desktop' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
-          }`}
-          title="Vue Bureau"
-        >
-          <Monitor className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setDeviceMode('tablet')}
-          className={`p-1.5 rounded-lg transition-colors ${
-            deviceMode === 'tablet' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
-          }`}
-          title="Vue Tablette"
-        >
-          <Tablet className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setDeviceMode('mobile')}
-          className={`p-1.5 rounded-lg transition-colors ${
-            deviceMode === 'mobile' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
-          }`}
-          title="Vue Mobile"
-        >
-          <Smartphone className="w-4 h-4" />
-        </button>
+          <div className="h-4 w-px bg-slate-800 my-auto" />
+
+          <button
+            onClick={() => setDeviceMode('desktop')}
+            className={`p-1.5 rounded-lg transition-colors ${
+              deviceMode === 'desktop' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
+            }`}
+            title="Vue Bureau"
+          >
+            <Monitor className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setDeviceMode('tablet')}
+            className={`p-1.5 rounded-lg transition-colors ${
+              deviceMode === 'tablet' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
+            }`}
+            title="Vue Tablette"
+          >
+            <Tablet className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setDeviceMode('mobile')}
+            className={`p-1.5 rounded-lg transition-colors ${
+              deviceMode === 'mobile' ? 'bg-[#00A0FF] text-white' : 'text-slate-400 hover:bg-slate-800'
+            }`}
+            title="Vue Mobile"
+          >
+            <Smartphone className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* SAVE / PUBLISH ACTIONS */}

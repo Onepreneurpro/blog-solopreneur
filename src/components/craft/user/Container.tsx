@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow } from './Text';
+import { getBoxShadow, getBackgroundStyles } from './Text';
 
 export interface ContainerProps {
   bgGradient?: string;
   bgColor?: string;
+  bgImage?: string;
   padding?: number;
   margin?: number;
   borderRadius?: number;
@@ -23,6 +24,7 @@ export interface ContainerProps {
 export const Container = ({
   bgGradient = 'none',
   bgColor = '#ffffff',
+  bgImage,
   padding = 16,
   margin = 8,
   borderRadius = 20,
@@ -49,7 +51,7 @@ export const Container = ({
   const bgStyle =
     bgGradient && bgGradient !== 'none'
       ? bgGradient
-      : { backgroundColor: bgColor };
+      : getBackgroundStyles(bgColor, bgImage);
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
 

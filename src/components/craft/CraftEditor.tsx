@@ -23,6 +23,7 @@ interface CraftEditorProps {
 
 export const CraftEditor = ({ stepData, stepId }: CraftEditorProps) => {
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [pageLayoutMode, setPageLayoutMode] = useState<'centered' | 'full'>('centered');
 
   const jsonContent = stepData?.content;
 
@@ -45,12 +46,18 @@ export const CraftEditor = ({ stepData, stepId }: CraftEditorProps) => {
           stepData={stepData}
           deviceMode={deviceMode}
           setDeviceMode={setDeviceMode}
+          pageLayoutMode={pageLayoutMode}
+          setPageLayoutMode={setPageLayoutMode}
           stepId={stepId}
         />
 
         <div className="flex-1 flex overflow-hidden w-full relative">
           <Toolbox />
-          <Viewport deviceMode={deviceMode} jsonContent={jsonContent} />
+          <Viewport
+            deviceMode={deviceMode}
+            pageLayoutMode={pageLayoutMode}
+            jsonContent={jsonContent}
+          />
           <SettingsPanel />
         </div>
       </div>

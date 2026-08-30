@@ -144,6 +144,94 @@ export const SettingsPanel = () => {
           </div>
         )}
 
+        {/* BACKGROUND COLOR & BACKGROUND IMAGE CONTROL FOR ALL COMPONENTS */}
+        <div className="space-y-3 bg-purple-50/60 p-3.5 rounded-2xl border border-purple-200">
+          <label className="font-black text-slate-900 flex items-center gap-1.5 text-xs">
+            <span>🖼️ Arrière-plan du Bloc</span>
+          </label>
+
+          {/* BG COLOR PICKER */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 text-[11px]">Couleur de Fond</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={props.bgColor || '#ffffff'}
+                onChange={(e) =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.bgColor = e.target.value;
+                  })
+                }
+                className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+              />
+              <input
+                type="text"
+                value={props.bgColor || '#ffffff'}
+                onChange={(e) =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.bgColor = e.target.value;
+                  })
+                }
+                className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
+              />
+            </div>
+          </div>
+
+          {/* BG IMAGE FILE PICKER / URL */}
+          <div className="space-y-1.5 pt-1.5 border-t border-purple-200/80">
+            <div className="flex justify-between items-center font-bold text-slate-700 text-[11px]">
+              <span>Photo d Arrière-plan (PC / URL)</span>
+              {props.bgImage && (
+                <button
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.bgImage = '';
+                    })
+                  }
+                  className="text-rose-600 hover:underline text-[10px] font-bold"
+                >
+                  Supprimer
+                </button>
+              )}
+            </div>
+
+            <label className="block cursor-pointer">
+              <div className="p-2 bg-white border border-dashed border-purple-300 rounded-xl flex items-center justify-center text-purple-700 font-bold text-xs gap-1.5 hover:bg-purple-100/50 transition-colors shadow-sm">
+                <span>📁 Choisir une photo de fond (PC)</span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.bgImage = ev.target?.result as string;
+                      });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </label>
+
+            <input
+              type="text"
+              placeholder="Ou coller une URL d image..."
+              value={props.bgImage || ''}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.bgImage = e.target.value;
+                })
+              }
+              className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs"
+            />
+          </div>
+        </div>
+
         {/* BORDER RADIUS (ARRONDI DES COINS) */}
         {props.borderRadius !== undefined && (
           <div className="space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-200">
@@ -518,35 +606,6 @@ export const SettingsPanel = () => {
                   {align === 'left' ? 'Gauche' : align === 'center' ? 'Centre' : 'Droite'}
                 </button>
               ))}
-            </div>
-          </div>
-        )}
-
-        {/* BUTTON BG COLOR */}
-        {props.bgColor !== undefined && (
-          <div className="space-y-1.5">
-            <label className="font-bold text-slate-700">Couleur de fond</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={props.bgColor || '#00A0FF'}
-                onChange={(e) =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.bgColor = e.target.value;
-                  })
-                }
-                className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer p-0.5"
-              />
-              <input
-                type="text"
-                value={props.bgColor || '#00A0FF'}
-                onChange={(e) =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.bgColor = e.target.value;
-                  })
-                }
-                className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono text-xs"
-              />
             </div>
           </div>
         )}

@@ -18,6 +18,8 @@ export interface TextProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
+  bgColor?: string;
+  bgImage?: string;
 }
 
 export const getBoxShadow = (
@@ -33,10 +35,23 @@ export const getBoxShadow = (
   if (preset === 'lg') return '0 20px 25px -5px rgba(0, 0, 0, 0.25)';
   if (preset === 'xl') return '0 25px 50px -12px rgba(0, 0, 0, 0.4)';
   if (preset === 'custom' || blur || offsetY) {
-    const alpha = (opacity / 100).toFixed(2);
     return `0px ${offsetY}px ${blur}px ${color}${Math.round(opacity * 2.55).toString(16).padStart(2, '0')}`;
   }
   return undefined;
+};
+
+export const getBackgroundStyles = (bgColor?: string, bgImage?: string) => {
+  const styles: React.CSSProperties = {};
+  if (bgColor && bgColor !== 'transparent') {
+    styles.backgroundColor = bgColor;
+  }
+  if (bgImage) {
+    styles.backgroundImage = `url(${bgImage})`;
+    styles.backgroundSize = 'cover';
+    styles.backgroundPosition = 'center';
+    styles.backgroundRepeat = 'no-repeat';
+  }
+  return styles;
 };
 
 export const Text = ({
@@ -54,6 +69,8 @@ export const Text = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  bgColor,
+  bgImage,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -69,17 +86,19 @@ export const Text = ({
 
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+  const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div
-        className="my-2 p-1 max-w-full mx-auto flex items-center justify-center"
+        className="my-2 p-3 max-w-full mx-auto flex items-center justify-center"
         style={{
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
           borderRadius: `${borderRadius}px`,
           boxShadow,
+          ...bgStyles,
         }}
       >
         <Tag
@@ -103,7 +122,7 @@ export const Text = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-1 relative transition-all mx-auto flex items-center justify-center ${
+      className={`my-2 p-3 relative transition-all mx-auto flex items-center justify-center ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
       style={{
@@ -111,6 +130,7 @@ export const Text = ({
         minHeight: height ? `${height}px` : undefined,
         borderRadius: `${borderRadius}px`,
         boxShadow,
+        ...bgStyles,
       }}
     >
       <Tag
