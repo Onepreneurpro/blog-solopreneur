@@ -689,27 +689,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         {/* 1. IF CLICKED SUB-ITEM IS AN IMAGE */}
                         {selectedSubItem.subType === 'image' && (
                           <>
-                            <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                              <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                                Fichier de l image (Élément #{selectedSubItem.itemIndex + 1})
-                              </label>
-                              <div className="space-y-2">
+                            <div className="space-y-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                                  Image (Élément #{selectedSubItem.itemIndex + 1})
+                                </label>
+                                {currentSubItem.img && (
+                                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded-full">
+                                    ✓ Active
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="space-y-2.5">
+                                {/* BOUTON D IMPORTATION DIRECTE DEPUIS LE PC AVEC APERÇU */}
                                 <div className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    value={currentSubItem.img || ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      const updatedItems = elItems.map((it: any, idx: number) =>
-                                        idx === selectedSubItem.itemIndex ? { ...it, img: val } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                    }}
-                                    placeholder="https://..."
-                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
-                                  />
-                                  <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
+                                  {currentSubItem.img && (
+                                    <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
+                                      <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+
+                                  <label className="flex-1 py-2 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
                                     <span>📤</span>
+                                    <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
                                     <input
                                       type="file"
                                       accept="image/*"
@@ -731,9 +734,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     />
                                   </label>
                                 </div>
-                                <p className="text-[10px] text-slate-500">
-                                  Téléchargez une image depuis votre PC ou collez une URL.
-                                </p>
+
+                                {/* LIEN / URL PROPRE SANS CODE RAW BASE64 ENCOMBRANT */}
+                                <div className="space-y-1 pt-1">
+                                  <span className="text-[10px] text-slate-400 font-medium block">Adresse / URL de l image web :</span>
+                                  <input
+                                    type="text"
+                                    value={
+                                      currentSubItem.img?.startsWith('data:')
+                                        ? '[ Image locale téléversée depuis votre PC ]'
+                                        : currentSubItem.img || ''
+                                    }
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (val === '[ Image locale téléversée depuis votre PC ]') return;
+                                      const updatedItems = elItems.map((it: any, idx: number) =>
+                                        idx === selectedSubItem.itemIndex ? { ...it, img: val } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                    }}
+                                    placeholder="https://..."
+                                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono focus:border-[#00A0FF] outline-none"
+                                  />
+                                </div>
                               </div>
                             </div>
 
@@ -1902,7 +1925,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               previewMode === 'MOBILE' ? 'max-w-sm' : 'max-w-4xl'
             } ${
               showCanvasGrid
-                ? 'bg-[linear-gradient(to_right,rgba(0,160,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.08)_1px,transparent_1px)] bg-[size:20px_20px]'
+                ? 'bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
                 : ''
             }`}
           >
@@ -2037,7 +2060,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div
                         className={`space-y-4 p-6 rounded-3xl shadow-xl relative transition-all ${
                           showCanvasGrid
-                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.06)_1px,transparent_1px)] bg-[size:20px_20px]'
+                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
                             : 'bg-white'
                         }`}
                       >
@@ -2192,7 +2215,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div
                         className={`p-6 rounded-3xl shadow-xl space-y-6 relative transition-all ${
                           showCanvasGrid
-                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.06)_1px,transparent_1px)] bg-[size:20px_20px]'
+                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
                             : 'bg-white text-slate-900'
                         }`}
                       >
