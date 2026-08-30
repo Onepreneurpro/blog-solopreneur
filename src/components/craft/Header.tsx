@@ -55,6 +55,13 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
     }
   };
 
+  const publicUrl =
+    stepData?.funnel?.slug && stepData?.slug
+      ? `/funnel/${stepData.funnel.slug}/${stepData.slug}`
+      : stepData?.funnel?.slug
+      ? `/funnel/${stepData.funnel.slug}`
+      : '#';
+
   return (
     <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40 text-slate-100">
       <div className="flex items-center gap-3">
@@ -142,17 +149,11 @@ export const Header = ({ stepData, deviceMode, setDeviceMode, stepId }: HeaderPr
         )}
 
         <a
-          href={
-            stepData?.funnel
-              ? `/funnel/${stepData.funnel.slug}/${stepData.slug}`
-              : stepData?.slug
-              ? `/funnel/preview/${stepData.slug}`
-              : '#'
-          }
+          href={publicUrl}
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
-          title="Ouvrir la page publique dans un nouvel onglet"
+          title="Ouvrir la page publique du tunnel dans un nouvel onglet"
         >
           <Eye className="w-4 h-4 text-purple-400" />
           <span>Voir la page</span>
