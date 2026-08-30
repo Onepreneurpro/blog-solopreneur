@@ -8,12 +8,16 @@ export interface LeadFormProps {
   title?: string;
   subtitle?: string;
   buttonText?: string;
+  width?: number;
+  height?: number;
 }
 
 export const LeadForm = ({
   title = 'Recevez votre Guide Offert 🎁',
   subtitle = 'Entrez votre prénom et adresse email ci-dessous pour recevoir l accès immédiat.',
   buttonText = 'Télécharger mon guide gratuit',
+  width = 100,
+  height,
 }: LeadFormProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -34,7 +38,13 @@ export const LeadForm = ({
   // PUBLIC READ-ONLY & INTERACTIVE VIEW FOR VISITORS
   if (!enabled) {
     return (
-      <div className="my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5">
+      <div
+        className="my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5"
+        style={{
+          width: `${width}%`,
+          minHeight: height ? `${height}px` : undefined,
+        }}
+      >
         <div className="space-y-2">
           <h3 className="font-heading font-black text-2xl text-slate-900 px-2">
             {title}
@@ -98,6 +108,10 @@ export const LeadForm = ({
       className={`my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5 transition-all ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
+      style={{
+        width: `${width}%`,
+        minHeight: height ? `${height}px` : undefined,
+      }}
     >
       <div className="space-y-2">
         <h3
@@ -163,6 +177,7 @@ export const LeadForm = ({
     title: 'Recevez votre Guide Offert 🎁',
     subtitle: 'Entrez votre prénom et adresse email ci-dessous pour recevoir l accès immédiat.',
     buttonText: 'Télécharger mon guide gratuit',
+    width: 100,
   },
   rules: {
     canDrag: () => true,

@@ -6,11 +6,15 @@ import { useNode, useEditor } from '@craftjs/core';
 export interface VideoProps {
   videoUrl?: string;
   caption?: string;
+  width?: number;
+  height?: number;
 }
 
 export const Video = ({
   videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   caption = 'Vidéo de démonstration en direct',
+  width = 100,
+  height,
 }: VideoProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -27,7 +31,13 @@ export const Video = ({
   // PUBLIC READ-ONLY VIEW FOR VISITORS
   if (!enabled) {
     return (
-      <div className="my-8 max-w-3xl mx-auto space-y-2 text-center">
+      <div
+        className="my-8 max-w-3xl mx-auto space-y-2 text-center"
+        style={{
+          width: `${width}%`,
+          minHeight: height ? `${height}px` : undefined,
+        }}
+      >
         <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
           <iframe
             src={videoUrl}
@@ -52,6 +62,10 @@ export const Video = ({
       className={`my-8 max-w-3xl mx-auto space-y-2 text-center transition-all ${
         selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-3xl' : ''
       }`}
+      style={{
+        width: `${width}%`,
+        minHeight: height ? `${height}px` : undefined,
+      }}
     >
       <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
         <iframe
@@ -81,6 +95,7 @@ export const Video = ({
   props: {
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     caption: 'Vidéo de démonstration en direct',
+    width: 100,
   },
   rules: {
     canDrag: () => true,
