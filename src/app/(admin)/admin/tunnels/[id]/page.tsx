@@ -74,6 +74,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
   const [activeTab, setActiveTab] = useState<'SETTINGS' | 'AUTOMATIONS' | 'AB_TEST' | 'STATS' | 'LEADS'>('SETTINGS');
   const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewTemplate, setPreviewTemplate] = useState<MaisonTemplate | null>(null);
 
   // New Step Modal State
   const [showAddStepModal, setShowAddStepModal] = useState(false);
@@ -519,7 +520,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                           : 'border-slate-200 hover:border-slate-300 shadow-xs'
                       }`}
                     >
-                      <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                      <div className="relative aspect-video bg-slate-100 overflow-hidden group/img">
                         <img
                           src={tmpl.previewImage}
                           alt={tmpl.name}
@@ -531,6 +532,17 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                             <span>Actif</span>
                           </div>
                         )}
+
+                        {/* HOVER EYE OVERLAY BUTTON */}
+                        <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-3">
+                          <button
+                            onClick={() => setPreviewTemplate(tmpl)}
+                            className="px-3.5 py-2 bg-white text-slate-900 font-black text-xs rounded-xl shadow-xl flex items-center gap-1.5 transition-transform hover:scale-105"
+                          >
+                            <Eye className="w-4 h-4 text-[#00A0FF]" />
+                            <span>👁️ Voir le template</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
@@ -546,18 +558,32 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                           </p>
                         </div>
 
-                        <Button
-                          onClick={() => handleSelectTemplate(tmpl)}
-                          size="sm"
-                          variant={isCurrent ? 'primary' : 'outline'}
-                          className={`w-full text-xs font-extrabold mt-3 py-1.5 ${
-                            isCurrent
-                              ? 'bg-[#00A0FF] !text-white'
-                              : 'border-slate-300 text-slate-800 hover:bg-slate-100'
-                          }`}
-                        >
-                          {isCurrent ? 'Modèle Sélectionné' : 'Sélectionner ce modèle'}
-                        </Button>
+                        {/* ACTION BUTTONS: EYE PREVIEW & SELECT */}
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
+                          <Button
+                            onClick={() => setPreviewTemplate(tmpl)}
+                            size="sm"
+                            variant="outline"
+                            className="border-slate-300 text-slate-800 hover:bg-slate-100 font-bold text-xs gap-1.5 px-3 py-1.5 shrink-0"
+                            title="Prévisualiser ce modèle avant son application"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-[#00A0FF]" />
+                            <span>Voir</span>
+                          </Button>
+
+                          <Button
+                            onClick={() => handleSelectTemplate(tmpl)}
+                            size="sm"
+                            variant={isCurrent ? 'primary' : 'outline'}
+                            className={`w-full text-xs font-extrabold py-1.5 ${
+                              isCurrent
+                                ? 'bg-[#00A0FF] !text-white'
+                                : 'border-slate-300 text-slate-800 hover:bg-slate-100'
+                            }`}
+                          >
+                            {isCurrent ? 'Modèle Sélectionné' : 'Sélectionner'}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -813,6 +839,216 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: PRÉVISUALISATION DU TEMPLATE (BOUTON OEIL) */}
+      {previewTemplate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-slate-950/80 backdrop-blur-sm animate-in fade-in select-none overflow-y-auto">
+          <div className="bg-slate-900 rounded-3xl border border-slate-800 w-full max-w-4xl max-h-[90vh] shadow-2xl flex flex-col my-auto overflow-hidden text-white">
+            
+            {/* MODAL PREVIEW HEADER */}
+            <div className="p-4 sm:p-5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-rose-500" />
+                  <div className="w-3 h-3 rounded-full bg-amber-500" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                </div>
+                <div className="h-4 w-px bg-slate-800 mx-1" />
+                <div className="min-w-0">
+                  <h3 className="font-heading font-black text-sm sm:text-base text-white truncate flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-[#00A0FF]" />
+                    <span>Prévisualisation : {previewTemplate.name}</span>
+                  </h3>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    https://solopreneur.pro/funnel/preview/{previewTemplate.id}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  onClick={() => {
+                    handleSelectTemplate(previewTemplate);
+                    setPreviewTemplate(null);
+                  }}
+                  className="bg-[#00A0FF] hover:bg-[#0080FF] text-white font-heading font-black text-xs px-4 py-2 rounded-xl shadow-lg flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Utiliser ce modèle 🚀</span>
+                </Button>
+
+                <button
+                  onClick={() => setPreviewTemplate(null)}
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* MODAL PREVIEW CANVAS BODY */}
+            <div className="p-6 sm:p-10 overflow-y-auto space-y-8 bg-slate-950 flex-1">
+              <div className="text-center space-y-1 mb-6 pb-4 border-b border-slate-800">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#00A0FF] bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
+                  {previewTemplate.category}
+                </span>
+                <p className="text-xs text-slate-400 font-medium pt-2">
+                  {previewTemplate.description}
+                </p>
+              </div>
+
+              {previewTemplate.elements.map((el: any) => {
+                if (el.type === 'Heading') {
+                  return (
+                    <h1 key={el.id} className="text-3xl sm:text-5xl font-heading font-black text-white leading-tight text-center">
+                      {el.content}
+                    </h1>
+                  );
+                }
+
+                if (el.type === 'Text') {
+                  return (
+                    <div
+                      key={el.id}
+                      className="text-base text-slate-300 leading-relaxed font-medium text-center max-w-2xl mx-auto"
+                      dangerouslySetInnerHTML={{ __html: el.content }}
+                    />
+                  );
+                }
+
+                if (el.type === 'Countdown') {
+                  return (
+                    <div key={el.id} className="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center max-w-sm mx-auto space-y-2">
+                      <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">⏳ Temps Restant</span>
+                      <div className="text-4xl font-mono font-black text-white tracking-widest">{el.content || '24:00:00'}</div>
+                    </div>
+                  );
+                }
+
+                if (el.type === 'ButtonCTA') {
+                  return (
+                    <div key={el.id} className="text-center pt-2">
+                      <button className="px-8 py-4 bg-[#00A0FF] text-white font-heading font-black text-base rounded-2xl shadow-xl">
+                        {el.content || 'Accéder Maintenant 🚀'}
+                      </button>
+                    </div>
+                  );
+                }
+
+                if (el.type === 'OptinForm') {
+                  return (
+                    <div key={el.id} className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+                      <div className="text-center font-heading font-black text-lg text-white">
+                        {el.content || 'Recevez votre accès offert par email'}
+                      </div>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          disabled
+                          placeholder="Votre Prénom..."
+                          className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white"
+                        />
+                        <input
+                          type="email"
+                          disabled
+                          placeholder="Votre Adresse Email *"
+                          className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white"
+                        />
+                        <Button disabled className="w-full bg-[#00A0FF] !text-white font-heading font-black text-sm py-3.5 rounded-xl shadow-lg">
+                          Recevoir mon accès gratuit
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (el.type === 'BlockFeat4ColImg' || el.type === 'BlockFeat3ColImg') {
+                  const items = el.data?.items || [];
+                  const cols = el.type === 'BlockFeat4ColImg' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+
+                  return (
+                    <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
+                      {el.data?.title && (
+                        <h3 className="text-2xl font-heading font-black text-white text-center">
+                          {el.data.title}
+                        </h3>
+                      )}
+                      <div className={`grid ${cols} gap-6`}>
+                        {items.map((it: any, idx: number) => (
+                          <div key={idx} className="space-y-3 flex flex-col items-center text-center bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                            {it.img && (
+                              <div className="w-full h-36 rounded-xl overflow-hidden shadow-md">
+                                <img src={it.img} alt={it.title} className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                            <h4 className="font-heading font-extrabold text-sm text-white uppercase">{it.title}</h4>
+                            <p className="text-xs text-slate-400 font-medium leading-relaxed">{it.desc}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (el.type === 'BlockFeat2ColIconsLeft' || el.type === 'BlockFeat4ColDark') {
+                  const items = el.data?.items || [];
+
+                  return (
+                    <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
+                      {el.data?.title && (
+                        <h3 className="text-2xl font-heading font-black text-white text-center">
+                          {el.data.title}
+                        </h3>
+                      )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {items.map((it: any, idx: number) => (
+                          <div key={idx} className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-[#00A0FF] flex items-center justify-center font-bold shrink-0 mt-0.5">
+                              ✓
+                            </div>
+                            <div>
+                              <h4 className="font-heading font-extrabold text-sm text-white">{it.title}</h4>
+                              <p className="text-xs text-slate-400 font-medium leading-relaxed mt-1">{it.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={el.id} className="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-slate-200 font-bold text-xs">
+                    {el.content}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* MODAL FOOTER */}
+            <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setPreviewTemplate(null)}
+                className="text-xs font-bold bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"
+              >
+                Fermer
+              </Button>
+
+              <Button
+                onClick={() => {
+                  handleSelectTemplate(previewTemplate);
+                  setPreviewTemplate(null);
+                }}
+                className="bg-[#00A0FF] hover:bg-[#0080FF] text-white font-heading font-black text-xs px-5 py-2.5 rounded-xl shadow-lg flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Utiliser ce modèle pour ma page 🚀</span>
+              </Button>
+            </div>
           </div>
         </div>
       )}
