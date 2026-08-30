@@ -4,6 +4,15 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, ArrowRight, Mail, ShieldCheck, Sparkles, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Editor, Frame } from '@craftjs/core';
+import { Container } from '@/components/craft/user/Container';
+import { Text } from '@/components/craft/user/Text';
+import { Button as CraftButton } from '@/components/craft/user/Button';
+import { Image as CraftImage } from '@/components/craft/user/Image';
+import { FeatureGrid } from '@/components/craft/user/FeatureGrid';
+import { Card } from '@/components/craft/user/Card';
+import { LeadForm } from '@/components/craft/user/LeadForm';
+import { Video } from '@/components/craft/user/Video';
 
 interface FunnelPublicClientProps {
   funnel: any;
@@ -18,16 +27,22 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Parse custom builder elements if saved
+  // Check if content is saved Craft.js JSON structure or legacy array
+  let craftData: string | null = null;
   let customElements: any[] | null = null;
+
   if (step?.content) {
     try {
-      const parsed = JSON.parse(step.content);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        customElements = parsed;
+      const parsed = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
+      if (parsed && (parsed.ROOT || parsed.content || typeof parsed === 'object')) {
+        if (Array.isArray(parsed)) {
+          customElements = parsed;
+        } else {
+          craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
+        }
       }
     } catch (e) {
-      console.error(e);
+      console.error('Error parsing step content:', e);
     }
   }
 
@@ -104,11 +119,35 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     );
   }
 
-  // RENDER DYNAMIC BUILDER PAGE IF CUSTOM ELEMENTS EXIST
+  // RENDER CRAFT.JS SAVED CANVAS CONTENT PUBLICLY
+  if (craftData) {
+    return (
+      <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col items-center justify-center py-6 px-4">
+        <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[800px]">
+          <Editor
+            resolver={{
+              Container,
+              Text,
+              Button: CraftButton,
+              Image: CraftImage,
+              FeatureGrid,
+              Card,
+              LeadForm,
+              Video,
+            }}
+            enabled={false}
+          >
+            <Frame data={craftData} />
+          </Editor>
+        </div>
+      </div>
+    );
+  }
+
+  // RENDER LEGACY BUILDER PAGE IF CUSTOM ELEMENTS ARRAY
   if (customElements) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-12">
-        {/* HEADER LOGO */}
         <div className="max-w-4xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
           <div className="flex items-center gap-2 font-heading font-black text-lg">
             <span className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center text-sm font-extrabold shadow-md">
@@ -121,7 +160,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           </span>
         </div>
 
-        {/* CUSTOM BUILDER ELEMENTS LAYOUT */}
         <div className="max-w-3xl mx-auto w-full my-8 space-y-6">
           {customElements.map((el) => {
             if (el.type === 'Heading') {
@@ -140,227 +178,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
-            if (el.type === 'BulletList') {
-              return (
-                <ul key={el.id} className="space-y-2 text-sm font-bold text-emerald-400">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>{el.content}</span>
-                  </li>
-                </ul>
-              );
-            }
-
-            if (el.type === 'Image') {
-              return (
-                <div key={el.id} className="aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
-                  <img src={el.content} alt="Visual" className="w-full h-full object-cover" />
-                </div>
-              );
-            }
-
-            if (el.type === 'OptinForm' || el.type === 'FormInput' || el.type === 'ButtonCTA') {
-              return (
-                <div key={el.id} className="bg-slate-900/90 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6 my-6">
-                  <div className="text-center space-y-1">
-                    <h3 className="font-heading font-black text-xl text-white">Recevez votre accès gratuit</h3>
-                    <p className="text-xs text-slate-400">Entrez vos coordonnées pour télécharger votre ressource.</p>
-                  </div>
-
-                  {success ? (
-                    <div className="p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-2xl text-center space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-                      <div className="font-bold text-xs">Inscription réussie ! Redirection...</div>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      {errorMsg && (
-                        <div className="p-3 bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold rounded-xl">
-                          {errorMsg}
-                        </div>
-                      )}
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300">Prénom (Optionnel)</label>
-                        <input
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="ex: Alexandre"
-                          className="w-full px-4 py-3 text-xs rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:ring-2 focus:ring-[#00A0FF] outline-none"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300">Adresse Email *</label>
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="alexandre@exemple.com"
-                          className="w-full px-4 py-3 text-xs rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:ring-2 focus:ring-[#00A0FF] outline-none"
-                        />
-                      </div>
-
-                      <Button
-                        type="submit"
-                        disabled={submitting}
-                        className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-sm py-3.5 rounded-xl shadow-lg gap-2"
-                      >
-                        <span>{submitting ? 'Validation...' : 'Recevoir mon accès gratuit'}</span>
-                        <ArrowRight className="w-4 h-4 !text-white" />
-                      </Button>
-
-                      <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-medium pt-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Garanti 100% sans spam. Désinscription en 1 clic.</span>
-                      </div>
-                    </form>
-                  )}
-                </div>
-              );
-            }
-
-            if (el.type === 'BlockFeat4ColImg') {
-              const items = el.data?.items || [
-                { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-              ];
-
-              return (
-                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
-                  {el.data?.title && (
-                    <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
-                  )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-                    {items.map((col: any, i: number) => {
-                      const imgElement = (
-                        <div
-                          className="w-full overflow-hidden shadow-md"
-                          style={{
-                            height: col.imgSize ? `${col.imgSize}px` : '280px',
-                            borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
-                          }}
-                        >
-                          <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
-                        </div>
-                      );
-
-                      return (
-                        <div key={col.id || i} className="flex flex-col items-center text-center space-y-3">
-                          {col.redirectUrl && col.clickAction === 'OpenURL' ? (
-                            <a href={col.redirectUrl} target="_blank" rel="noopener noreferrer" className="w-full block hover:opacity-90 transition-opacity">
-                              {imgElement}
-                            </a>
-                          ) : (
-                            imgElement
-                          )}
-                          <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            }
-
-            if (el.type === 'BlockFeat3ColImg') {
-              return (
-                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
-                  <div className="text-center space-y-1">
-                    <h4 className="text-[10px] font-black text-[#00A0FF] uppercase tracking-widest">CE QUE VOUS OBTENEZ</h4>
-                    <h2 className="text-2xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                      { title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
-                      { title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
-                      { title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
-                    ].map((col, i) => (
-                      <div key={i} className="space-y-3">
-                        <div className="aspect-video rounded-2xl overflow-hidden shadow-sm">
-                          <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                        </div>
-                        <h4 className="font-heading font-extrabold text-sm text-slate-900">{col.title}</h4>
-                        <p className="text-xs text-slate-500 leading-relaxed">{col.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-
-            if (el.type === 'BlockFeat2ColIconsLeft') {
-              return (
-                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-heading font-black text-slate-900">Nos Services & Garanties</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                      { title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
-                      { title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
-                      { title: 'Un Support Excellent', desc: 'Une équipe réactive disponible pour répondre à toutes vos questions.' },
-                      { title: 'Template Responsive', desc: 'Des interfaces optimisées pour tous les écrans mobiles et ordinateurs.' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">
-                          ✓
-                        </div>
-                        <div>
-                          <h4 className="font-heading font-extrabold text-sm text-slate-900">{item.title}</h4>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-
-            if (el.type === 'BlockFeat4ColDark') {
-              return (
-                <div key={el.id} className="p-8 bg-slate-950 text-white rounded-3xl border border-slate-800 space-y-6 shadow-2xl my-8">
-                  <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-heading font-black text-white">Votre titre accrocheur ici pour attirer l attention</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {[
-                      { title: 'Rapidité', desc: 'Déploiement en 1 clic.' },
-                      { title: 'Sécurité', desc: 'Données protégées.' },
-                      { title: 'Performance', desc: 'Vitesse maximale.' },
-                      { title: 'Support', desc: '24/7 disponible.' },
-                    ].map((item, i) => (
-                      <div key={i} className="p-5 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center mx-auto font-black text-sm">
-                          {i + 1}
-                        </div>
-                        <h4 className="font-heading font-black text-sm text-white">{item.title}</h4>
-                        <p className="text-xs text-slate-400">{item.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-
-            if (el.type === 'Countdown') {
-              return (
-                <div key={el.id} className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-center space-y-1 my-4">
-                  <div className="text-[10px] font-black text-amber-400 uppercase">Offre limitée</div>
-                  <div className="text-2xl font-heading font-black text-amber-300">{el.content}</div>
-                </div>
-              );
-            }
-
-            if (el.type === 'Divider') {
-              return <hr key={el.id} className="border-slate-800 my-6" />;
-            }
-
             return (
               <div key={el.id} className="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-slate-200 font-bold text-xs">
                 {el.content}
@@ -369,7 +186,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           })}
         </div>
 
-        {/* FOOTER COPYRIGHT */}
         <div className="max-w-4xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
           © {new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.
         </div>
