@@ -39,7 +39,7 @@ export const LeadForm = ({
   if (!enabled) {
     return (
       <div
-        className="my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5"
+        className="my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl shadow-2xl text-center space-y-5"
         style={{
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
@@ -105,7 +105,7 @@ export const LeadForm = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5 transition-all ${
+      className={`my-8 max-w-lg mx-auto p-8 bg-white rounded-3xl shadow-2xl text-center space-y-5 transition-all ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
       style={{

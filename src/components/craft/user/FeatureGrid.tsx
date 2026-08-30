@@ -62,7 +62,7 @@ export const FeatureGrid = ({
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
-      <div className="my-6 p-6 bg-white rounded-3xl border border-slate-200 shadow-xl">
+      <div className="my-6 p-6 bg-white rounded-3xl shadow-xl">
         <div className={`grid ${gridCols} gap-6`}>
           {items.map((col, i) => (
             <div key={i} className="flex flex-col items-center text-center space-y-3">
@@ -93,7 +93,7 @@ export const FeatureGrid = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-6 p-6 bg-white rounded-3xl border border-slate-200 shadow-xl transition-all ${
+      className={`my-6 p-6 bg-white rounded-3xl shadow-xl transition-all ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
     >

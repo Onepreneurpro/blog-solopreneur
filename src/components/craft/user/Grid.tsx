@@ -156,7 +156,7 @@ export const Grid = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-6 w-full border border-slate-200 shadow-sm transition-all rounded-3xl bg-white ${
+      className={`my-6 w-full shadow-xs transition-all rounded-3xl bg-white ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
       style={{

@@ -38,7 +38,7 @@ export const Video = ({
           minHeight: height ? `${height}px` : undefined,
         }}
       >
-        <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
+        <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
           <iframe
             src={videoUrl}
             title="Vidéo Craft"
@@ -67,7 +67,7 @@ export const Video = ({
         minHeight: height ? `${height}px` : undefined,
       }}
     >
-      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
+      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
         <iframe
           src={videoUrl}
           title="Vidéo Craft"

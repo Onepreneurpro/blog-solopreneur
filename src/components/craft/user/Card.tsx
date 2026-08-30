@@ -111,7 +111,7 @@ export const Card = ({
   if (!enabled) {
     return (
       <div
-        className="my-4 border border-slate-200 space-y-2 mx-auto overflow-hidden"
+        className="my-4 space-y-2 mx-auto overflow-hidden"
         style={{
           ...bgStyles,
           fontFamily,
@@ -159,7 +159,7 @@ export const Card = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-4 relative border border-slate-200 space-y-2 transition-all mx-auto overflow-hidden ${
+      className={`my-4 relative space-y-2 transition-all mx-auto overflow-hidden ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
       style={{
