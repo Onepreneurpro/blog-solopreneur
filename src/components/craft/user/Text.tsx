@@ -83,7 +83,7 @@ export const CreativeUnderlineOverlay = ({
   if (style === 'wavy') {
     return (
       <svg
-        className="absolute left-0 w-full overflow-visible pointer-events-none"
+        className="absolute left-0 w-full overflow-visible pointer-events-none z-0"
         style={{
           bottom: `${-offset}px`,
           height: `${Math.max(thickness * 2.5, 10)}px`,
@@ -104,7 +104,7 @@ export const CreativeUnderlineOverlay = ({
 
   return (
     <span
-      className="absolute left-0 w-full pointer-events-none"
+      className="absolute left-0 w-full pointer-events-none z-0"
       style={{
         bottom: `${-offset}px`,
         borderBottomWidth: `${thickness}px`,
@@ -203,7 +203,6 @@ export const Text = ({
           className="tracking-tight leading-tight w-full inline-block"
         >
           <span className="relative inline-block" style={{ ...highlightStyles }}>
-            <span>{text}</span>
             <CreativeUnderlineOverlay
               enabled={underlineEnabled}
               color={underlineColor}
@@ -211,6 +210,7 @@ export const Text = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
+            <span className="relative z-10">{text}</span>
           </span>
         </Tag>
       </div>
@@ -246,6 +246,13 @@ export const Text = ({
         className="tracking-tight leading-tight w-full min-w-[50px] inline-block"
       >
         <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
           <span
             contentEditable
             suppressContentEditableWarning
@@ -254,17 +261,11 @@ export const Text = ({
                 props.text = e.currentTarget.innerText;
               });
             }}
+            className="relative z-10"
             style={{ outline: 'none', cursor: 'text' }}
           >
             {text}
           </span>
-          <CreativeUnderlineOverlay
-            enabled={underlineEnabled}
-            color={underlineColor}
-            thickness={underlineThickness}
-            style={underlineStyle}
-            offset={underlineOffset}
-          />
         </span>
       </Tag>
     </div>

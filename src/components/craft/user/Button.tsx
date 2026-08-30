@@ -116,7 +116,6 @@ export const Button = ({
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
           <span className="relative inline-block" style={{ ...highlightStyles }}>
-            <span>{text}</span>
             <CreativeUnderlineOverlay
               enabled={underlineEnabled}
               color={underlineColor}
@@ -124,6 +123,7 @@ export const Button = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
+            <span className="relative z-10">{text}</span>
           </span>
         </a>
       </div>
@@ -158,6 +158,13 @@ export const Button = ({
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >
         <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
           <span
             contentEditable
             suppressContentEditableWarning
@@ -166,17 +173,11 @@ export const Button = ({
                 props.text = e.currentTarget.innerText;
               });
             }}
+            className="relative z-10"
             style={{ outline: 'none' }}
           >
             {text}
           </span>
-          <CreativeUnderlineOverlay
-            enabled={underlineEnabled}
-            color={underlineColor}
-            thickness={underlineThickness}
-            style={underlineStyle}
-            offset={underlineOffset}
-          />
         </span>
       </button>
     </div>

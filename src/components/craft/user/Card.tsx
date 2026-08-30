@@ -97,7 +97,6 @@ export const Card = ({
       >
         <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
           <span className="relative inline-block" style={{ ...highlightStyles }}>
-            <span>{title}</span>
             <CreativeUnderlineOverlay
               enabled={underlineEnabled}
               color={underlineColor}
@@ -105,6 +104,7 @@ export const Card = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
+            <span className="relative z-10">{title}</span>
           </span>
         </h3>
 
@@ -136,6 +136,13 @@ export const Card = ({
     >
       <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
         <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
           <span
             contentEditable
             suppressContentEditableWarning
@@ -144,17 +151,11 @@ export const Card = ({
                 props.title = e.currentTarget.innerText;
               });
             }}
+            className="relative z-10"
             style={{ outline: 'none', cursor: 'text' }}
           >
             {title}
           </span>
-          <CreativeUnderlineOverlay
-            enabled={underlineEnabled}
-            color={underlineColor}
-            thickness={underlineThickness}
-            style={underlineStyle}
-            offset={underlineOffset}
-          />
         </span>
       </h3>
 
