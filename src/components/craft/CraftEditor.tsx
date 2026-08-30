@@ -25,12 +25,14 @@ interface CraftEditorProps {
 export const CraftEditor = ({ stepData, stepId }: CraftEditorProps) => {
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
-  // Determine initial layout mode from step content
-  let initialMode: 'centered' | 'full' = 'centered';
+  // Determine initial layout mode from step content (default to 'full' for 100% full width)
+  let initialMode: 'centered' | 'full' = 'full';
   if (stepData?.content) {
     try {
       const parsed = typeof stepData.content === 'string' ? JSON.parse(stepData.content) : stepData.content;
-      if (parsed?.ROOT?.props?.pageLayoutMode === 'full') {
+      if (parsed?.ROOT?.props?.pageLayoutMode === 'centered') {
+        initialMode = 'centered';
+      } else if (parsed?.ROOT?.props?.pageLayoutMode === 'full') {
         initialMode = 'full';
       }
     } catch (e) {}

@@ -31,7 +31,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   // Check if content is saved Craft.js JSON structure or legacy array
   let craftData: string | null = null;
   let customElements: any[] | null = null;
-  let isFullWidth = false;
+  let isFullWidth = true;
 
   if (step?.content) {
     try {
@@ -41,7 +41,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           customElements = parsed;
         } else {
           craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
-          if (parsed?.ROOT?.props?.pageLayoutMode === 'full') {
+          if (parsed?.ROOT?.props?.pageLayoutMode === 'centered') {
+            isFullWidth = false;
+          } else {
             isFullWidth = true;
           }
         }
