@@ -63,6 +63,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedSubItem, setSelectedSubItem] = useState<{
+    blockId: string;
+    itemIndex: number;
+    subType: 'image' | 'title' | 'desc';
+  } | null>(null);
 
   // Canvas elements state
   const [elements, setElements] = useState<CanvasElement[]>([
@@ -457,88 +462,270 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               const selectedEl = elements.find((el) => el.id === selectedElementId);
               if (!selectedEl) return null;
               const elData = selectedEl.data || {};
+              const currentSubItem =
+                selectedSubItem && selectedSubItem.blockId === selectedEl.id && elData.items?.[selectedSubItem.itemIndex]
+                  ? elData.items[selectedSubItem.itemIndex]
+                  : null;
 
               return (
                 <div className="flex flex-col h-full text-slate-200">
                   {/* TOP HEADER MATCHING SCREENSHOT 3: < Retour | Section > Rangée > Image */}
                   <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2">
                     <button
-                      onClick={() => setSelectedElementId(null)}
+                      onClick={() => {
+                        if (selectedSubItem) {
+                          setSelectedSubItem(null);
+                        } else {
+                          setSelectedElementId(null);
+                        }
+                      }}
                       className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-700 transition-colors"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>&lt; Retour</span>
                     </button>
                     <div className="text-[11px] font-bold text-slate-400 truncate">
-                      Section &gt; Rangée &gt; <span className="text-white font-extrabold">{selectedEl.type}</span>
+                      Section &gt; Rangée &gt;{' '}
+                      <span className="text-white font-extrabold">
+                        {selectedSubItem
+                          ? selectedSubItem.subType === 'image'
+                            ? `Image (#${selectedSubItem.itemIndex + 1})`
+                            : selectedSubItem.subType === 'title'
+                            ? `Titre (#${selectedSubItem.itemIndex + 1})`
+                            : `Paragraphe (#${selectedSubItem.itemIndex + 1})`
+                          : selectedEl.type}
+                      </span>
                     </div>
                   </div>
 
                   {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
                   <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1">
                     
-                    {/* SECTION TITLE / MAIN CONTENT EDITING */}
-                    <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                      <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                        Contenu Principal / Titre
-                      </label>
-                      <input
-                        type="text"
-                        value={elData.title || selectedEl.content || ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleUpdateElementData(selectedEl.id, { title: val });
-                          handleUpdateElementContent(selectedEl.id, val);
-                        }}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
-                      />
-                    </div>
+                    {/* IF A SPECIFIC SUB-ITEM (IMAGE, TITLE, DESC) WAS CLICKED DIRECTLY */}
+                    {selectedSubItem && currentSubItem ? (
+                      <div className="space-y-4">
+                        {/* 1. IF CLICKED SUB-ITEM IS AN IMAGE */}
+                        {selectedSubItem.subType === 'image' && (
+                          <>
+                            <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                              <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                                Fichier de l image (Élément #{selectedSubItem.itemIndex + 1})
+                              </label>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={currentSubItem.img || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      const updatedItems = elData.items.map((it: any, idx: number) =>
+                                        idx === selectedSubItem.itemIndex ? { ...it, img: val } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                    }}
+                                    placeholder="https://..."
+                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                                  />
+                                  <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
+                                    <span>📤</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (uploadEv) => {
+                                            const url = uploadEv.target?.result as string;
+                                            const updatedItems = elData.items.map((it: any, idx: number) =>
+                                              idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
+                                            );
+                                            handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                </div>
+                                <p className="text-[10px] text-slate-500">
+                                  Téléchargez une image depuis votre PC ou collez une URL.
+                                </p>
+                              </div>
+                            </div>
 
-                    {/* 1. FICHIER DE L IMAGE (IMAGE UPLOAD & URL - SCREENSHOT 3) */}
-                    {(selectedEl.type === 'Image' || selectedEl.type.includes('Img') || elData.items) && (
-                      <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
-                          Fichier de l image
-                        </label>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
+                            {/* TAILLE DE L IMAGE */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-400">Taille de l image</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    value={currentSubItem.imgSize || 240}
+                                    onChange={(e) => {
+                                      const val = Number(e.target.value);
+                                      const updatedItems = elData.items.map((it: any, idx: number) =>
+                                        idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                    }}
+                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                                  />
+                                  <span className="text-slate-500 text-[10px]">px</span>
+                                </div>
+                              </div>
+                              <input
+                                type="range"
+                                min={50}
+                                max={800}
+                                value={currentSubItem.imgSize || 240}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  const updatedItems = elData.items.map((it: any, idx: number) =>
+                                    idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full accent-[#00A0FF]"
+                              />
+                            </div>
+
+                            {/* BORDURE & ARRONDI */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-400">Arrondissement des coins</span>
+                                <span className="text-xs font-mono text-slate-300">
+                                  {currentSubItem.borderRadius || 16}px
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min={0}
+                                max={60}
+                                value={currentSubItem.borderRadius || 16}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  const updatedItems = elData.items.map((it: any, idx: number) =>
+                                    idx === selectedSubItem.itemIndex ? { ...it, borderRadius: val } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full accent-[#00A0FF]"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* 2. IF CLICKED SUB-ITEM IS A TITLE */}
+                        {selectedSubItem.subType === 'title' && (
+                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              Titre de l élément #{selectedSubItem.itemIndex + 1}
+                            </label>
                             <input
                               type="text"
-                              value={elData.img || selectedEl.content || ''}
+                              value={currentSubItem.title || ''}
                               onChange={(e) => {
                                 const val = e.target.value;
-                                handleUpdateElementData(selectedEl.id, { img: val });
-                                handleUpdateElementContent(selectedEl.id, val);
+                                const updatedItems = elData.items.map((it: any, idx: number) =>
+                                  idx === selectedSubItem.itemIndex ? { ...it, title: val } : it
+                                );
+                                handleUpdateElementData(selectedEl.id, { items: updatedItems });
                               }}
-                              placeholder="https://..."
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
                             />
-                            <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
-                              <span>📤</span>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const reader = new FileReader();
-                                    reader.onload = (uploadEv) => {
-                                      const url = uploadEv.target?.result as string;
-                                      handleUpdateElementData(selectedEl.id, { img: url });
-                                      handleUpdateElementContent(selectedEl.id, url);
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
-                              />
-                            </label>
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Sélectionnez une image de votre ordinateur ou entrez une URL.
-                          </p>
-                        </div>
+                        )}
+
+                        {/* 3. IF CLICKED SUB-ITEM IS A DESCRIPTION */}
+                        {selectedSubItem.subType === 'desc' && (
+                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              Description de l élément #{selectedSubItem.itemIndex + 1}
+                            </label>
+                            <textarea
+                              rows={4}
+                              value={currentSubItem.desc || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const updatedItems = elData.items.map((it: any, idx: number) =>
+                                  idx === selectedSubItem.itemIndex ? { ...it, desc: val } : it
+                                );
+                                handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                              }}
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-medium outline-none focus:border-[#00A0FF]"
+                            />
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      /* OVERALL BLOCK SETTINGS (WHEN NO SUB-ITEM CLICKED SPECIFICALLY) */
+                      <>
+                        {/* SECTION TITLE / MAIN CONTENT EDITING */}
+                        <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                          <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                            Contenu Principal / Titre
+                          </label>
+                          <input
+                            type="text"
+                            value={elData.title || selectedEl.content || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(selectedEl.id, { title: val });
+                              handleUpdateElementContent(selectedEl.id, val);
+                            }}
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
+                          />
+                        </div>
+
+                        {/* 1. FICHIER DE L IMAGE (IMAGE UPLOAD & URL - SCREENSHOT 3) */}
+                        {(selectedEl.type === 'Image' || selectedEl.type.includes('Img') || elData.items) && (
+                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                              Fichier de l image
+                            </label>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={elData.img || selectedEl.content || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    handleUpdateElementData(selectedEl.id, { img: val });
+                                    handleUpdateElementContent(selectedEl.id, val);
+                                  }}
+                                  placeholder="https://..."
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                                />
+                                <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
+                                  <span>📤</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = (uploadEv) => {
+                                          const url = uploadEv.target?.result as string;
+                                          handleUpdateElementData(selectedEl.id, { img: url });
+                                          handleUpdateElementContent(selectedEl.id, url);
+                                        };
+                                        reader.readAsDataURL(file);
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                              <p className="text-[10px] text-slate-500">
+                                Cliquez sur une image spécifique ci-contre pour la modifier.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {/* 2. ACTION SUR UNE IMAGE CLIQUÉE (SCREENSHOT 3) */}
@@ -1382,7 +1569,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {el.type === 'Divider' && <hr className="border-slate-800 my-4" />}
 
-                    {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS */}
+                    {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {el.type === 'BlockFeat4ColImg' && (
                       <div className="space-y-4 p-6 bg-white text-slate-900 rounded-3xl shadow-xl">
                         {el.data?.title && (
@@ -1394,15 +1581,66 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
                             { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
                             { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                          ]).map((col: any, i: number) => (
-                            <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
-                              <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
-                                <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                          ]).map((col: any, i: number) => {
+                            const isImgSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'image';
+                            const isTitleSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'title';
+                            const isDescSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'desc';
+
+                            return (
+                              <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
+                                {/* CLICKABLE IMAGE CONTAINER WITH BLUE HIGHLIGHT RING */}
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
+                                  }}
+                                  className={`w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md transition-all cursor-pointer ${
+                                    isImgSel
+                                      ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
+                                      : 'hover:ring-4 hover:ring-[#00A0FF]/60'
+                                  }`}
+                                  style={{
+                                    borderRadius: `${col.borderRadius || 16}px`,
+                                  }}
+                                >
+                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                </div>
+
+                                {/* CLICKABLE TITLE WITH HIGHLIGHT */}
+                                <h3
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'title' });
+                                  }}
+                                  className={`font-heading font-black text-base tracking-wider uppercase transition-all rounded-lg px-2 py-0.5 cursor-pointer ${
+                                    isTitleSel
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-[#00A0FF]'
+                                      : 'text-slate-900 hover:text-[#00A0FF]'
+                                  }`}
+                                >
+                                  {col.title}
+                                </h3>
+
+                                {/* CLICKABLE PARAGRAPH DESCRIPTION WITH HIGHLIGHT */}
+                                <p
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'desc' });
+                                  }}
+                                  className={`text-xs leading-relaxed font-medium transition-all rounded-lg p-1 cursor-pointer ${
+                                    isDescSel
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-slate-900 font-bold'
+                                      : 'text-slate-500 hover:text-slate-800'
+                                  }`}
+                                >
+                                  {col.desc}
+                                </p>
                               </div>
-                              <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
-                              <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -1414,19 +1652,62 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <h2 className="text-xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          {[
-                            { title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
-                            { title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
-                            { title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
-                          ].map((col, i) => (
-                            <div key={i} className="space-y-3">
-                              <div className="aspect-video rounded-2xl overflow-hidden shadow-sm">
-                                <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                          {(el.data?.items || [
+                            { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
+                            { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
+                            { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
+                          ]).map((col: any, i: number) => {
+                            const isImgSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'image';
+                            const isTitleSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'title';
+                            const isDescSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'desc';
+
+                            return (
+                              <div key={col.id || i} className="space-y-3">
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
+                                  }}
+                                  className={`aspect-video rounded-2xl overflow-hidden shadow-sm transition-all cursor-pointer ${
+                                    isImgSel
+                                      ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
+                                      : 'hover:ring-4 hover:ring-[#00A0FF]/60'
+                                  }`}
+                                >
+                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                </div>
+                                <h4
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'title' });
+                                  }}
+                                  className={`font-heading font-extrabold text-sm transition-all rounded-lg px-2 py-0.5 cursor-pointer ${
+                                    isTitleSel
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-[#00A0FF]'
+                                      : 'text-slate-900 hover:text-[#00A0FF]'
+                                  }`}
+                                >
+                                  {col.title}
+                                </h4>
+                                <p
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedElementId(el.id);
+                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'desc' });
+                                  }}
+                                  className={`text-xs leading-relaxed transition-all rounded-lg p-1 cursor-pointer ${
+                                    isDescSel
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-slate-900 font-bold'
+                                      : 'text-slate-500 hover:text-slate-800'
+                                  }`}
+                                >
+                                  {col.desc}
+                                </p>
                               </div>
-                              <h4 className="font-heading font-extrabold text-sm text-slate-900">{col.title}</h4>
-                              <p className="text-xs text-slate-500 leading-relaxed">{col.desc}</p>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
