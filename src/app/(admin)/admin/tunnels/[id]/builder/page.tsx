@@ -47,6 +47,7 @@ interface CanvasElement {
   type: string;
   category: string;
   content: string;
+  data?: any;
   styles?: any;
 }
 
@@ -185,15 +186,113 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     });
   };
 
+  const [editingBlock, setEditingBlock] = useState<CanvasElement | null>(null);
+
+  const getDefaultBlockData = (type: string, name: string) => {
+    if (type === 'BlockFeat4ColImg') {
+      return {
+        title: 'BASES ET NUTRITION',
+        items: [
+          { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+          { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+          { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+          { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+        ],
+      };
+    }
+    if (type === 'BlockFeat3ColImg') {
+      return {
+        title: 'Le Savoir-Faire des Experts à Votre Portée',
+        subtitle: 'CE QUE VOUS OBTENEZ',
+        items: [
+          { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
+          { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
+          { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
+        ],
+      };
+    }
+    if (type === 'BlockFeat2ColIconsLeft') {
+      return {
+        title: 'Nos Services & Garanties',
+        items: [
+          { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
+          { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
+          { id: '3', title: 'Un Support Excellent', desc: 'Une équipe réactive disponible pour répondre à toutes vos questions.' },
+          { id: '4', title: 'Template Responsive', desc: 'Des interfaces optimisées pour tous les écrans mobiles et ordinateurs.' },
+        ],
+      };
+    }
+    if (type === 'BlockFeat4ColDark') {
+      return {
+        title: 'Votre titre accrocheur ici pour attirer l attention',
+        items: [
+          { id: '1', title: 'Rapidité', desc: 'Déploiement en 1 clic.' },
+          { id: '2', title: 'Sécurité', desc: 'Données protégées.' },
+          { id: '3', title: 'Performance', desc: 'Vitesse maximale.' },
+          { id: '4', title: 'Support', desc: '24/7 disponible.' },
+        ],
+      };
+    }
+    return { title: name, items: [] };
+  };
+
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
     const newEl: CanvasElement = {
       id: `el-${Date.now()}`,
       type,
       category,
       content: defaultContent,
+      data: getDefaultBlockData(type, defaultContent),
     };
     setElements((prev) => [...prev, newEl]);
     setSelectedElementId(newEl.id);
+  };
+
+  const handleUpdateElementData = (id: string, newData: any) => {
+    setElements((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, data: { ...item.data, ...newData } } : item))
+    );
+  };
+
+  const handleUpdateElementContent = (id: string, newContent: string) => {
+    setElements((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, content: newContent } : item))
+    );
+  };
+
+  const handleAddItemToBlock = (blockId: string) => {
+    setElements((prev) =>
+      prev.map((item) => {
+        if (item.id !== blockId) return item;
+        const currentItems = item.data?.items || [];
+        const newItem = {
+          id: `${Date.now()}`,
+          title: `NOUVEL ÉLÉMENT ${currentItems.length + 1}`,
+          img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80',
+          desc: 'Description personnalisée de votre élément.',
+        };
+        const updatedData = { ...item.data, items: [...currentItems, newItem] };
+        if (editingBlock?.id === blockId) {
+          setEditingBlock({ ...item, data: updatedData });
+        }
+        return { ...item, data: updatedData };
+      })
+    );
+  };
+
+  const handleRemoveItemFromBlock = (blockId: string, itemId: string) => {
+    setElements((prev) =>
+      prev.map((item) => {
+        if (item.id !== blockId) return item;
+        const currentItems = item.data?.items || [];
+        const updatedItems = currentItems.filter((it: any) => it.id !== itemId);
+        const updatedData = { ...item.data, items: updatedItems };
+        if (editingBlock?.id === blockId) {
+          setEditingBlock({ ...item, data: updatedData });
+        }
+        return { ...item, data: updatedData };
+      })
+    );
   };
 
   const handleDuplicateElement = (id: string, e: React.MouseEvent) => {
@@ -861,10 +960,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         : 'border-slate-800/80 hover:border-slate-700 bg-slate-950/40'
                     }`}
                   >
-                    {/* ELEMENT CONTROLS TOOLBAR (UP, DOWN, PARAMS, DUPLICATE, DELETE) */}
+                    {/* ELEMENT CONTROLS TOOLBAR (UP, DOWN, SETTINGS, DUPLICATE, DELETE) */}
                     {isSelected && (
                       <div className="absolute -top-3 right-4 bg-[#00A0FF] text-white px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-2 shadow-lg z-20">
                         <span className="uppercase">{el.type}</span>
+                        <div className="h-3 w-px bg-white/40" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingBlock(el);
+                          }}
+                          title="Personnaliser le bloc (Texte, Images, Colonnes...)"
+                          className="flex items-center gap-1 hover:text-amber-300 bg-white/10 px-1.5 py-0.5 rounded-lg"
+                        >
+                          <Sliders className="w-3 h-3" />
+                          <span>Personnaliser</span>
+                        </button>
                         <div className="h-3 w-px bg-white/40" />
                         <button
                           onClick={(e) => moveElement(idx, -1, e)}
@@ -892,7 +1003,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {/* ELEMENT TYPE CONTENT RENDERERS */}
+                    {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
                       <h1 className="text-2xl sm:text-4xl font-heading font-black text-white leading-tight">
                         {el.content}
@@ -940,23 +1051,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {el.type === 'Divider' && <hr className="border-slate-800 my-4" />}
 
-                    {/* RICH PRE-FILLED FEATURE BLOCKS RENDERERS */}
+                    {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS */}
                     {el.type === 'BlockFeat4ColImg' && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white text-slate-900 rounded-3xl shadow-xl">
-                        {[
-                          { title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                          { title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                          { title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                          { title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                        ].map((col, i) => (
-                          <div key={i} className="flex flex-col items-center text-center space-y-3">
-                            <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
-                              <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                      <div className="space-y-4 p-6 bg-white text-slate-900 rounded-3xl shadow-xl">
+                        {el.data?.title && (
+                          <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                          {(el.data?.items || [
+                            { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                            { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                            { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                            { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                          ]).map((col: any, i: number) => (
+                            <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
+                              <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
+                                <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                              </div>
+                              <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
+                              <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
                             </div>
-                            <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
-                            <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
 
@@ -1069,6 +1185,155 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         </div>
 
       </div>
+
+      {/* 3. BLOCK CUSTOMIZATION MODAL / DRAWER */}
+      {editingBlock && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 space-y-6 max-h-[85vh] overflow-y-auto text-white shadow-2xl">
+            
+            {/* MODAL HEADER */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center font-bold">
+                  ⚙️
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-base text-white">
+                    Personnaliser le bloc : {editingBlock.type}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Modifiez les textes, visuels, et ajoutez/supprimez des sous-éléments.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingBlock(null)}
+                className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* BLOCK TITLES EDITING */}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300">Titre principal du bloc / section</label>
+                <input
+                  type="text"
+                  value={editingBlock.data?.title || editingBlock.content || ''}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    handleUpdateElementData(editingBlock.id, { title: newTitle });
+                    handleUpdateElementContent(editingBlock.id, newTitle);
+                    setEditingBlock((prev) => prev ? { ...prev, content: newTitle, data: { ...prev.data, title: newTitle } } : null);
+                  }}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
+                />
+              </div>
+
+              {/* ITEMS LIST EDITING (COLUMNS, CARDS, IMAGES) */}
+              {editingBlock.data?.items && (
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-heading font-extrabold text-xs text-slate-300 uppercase tracking-wider">
+                      Sous-éléments du bloc ({editingBlock.data.items.length})
+                    </h4>
+                    <Button
+                      onClick={() => handleAddItemToBlock(editingBlock.id)}
+                      size="sm"
+                      className="bg-[#00A0FF] hover:bg-[#0082D6] !text-white text-xs font-bold gap-1 py-1 rounded-xl"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Ajouter un élément</span>
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {editingBlock.data.items.map((item: any, idx: number) => (
+                      <div key={item.id || idx} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+                        <div className="flex items-center justify-between text-xs font-bold text-slate-400">
+                          <span>Élément #{idx + 1}</span>
+                          <button
+                            onClick={() => handleRemoveItemFromBlock(editingBlock.id, item.id)}
+                            className="text-rose-400 hover:text-rose-300 flex items-center gap-1 text-[11px]"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Supprimer</span>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-400">Titre</label>
+                            <input
+                              type="text"
+                              value={item.title || ''}
+                              onChange={(e) => {
+                                const newTitle = e.target.value;
+                                const updatedItems = editingBlock.data.items.map((it: any) =>
+                                  it.id === item.id ? { ...it, title: newTitle } : it
+                                );
+                                handleUpdateElementData(editingBlock.id, { items: updatedItems });
+                                setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
+                              }}
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-400">URL d Image (facultatif)</label>
+                            <input
+                              type="text"
+                              value={item.img || ''}
+                              onChange={(e) => {
+                                const newImg = e.target.value;
+                                const updatedItems = editingBlock.data.items.map((it: any) =>
+                                  it.id === item.id ? { ...it, img: newImg } : it
+                                );
+                                handleUpdateElementData(editingBlock.id, { items: updatedItems });
+                                setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
+                              }}
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 font-mono"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-slate-400">Description / Paragraphe</label>
+                          <textarea
+                            rows={2}
+                            value={item.desc || ''}
+                            onChange={(e) => {
+                              const newDesc = e.target.value;
+                              const updatedItems = editingBlock.data.items.map((it: any) =>
+                                it.id === item.id ? { ...it, desc: newDesc } : it
+                              );
+                              handleUpdateElementData(editingBlock.id, { items: updatedItems });
+                              setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
+                            }}
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 font-medium"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* MODAL FOOTER */}
+            <div className="pt-4 border-t border-slate-800 flex justify-end">
+              <Button
+                onClick={() => setEditingBlock(null)}
+                className="bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-md"
+              >
+                Terminer la personnalisation
+              </Button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
