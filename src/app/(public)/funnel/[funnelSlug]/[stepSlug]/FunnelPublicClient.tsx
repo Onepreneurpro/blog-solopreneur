@@ -227,8 +227,32 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     href="#optin"
                     className="inline-flex items-center justify-center px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-heading font-black text-base rounded-2xl shadow-xl transition-all hover:scale-105"
                   >
-                    {el.content || 'Accéder Maintenant 🚀'}
+                    {el.data?.buttonText || el.content || 'Accéder Maintenant 🚀'}
                   </a>
+                </div>
+              );
+            }
+
+            if (el.type === 'FormInput') {
+              return (
+                <div key={el.id} className="max-w-md mx-auto space-y-1.5 text-left">
+                  <label className="text-xs font-bold text-slate-300 block">{el.data?.title || 'Champ de formulaire'}</label>
+                  <input
+                    type={el.data?.inputType || 'email'}
+                    placeholder={el.data?.placeholder || el.content || 'votre.email@exemple.com'}
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                  />
+                </div>
+              );
+            }
+
+            if (el.type === 'Checkbox') {
+              return (
+                <div key={el.id} className="max-w-md mx-auto p-4 bg-slate-900 border border-slate-800 rounded-2xl">
+                  <label className="flex items-center gap-3 cursor-pointer text-sm font-semibold text-slate-300">
+                    <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-[#00A0FF] bg-slate-950 border-slate-800 accent-[#00A0FF]" />
+                    <span>{el.data?.label || el.data?.title || el.content || 'J accepte la politique de confidentialité'}</span>
+                  </label>
                 </div>
               );
             }

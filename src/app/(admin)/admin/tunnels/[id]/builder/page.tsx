@@ -1288,15 +1288,83 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {el.type === 'OptinForm' && (
-                      <div className="p-6 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                        <div className="text-xs font-bold text-slate-300">Adresse Email *</div>
-                        <div className="px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-500">
-                          votre.email@exemple.com
-                        </div>
-                        <Button className="w-full bg-[#00A0FF] !text-white font-black text-xs py-3 rounded-xl">
-                          Recevoir mon accès gratuit →
-                        </Button>
+                    {el.type === 'ButtonCTA' && (
+                      <div className="p-4 text-center">
+                        <button
+                          type="button"
+                          className="w-full sm:w-auto px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-heading font-black text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02] cursor-pointer"
+                        >
+                          <input
+                            type="text"
+                            value={el.data?.buttonText || el.content || 'Recevoir mon accès gratuit →'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { buttonText: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="bg-transparent text-white text-center font-heading font-black outline-none border-b border-transparent focus:border-white w-full cursor-text"
+                            placeholder="Bouton CTA..."
+                          />
+                        </button>
+                      </div>
+                    )}
+
+                    {(el.type === 'OptinForm' || el.type === 'FormInput') && (
+                      <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-md max-w-md mx-auto space-y-2 text-left">
+                        <label className="text-xs font-bold text-slate-700 block">
+                          {el.data?.title || 'Champ de formulaire (Email)'}
+                        </label>
+                        <input
+                          type={el.data?.inputType || 'email'}
+                          placeholder={el.data?.placeholder || el.content || 'votre.email@exemple.com'}
+                          readOnly
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 outline-none shadow-inner"
+                        />
+                      </div>
+                    )}
+
+                    {el.type === 'Checkbox' && (
+                      <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-md max-w-md mx-auto">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={el.data?.checked ?? true}
+                            onChange={(e) => handleUpdateElementData(el.id, { checked: e.target.checked })}
+                            className="w-5 h-5 rounded text-[#00A0FF] bg-white border-slate-300 accent-[#00A0FF] cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={el.data?.label || el.data?.title || el.content || 'J accepte la politique de confidentialité'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { label: val, title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="bg-transparent text-sm font-semibold text-slate-800 outline-none border-b border-transparent focus:border-[#00A0FF] flex-1 cursor-text"
+                            placeholder="Case à cocher..."
+                          />
+                        </label>
+                      </div>
+                    )}
+
+                    {el.type === 'Video' && (
+                      <div className="aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 relative flex items-center justify-center">
+                        {el.content?.includes('http') ? (
+                          <iframe src={el.content} className="w-full h-full border-0" allowFullScreen />
+                        ) : (
+                          <div className="text-center p-8 space-y-2">
+                            <Video className="w-12 h-12 text-[#00A0FF] mx-auto" />
+                            <div className="text-xs font-bold text-slate-400">Lecteur Vidéo (Saisissez l URL dans l inspecteur)</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {el.type === 'Audio' && (
+                      <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-3 text-white max-w-md mx-auto shadow-lg">
+                        <Music className="w-6 h-6 text-[#00A0FF] shrink-0" />
+                        <div className="flex-1 text-xs font-bold truncate">{el.content || 'Fichier Audio'}</div>
+                        <audio controls src={el.data?.audioUrl || el.content} className="h-8 max-w-[180px]" />
                       </div>
                     )}
 
@@ -1782,8 +1850,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {/* DEFAULT FALLBACK RENDERER FOR ANY OTHER BLOCK TYPES */}
-                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark'].includes(el.type) && (
+                    {/* DEFAULT FALLBACK RENDERER FOR UNHANDLED CUSTOM BLOCKS */}
+                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark'].includes(el.type) && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
