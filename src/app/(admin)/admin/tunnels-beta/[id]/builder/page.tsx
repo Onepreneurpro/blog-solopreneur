@@ -114,7 +114,7 @@ export default function PuckBuilderPage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
+      <div className="fixed inset-0 z-[99999] bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-[#00A0FF] border-t-transparent rounded-full animate-spin" />
         <p className="text-xs font-bold tracking-wider text-slate-400">Chargement de l Éditeur Puck Beta...</p>
       </div>
@@ -122,7 +122,7 @@ export default function PuckBuilderPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
+    <div className="fixed inset-0 z-[99999] bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
       {/* TOP HEADER */}
       <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
         <div className="flex items-center gap-3">
