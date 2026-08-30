@@ -530,23 +530,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         
         {/* LEFT TOOLBAR CONTROLS */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href="/admin/tunnels"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+          <button
+            onClick={() => router.push('/admin/tunnels')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors cursor-pointer"
             title="Revenir à la liste de tous vos Tunnels de Vente"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#00A0FF]" />
             <span className="hidden sm:inline">Tunnels</span>
-          </Link>
+          </button>
 
-          <Link
-            href={`/admin/tunnels/${params.id}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00A0FF]/20 hover:bg-[#00A0FF]/30 text-[#00A0FF] border border-[#00A0FF]/40 text-xs font-extrabold rounded-xl transition-colors"
-            title="Revenir aux étapes du tunnel actuel (Screen 2)"
+          <button
+            onClick={() => router.push(`/admin/tunnels/${params.id}`)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white text-xs font-black rounded-xl shadow-md transition-transform active:scale-95 cursor-pointer"
+            title="Revenir aux étapes du tunnel (http://localhost:3000/admin/tunnels/1e3dcc95-0846-4b37-bfc2-4b312c573b5d)"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Retour au Tunnel</span>
-          </Link>
+            <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+            <span>← Retour au Tunnel</span>
+          </button>
 
           <div className="h-5 w-px bg-slate-800" />
 
@@ -635,17 +635,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </Button>
 
           {/* EXIT BUTTON (RETOUR AU TUNNEL) */}
-          <Link href={`/admin/tunnels/${params.id}`}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 font-bold text-xs gap-1.5 rounded-xl"
-              title="Quitter le builder et revenir aux étapes du tunnel (Screen 2)"
-            >
-              <LogOut className="w-4 h-4 text-rose-400" />
-              <span>Sortir</span>
-            </Button>
-          </Link>
+          <Button
+            onClick={() => router.push(`/admin/tunnels/${params.id}`)}
+            variant="outline"
+            size="sm"
+            className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 font-bold text-xs gap-1.5 rounded-xl cursor-pointer"
+            title="Quitter le builder et revenir aux étapes du tunnel"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+            <span>Sortir</span>
+          </Button>
         </div>
       </header>
 
