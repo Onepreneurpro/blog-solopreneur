@@ -179,7 +179,7 @@ export const Card = ({
             }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.title = titleEmoji ? `${titleEmoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
+                props.title = titleEmoji ? `${titleEmoji} ${e.currentTarget.innerHTML}` : e.currentTarget.innerHTML;
               });
             }}
             dangerouslySetInnerHTML={{ __html: titleCleanText }}
@@ -213,7 +213,7 @@ export const Card = ({
             }}
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.content = contentEmoji ? `${contentEmoji} ${e.currentTarget.innerText}` : e.currentTarget.innerText;
+                props.content = contentEmoji ? `${contentEmoji} ${e.currentTarget.innerHTML}` : e.currentTarget.innerHTML;
               });
             }}
             dangerouslySetInnerHTML={{ __html: contentCleanText }}

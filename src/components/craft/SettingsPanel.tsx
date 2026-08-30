@@ -20,7 +20,13 @@ const updateTextWithEmoji = (currentText: string, newEmoji: string) => {
   return `${newEmoji} ${currentText}`;
 };
 
-const applySelectionFormat = (type: 'highlight' | 'underline' | 'bold' | 'italic', color?: string) => {
+const applySelectionFormat = (
+  type: 'highlight' | 'underline' | 'bold' | 'italic',
+  color?: string,
+  thickness = 4,
+  style = 'solid',
+  offset = 2
+) => {
   if (typeof window === 'undefined') return false;
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
@@ -28,6 +34,22 @@ const applySelectionFormat = (type: 'highlight' | 'underline' | 'bold' | 'italic
   }
 
   const range = selection.getRangeAt(0);
+
+  if (type === 'underline') {
+    const span = document.createElement('span');
+    span.style.textDecoration = 'underline';
+    span.style.textDecorationColor = color || '#00A0FF';
+    span.style.textDecorationThickness = `${thickness}px`;
+    span.style.textUnderlineOffset = `${offset}px`;
+    span.style.textDecorationStyle = (style as any) || 'solid';
+
+    try {
+      range.surroundContents(span);
+    } catch (err) {
+      document.execCommand('underline', false);
+    }
+    return true;
+  }
 
   if (type === 'highlight') {
     if (color === 'transparent' || !color) {
@@ -44,24 +66,20 @@ const applySelectionFormat = (type: 'highlight' | 'underline' | 'bold' | 'italic
         document.execCommand('hiliteColor', false, color);
       }
     }
-  } else if (type === 'underline') {
-    const span = document.createElement('span');
-    span.style.textDecoration = 'underline';
-    if (color) span.style.textDecorationColor = color;
-    span.style.textDecorationThickness = '3px';
-    span.style.textUnderlineOffset = '2px';
-    try {
-      range.surroundContents(span);
-    } catch (err) {
-      document.execCommand('underline', false);
-    }
-  } else if (type === 'bold') {
-    document.execCommand('bold', false);
-  } else if (type === 'italic') {
-    document.execCommand('italic', false);
+    return true;
   }
 
-  return true;
+  if (type === 'bold') {
+    document.execCommand('bold', false);
+    return true;
+  }
+
+  if (type === 'italic') {
+    document.execCommand('italic', false);
+    return true;
+  }
+
+  return false;
 };
 
 export const SettingsPanel = () => {
@@ -404,22 +422,25 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* UNDERLINE (SOULIGNAGE CRÉATIF AVEC DÉCALAGE / CHEVAUCHEMENT TEXTE) - ALWAYS VISIBLE */}
+        {/* UNDERLINE (SOULIGNAGE CRÉATIF SUR MOTS SÉLECTIONNÉS À LA SOURIS) */}
         {(props.title !== undefined || props.text !== undefined) && (
           <div className="space-y-3 bg-sky-50/60 p-3.5 rounded-2xl border border-sky-200">
             <div className="flex items-center justify-between font-black text-slate-900 text-xs">
               <span className="flex items-center gap-1.5">
                 <Underline className="w-4 h-4 text-sky-600" />
-                <span>✏️ Soulignage Créatif & Chevauchement</span>
+                <span>✏️ Soulignage (Mots Sélectionnés)</span>
               </span>
               <button
                 onClick={() => {
-                  const nextState = !props.underlineEnabled;
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.underlineEnabled = nextState;
-                  });
-                  if (nextState) {
-                    applySelectionFormat('underline', props.underlineColor || '#00A0FF');
+                  const color = props.underlineColor || '#00A0FF';
+                  const thickness = props.underlineThickness || 4;
+                  const style = props.underlineStyle || 'solid';
+                  const offset = props.underlineOffset || 2;
+                  const formatted = applySelectionFormat('underline', color, thickness, style, offset);
+                  if (!formatted) {
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.underlineEnabled = !nodeProps.underlineEnabled;
+                    });
                   }
                 }}
                 className={`px-2.5 py-1 rounded-lg font-bold text-[10px] transition-colors ${
@@ -428,7 +449,7 @@ export const SettingsPanel = () => {
                     : 'bg-white text-slate-700 border border-slate-200 hover:bg-sky-100/50'
                 }`}
               >
-                {props.underlineEnabled ? 'Actif' : 'Inactif'}
+                {props.underlineEnabled ? 'Actif' : 'Souligner Sélection'}
               </button>
             </div>
 
@@ -441,23 +462,25 @@ export const SettingsPanel = () => {
                   <input
                     type="color"
                     value={props.underlineColor || '#00A0FF'}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const color = e.target.value;
                       actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.underlineColor = e.target.value;
-                        nodeProps.underlineEnabled = true;
-                      })
-                    }
+                        nodeProps.underlineColor = color;
+                      });
+                      applySelectionFormat('underline', color, props.underlineThickness || 4, props.underlineStyle || 'solid', props.underlineOffset || 2);
+                    }}
                     className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                   />
                   <input
                     type="text"
                     value={props.underlineColor || '#00A0FF'}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const color = e.target.value;
                       actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.underlineColor = e.target.value;
-                        nodeProps.underlineEnabled = true;
-                      })
-                    }
+                        nodeProps.underlineColor = color;
+                      });
+                      applySelectionFormat('underline', color, props.underlineThickness || 4, props.underlineStyle || 'solid', props.underlineOffset || 2);
+                    }}
                     className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
                   />
                 </div>
@@ -476,12 +499,12 @@ export const SettingsPanel = () => {
                   ].map((st) => (
                     <button
                       key={st.key}
-                      onClick={() =>
+                      onClick={() => {
                         actions.setProp(id, (nodeProps: any) => {
                           nodeProps.underlineStyle = st.key;
-                          nodeProps.underlineEnabled = true;
-                        })
-                      }
+                        });
+                        applySelectionFormat('underline', props.underlineColor || '#00A0FF', props.underlineThickness || 4, st.key, props.underlineOffset || 2);
+                      }}
                       className={`py-1 px-1.5 rounded-lg border font-extrabold text-[10px] transition-colors ${
                         (props.underlineStyle || 'solid') === st.key
                           ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
@@ -506,12 +529,13 @@ export const SettingsPanel = () => {
                   max={12}
                   step={1}
                   value={props.underlineThickness !== undefined ? props.underlineThickness : 4}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const thickness = parseInt(e.target.value, 10);
                     actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.underlineThickness = parseInt(e.target.value, 10);
-                      nodeProps.underlineEnabled = true;
-                    })
-                  }
+                      nodeProps.underlineThickness = thickness;
+                    });
+                    applySelectionFormat('underline', props.underlineColor || '#00A0FF', thickness, props.underlineStyle || 'solid', props.underlineOffset || 2);
+                  }}
                   className="w-full accent-sky-600"
                 />
               </div>
@@ -530,12 +554,13 @@ export const SettingsPanel = () => {
                   max={14}
                   step={1}
                   value={props.underlineOffset !== undefined ? props.underlineOffset : 2}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const offset = parseInt(e.target.value, 10);
                     actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.underlineOffset = parseInt(e.target.value, 10);
-                      nodeProps.underlineEnabled = true;
-                    })
-                  }
+                      nodeProps.underlineOffset = offset;
+                    });
+                    applySelectionFormat('underline', props.underlineColor || '#00A0FF', props.underlineThickness || 4, props.underlineStyle || 'solid', offset);
+                  }}
                   className="w-full accent-sky-600"
                 />
                 <div className="flex justify-between text-[9px] text-slate-500 font-semibold px-0.5">
