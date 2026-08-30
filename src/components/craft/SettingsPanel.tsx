@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useEditor } from '@craftjs/core';
-import { Settings, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Settings, Trash2, ArrowDown, ArrowRight, LayoutGrid } from 'lucide-react';
 
 export const SettingsPanel = () => {
   const { selected, actions } = useEditor((state, query) => {
@@ -60,6 +60,100 @@ export const SettingsPanel = () => {
       </div>
 
       <div className="p-4 space-y-4 overflow-y-auto flex-1 text-xs">
+        {/* CONTAINER FLEX DIRECTION (HORIZONTAL VS VERTICAL) */}
+        {props.flexDirection !== undefined && (
+          <div className="space-y-3 bg-blue-50/60 p-3 rounded-2xl border border-blue-100">
+            <label className="font-black text-slate-900 flex items-center gap-1.5 text-xs">
+              <LayoutGrid className="w-4 h-4 text-[#00A0FF]" />
+              <span>Disposition du Conteneur</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.flexDirection = 'col';
+                  })
+                }
+                className={`py-2 px-3 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                  props.flexDirection === 'col' || !props.flexDirection
+                    ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-sm'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <ArrowDown className="w-3.5 h-3.5" />
+                <span>Empilé (⬇️)</span>
+              </button>
+              <button
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.flexDirection = 'row';
+                  })
+                }
+                className={`py-2 px-3 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
+                  props.flexDirection === 'row'
+                    ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-sm'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Côte à côte (➡️)</span>
+              </button>
+            </div>
+
+            {props.gap !== undefined && (
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between font-bold text-slate-700">
+                  <span>Espacement interne (Gap)</span>
+                  <span>{props.gap}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={64}
+                  step={4}
+                  value={props.gap}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.gap = parseInt(e.target.value, 10);
+                    })
+                  }
+                  className="w-full accent-[#00A0FF]"
+                />
+              </div>
+            )}
+
+            {props.justifyContent !== undefined && (
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Alignement de disposition</label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { key: 'start', label: 'Gauche' },
+                    { key: 'center', label: 'Centre' },
+                    { key: 'end', label: 'Droite' },
+                    { key: 'between', label: 'Espacé' },
+                  ].map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.justifyContent = item.key;
+                        })
+                      }
+                      className={`py-1.5 px-2 rounded-lg border font-bold text-[10px] transition-colors ${
+                        props.justifyContent === item.key
+                          ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* TEXT PROPS */}
         {props.text !== undefined && (
           <div className="space-y-1.5">

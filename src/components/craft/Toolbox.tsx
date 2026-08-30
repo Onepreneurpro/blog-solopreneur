@@ -20,6 +20,8 @@ import {
   Mail,
   Video as VideoIcon,
   GripVertical,
+  Columns,
+  Sparkles,
 } from 'lucide-react';
 
 export const Toolbox = () => {
@@ -27,7 +29,18 @@ export const Toolbox = () => {
 
   const components = [
     {
-      label: 'Section Conteneur',
+      label: 'Ligne Côte à Côte (Horizontal ➡️)',
+      icon: Columns,
+      color: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 font-extrabold',
+      element: (
+        <Element is={Container} flexDirection="row" justifyContent="center" alignItems="center" gap={16} padding={20} bgColor="#f8fafc" canvas>
+          <Text text="Texte à gauche..." fontSize={20} />
+          <Button text="Bouton à droite 🚀" align="center" />
+        </Element>
+      ),
+    },
+    {
+      label: 'Section Conteneur (Héro)',
       icon: Layout,
       color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
       element: (
@@ -53,7 +66,7 @@ export const Toolbox = () => {
     {
       label: 'Image PC (1 Clic)',
       icon: ImageIcon,
-      color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+      color: 'bg-[#00A0FF]/10 text-[#00A0FF] border-[#00A0FF]/30 hover:bg-[#00A0FF]/20',
       element: <Image />,
     },
     {
@@ -106,9 +119,9 @@ export const Toolbox = () => {
               }}
               className={`p-3 rounded-2xl border cursor-grab active:cursor-grabbing flex items-center justify-between transition-all shadow-xs hover:scale-[1.02] ${item.color}`}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0 pr-2">
                 <Icon className="w-4 h-4 shrink-0" />
-                <span className="text-xs font-black font-heading">{item.label}</span>
+                <span className="text-xs font-black font-heading truncate">{item.label}</span>
               </div>
               <GripVertical className="w-4 h-4 opacity-40 shrink-0" />
             </div>
