@@ -63,6 +63,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS'>('ELEMENTS');
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
+  const engineParam = searchParams?.get('engine');
+  const [builderEngine, setBuilderEngine] = useState<'MAISON_V1' | 'WEBSTUDIO_V3'>(
+    engineParam === 'webstudio_v3' ? 'WEBSTUDIO_V3' : 'MAISON_V1'
+  );
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedSubItem, setSelectedSubItem] = useState<{
@@ -625,6 +629,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             </button>
           </div>
 
+          {/* BUILDER ENGINE SWITCHER (MAISON V1 vs WEBSTUDIO V3) */}
+          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
+            <button
+              onClick={() => setBuilderEngine('MAISON_V1')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                builderEngine === 'MAISON_V1'
+                  ? 'bg-[#00A0FF] text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🎨 Maison V1
+            </button>
+            <button
+              onClick={() => setBuilderEngine('WEBSTUDIO_V3')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                builderEngine === 'WEBSTUDIO_V3'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Webstudio V3 (OSS)</span>
+            </button>
+          </div>
+
           {/* VOIR LA PAGE (PUBLIC VIEW) BUTTON */}
           <a
             href={
@@ -658,14 +687,39 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             onClick={() => router.push(`/admin/tunnels/${params.id}`)}
             variant="outline"
             size="sm"
-            className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 font-bold text-xs gap-1.5 rounded-xl cursor-pointer"
-            title="Quitter le builder et revenir aux étapes du tunnel"
+            className="text-slate-300 border-slate-700 bg-slate-900 hover:bg-slate-800 font-bold text-xs gap-1 rounded-xl"
           >
-            <LogOut className="w-4 h-4 text-rose-400" />
-            <span>Sortir</span>
+            <LogOut className="w-4 h-4" />
+            <span>Quitter</span>
           </Button>
         </div>
       </header>
+
+      {/* WEBSTUDIO V3 OPEN SOURCE WORKSPACE BANNER */}
+      {builderEngine === 'WEBSTUDIO_V3' && (
+        <div className="bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 text-white px-6 py-2.5 border-b border-purple-800/40 flex items-center justify-between text-xs font-medium shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="px-2.5 py-1 rounded-lg bg-purple-600/30 text-purple-300 font-mono font-bold text-[11px] border border-purple-500/40 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Webstudio.is Open-Source Engine v0.100</span>
+            </span>
+            <a
+              href="https://github.com/webstudio-is/webstudio"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-300 hover:text-white font-mono underline flex items-center gap-1 text-[11px]"
+            >
+              <Code className="w-3.5 h-3.5 text-purple-400" />
+              <span>github.com/webstudio-is/webstudio</span>
+            </a>
+          </div>
+          <div className="flex items-center gap-4 text-[11px] font-bold text-slate-300">
+            <span>🌳 DOM Tree Sync : Active</span>
+            <span>🎨 Radix UI Primitives : Enabled</span>
+            <span>⚡ CSS Flex & Grid Tokens : Ready</span>
+          </div>
+        </div>
+      )}
 
       {/* 2. MAIN BUILDER BODY (PALETTE SIDEBAR & CANVAS) */}
       <div className="flex-1 flex overflow-hidden">
