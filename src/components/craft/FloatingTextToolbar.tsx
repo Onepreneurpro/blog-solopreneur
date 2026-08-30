@@ -81,18 +81,45 @@ export const FloatingTextToolbar = () => {
     document.execCommand(command, false, value);
   };
 
-  const wrapSelectionWithStyle = (cssText: string) => {
+  const removeAllFormattingFromSelection = () => {
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || !selection.rangeCount) return;
 
     const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.cssText = cssText;
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === Node.TEXT_NODE) container = container.parentElement!;
 
-    try {
-      range.surroundContents(span);
-    } catch (e) {
-      document.execCommand('styleWithCSS', false, 'true');
+    const element = container as HTMLElement;
+    const formattingSpans = element.querySelectorAll('span[style]');
+    formattingSpans.forEach((sp) => {
+      const html = sp.innerHTML;
+      sp.outerHTML = html;
+    });
+
+    document.execCommand('removeFormat', false);
+  };
+
+  const applyCurrentHighlight = (color: string) => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
+
+    const existingSpan = (parent as HTMLElement).closest('span[style*="background-color"]');
+    if (existingSpan) {
+      (existingSpan as HTMLElement).style.backgroundColor = color;
+    } else {
+      const span = document.createElement('span');
+      span.style.cssText = `background-color: ${color}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`;
+      try {
+        range.surroundContents(span);
+      } catch (e) {
+        const contents = range.extractContents();
+        span.appendChild(contents);
+        range.insertNode(span);
+      }
     }
   };
 
@@ -102,8 +129,32 @@ export const FloatingTextToolbar = () => {
     thickness = underlineThickness,
     offset = underlineOffset
   ) => {
-    const cssText = `text-decoration: underline ${style}; text-decoration-color: ${color}; text-decoration-thickness: ${thickness}px; text-underline-offset: ${offset}px; position: relative; z-index: 10;`;
-    wrapSelectionWithStyle(cssText);
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    let parent = range.commonAncestorContainer;
+    if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
+
+    const existingSpan = (parent as HTMLElement).closest('span[style*="text-decoration"]');
+
+    if (existingSpan) {
+      const spanEl = existingSpan as HTMLElement;
+      spanEl.style.textDecoration = `underline ${style}`;
+      spanEl.style.textDecorationColor = color;
+      spanEl.style.textDecorationThickness = `${thickness}px`;
+      spanEl.style.textUnderlineOffset = `${offset}px`;
+    } else {
+      const span = document.createElement('span');
+      span.style.cssText = `text-decoration: underline ${style}; text-decoration-color: ${color}; text-decoration-thickness: ${thickness}px; text-underline-offset: ${offset}px;`;
+      try {
+        range.surroundContents(span);
+      } catch (e) {
+        const contents = range.extractContents();
+        span.appendChild(contents);
+        range.insertNode(span);
+      }
+    }
   };
 
   const menuPosClass = openUpward ? 'bottom-full mb-3' : 'top-full mt-3';
@@ -179,7 +230,7 @@ export const FloatingTextToolbar = () => {
                   key={c.color}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    wrapSelectionWithStyle(`background-color: ${c.color}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`);
+                    applyCurrentHighlight(c.color);
                     setShowHighlightMenu(false);
                   }}
                   className="w-7 h-7 rounded-xl border border-slate-300 transition-transform hover:scale-115 shadow-xs cursor-pointer"
@@ -201,7 +252,7 @@ export const FloatingTextToolbar = () => {
               <button
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  wrapSelectionWithStyle(`background-color: ${customHighlightColor}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`);
+                  applyCurrentHighlight(customHighlightColor);
                   setShowHighlightMenu(false);
                 }}
                 className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
@@ -213,7 +264,7 @@ export const FloatingTextToolbar = () => {
             <button
               onMouseDown={(e) => {
                 e.preventDefault();
-                applyFormat('removeFormat');
+                removeAllFormattingFromSelection();
                 setShowHighlightMenu(false);
               }}
               className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
@@ -363,7 +414,7 @@ export const FloatingTextToolbar = () => {
             <button
               onMouseDown={(e) => {
                 e.preventDefault();
-                applyFormat('removeFormat');
+                removeAllFormattingFromSelection();
                 setShowUnderlineMenu(false);
               }}
               className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
@@ -446,7 +497,7 @@ export const FloatingTextToolbar = () => {
       <button
         onMouseDown={(e) => {
           e.preventDefault();
-          applyFormat('removeFormat');
+          removeAllFormattingFromSelection();
         }}
         className="p-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded-full transition-colors text-rose-700 font-black text-xs flex items-center gap-1"
         title="Effacer les mises en forme"
