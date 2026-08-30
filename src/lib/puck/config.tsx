@@ -127,8 +127,6 @@ export const puckConfig: Config<PuckProps> = {
         imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
       },
       render: ({ title, subtitle, buttonText, buttonLink, bgGradient, imageUrl, ...props }: any) => {
-        const fileInputRef = React.useRef<HTMLInputElement>(null);
-
         const updateProp = (key: string, value: any) => {
           if (props.onChange) {
             props.onChange({ [key]: value });
@@ -177,16 +175,13 @@ export const puckConfig: Config<PuckProps> = {
                 </div>
               </div>
 
-              {/* INLINE IMAGE FRAME WITH INSTANT SINGLE-CLICK FILE UPLOAD */}
+              {/* INLINE IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL */}
               <div className="w-full md:w-1/2 flex justify-center">
-                <div
+                <label
                   onMouseDown={(e) => e.stopPropagation()}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
+                  onClick={(e) => e.stopPropagation()}
                   title="Cliquez pour choisir un fichier image sur votre PC"
-                  className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto"
+                  className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto block"
                 >
                   {imageUrl ? (
                     <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none pointer-events-none" />
@@ -210,6 +205,7 @@ export const puckConfig: Config<PuckProps> = {
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         updateProp('imageUrl', '');
                       }}
                       title="Supprimer l image"
@@ -219,10 +215,9 @@ export const puckConfig: Config<PuckProps> = {
                     </button>
                   )}
 
-                  {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
+                  {/* HIDDEN NATIVE FILE INPUT */}
                   <input
                     type="file"
-                    ref={fileInputRef}
                     accept="image/*"
                     className="hidden"
                     onChange={(e) => {
@@ -234,7 +229,7 @@ export const puckConfig: Config<PuckProps> = {
                       }
                     }}
                   />
-                </div>
+                </label>
               </div>
             </div>
           </div>
@@ -475,8 +470,6 @@ export const puckConfig: Config<PuckProps> = {
         imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
-        const fileInputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
-
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -556,15 +549,12 @@ export const puckConfig: Config<PuckProps> = {
                     <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
                   </div>
 
-                  {/* IMAGE FRAME WITH DIRECT INSTANT SINGLE-CLICK FILE PICKER */}
-                  <div
+                  {/* IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL */}
+                  <label
                     onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      fileInputRefs.current[i]?.click();
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                     title="Cliquez pour choisir un fichier image sur votre PC"
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
                     {col.img ? (
@@ -589,6 +579,7 @@ export const puckConfig: Config<PuckProps> = {
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           updateProp(col.imgKey, '');
                         }}
                         title="Supprimer l image (1 clic)"
@@ -598,10 +589,9 @@ export const puckConfig: Config<PuckProps> = {
                       </button>
                     )}
 
-                    {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
+                    {/* HIDDEN NATIVE FILE INPUT */}
                     <input
                       type="file"
-                      ref={(el) => { fileInputRefs.current[i] = el; }}
                       accept="image/*"
                       className="hidden"
                       onChange={(e) => {
@@ -613,7 +603,7 @@ export const puckConfig: Config<PuckProps> = {
                         }
                       }}
                     />
-                  </div>
+                  </label>
 
                   {/* INLINE EDITABLE TITLE DIRECTLY ON CANVAS BLOCK */}
                   <input
@@ -680,8 +670,6 @@ export const puckConfig: Config<PuckProps> = {
         imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
-        const fileInputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
-
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -756,14 +744,11 @@ export const puckConfig: Config<PuckProps> = {
                     <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
                   </div>
 
-                  <div
+                  <label
                     onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      fileInputRefs.current[i]?.click();
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                     title="Cliquez pour choisir un fichier image sur votre PC"
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
                     {col.img ? (
@@ -788,6 +773,7 @@ export const puckConfig: Config<PuckProps> = {
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           updateProp(col.imgKey, '');
                         }}
                         title="Supprimer l image (1 clic)"
@@ -797,10 +783,9 @@ export const puckConfig: Config<PuckProps> = {
                       </button>
                     )}
 
-                    {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
+                    {/* HIDDEN NATIVE FILE INPUT */}
                     <input
                       type="file"
-                      ref={(el) => { fileInputRefs.current[i] = el; }}
                       accept="image/*"
                       className="hidden"
                       onChange={(e) => {
@@ -812,7 +797,7 @@ export const puckConfig: Config<PuckProps> = {
                         }
                       }}
                     />
-                  </div>
+                  </label>
 
                   <input
                     type="text"

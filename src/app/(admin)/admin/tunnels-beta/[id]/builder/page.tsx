@@ -170,18 +170,41 @@ export default function PuckBuilderPage() {
         </div>
       </header>
 
-      {/* PUCK EDITOR WORKSPACE WITH NATURAL CHROME WINDOW SCROLL */}
+      {/* PUCK EDITOR WORKSPACE WITH GLOBAL OVERRIDES */}
       <div className="flex-1 w-full bg-slate-100 text-slate-900">
         <style jsx global>{`
-          .Puck-component input,
-          .Puck-component textarea,
-          .Puck-component label,
-          .Puck-component button,
-          [data-puck-component] input,
-          [data-puck-component] textarea,
-          [data-puck-component] label,
-          [data-puck-component] button {
-            pointer-events: auto;
+          /* Eliminate forced grab/hand cursor across all Puck canvas components */
+          [class*="_PuckCanvas_"] *,
+          [class*="PuckCanvas"] *,
+          [data-puck-component] *,
+          .Puck * {
+            cursor: auto;
+          }
+
+          /* Ensure images and input labels have explicit pointer cursor & direct clickability */
+          label,
+          label *,
+          button,
+          a {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+          }
+
+          input[type="text"],
+          textarea {
+            cursor: text !important;
+            pointer-events: auto !important;
+          }
+
+          /* Prevent independent internal scrollbars on the 3 Puck layout panels */
+          [class*="_Sidebar_"],
+          [class*="_PuckCanvas_"],
+          [class*="PuckCanvas"],
+          [class*="Sidebar"] {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            overflow-y: visible !important;
           }
         `}</style>
         <Puck
