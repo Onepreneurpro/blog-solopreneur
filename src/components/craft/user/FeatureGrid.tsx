@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
 
@@ -42,6 +42,8 @@ export const FeatureGrid = ({
   imgHeight = 220,
   borderRadius = 16,
 }: FeatureGridProps) => {
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -85,7 +87,7 @@ export const FeatureGrid = ({
     );
   }
 
-  // BUILDER EDITOR VIEW
+  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE EXPLORER
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -97,61 +99,64 @@ export const FeatureGrid = ({
     >
       <div className={`grid ${gridCols} gap-6`}>
         {items.map((col, i) => {
-          const inputId = `craft-grid-img-${id}-${i}`;
-
           return (
             <div key={i} className="flex flex-col items-center text-center space-y-3">
-              {/* IMAGE FRAME WITH FILE PICKER */}
-              <div className="w-full relative group/img overflow-hidden shadow-md" style={{ borderRadius: `${borderRadius}px` }}>
-                <label
-                  htmlFor={inputId}
-                  className="block cursor-pointer relative"
-                  style={{ height: `${imgHeight}px` }}
-                >
-                  {col.img ? (
-                    <img
-                      src={col.img}
-                      alt={col.title}
-                      className="w-full h-full object-cover select-none pointer-events-none"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
-                      <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
-                      <span>🖼️ Aucune photo</span>
-                    </div>
-                  )}
-
-                  {/* HOVER OVERLAY */}
-                  <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-1 p-2 text-center pointer-events-none">
+              {/* IMAGE FRAME WITH DOUBLE CLICK FILE PICKER */}
+              <div
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRefs.current[i]?.click();
+                }}
+                title="1 clic : Sélectionner | Double-clic : Choisir un fichier PC"
+                className="w-full relative group/img overflow-hidden shadow-md cursor-pointer"
+                style={{ height: `${imgHeight}px`, borderRadius: `${borderRadius}px` }}
+              >
+                {col.img ? (
+                  <img
+                    src={col.img}
+                    alt={col.title}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
                     <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
-                    <span className="px-2.5 py-1 bg-[#00A0FF] text-white font-black text-[10px] rounded-md shadow-md">
-                      📁 Photo PC
-                    </span>
+                    <span>🖼️ Aucune photo</span>
                   </div>
+                )}
 
-                  {/* TRASH BUTTON */}
-                  {col.img && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        setProp((props: FeatureGridProps) => {
-                          const updated = [...(props.items || [])];
-                          updated[i] = { ...updated[i], img: '' };
-                          props.items = updated;
-                        });
-                      }}
-                      title="Supprimer l image (1 clic)"
-                      className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </label>
+                {/* HOVER OVERLAY */}
+                <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-1 p-2 text-center pointer-events-none">
+                  <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                  <span className="px-2.5 py-1 bg-[#00A0FF] text-white font-black text-[10px] rounded-md shadow-md">
+                    📁 Double-clic photo (PC)
+                  </span>
+                </div>
 
+                {/* TRASH BUTTON */}
+                {col.img && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setProp((props: FeatureGridProps) => {
+                        const updated = [...(props.items || [])];
+                        updated[i] = { ...updated[i], img: '' };
+                        props.items = updated;
+                      });
+                    }}
+                    title="Supprimer l image (1 clic)"
+                    className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* HIDDEN INPUT */}
                 <input
-                  id={inputId}
+                  ref={(el) => {
+                    fileInputRefs.current[i] = el;
+                  }}
                   type="file"
                   accept="image/*"
                   className="hidden"

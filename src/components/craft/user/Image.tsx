@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
 
@@ -19,6 +19,8 @@ export const Image = ({
   borderRadius = 20,
   align = 'center',
 }: ImageProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -31,8 +33,6 @@ export const Image = ({
   } = useNode((node) => ({
     selected: node.events.selected,
   }));
-
-  const inputId = `craft-img-input-${id}`;
 
   const alignClasses = {
     left: 'justify-start',
@@ -56,7 +56,7 @@ export const Image = ({
     );
   }
 
-  // BUILDER EDITOR VIEW
+  // BUILDER EDITOR VIEW: 1 CLICK = SELECT ELEMENT / DOUBLE CLICK = FILE EXPLORER
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -66,58 +66,60 @@ export const Image = ({
         selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-2xl' : ''
       }`}
     >
-      <div className="relative group/img max-w-full overflow-hidden shadow-xl" style={{ borderRadius: `${borderRadius}px` }}>
-        <label
-          htmlFor={inputId}
-          className="block cursor-pointer relative"
-          style={{ height: `${height}px` }}
-        >
-          {src ? (
-            <img
-              src={src}
-              alt={alt}
-              className="w-full h-full object-cover select-none pointer-events-none"
-            />
-          ) : (
-            <div
-              className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-6 gap-2"
-            >
-              <FolderOpen className="w-8 h-8 text-[#00A0FF]" />
-              <span>🖼️ Aucune image sélectionnée</span>
-              <span className="text-[10px] text-slate-500 font-normal">Cliquez pour choisir un fichier PC</span>
-            </div>
-          )}
-
-          {/* HOVER OVERLAY */}
-          <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-2 p-3 text-center pointer-events-none">
+      <div
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          fileInputRef.current?.click();
+        }}
+        title="1 clic : Sélectionner l image | Double-clic : Choisir un fichier PC"
+        className="relative group/img max-w-full overflow-hidden shadow-xl cursor-pointer"
+        style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={alt}
+            className="w-full h-full object-cover select-none pointer-events-none"
+          />
+        ) : (
+          <div
+            className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-6 gap-2"
+          >
             <FolderOpen className="w-8 h-8 text-[#00A0FF]" />
-            <span className="px-3 py-1.5 bg-[#00A0FF] text-white font-black text-xs rounded-xl shadow-lg">
-              📁 Choisir une photo (PC)
-            </span>
+            <span>🖼️ Aucune image sélectionnée</span>
+            <span className="text-[10px] text-slate-500 font-normal">Double-cliquez pour choisir un fichier PC</span>
           </div>
+        )}
 
-          {/* TRASH ICON BUTTON */}
-          {src && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                setProp((props: ImageProps) => {
-                  props.src = '';
-                });
-              }}
-              title="Supprimer l image (1 clic)"
-              className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
-        </label>
+        {/* HOVER OVERLAY */}
+        <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-2 p-3 text-center pointer-events-none">
+          <FolderOpen className="w-8 h-8 text-[#00A0FF]" />
+          <span className="px-3 py-1.5 bg-[#00A0FF] text-white font-black text-xs rounded-xl shadow-lg">
+            📁 Double-cliquez pour choisir (PC)
+          </span>
+        </div>
 
-        {/* HIDDEN INPUT LINKED BY HTMLFOR */}
+        {/* TRASH ICON BUTTON */}
+        {src && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setProp((props: ImageProps) => {
+                props.src = '';
+              });
+            }}
+            title="Supprimer l image (1 clic)"
+            className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* HIDDEN FILE INPUT */}
         <input
-          id={inputId}
+          ref={fileInputRef}
           type="file"
           accept="image/*"
           className="hidden"
