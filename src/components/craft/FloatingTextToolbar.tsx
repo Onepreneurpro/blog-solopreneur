@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bold, Italic, Highlighter, Underline, Palette, RemoveFormatting, X, Sliders } from 'lucide-react';
+import { Bold, Italic, Highlighter, Underline, Palette, RemoveFormatting, X } from 'lucide-react';
 
 export const FloatingTextToolbar = () => {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const [openUpward, setOpenUpward] = useState(false);
   const [showHighlightMenu, setShowHighlightMenu] = useState(false);
   const [showUnderlineMenu, setShowUnderlineMenu] = useState(false);
   const [showTextColorMenu, setShowTextColorMenu] = useState(false);
@@ -53,9 +54,14 @@ export const FloatingTextToolbar = () => {
       const rect = range.getBoundingClientRect();
 
       if (rect && rect.width > 0 && rect.height > 0) {
+        const spaceBelow = window.innerHeight - rect.bottom;
+        setOpenUpward(spaceBelow < 340);
+
+        const clampedLeft = Math.max(150, Math.min(window.innerWidth - 150, rect.left + rect.width / 2));
+
         setPosition({
           top: Math.max(12, rect.top - 54),
-          left: rect.left + rect.width / 2,
+          left: clampedLeft,
         });
       }
     };
@@ -99,6 +105,8 @@ export const FloatingTextToolbar = () => {
     const cssText = `text-decoration: underline ${style}; text-decoration-color: ${color}; text-decoration-thickness: ${thickness}px; text-underline-offset: ${offset}px; position: relative; z-index: 10;`;
     wrapSelectionWithStyle(cssText);
   };
+
+  const menuPosClass = openUpward ? 'bottom-full mb-2' : 'top-full mt-2';
 
   return (
     <div
@@ -152,7 +160,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {showHighlightMenu && (
-          <div className="absolute top-full mt-2 left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[200px]">
+          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[200px] ${menuPosClass}`}>
             <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Couleur de Feutre</span>
             <div className="grid grid-cols-5 gap-1.5">
               {[
@@ -233,7 +241,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {showUnderlineMenu && (
-          <div className="absolute top-full mt-2 left-0 bg-slate-900 border border-slate-700 rounded-2xl p-3 shadow-2xl flex flex-col gap-2.5 z-50 min-w-[250px]">
+          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-3 shadow-2xl flex flex-col gap-2.5 z-50 min-w-[250px] ${menuPosClass}`}>
             {/* STYLE SELECTOR */}
             <div className="space-y-1">
               <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Style de Trait</span>
@@ -382,7 +390,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {showTextColorMenu && (
-          <div className="absolute top-full mt-2 left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[180px]">
+          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[180px] ${menuPosClass}`}>
             <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Couleur de Texte</span>
             <div className="grid grid-cols-5 gap-1.5">
               {[
