@@ -175,11 +175,11 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     );
   }
 
-  // RENDER LEGACY BUILDER PAGE IF CUSTOM ELEMENTS ARRAY
+  // RENDER MAISON BUILDER PAGE IF CUSTOM ELEMENTS ARRAY
   if (customElements) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-12">
-        <div className="max-w-4xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
+        <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
           <div className="flex items-center gap-2 font-heading font-black text-lg">
             <span className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center text-sm font-extrabold shadow-md">
               O
@@ -187,15 +187,15 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             <span>Onepreneur&Co</span>
           </div>
           <span className="px-3 py-1 rounded-full bg-slate-900 text-amber-300 border border-slate-800 text-xs font-bold">
-            🎁 100% GRATUIT
+            🎁 ACCÈS RÉSULTATS
           </span>
         </div>
 
-        <div className="max-w-3xl mx-auto w-full my-8 space-y-6">
-          {customElements.map((el) => {
+        <div className="max-w-4xl mx-auto w-full my-8 space-y-8">
+          {customElements.map((el: any) => {
             if (el.type === 'Heading') {
               return (
-                <h1 key={el.id} className="text-3xl sm:text-5xl font-heading font-black text-white leading-tight text-center sm:text-left">
+                <h1 key={el.id} className="text-3xl sm:text-5xl font-heading font-black text-white leading-tight text-center">
                   {el.content}
                 </h1>
               );
@@ -203,9 +203,131 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
             if (el.type === 'Text') {
               return (
-                <p key={el.id} className="text-base text-slate-300 leading-relaxed font-medium">
-                  {el.content}
-                </p>
+                <div
+                  key={el.id}
+                  className="text-base text-slate-300 leading-relaxed font-medium text-center max-w-2xl mx-auto"
+                  dangerouslySetInnerHTML={{ __html: el.content }}
+                />
+              );
+            }
+
+            if (el.type === 'Countdown') {
+              return (
+                <div key={el.id} className="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center max-w-sm mx-auto space-y-2">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">⏳ Temps Restant</span>
+                  <div className="text-4xl font-mono font-black text-white tracking-widest">{el.content || '24:00:00'}</div>
+                </div>
+              );
+            }
+
+            if (el.type === 'ButtonCTA') {
+              return (
+                <div key={el.id} className="text-center pt-2">
+                  <a
+                    href="#optin"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-heading font-black text-base rounded-2xl shadow-xl transition-all hover:scale-105"
+                  >
+                    {el.content || 'Accéder Maintenant 🚀'}
+                  </a>
+                </div>
+              );
+            }
+
+            if (el.type === 'OptinForm') {
+              return (
+                <div key={el.id} id="optin" className="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+                  <div className="text-center font-heading font-black text-lg text-white">
+                    {el.content || 'Recevez votre accès offert par email'}
+                  </div>
+                  {success ? (
+                    <div className="p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-2xl text-center font-bold text-xs">
+                      ✓ Inscription validée ! Redirection en cours...
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                      {errorMsg && (
+                        <div className="p-2.5 bg-rose-500/20 text-rose-300 text-xs rounded-xl">{errorMsg}</div>
+                      )}
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Votre Prénom..."
+                        className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                      />
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Votre Adresse Email *"
+                        className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                      />
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-sm py-3.5 rounded-xl shadow-lg"
+                      >
+                        {submitting ? 'Validation...' : 'Recevoir mon accès gratuit'}
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockFeat4ColImg' || el.type === 'BlockFeat3ColImg') {
+              const items = el.data?.items || [];
+              const cols = el.type === 'BlockFeat4ColImg' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+
+              return (
+                <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
+                  {el.data?.title && (
+                    <h3 className="text-2xl font-heading font-black text-white text-center">
+                      {el.data.title}
+                    </h3>
+                  )}
+                  <div className={`grid ${cols} gap-6`}>
+                    {items.map((it: any, idx: number) => (
+                      <div key={idx} className="space-y-3 flex flex-col items-center text-center bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                        {it.img && (
+                          <div className="w-full h-36 rounded-xl overflow-hidden shadow-md">
+                            <img src={it.img} alt={it.title} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <h4 className="font-heading font-extrabold text-sm text-white uppercase">{it.title}</h4>
+                        <p className="text-xs text-slate-400 font-medium leading-relaxed">{it.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockFeat2ColIconsLeft' || el.type === 'BlockFeat4ColDark') {
+              const items = el.data?.items || [];
+
+              return (
+                <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
+                  {el.data?.title && (
+                    <h3 className="text-2xl font-heading font-black text-white text-center">
+                      {el.data.title}
+                    </h3>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {items.map((it: any, idx: number) => (
+                      <div key={idx} className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-[#00A0FF] flex items-center justify-center font-bold shrink-0 mt-0.5">
+                          ✓
+                        </div>
+                        <div>
+                          <h4 className="font-heading font-extrabold text-sm text-white">{it.title}</h4>
+                          <p className="text-xs text-slate-400 font-medium leading-relaxed mt-1">{it.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               );
             }
 
@@ -217,7 +339,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           })}
         </div>
 
-        <div className="max-w-4xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
+        <div className="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
           © {new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.
         </div>
       </div>

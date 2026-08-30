@@ -66,57 +66,7 @@ interface Funnel {
   automationRules: AutomationRule[];
 }
 
-const CAPTURE_TEMPLATES = [
-  {
-    id: 'ebook-optin-1',
-    name: 'Votre emploi de rêve n est qu à un clic',
-    category: 'Capture eBook & Lead',
-    previewImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
-    description: 'Header avec photo créateur, puces d avantages et formulaire d inscription rapide.',
-  },
-  {
-    id: 'dark-theater',
-    name: 'Votre aventure théâtrale vous attend',
-    category: 'Dark Minimalist',
-    previewImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
-    description: 'Design sombre haut de gamme avec vidéo de fond et titre impactant.',
-  },
-  {
-    id: 'country-lane',
-    name: 'Amusez-vous à la ferme Country Lane !',
-    category: 'Full Hero Image',
-    previewImage: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80',
-    description: 'Bannière panoramique nature avec formulaire transparent sur overlay.',
-  },
-  {
-    id: 'black-friday-flash',
-    name: 'BLACK FRIDAY Flash Deal',
-    category: 'Promotion & Offre Limitée',
-    previewImage: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=600&q=80',
-    description: 'Fond sombre avec accents vert fluo, compte à rebours et appel à l action fort.',
-  },
-  {
-    id: 'webmaven-clean',
-    name: 'Webmaven - Plugins puissants',
-    category: 'SaaS & Moderne',
-    previewImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
-    description: 'Mise en page pastel claire avec logos partenaires et témoignages.',
-  },
-  {
-    id: 'machine-envouter',
-    name: 'Machine à envouter (DJ & Music)',
-    category: 'Créatif & Vibrant',
-    previewImage: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
-    description: 'Design vibrant avec dégradé violet néon et capteur de leads optimisé.',
-  },
-  {
-    id: 'blank-page',
-    name: 'Page Vierge (Partir de zéro)',
-    category: 'Sur-mesure',
-    previewImage: 'https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=600&q=80',
-    description: 'Toile blanche vierge pour construire votre propre mise en page.',
-  },
-];
+import { MAISON_TEMPLATES, MaisonTemplate } from '@/lib/templates/maisonTemplates';
 
 export default function AdminFunnelDetailPage({ params }: { params: { id: string } }) {
   const [funnel, setFunnel] = useState<Funnel | null>(null);
@@ -172,7 +122,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
 
   const selectedStep = funnel?.steps.find((s) => s.id === selectedStepId);
 
-  const handleSelectTemplate = async (template: (typeof CAPTURE_TEMPLATES)[0]) => {
+  const handleSelectTemplate = async (template: MaisonTemplate) => {
     if (!selectedStep) return;
 
     try {
@@ -183,6 +133,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
           stepId: selectedStep.id,
           templateId: template.id,
           templateName: template.name,
+          content: JSON.stringify(template.elements),
         }),
       });
 
@@ -556,7 +507,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                 </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {CAPTURE_TEMPLATES.map((tmpl) => {
+                {MAISON_TEMPLATES.map((tmpl) => {
                   const isCurrent = selectedStep?.templateId === tmpl.id;
 
                   return (
