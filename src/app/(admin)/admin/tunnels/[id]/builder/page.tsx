@@ -529,7 +529,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-hidden">
+    <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden">
       
       {/* 1. TOP BUILDER TOOLBAR (INDEPENDENT WORKSPACE MODE) */}
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">

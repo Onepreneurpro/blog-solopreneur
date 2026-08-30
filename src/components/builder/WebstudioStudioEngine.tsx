@@ -409,7 +409,7 @@ export default function WebstudioStudioEngine({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col h-full w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
       {/* 1. TOP WEBSTUDIO STUDIO BAR */}
       <header className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shrink-0 shadow-md">
         <div className="flex items-center gap-4">
