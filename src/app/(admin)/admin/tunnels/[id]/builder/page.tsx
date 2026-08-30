@@ -562,10 +562,46 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               </div>
                             </div>
 
-                            {/* TAILLE DE L IMAGE */}
+                            {/* LARGEUR DE L IMAGE */}
                             <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
                               <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-slate-400">Taille de l image</span>
+                                <span className="text-slate-400">Largeur de l image</span>
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    value={currentSubItem.imgWidth || 280}
+                                    onChange={(e) => {
+                                      const val = Number(e.target.value);
+                                      const updatedItems = elItems.map((it: any, idx: number) =>
+                                        idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                    }}
+                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                                  />
+                                  <span className="text-slate-500 text-[10px]">px</span>
+                                </div>
+                              </div>
+                              <input
+                                type="range"
+                                min={50}
+                                max={800}
+                                value={currentSubItem.imgWidth || 280}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  const updatedItems = elItems.map((it: any, idx: number) =>
+                                    idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full accent-[#00A0FF]"
+                              />
+                            </div>
+
+                            {/* HAUTEUR / TAILLE DE L IMAGE */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-400">Hauteur / Taille de l image</span>
                                 <div className="flex items-center gap-1">
                                   <input
                                     type="number"
@@ -1677,19 +1713,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             return (
                               <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
-                                {/* CLICKABLE IMAGE CONTAINER WITH DYNAMIC HEIGHT & BORDER RADIUS */}
+                                {/* CLICKABLE IMAGE CONTAINER WITH DYNAMIC WIDTH, HEIGHT & BORDER RADIUS */}
                                 <div
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                   }}
-                                  className={`w-full overflow-hidden shadow-md transition-all cursor-pointer ${
+                                  className={`overflow-hidden shadow-md transition-all cursor-pointer ${
                                     isImgSel
                                       ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
                                       : 'hover:ring-4 hover:ring-[#00A0FF]/60'
                                   }`}
                                   style={{
+                                    width: col.imgWidth ? `${col.imgWidth}px` : '100%',
+                                    maxWidth: '100%',
                                     height: col.imgSize ? `${col.imgSize}px` : '280px',
                                     borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
                                   }}
