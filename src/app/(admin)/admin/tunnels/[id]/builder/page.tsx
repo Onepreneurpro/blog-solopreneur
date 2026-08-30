@@ -461,10 +461,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             (() => {
               const selectedEl = elements.find((el) => el.id === selectedElementId);
               if (!selectedEl) return null;
-              const elData = selectedEl.data || {};
+              const rawData = selectedEl.data || {};
+              const defaultData = getDefaultBlockData(selectedEl.type, selectedEl.content);
+              const elItems =
+                rawData.items && rawData.items.length > 0
+                  ? rawData.items
+                  : defaultData.items || [];
+              const elData = { ...defaultData, ...rawData, items: elItems };
+
               const currentSubItem =
-                selectedSubItem && selectedSubItem.blockId === selectedEl.id && elData.items?.[selectedSubItem.itemIndex]
-                  ? elData.items[selectedSubItem.itemIndex]
+                selectedSubItem && selectedSubItem.blockId === selectedEl.id && elItems[selectedSubItem.itemIndex]
+                  ? elItems[selectedSubItem.itemIndex]
                   : null;
 
               return (
@@ -518,7 +525,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     value={currentSubItem.img || ''}
                                     onChange={(e) => {
                                       const val = e.target.value;
-                                      const updatedItems = elData.items.map((it: any, idx: number) =>
+                                      const updatedItems = elItems.map((it: any, idx: number) =>
                                         idx === selectedSubItem.itemIndex ? { ...it, img: val } : it
                                       );
                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
@@ -538,7 +545,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           const reader = new FileReader();
                                           reader.onload = (uploadEv) => {
                                             const url = uploadEv.target?.result as string;
-                                            const updatedItems = elData.items.map((it: any, idx: number) =>
+                                            const updatedItems = elItems.map((it: any, idx: number) =>
                                               idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
                                             );
                                             handleUpdateElementData(selectedEl.id, { items: updatedItems });
