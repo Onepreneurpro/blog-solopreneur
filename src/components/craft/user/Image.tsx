@@ -3,9 +3,9 @@
 import React, { useRef } from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
-import { getBoxShadow } from './Text';
+import { getBoxShadow, SpacingProps, getSpacingStyles } from './Text';
 
-export interface ImageProps {
+export interface ImageProps extends SpacingProps {
   src?: string;
   alt?: string;
   height?: number;
@@ -31,6 +31,15 @@ export const Image = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
+  padding,
 }: ImageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,10 +64,22 @@ export const Image = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
 
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+  });
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
-      <div className={`my-4 flex ${alignClasses[align]} max-w-full mx-auto`} style={{ width: `${width}%` }}>
+      <div className={`my-4 flex ${alignClasses[align]} max-w-full mx-auto`} style={{ width: `${width}%`, ...spacingStyles }}>
         {src ? (
           <div
             className="w-full overflow-hidden"
@@ -80,7 +101,7 @@ export const Image = ({
       className={`my-4 flex ${alignClasses[align]} relative mx-auto ${
         selected ? 'ring-2 ring-[#00A0FF] p-1' : ''
       }`}
-      style={{ width: `${width}%` }}
+      style={{ width: `${width}%`, ...spacingStyles }}
     >
       <div
         onDoubleClick={(e) => {

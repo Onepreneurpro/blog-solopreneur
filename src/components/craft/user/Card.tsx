@@ -2,15 +2,14 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay, splitEmojiAndText } from './Text';
+import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay, splitEmojiAndText, SpacingProps, getSpacingStyles } from './Text';
 
-export interface CardProps {
+export interface CardProps extends SpacingProps {
   title?: string;
   content?: string;
   bgColor?: string;
   bgImage?: string;
   fontFamily?: string;
-  padding?: number;
   width?: number;
   height?: number;
   borderRadius?: number;
@@ -55,6 +54,14 @@ export const Card = ({
   underlineStyle = 'solid',
   underlineOffset = 2,
   targetText = 'title',
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -70,6 +77,17 @@ export const Card = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+  });
 
   const isTitleTargeted = targetText === 'title' || targetText === 'both';
   const isContentTargeted = targetText === 'content' || targetText === 'both';
@@ -97,11 +115,11 @@ export const Card = ({
         style={{
           ...bgStyles,
           fontFamily,
-          padding: `${padding}px`,
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
           borderRadius: `${borderRadius}px`,
           boxShadow,
+          ...spacingStyles,
         }}
       >
         <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
@@ -147,11 +165,11 @@ export const Card = ({
       style={{
         ...bgStyles,
         fontFamily,
-        padding: `${padding}px`,
         width: `${width}%`,
         minHeight: height ? `${height}px` : undefined,
         borderRadius: `${borderRadius}px`,
         boxShadow,
+        ...spacingStyles,
       }}
     >
       <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">

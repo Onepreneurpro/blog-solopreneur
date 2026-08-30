@@ -2,9 +2,16 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay, splitEmojiAndText } from './Text';
+import {
+  getBoxShadow,
+  getBackgroundStyles,
+  CreativeUnderlineOverlay,
+  splitEmojiAndText,
+  SpacingProps,
+  getSpacingStyles,
+} from './Text';
 
-export interface ButtonProps {
+export interface ButtonProps extends SpacingProps {
   text?: string;
   bgColor?: string;
   bgImage?: string;
@@ -15,8 +22,6 @@ export interface ButtonProps {
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
   href?: string;
-  paddingY?: number;
-  paddingX?: number;
   width?: number;
   height?: number;
   shadowPreset?: string;
@@ -62,6 +67,14 @@ export const Button = ({
   underlineThickness = 4,
   underlineStyle = 'solid',
   underlineOffset = 2,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -84,6 +97,19 @@ export const Button = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
   const { emoji, text: cleanText } = splitEmojiAndText(text);
+
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    paddingY,
+    paddingX,
+  });
 
   const highlightStyles: React.CSSProperties =
     highlightColor && highlightColor !== 'transparent'
@@ -110,9 +136,9 @@ export const Button = ({
             fontWeight,
             fontStyle,
             borderRadius: `${borderRadius}px`,
-            padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
+            ...spacingStyles,
           }}
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
@@ -152,10 +178,10 @@ export const Button = ({
           fontWeight,
           fontStyle,
           borderRadius: `${borderRadius}px`,
-          padding: `${paddingY}px ${paddingX}px`,
           minHeight: height ? `${height}px` : undefined,
           boxShadow,
           outline: 'none',
+          ...spacingStyles,
         }}
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >

@@ -3,7 +3,56 @@
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 
-export interface TextProps {
+export interface SpacingProps {
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  paddingRight?: number;
+  padding?: number;
+  paddingY?: number;
+  paddingX?: number;
+}
+
+export const getSpacingStyles = (props: SpacingProps): React.CSSProperties => {
+  const {
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+    paddingY,
+    paddingX,
+  } = props;
+
+  const topP = paddingTop !== undefined ? paddingTop : (paddingY !== undefined ? paddingY : (padding !== undefined ? padding : undefined));
+  const botP = paddingBottom !== undefined ? paddingBottom : (paddingY !== undefined ? paddingY : (padding !== undefined ? padding : undefined));
+  const leftP = paddingLeft !== undefined ? paddingLeft : (paddingX !== undefined ? paddingX : (padding !== undefined ? padding : undefined));
+  const rightP = paddingRight !== undefined ? paddingRight : (paddingX !== undefined ? paddingX : (padding !== undefined ? padding : undefined));
+
+  const styles: React.CSSProperties = {};
+
+  if (marginTop !== undefined) styles.marginTop = `${marginTop}px`;
+  if (marginBottom !== undefined) styles.marginBottom = `${marginBottom}px`;
+  if (marginLeft !== undefined) styles.marginLeft = `${marginLeft}px`;
+  if (marginRight !== undefined) styles.marginRight = `${marginRight}px`;
+
+  if (topP !== undefined) styles.paddingTop = `${topP}px`;
+  if (botP !== undefined) styles.paddingBottom = `${botP}px`;
+  if (leftP !== undefined) styles.paddingLeft = `${leftP}px`;
+  if (rightP !== undefined) styles.paddingRight = `${rightP}px`;
+
+  return styles;
+};
+
+export interface TextProps extends SpacingProps {
   text?: string;
   fontSize?: number;
   textAlign?: 'left' | 'center' | 'right';
@@ -164,6 +213,15 @@ export const Text = ({
   underlineThickness = 4,
   underlineStyle = 'solid',
   underlineOffset = 2,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
+  padding = 12,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -180,6 +238,18 @@ export const Text = ({
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+  });
+
   const { emoji, text: cleanText } = splitEmojiAndText(text);
 
   const highlightStyles: React.CSSProperties =
@@ -198,13 +268,14 @@ export const Text = ({
   if (!enabled) {
     return (
       <div
-        className="my-2 p-3 max-w-full mx-auto flex items-center justify-center"
+        className="my-2 max-w-full mx-auto flex items-center justify-center"
         style={{
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
           borderRadius: `${borderRadius}px`,
           boxShadow,
           ...bgStyles,
+          ...spacingStyles,
         }}
       >
         <Tag
@@ -240,7 +311,7 @@ export const Text = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-3 relative transition-all mx-auto flex items-center justify-center ${
+      className={`my-2 relative transition-all mx-auto flex items-center justify-center ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
       style={{
@@ -249,6 +320,7 @@ export const Text = ({
         borderRadius: `${borderRadius}px`,
         boxShadow,
         ...bgStyles,
+        ...spacingStyles,
       }}
     >
       <Tag

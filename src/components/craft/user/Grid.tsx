@@ -3,14 +3,13 @@
 import React from 'react';
 import { useNode, useEditor, Element } from '@craftjs/core';
 import { Container } from './Container';
-import { Text } from './Text';
+import { Text, SpacingProps, getSpacingStyles } from './Text';
 
-export interface GridProps {
+export interface GridProps extends SpacingProps {
   columns?: 1 | 2 | 3 | 4;
   columnWidths?: number[];
   gap?: number;
   bgColor?: string;
-  padding?: number;
   borderRadius?: number;
 }
 
@@ -21,6 +20,14 @@ export const Grid = ({
   bgColor = '#ffffff',
   padding = 20,
   borderRadius = 20,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
 }: GridProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -96,6 +103,18 @@ export const Grid = ({
     window.addEventListener('mouseup', onMouseUp);
   };
 
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+  });
+
   // PUBLIC READ-ONLY VIEW FOR VISITORS
   if (!enabled) {
     return (
@@ -103,8 +122,8 @@ export const Grid = ({
         className="my-6 w-full"
         style={{
           backgroundColor: bgColor,
-          padding: `${padding}px`,
           borderRadius: `${borderRadius}px`,
+          ...spacingStyles,
         }}
       >
         <div className="flex flex-col md:flex-row w-full items-stretch" style={{ gap: `${gap}px` }}>
@@ -137,13 +156,13 @@ export const Grid = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-6 w-full p-4 border border-slate-200 shadow-sm transition-all rounded-3xl bg-white ${
+      className={`my-6 w-full border border-slate-200 shadow-sm transition-all rounded-3xl bg-white ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
       style={{
         backgroundColor: bgColor,
-        padding: `${padding}px`,
         borderRadius: `${borderRadius}px`,
+        ...spacingStyles,
       }}
     >
       <div className="craft-grid-container flex flex-col md:flex-row w-full items-stretch" style={{ gap: `${gap}px` }}>

@@ -2,13 +2,12 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, SpacingProps, getSpacingStyles } from './Text';
 
-export interface ContainerProps {
+export interface ContainerProps extends SpacingProps {
   bgGradient?: string;
   bgColor?: string;
   bgImage?: string;
-  padding?: number;
   margin?: number;
   borderRadius?: number;
   width?: number;
@@ -35,6 +34,14 @@ export const Container = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
   children,
 }: ContainerProps) => {
   const { enabled } = useEditor((state) => ({
@@ -54,6 +61,17 @@ export const Container = ({
       : getBackgroundStyles(bgColor, bgImage);
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+  const spacingStyles = getSpacingStyles({
+    marginTop,
+    marginBottom,
+    marginLeft,
+    marginRight,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    padding,
+  });
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -62,12 +80,11 @@ export const Container = ({
         className={`relative mx-auto ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
         style={{
           ...(typeof bgStyle === 'object' ? bgStyle : {}),
-          padding: `${padding}px`,
-          margin: `${margin}px auto`,
           borderRadius: `${borderRadius}px`,
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
           boxShadow,
+          ...spacingStyles,
         }}
       >
         {children}
@@ -86,12 +103,11 @@ export const Container = ({
       } ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
       style={{
         ...(typeof bgStyle === 'object' ? bgStyle : {}),
-        padding: `${padding}px`,
-        margin: `${margin}px auto`,
         borderRadius: `${borderRadius}px`,
         width: `${width}%`,
         minHeight: height ? `${height}px` : undefined,
         boxShadow,
+        ...spacingStyles,
       }}
     >
       {children}

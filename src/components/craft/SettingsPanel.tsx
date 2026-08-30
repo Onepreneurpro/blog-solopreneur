@@ -550,51 +550,168 @@ export const SettingsPanel = () => {
           )}
         </div>
 
-        {/* BUTTON HEIGHT CONTROL (PADDING Y) */}
-        {props.paddingY !== undefined && (
-          <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
-            <div className="flex justify-between font-black text-slate-900 text-xs">
-              <span>↕️ Hauteur du Bouton (Padding Y)</span>
-              <span className="text-[#00A0FF] font-mono">{props.paddingY}px</span>
-            </div>
-            <input
-              type="range"
-              min={6}
-              max={36}
-              step={2}
-              value={props.paddingY}
-              onChange={(e) =>
-                actions.setProp(id, (nodeProps: any) => {
-                  nodeProps.paddingY = parseInt(e.target.value, 10);
-                })
-              }
-              className="w-full accent-[#00A0FF]"
-            />
+        {/* UNIFIED ADVANCED MARGIN & PADDING CONTROLS FOR ALL COMPONENTS */}
+        <div className="space-y-3 bg-[#f0f7ff] p-3.5 rounded-2xl border border-blue-200 shadow-xs">
+          <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+            <span>📏 Marges Extérieures & Intérieures</span>
           </div>
-        )}
 
-        {/* CONTAINER / CARD PADDING (VERTICAL HEIGHT & SPACING) */}
-        {props.padding !== undefined && (
-          <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
-            <div className="flex justify-between font-black text-slate-900 text-xs">
-              <span>↕️ Hauteur Interne (Padding)</span>
-              <span className="text-[#00A0FF] font-mono">{props.padding}px</span>
+          {/* MARGIN CONTROLS (TOP, BOTTOM, LEFT, RIGHT) */}
+          <div className="space-y-2 pt-1">
+            <label className="font-extrabold text-slate-800 text-[11px] flex items-center gap-1">
+              <span>📐 Marges Extérieures (Margin - Distance du bloc)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Haut (Top)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.marginTop !== undefined ? props.marginTop : 0}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.marginTop = parseInt(e.target.value, 10) || 0;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Bas (Bottom)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.marginBottom !== undefined ? props.marginBottom : 0}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.marginBottom = parseInt(e.target.value, 10) || 0;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Gauche (Left)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.marginLeft !== undefined ? props.marginLeft : 0}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.marginLeft = parseInt(e.target.value, 10) || 0;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Droite (Right)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.marginRight !== undefined ? props.marginRight : 0}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.marginRight = parseInt(e.target.value, 10) || 0;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
             </div>
-            <input
-              type="range"
-              min={4}
-              max={120}
-              step={4}
-              value={props.padding}
-              onChange={(e) =>
-                actions.setProp(id, (nodeProps: any) => {
-                  nodeProps.padding = parseInt(e.target.value, 10);
-                })
-              }
-              className="w-full accent-[#00A0FF]"
-            />
           </div>
-        )}
+
+          {/* PADDING CONTROLS (TOP, BOTTOM, LEFT, RIGHT) */}
+          <div className="space-y-2 pt-2 border-t border-blue-200/80">
+            <label className="font-extrabold text-slate-800 text-[11px] flex items-center gap-1">
+              <span>📥 Marges Intérieures (Padding - Espacement interne)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Haut (Top)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.paddingTop !== undefined ? props.paddingTop : (props.paddingY !== undefined ? props.paddingY : (props.padding !== undefined ? props.padding : 0))}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        const val = parseInt(e.target.value, 10) || 0;
+                        nodeProps.paddingTop = val;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Bas (Bottom)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.paddingBottom !== undefined ? props.paddingBottom : (props.paddingY !== undefined ? props.paddingY : (props.padding !== undefined ? props.padding : 0))}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        const val = parseInt(e.target.value, 10) || 0;
+                        nodeProps.paddingBottom = val;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Gauche (Left)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.paddingLeft !== undefined ? props.paddingLeft : (props.paddingX !== undefined ? props.paddingX : (props.padding !== undefined ? props.padding : 0))}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        const val = parseInt(e.target.value, 10) || 0;
+                        nodeProps.paddingLeft = val;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-600 mb-0.5">Droite (Right)</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={props.paddingRight !== undefined ? props.paddingRight : (props.paddingX !== undefined ? props.paddingX : (props.padding !== undefined ? props.padding : 0))}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        const val = parseInt(e.target.value, 10) || 0;
+                        nodeProps.paddingRight = val;
+                      })
+                    }
+                    className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold"
+                  />
+                  <span className="text-[10px] text-slate-400 font-bold">px</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* GRID COLUMNS SELECTOR (1, 2, 3, 4 COLUMNS) */}
         {props.columns !== undefined && (
