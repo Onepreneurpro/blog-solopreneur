@@ -2246,15 +2246,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <h1 className="text-2xl sm:text-4xl font-heading font-black text-white leading-tight">
-                        {el.content}
-                      </h1>
+                      <input
+                        type="text"
+                        value={el.content}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
+                        }}
+                        className="w-full text-2xl sm:text-4xl font-heading font-black text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1 transition-all hover:bg-white/5 focus:bg-slate-900/80"
+                        placeholder="Votre titre ici..."
+                      />
                     )}
 
                     {el.type === 'Text' && (
-                      <p className="text-sm text-slate-300 leading-relaxed font-medium">
-                        {el.content}
-                      </p>
+                      <textarea
+                        value={el.content}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
+                        }}
+                        rows={2}
+                        className="w-full text-sm text-slate-300 leading-relaxed font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none rounded-lg p-2 transition-all hover:bg-white/5 focus:bg-slate-900/80"
+                        placeholder="Votre texte ici..."
+                      />
                     )}
 
                     {el.type === 'BulletList' && (
@@ -2410,37 +2424,53 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                                 </div>
 
-                                {/* CLICKABLE TITLE WITH HIGHLIGHT */}
-                                <h3
+                                {/* INLINE LIVE EDITABLE TITLE ON CANVAS */}
+                                <input
+                                  type="text"
+                                  value={col.title || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, title: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items: updatedItems });
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'title' });
                                   }}
-                                  className={`font-heading font-black text-base tracking-wider uppercase transition-all rounded-lg px-2 py-0.5 cursor-pointer ${
+                                  className={`w-full text-center font-heading font-black text-base tracking-wider uppercase transition-all rounded-lg px-2 py-1 outline-none ${
                                     isTitleSel
-                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-[#00A0FF]'
-                                      : 'text-slate-900 hover:text-[#00A0FF]'
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50/90 text-[#00A0FF] shadow-sm'
+                                      : 'text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF]'
                                   }`}
-                                >
-                                  {col.title}
-                                </h3>
+                                  placeholder="Titre..."
+                                />
 
-                                {/* CLICKABLE PARAGRAPH DESCRIPTION WITH HIGHLIGHT */}
-                                <p
+                                {/* INLINE LIVE EDITABLE PARAGRAPH DESCRIPTION ON CANVAS */}
+                                <textarea
+                                  value={col.desc || ''}
+                                  rows={3}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, desc: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items: updatedItems });
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'desc' });
                                   }}
-                                  className={`text-xs leading-relaxed font-medium transition-all rounded-lg p-1 cursor-pointer ${
+                                  className={`w-full text-center text-xs leading-relaxed font-medium transition-all rounded-lg p-1.5 outline-none resize-none overflow-hidden ${
                                     isDescSel
-                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-slate-900 font-bold'
-                                      : 'text-slate-500 hover:text-slate-800'
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50/90 text-slate-900 font-bold shadow-sm'
+                                      : 'text-slate-500 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF]'
                                   }`}
-                                >
-                                  {col.desc}
-                                </p>
+                                  placeholder="Description..."
+                                />
                               </div>
                             );
                           })}
@@ -2561,34 +2591,53 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
 
                                 </div>
-                                <h4
+                                {/* INLINE LIVE EDITABLE TITLE ON CANVAS */}
+                                <input
+                                  type="text"
+                                  value={col.title || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, title: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items: updatedItems });
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'title' });
                                   }}
-                                  className={`font-heading font-extrabold text-sm transition-all rounded-lg px-2 py-0.5 cursor-pointer ${
+                                  className={`w-full text-center font-heading font-black text-sm tracking-wider uppercase transition-all rounded-lg px-2 py-1 outline-none ${
                                     isTitleSel
-                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-[#00A0FF]'
-                                      : 'text-slate-900 hover:text-[#00A0FF]'
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50/90 text-[#00A0FF] shadow-sm'
+                                      : 'text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF]'
                                   }`}
-                                >
-                                  {col.title}
-                                </h4>
-                                <p
+                                  placeholder="Titre..."
+                                />
+
+                                {/* INLINE LIVE EDITABLE PARAGRAPH DESCRIPTION ON CANVAS */}
+                                <textarea
+                                  value={col.desc || ''}
+                                  rows={3}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, desc: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items: updatedItems });
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'desc' });
                                   }}
-                                  className={`text-xs leading-relaxed transition-all rounded-lg p-1 cursor-pointer ${
+                                  className={`w-full text-center text-xs leading-relaxed font-medium transition-all rounded-lg p-1.5 outline-none resize-none overflow-hidden ${
                                     isDescSel
-                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50 text-slate-900 font-bold'
-                                      : 'text-slate-500 hover:text-slate-800'
+                                      ? 'ring-2 ring-[#00A0FF] bg-blue-50/90 text-slate-900 font-bold shadow-sm'
+                                      : 'text-slate-500 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF]'
                                   }`}
-                                >
-                                  {col.desc}
-                                </p>
+                                  placeholder="Description..."
+                                />
                               </div>
                             );
                           })}
