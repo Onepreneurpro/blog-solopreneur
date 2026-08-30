@@ -28,8 +28,8 @@ export const Card = ({
   padding = 24,
   width = 100,
   height,
-  borderRadius = 24,
-  shadowPreset = 'md',
+  borderRadius = 0,
+  shadowPreset = 'none',
   shadowBlur = 15,
   shadowOffsetY = 10,
   shadowColor = '#000000',
@@ -67,7 +67,7 @@ export const Card = ({
         <h3 className="font-heading font-black text-lg text-slate-900 px-1">
           {title}
         </h3>
-        <p className="text-sm font-medium text-slate-600 leading-relaxed p-1">
+        <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
           {content}
         </p>
       </div>
@@ -112,7 +112,7 @@ export const Card = ({
             props.content = e.currentTarget.innerText;
           });
         }}
-        className="text-sm font-medium text-slate-600 leading-relaxed outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md p-1 cursor-text"
+        className="text-sm font-medium text-[#475569] leading-relaxed outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md p-1 cursor-text"
       >
         {content}
       </p>
@@ -128,8 +128,8 @@ export const Card = ({
     bgColor: '#ffffff',
     padding: 24,
     width: 100,
-    borderRadius: 24,
-    shadowPreset: 'md',
+    borderRadius: 0,
+    shadowPreset: 'none',
   },
   rules: {
     canDrag: () => true,

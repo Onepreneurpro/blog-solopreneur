@@ -28,14 +28,14 @@ export const Button = ({
   bgColor = '#00A0FF',
   bgImage,
   textColor = '#ffffff',
-  borderRadius = 16,
+  borderRadius = 0,
   align = 'center',
   href = '#',
   paddingY = 14,
   paddingX = 28,
   width = 100,
   height,
-  shadowPreset = 'md',
+  shadowPreset = 'none',
   shadowBlur = 15,
   shadowOffsetY = 10,
   shadowColor = '#000000',
@@ -91,7 +91,7 @@ export const Button = ({
         if (ref) connect(drag(ref));
       }}
       className={`my-3 flex ${alignClasses[align]} relative mx-auto ${
-        selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-xl' : ''
+        selected ? 'ring-2 ring-[#00A0FF] p-1' : ''
       }`}
       style={{ width: `${width}%` }}
     >
@@ -127,13 +127,13 @@ export const Button = ({
     text: 'Commencer maintenant 🚀',
     bgColor: '#00A0FF',
     textColor: '#ffffff',
-    borderRadius: 16,
+    borderRadius: 0,
     align: 'center',
     href: '#',
     paddingY: 14,
     paddingX: 28,
     width: 100,
-    shadowPreset: 'md',
+    shadowPreset: 'none',
   },
   rules: {
     canDrag: () => true,

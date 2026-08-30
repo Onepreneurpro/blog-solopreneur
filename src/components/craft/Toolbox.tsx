@@ -39,10 +39,10 @@ export const Toolbox = () => {
       icon: Layout,
       color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
       element: (
-        <Element is={Container} padding={40} bgGradient="bg-gradient-to-r from-blue-600 to-indigo-900" canvas>
-          <Text text="Nouveau Conteneur Héro 🚀" fontSize={32} textColor="#ffffff" />
-          <Text text="Glissez-déposez des sous-éléments ici..." fontSize={16} textColor="#e2e8f0" />
-          <Button text="Explorer l offre" align="center" />
+        <Element is={Container} padding={40} borderRadius={0} bgGradient="bg-gradient-to-r from-blue-600 to-indigo-900" canvas>
+          <Text text="Nouveau Conteneur Héro 🚀" fontSize={32} textColor="#ffffff" borderRadius={0} />
+          <Text text="Glissez-déposez des sous-éléments ici..." fontSize={16} textColor="#e2e8f0" borderRadius={0} />
+          <Button text="Explorer l offre" align="center" borderRadius={0} />
         </Element>
       ),
     },
@@ -50,19 +50,19 @@ export const Toolbox = () => {
       label: 'Titre / Texte',
       icon: Type,
       color: 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100',
-      element: <Text text="Votre Titre de Section..." fontSize={28} />,
+      element: <Text text="Votre Titre de Section..." fontSize={28} borderRadius={0} />,
     },
     {
       label: 'Bouton d Action',
       icon: MousePointerClick,
       color: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100',
-      element: <Button text="👉 Accéder à l Offre Spéciale" />,
+      element: <Button text="👉 Accéder à l Offre Spéciale" borderRadius={0} />,
     },
     {
       label: 'Image PC (1 Clic)',
       icon: ImageIcon,
       color: 'bg-teal-50 text-teal-800 border-teal-200 hover:bg-teal-100',
-      element: <Image />,
+      element: <Image borderRadius={0} />,
     },
     {
       label: 'Grille 4 Colonnes Pre-remplie',
@@ -74,7 +74,7 @@ export const Toolbox = () => {
       label: 'Carte d Info',
       icon: CreditCard,
       color: 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100',
-      element: <Card />,
+      element: <Card borderRadius={0} />,
     },
     {
       label: 'Formulaire Capture',

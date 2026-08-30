@@ -23,10 +23,10 @@ export const Image = ({
   src = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
   alt = 'Image illustration',
   height = 300,
-  borderRadius = 20,
+  borderRadius = 0,
   align = 'center',
   width = 100,
-  shadowPreset = 'lg',
+  shadowPreset = 'none',
   shadowBlur = 20,
   shadowOffsetY = 10,
   shadowColor = '#000000',
@@ -78,7 +78,7 @@ export const Image = ({
         if (ref) connect(drag(ref));
       }}
       className={`my-4 flex ${alignClasses[align]} relative mx-auto ${
-        selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-2xl' : ''
+        selected ? 'ring-2 ring-[#00A0FF] p-1' : ''
       }`}
       style={{ width: `${width}%` }}
     >
@@ -163,10 +163,10 @@ export const Image = ({
     src: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
     alt: 'Image illustration',
     height: 300,
-    borderRadius: 20,
+    borderRadius: 0,
     align: 'center',
     width: 100,
-    shadowPreset: 'lg',
+    shadowPreset: 'none',
   },
   rules: {
     canDrag: () => true,
