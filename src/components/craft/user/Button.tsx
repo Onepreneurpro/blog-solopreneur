@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
+import { getBoxShadow } from './Text';
 
 export interface ButtonProps {
   text?: string;
@@ -14,6 +15,11 @@ export interface ButtonProps {
   paddingX?: number;
   width?: number;
   height?: number;
+  shadowPreset?: string;
+  shadowBlur?: number;
+  shadowOffsetY?: number;
+  shadowColor?: string;
+  shadowOpacity?: number;
 }
 
 export const Button = ({
@@ -26,7 +32,12 @@ export const Button = ({
   paddingY = 14,
   paddingX = 28,
   width = 100,
-  height = 50,
+  height,
+  shadowPreset = 'md',
+  shadowBlur = 15,
+  shadowOffsetY = 10,
+  shadowColor = '#000000',
+  shadowOpacity = 20,
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -46,6 +57,8 @@ export const Button = ({
     right: 'justify-end',
   };
 
+  const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -58,8 +71,9 @@ export const Button = ({
             borderRadius: `${borderRadius}px`,
             padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
+            boxShadow,
           }}
-          className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading flex items-center justify-center text-center"
+          className="w-full font-black text-sm hover:opacity-90 transition-all font-heading flex items-center justify-center text-center"
         >
           {text}
         </a>
@@ -93,9 +107,10 @@ export const Button = ({
           borderRadius: `${borderRadius}px`,
           padding: `${paddingY}px ${paddingX}px`,
           minHeight: height ? `${height}px` : undefined,
+          boxShadow,
           outline: 'none',
         }}
-        className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center"
+        className="w-full font-black text-sm hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center"
       >
         {text}
       </button>
@@ -115,7 +130,7 @@ export const Button = ({
     paddingY: 14,
     paddingX: 28,
     width: 100,
-    height: 50,
+    shadowPreset: 'md',
   },
   rules: {
     canDrag: () => true,

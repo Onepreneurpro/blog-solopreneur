@@ -144,6 +144,196 @@ export const SettingsPanel = () => {
           </div>
         )}
 
+        {/* BORDER RADIUS (ARRONDI DES COINS) */}
+        {props.borderRadius !== undefined && (
+          <div className="space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <div className="flex justify-between font-black text-slate-900 text-xs">
+              <span>🔘 Arrondi des Coins</span>
+              <span className="text-[#00A0FF] font-mono">{props.borderRadius}px</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={48}
+              step={2}
+              value={props.borderRadius}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.borderRadius = parseInt(e.target.value, 10);
+                })
+              }
+              className="w-full accent-[#00A0FF]"
+            />
+            <div className="grid grid-cols-5 gap-1 pt-0.5">
+              {[
+                { label: '0px', val: 0 },
+                { label: '8px', val: 8 },
+                { label: '16px', val: 16 },
+                { label: '24px', val: 24 },
+                { label: 'Rond', val: 999 },
+              ].map((b) => (
+                <button
+                  key={b.val}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.borderRadius = b.val;
+                    })
+                  }
+                  className={`py-1 rounded font-black text-[10px] transition-colors ${
+                    props.borderRadius === b.val
+                      ? 'bg-[#00A0FF] text-white'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* BOX SHADOW (OMBRE PORTÉE SUR MESURE) */}
+        <div className="space-y-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
+          <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+            <span>✨ Ombre Portée</span>
+            <span className="text-amber-600 font-mono text-[10px] uppercase font-bold">
+              {props.shadowPreset || 'none'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5">
+            {[
+              { key: 'none', label: 'Aucune' },
+              { key: 'sm', label: 'Subtile ☁️' },
+              { key: 'md', label: 'Moyenne 🌤️' },
+              { key: 'lg', label: 'Marquée ☀️' },
+              { key: 'xl', label: 'Intense 💥' },
+              { key: 'custom', label: 'Sur Mesure 🎨' },
+            ].map((preset) => (
+              <button
+                key={preset.key}
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.shadowPreset = preset.key;
+                  })
+                }
+                className={`py-1.5 px-2 rounded-lg border font-extrabold text-[10px] transition-colors ${
+                  props.shadowPreset === preset.key
+                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
+          {/* CUSTOM ADVANCED SHADOW CONTROLS */}
+          {(props.shadowPreset === 'custom' || (props.shadowPreset !== undefined && props.shadowPreset !== 'none')) && (
+            <div className="space-y-3 pt-2 border-t border-amber-200/80">
+              {/* SHADOW COLOUR & OPACITY */}
+              <div className="grid grid-cols-2 gap-2 items-center">
+                <div>
+                  <label className="font-bold text-slate-700 text-[11px]">Couleur d Ombre</label>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <input
+                      type="color"
+                      value={props.shadowColor || '#000000'}
+                      onChange={(e) =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.shadowColor = e.target.value;
+                          nodeProps.shadowPreset = 'custom';
+                        })
+                      }
+                      className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={props.shadowColor || '#000000'}
+                      onChange={(e) =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.shadowColor = e.target.value;
+                          nodeProps.shadowPreset = 'custom';
+                        })
+                      }
+                      className="w-full p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-[10px]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                    <span>Transparence</span>
+                    <span>{props.shadowOpacity !== undefined ? props.shadowOpacity : 20}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={props.shadowOpacity !== undefined ? props.shadowOpacity : 20}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.shadowOpacity = parseInt(e.target.value, 10);
+                        nodeProps.shadowPreset = 'custom';
+                      })
+                    }
+                    className="w-full accent-amber-500 mt-2"
+                  />
+                </div>
+              </div>
+
+              {/* SHADOW BLUR (DIFFUS VS CONCENTRE) */}
+              <div className="space-y-1">
+                <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                  <span>Flou (Concentré vs Diffus)</span>
+                  <span>{props.shadowBlur !== undefined ? props.shadowBlur : 15}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={60}
+                  step={2}
+                  value={props.shadowBlur !== undefined ? props.shadowBlur : 15}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.shadowBlur = parseInt(e.target.value, 10);
+                      nodeProps.shadowPreset = 'custom';
+                    })
+                  }
+                  className="w-full accent-amber-500"
+                />
+                <div className="flex justify-between text-[9px] text-slate-400 font-semibold px-0.5">
+                  <span>Net / Concentré (0px)</span>
+                  <span>Très Diffus (60px)</span>
+                </div>
+              </div>
+
+              {/* SHADOW OFFSET Y (TAILLE / DECALAGE) */}
+              <div className="space-y-1">
+                <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                  <span>Taille / Décalage Vertical</span>
+                  <span>{props.shadowOffsetY !== undefined ? props.shadowOffsetY : 10}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={40}
+                  step={2}
+                  value={props.shadowOffsetY !== undefined ? props.shadowOffsetY : 10}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.shadowOffsetY = parseInt(e.target.value, 10);
+                      nodeProps.shadowPreset = 'custom';
+                    })
+                  }
+                  className="w-full accent-amber-500"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* BUTTON HEIGHT CONTROL (PADDING Y) */}
         {props.paddingY !== undefined && (
           <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">

@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
+import { getBoxShadow } from './Text';
 
 export interface ImageProps {
   src?: string;
@@ -11,6 +12,11 @@ export interface ImageProps {
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
   width?: number;
+  shadowPreset?: string;
+  shadowBlur?: number;
+  shadowOffsetY?: number;
+  shadowColor?: string;
+  shadowOpacity?: number;
 }
 
 export const Image = ({
@@ -20,6 +26,11 @@ export const Image = ({
   borderRadius = 20,
   align = 'center',
   width = 100,
+  shadowPreset = 'lg',
+  shadowBlur = 20,
+  shadowOffsetY = 10,
+  shadowColor = '#000000',
+  shadowOpacity = 20,
 }: ImageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,14 +53,16 @@ export const Image = ({
     right: 'justify-end',
   };
 
+  const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div className={`my-4 flex ${alignClasses[align]} max-w-full mx-auto`} style={{ width: `${width}%` }}>
         {src ? (
           <div
-            className="w-full overflow-hidden shadow-xl"
-            style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
+            className="w-full overflow-hidden"
+            style={{ borderRadius: `${borderRadius}px`, height: `${height}px`, boxShadow }}
           >
             <img src={src} alt={alt} className="w-full h-full object-cover" />
           </div>
@@ -58,7 +71,7 @@ export const Image = ({
     );
   }
 
-  // BUILDER EDITOR VIEW (CLEAN & NATURAL): 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER
+  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -75,8 +88,8 @@ export const Image = ({
           fileInputRef.current?.click();
         }}
         title="1 clic : Sélectionner | Double-clic : Choisir photo (PC)"
-        className="relative group/img w-full overflow-hidden shadow-xl cursor-pointer"
-        style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
+        className="relative group/img w-full overflow-hidden cursor-pointer"
+        style={{ borderRadius: `${borderRadius}px`, height: `${height}px`, boxShadow }}
       >
         {src ? (
           <img
@@ -153,6 +166,7 @@ export const Image = ({
     borderRadius: 20,
     align: 'center',
     width: 100,
+    shadowPreset: 'lg',
   },
   rules: {
     canDrag: () => true,

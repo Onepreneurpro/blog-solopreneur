@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
+import { getBoxShadow } from './Text';
 
 export interface ContainerProps {
   bgGradient?: string;
@@ -11,6 +12,11 @@ export interface ContainerProps {
   borderRadius?: number;
   width?: number;
   height?: number;
+  shadowPreset?: string;
+  shadowBlur?: number;
+  shadowOffsetY?: number;
+  shadowColor?: string;
+  shadowOpacity?: number;
   children?: React.ReactNode;
 }
 
@@ -22,6 +28,11 @@ export const Container = ({
   borderRadius = 20,
   width = 100,
   height,
+  shadowPreset = 'none',
+  shadowBlur = 15,
+  shadowOffsetY = 10,
+  shadowColor = '#000000',
+  shadowOpacity = 20,
   children,
 }: ContainerProps) => {
   const { enabled } = useEditor((state) => ({
@@ -40,6 +51,8 @@ export const Container = ({
       ? bgGradient
       : { backgroundColor: bgColor };
 
+  const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -52,6 +65,7 @@ export const Container = ({
           borderRadius: `${borderRadius}px`,
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
+          boxShadow,
         }}
       >
         {children}
@@ -75,6 +89,7 @@ export const Container = ({
         borderRadius: `${borderRadius}px`,
         width: `${width}%`,
         minHeight: height ? `${height}px` : undefined,
+        boxShadow,
       }}
     >
       {children}
@@ -91,6 +106,7 @@ export const Container = ({
     margin: 8,
     borderRadius: 20,
     width: 100,
+    shadowPreset: 'none',
   },
   rules: {
     canDrag: () => true,
