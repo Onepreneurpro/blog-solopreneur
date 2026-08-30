@@ -60,6 +60,47 @@ export const SettingsPanel = () => {
       </div>
 
       <div className="p-4 space-y-4 overflow-y-auto flex-1 text-xs">
+        {/* BLOCK WIDTH CONTROL (SLIDER & PRESETS) */}
+        {props.width !== undefined && (
+          <div className="space-y-2 bg-blue-50/60 p-3 rounded-2xl border border-blue-200">
+            <div className="flex justify-between font-black text-slate-900 text-xs">
+              <span>↔️ Largeur du Bloc (Width)</span>
+              <span className="text-[#00A0FF] font-mono">{props.width}%</span>
+            </div>
+            <input
+              type="range"
+              min={20}
+              max={100}
+              step={5}
+              value={props.width}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.width = parseInt(e.target.value, 10);
+                })
+              }
+              className="w-full accent-[#00A0FF]"
+            />
+            <div className="grid grid-cols-5 gap-1 pt-0.5">
+              {[100, 75, 50, 33, 25].map((w) => (
+                <button
+                  key={w}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.width = w;
+                    })
+                  }
+                  className={`py-1 rounded font-black text-[10px] transition-colors ${
+                    props.width === w
+                      ? 'bg-[#00A0FF] text-white'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {w}%
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {/* GRID COLUMNS SELECTOR (2, 3, 4 COLUMNS) */}
         {props.columns !== undefined && (
           <div className="space-y-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200">

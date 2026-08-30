@@ -10,6 +10,7 @@ export interface ImageProps {
   height?: number;
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
+  width?: number;
 }
 
 export const Image = ({
@@ -18,6 +19,7 @@ export const Image = ({
   height = 300,
   borderRadius = 20,
   align = 'center',
+  width = 100,
 }: ImageProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,13 +67,45 @@ export const Image = ({
     window.addEventListener('mouseup', onMouseUp);
   };
 
+  const handleWidthResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const resizerEl = e.currentTarget as HTMLElement;
+    const parentEl = resizerEl.parentElement?.parentElement?.parentElement as HTMLElement;
+    if (!parentEl) return;
+
+    const parentRect = parentEl.getBoundingClientRect();
+    const parentWidth = parentRect.width;
+    const startX = e.clientX;
+    const startWidth = width || 100;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
+      const newWidth = Math.min(100, Math.max(20, startWidth + deltaPercent));
+
+      setProp((props: ImageProps) => {
+        props.width = Math.round(newWidth);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
-      <div className={`my-4 flex ${alignClasses[align]}`}>
+      <div className={`my-4 flex ${alignClasses[align]} max-w-full mx-auto`} style={{ width: `${width}%` }}>
         {src ? (
           <div
-            className="max-w-full overflow-hidden shadow-xl"
+            className="w-full overflow-hidden shadow-xl"
             style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
           >
             <img src={src} alt={alt} className="w-full h-full object-cover" />
@@ -81,23 +115,24 @@ export const Image = ({
     );
   }
 
-  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER / BOTTOM DRAG = HEIGHT RESIZE
+  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER / BOTTOM & RIGHT DRAG RESIZE
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-4 flex ${alignClasses[align]} ${
+      className={`my-4 flex ${alignClasses[align]} relative mx-auto ${
         selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-2xl' : ''
       }`}
+      style={{ width: `${width}%` }}
     >
       <div
         onDoubleClick={(e) => {
           e.stopPropagation();
           fileInputRef.current?.click();
         }}
-        title="1 clic : Sélectionner | Double-clic : Choisir photo | Bord bas : Redimensionner la hauteur"
-        className="relative group/img max-w-full overflow-hidden shadow-xl cursor-pointer"
+        title="1 clic : Sélectionner | Double-clic : Choisir photo | Bords : Redimensionner largeur/hauteur"
+        className="relative group/img w-full overflow-hidden shadow-xl cursor-pointer"
         style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
       >
         {src ? (
@@ -136,7 +171,7 @@ export const Image = ({
               });
             }}
             title="Supprimer l image (1 clic)"
-            className="absolute bottom-4 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+            className="absolute bottom-4 right-4 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -145,10 +180,19 @@ export const Image = ({
         {/* BOTTOM HEIGHT RESIZER HANDLE BAR */}
         <div
           onMouseDown={handleHeightResizeMouseDown}
-          title="Tirez vers le bas ou le haut pour modifier la hauteur de l image"
+          title="Tirez vers le bas ou le haut pour modifier la hauteur"
           className="absolute bottom-0 left-0 right-0 h-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-row-resize flex items-center justify-center transition-colors group/bottom-resizer z-40 rounded-b-xl select-none"
         >
           <div className="w-12 h-1 bg-[#00A0FF] group-hover/bottom-resizer:bg-white rounded-full transition-colors" />
+        </div>
+
+        {/* RIGHT BORDER WIDTH RESIZER HANDLE BAR */}
+        <div
+          onMouseDown={handleWidthResizeMouseDown}
+          title="Tirez la bordure droite pour ajuster la largeur de l image"
+          className="absolute top-0 bottom-0 right-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/right-resizer z-40 rounded-r-xl select-none"
+        >
+          <div className="w-1 h-8 bg-[#00A0FF] group-hover/right-resizer:bg-white rounded-full transition-colors" />
         </div>
 
         {/* HIDDEN FILE INPUT */}
@@ -183,6 +227,7 @@ export const Image = ({
     height: 300,
     borderRadius: 20,
     align: 'center',
+    width: 100,
   },
   rules: {
     canDrag: () => true,

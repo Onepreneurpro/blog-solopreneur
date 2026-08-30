@@ -10,6 +10,7 @@ export interface TextProps {
   textColor?: string;
   fontWeight?: string;
   tagName?: 'h1' | 'h2' | 'h3' | 'p';
+  width?: number;
 }
 
 export const Text = ({
@@ -19,6 +20,7 @@ export const Text = ({
   textColor = '#0f172a',
   fontWeight = 'bold',
   tagName = 'h2',
+  width = 100,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -34,10 +36,42 @@ export const Text = ({
 
   const Tag = tagName;
 
+  const handleWidthResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const resizerEl = e.currentTarget as HTMLElement;
+    const parentEl = resizerEl.parentElement?.parentElement as HTMLElement;
+    if (!parentEl) return;
+
+    const parentRect = parentEl.getBoundingClientRect();
+    const parentWidth = parentRect.width;
+    const startX = e.clientX;
+    const startWidth = width || 100;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
+      const newWidth = Math.min(100, Math.max(20, startWidth + deltaPercent));
+
+      setProp((props: TextProps) => {
+        props.width = Math.round(newWidth);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
-      <div className="my-2 p-1">
+      <div className="my-2 p-1 max-w-full mx-auto" style={{ width: `${width}%` }}>
         <Tag
           style={{
             fontSize: `${fontSize}px`,
@@ -59,9 +93,10 @@ export const Text = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-1 rounded-lg transition-all ${
+      className={`my-2 p-1 relative rounded-lg transition-all mx-auto ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
+      style={{ width: `${width}%` }}
     >
       <Tag
         contentEditable
@@ -83,6 +118,15 @@ export const Text = ({
       >
         {text}
       </Tag>
+
+      {/* RIGHT BORDER WIDTH RESIZER HANDLE */}
+      <div
+        onMouseDown={handleWidthResizeMouseDown}
+        title="Tirez la bordure droite pour ajuster la largeur du texte"
+        className="absolute top-0 bottom-0 right-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/right-resizer z-40 rounded-r-lg select-none"
+      >
+        <div className="w-1 h-6 bg-[#00A0FF] group-hover/right-resizer:bg-white rounded-full transition-colors" />
+      </div>
     </div>
   );
 };
@@ -96,6 +140,7 @@ export const Text = ({
     textColor: '#0f172a',
     fontWeight: 'bold',
     tagName: 'h2',
+    width: 100,
   },
   rules: {
     canDrag: () => true,

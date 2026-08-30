@@ -9,6 +9,7 @@ export interface ContainerProps {
   padding?: number;
   margin?: number;
   borderRadius?: number;
+  width?: number;
   children?: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const Container = ({
   padding = 32,
   margin = 16,
   borderRadius = 24,
+  width = 100,
   children,
 }: ContainerProps) => {
   const { enabled } = useEditor((state) => ({
@@ -62,16 +64,49 @@ export const Container = ({
     window.addEventListener('mouseup', onMouseUp);
   };
 
+  const handleWidthResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const resizerEl = e.currentTarget as HTMLElement;
+    const parentEl = resizerEl.parentElement?.parentElement as HTMLElement;
+    if (!parentEl) return;
+
+    const parentRect = parentEl.getBoundingClientRect();
+    const parentWidth = parentRect.width;
+    const startX = e.clientX;
+    const startWidth = width || 100;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
+      const newWidth = Math.min(100, Math.max(20, startWidth + deltaPercent));
+
+      setProp((props: ContainerProps) => {
+        props.width = Math.round(newWidth);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div
-        className={`relative ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
+        className={`relative mx-auto ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
         style={{
           ...(typeof bgStyle === 'object' ? bgStyle : {}),
           padding: `${padding}px`,
-          margin: `${margin}px 0`,
+          margin: `${margin}px auto`,
           borderRadius: `${borderRadius}px`,
+          width: `${width}%`,
         }}
       >
         {children}
@@ -79,20 +114,21 @@ export const Container = ({
     );
   }
 
-  // BUILDER EDITOR VIEW WITH BOTTOM PADDING RESIZER
+  // BUILDER EDITOR VIEW WITH BOTTOM & RIGHT RESIZERS
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`relative transition-all ${
+      className={`relative mx-auto transition-all ${
         selected ? 'ring-2 ring-[#00A0FF] ring-offset-2' : 'hover:ring-1 hover:ring-blue-300'
       } ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
       style={{
         ...(typeof bgStyle === 'object' ? bgStyle : {}),
         padding: `${padding}px`,
-        margin: `${margin}px 0`,
+        margin: `${margin}px auto`,
         borderRadius: `${borderRadius}px`,
+        width: `${width}%`,
       }}
     >
       {children}
@@ -104,6 +140,15 @@ export const Container = ({
         className="absolute bottom-0 left-0 right-0 h-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-row-resize flex items-center justify-center transition-colors group/bottom-resizer z-40 rounded-b-xl select-none"
       >
         <div className="w-12 h-1 bg-[#00A0FF] group-hover/bottom-resizer:bg-white rounded-full transition-colors" />
+      </div>
+
+      {/* RIGHT BORDER WIDTH RESIZER HANDLE BAR */}
+      <div
+        onMouseDown={handleWidthResizeMouseDown}
+        title="Tirez la bordure droite pour ajuster la largeur du conteneur"
+        className="absolute top-0 bottom-0 right-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/right-resizer z-40 rounded-r-xl select-none"
+      >
+        <div className="w-1 h-8 bg-[#00A0FF] group-hover/right-resizer:bg-white rounded-full transition-colors" />
       </div>
     </div>
   );
@@ -117,6 +162,7 @@ export const Container = ({
     padding: 32,
     margin: 16,
     borderRadius: 24,
+    width: 100,
   },
   rules: {
     canDrag: () => true,
