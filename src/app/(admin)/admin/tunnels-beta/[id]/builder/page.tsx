@@ -114,7 +114,7 @@ export default function PuckBuilderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
+      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-[#00A0FF] border-t-transparent rounded-full animate-spin" />
         <p className="text-xs font-bold tracking-wider text-slate-400">Chargement de l Éditeur Puck Beta...</p>
       </div>
@@ -122,9 +122,9 @@ export default function PuckBuilderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
       {/* TOP HEADER */}
-      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 sticky top-0 z-40">
+      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/tunnels-beta"
@@ -170,41 +170,20 @@ export default function PuckBuilderPage() {
         </div>
       </header>
 
-      {/* PUCK EDITOR WORKSPACE WITH GLOBAL OVERRIDES */}
-      <div className="flex-1 w-full bg-slate-100 text-slate-900">
+      {/* PUCK EDITOR FULLSCREEN WORKSPACE */}
+      <div className="flex-1 w-full relative bg-slate-100 text-slate-900 overflow-hidden">
         <style jsx global>{`
-          /* Eliminate forced grab/hand cursor across all Puck canvas components */
-          [class*="_PuckCanvas_"] *,
-          [class*="PuckCanvas"] *,
-          [data-puck-component] *,
-          .Puck * {
-            cursor: auto;
+          .Puck {
+            height: calc(100vh - 3.5rem) !important;
+            max-height: calc(100vh - 3.5rem) !important;
           }
-
-          /* Ensure images and input labels have explicit pointer cursor & direct clickability */
-          label,
-          label *,
-          button,
-          a {
+          label, label * {
             cursor: pointer !important;
             pointer-events: auto !important;
           }
-
-          input[type="text"],
-          textarea {
+          input[type="text"], textarea {
             cursor: text !important;
             pointer-events: auto !important;
-          }
-
-          /* Prevent independent internal scrollbars on the 3 Puck layout panels */
-          [class*="_Sidebar_"],
-          [class*="_PuckCanvas_"],
-          [class*="PuckCanvas"],
-          [class*="Sidebar"] {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            overflow-y: visible !important;
           }
         `}</style>
         <Puck
