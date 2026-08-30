@@ -10,6 +10,7 @@ import { FeatureGrid } from './user/FeatureGrid';
 import { Card } from './user/Card';
 import { LeadForm } from './user/LeadForm';
 import { Video } from './user/Video';
+import { Grid as GridComponent } from './user/Grid';
 import {
   Layout,
   Type,
@@ -20,6 +21,7 @@ import {
   Mail,
   Video as VideoIcon,
   GripVertical,
+  Columns,
 } from 'lucide-react';
 
 export const Toolbox = () => {
@@ -27,7 +29,13 @@ export const Toolbox = () => {
 
   const components = [
     {
-      label: 'Section Conteneur',
+      label: 'Grille Vierge (2, 3, 4 Cols)',
+      icon: Columns,
+      color: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 font-extrabold shadow-sm',
+      element: <GridComponent columns={2} />,
+    },
+    {
+      label: 'Section Conteneur (Héro)',
       icon: Layout,
       color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
       element: (
@@ -53,11 +61,11 @@ export const Toolbox = () => {
     {
       label: 'Image PC (1 Clic)',
       icon: ImageIcon,
-      color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+      color: 'bg-teal-50 text-teal-800 border-teal-200 hover:bg-teal-100',
       element: <Image />,
     },
     {
-      label: 'Grille 4 Colonnes',
+      label: 'Grille 4 Colonnes Pre-remplie',
       icon: Grid,
       color: 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100',
       element: <FeatureGrid columns={4} />,
@@ -106,9 +114,9 @@ export const Toolbox = () => {
               }}
               className={`p-3 rounded-2xl border cursor-grab active:cursor-grabbing flex items-center justify-between transition-all shadow-xs hover:scale-[1.02] ${item.color}`}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0 pr-2">
                 <Icon className="w-4 h-4 shrink-0" />
-                <span className="text-xs font-black font-heading">{item.label}</span>
+                <span className="text-xs font-black font-heading truncate">{item.label}</span>
               </div>
               <GripVertical className="w-4 h-4 opacity-40 shrink-0" />
             </div>

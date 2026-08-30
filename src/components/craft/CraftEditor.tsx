@@ -10,6 +10,7 @@ import { FeatureGrid } from './user/FeatureGrid';
 import { Card } from './user/Card';
 import { LeadForm } from './user/LeadForm';
 import { Video } from './user/Video';
+import { Grid } from './user/Grid';
 import { Toolbox } from './Toolbox';
 import { SettingsPanel } from './SettingsPanel';
 import { Header } from './Header';
@@ -36,6 +37,7 @@ export const CraftEditor = ({ stepData, stepId }: CraftEditorProps) => {
         Card,
         LeadForm,
         Video,
+        Grid,
       }}
     >
       <div className="fixed inset-0 z-[99999] bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">

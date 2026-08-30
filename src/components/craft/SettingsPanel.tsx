@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useEditor } from '@craftjs/core';
-import { Settings, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Settings, Trash2 } from 'lucide-react';
 
 export const SettingsPanel = () => {
   const { selected, actions } = useEditor((state, query) => {
@@ -60,6 +60,56 @@ export const SettingsPanel = () => {
       </div>
 
       <div className="p-4 space-y-4 overflow-y-auto flex-1 text-xs">
+        {/* GRID COLUMNS SELECTOR (2, 3, 4 COLUMNS) */}
+        {props.columns !== undefined && (
+          <div className="space-y-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200">
+            <label className="font-black text-slate-900 flex items-center gap-1.5 text-xs">
+              <span>📐 Modèle de Grille (Colonnes)</span>
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[2, 3, 4].map((numCols) => (
+                <button
+                  key={numCols}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.columns = numCols;
+                    })
+                  }
+                  className={`py-2 px-2 rounded-xl border font-black text-xs transition-all ${
+                    props.columns === numCols
+                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {numCols} Cols
+                </button>
+              ))}
+            </div>
+
+            {props.gap !== undefined && (
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between font-bold text-slate-700">
+                  <span>Espacement entre colonnes (Gap)</span>
+                  <span>{props.gap}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={8}
+                  max={48}
+                  step={4}
+                  value={props.gap}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.gap = parseInt(e.target.value, 10);
+                    })
+                  }
+                  className="w-full accent-[#00A0FF]"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* TEXT PROPS */}
         {props.text !== undefined && (
           <div className="space-y-1.5">

@@ -13,6 +13,7 @@ import { FeatureGrid } from '@/components/craft/user/FeatureGrid';
 import { Card } from '@/components/craft/user/Card';
 import { LeadForm } from '@/components/craft/user/LeadForm';
 import { Video } from '@/components/craft/user/Video';
+import { Grid } from '@/components/craft/user/Grid';
 
 interface FunnelPublicClientProps {
   funnel: any;
@@ -134,6 +135,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               Card,
               LeadForm,
               Video,
+              Grid,
             }}
             enabled={false}
           >
