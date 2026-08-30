@@ -202,6 +202,73 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
+  const handleCardDrop = (e: React.DragEvent, blockId: string, itemIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dataStr = e.dataTransfer.getData('application/json');
+    if (!dataStr) return;
+
+    try {
+      const data = JSON.parse(dataStr);
+      const imageUrl = data.defaultContent || data.img || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
+
+      setElements((prev) =>
+        prev.map((el) => {
+          if (el.id !== blockId) return el;
+          const currentItems = el.data?.items || [];
+          const updatedItems = currentItems.map((it: any, i: number) =>
+            i === itemIndex ? { ...it, img: imageUrl } : it
+          );
+          return { ...el, data: { ...el.data, items: updatedItems } };
+        })
+      );
+
+      // Remove standalone element if dragged from canvas into container
+      if (!data.isNew && data.draggedElementId) {
+        setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
+      }
+
+      setSelectedElementId(blockId);
+      setSelectedSubItem({ blockId, itemIndex, subType: 'image' });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleBlockDrop = (e: React.DragEvent, blockId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dataStr = e.dataTransfer.getData('application/json');
+    if (!dataStr) return;
+
+    try {
+      const data = JSON.parse(dataStr);
+      const imageUrl = data.defaultContent || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
+
+      setElements((prev) =>
+        prev.map((el) => {
+          if (el.id !== blockId) return el;
+          if (el.data?.items && el.data.items.length > 0) {
+            const currentItems = el.data.items;
+            const updatedItems = currentItems.map((it: any, i: number) =>
+              i === 0 ? { ...it, img: imageUrl } : it
+            );
+            return { ...el, data: { ...el.data, items: updatedItems, img: imageUrl } };
+          }
+          return { ...el, data: { ...el.data, img: imageUrl } };
+        })
+      );
+
+      if (!data.isNew && data.draggedElementId) {
+        setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
+      }
+
+      setSelectedElementId(blockId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const moveElement = (index: number, direction: -1 | 1, e: React.MouseEvent) => {
     e.stopPropagation();
     const targetIndex = index + direction;
@@ -1570,7 +1637,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Block3ColArcadeArizona' && (
-                      <div className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100">
+                      <div
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={(e) => handleBlockDrop(e, el.id)}
+                        className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100 relative group/block"
+                      >
                         <div className="text-center">
                           <input
                             type="text"
@@ -1596,8 +1667,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             return (
                               <div key={i} className="flex flex-col items-center">
-                                <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm border border-slate-100 flex items-center justify-center`}>
+                                <div
+                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                  onDrop={(e) => handleCardDrop(e, el.id, i)}
+                                  className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm border-2 border-dashed border-transparent hover:border-[#00A0FF] flex items-center justify-center relative cursor-pointer group/card`}
+                                >
                                   <img src={col.img} alt={col.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
+                                  <div className="absolute inset-0 bg-[#00A0FF]/20 opacity-0 group-hover/card:opacity-100 flex items-center justify-center text-white font-bold text-xs pointer-events-none transition-opacity">
+                                    🎯 Déposer l image ici
+                                  </div>
                                 </div>
                                 <div className={`text-[10px] font-serif font-extrabold ${textColor} italic my-1.5`}>{col.subtitle}</div>
                                 <div className={`w-full ${bgHeader} text-white p-4 rounded-b-2xl text-center space-y-1 shadow-md`}>
@@ -1636,6 +1714,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (
                       <div
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={(e) => handleBlockDrop(e, el.id)}
                         className={`space-y-4 p-6 rounded-3xl shadow-xl relative transition-all ${
                           showCanvasGrid
                             ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
@@ -1656,8 +1736,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           />
                         </div>
 
-
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
                           {(el.data?.items || [
                             { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
@@ -1671,9 +1749,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             return (
                               <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
-                                {/* CLICKABLE IMAGE CONTAINER WITH DYNAMIC WIDTH, HEIGHT & BORDER RADIUS */}
+                                {/* CLICKABLE & DROPPABLE IMAGE CONTAINER */}
                                 <div className="relative flex justify-center w-full">
                                   <div
+                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                    onDrop={(e) => handleCardDrop(e, el.id, i)}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setSnapGuide(null);
@@ -1817,6 +1897,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {(el.type === 'BlockFeat3ColImg' || el.type === 'Col3') && (
                       <div
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={(e) => handleBlockDrop(e, el.id)}
                         className={`p-6 rounded-3xl shadow-xl space-y-6 relative transition-all ${
                           showCanvasGrid
                             ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
@@ -1844,7 +1926,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           />
                         </div>
 
-
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                           {(el.data?.items || [
                             { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
@@ -1859,6 +1940,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               <div key={col.id || i} className="space-y-3">
                                 <div className="relative flex justify-center w-full">
                                   <div
+                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                    onDrop={(e) => handleCardDrop(e, el.id, i)}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setSelectedElementId(el.id);
