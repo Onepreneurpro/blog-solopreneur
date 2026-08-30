@@ -210,7 +210,7 @@ export const Text = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10">{text}</span>
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: text }} />
           </span>
         </Tag>
       </div>
@@ -258,14 +258,12 @@ export const Text = ({
             suppressContentEditableWarning
             onBlur={(e) => {
               setProp((props: TextProps) => {
-                props.text = e.currentTarget.innerText;
+                props.text = e.currentTarget.innerHTML;
               });
             }}
-            className="relative z-10"
-            style={{ outline: 'none', cursor: 'text' }}
-          >
-            {text}
-          </span>
+            dangerouslySetInnerHTML={{ __html: text }}
+            className="relative z-10 outline-none cursor-text inline-block min-w-[30px]"
+          />
         </span>
       </Tag>
     </div>

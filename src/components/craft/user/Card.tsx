@@ -110,7 +110,7 @@ export const Card = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10">{title}</span>
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: title }} />
           </span>
         </h3>
 
@@ -123,7 +123,7 @@ export const Card = ({
               style={underlineStyle}
               offset={underlineOffset}
             />
-            <span className="relative z-10">{content}</span>
+            <span className="relative z-10" dangerouslySetInnerHTML={{ __html: content }} />
           </span>
         </p>
       </div>
@@ -163,14 +163,12 @@ export const Card = ({
             suppressContentEditableWarning
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.title = e.currentTarget.innerText;
+                props.title = e.currentTarget.innerHTML;
               });
             }}
-            className="relative z-10"
-            style={{ outline: 'none', cursor: 'text' }}
-          >
-            {title}
-          </span>
+            dangerouslySetInnerHTML={{ __html: title }}
+            className="relative z-10 outline-none cursor-text inline-block min-w-[30px]"
+          />
         </span>
       </h3>
 
@@ -188,14 +186,12 @@ export const Card = ({
             suppressContentEditableWarning
             onBlur={(e) => {
               setProp((props: CardProps) => {
-                props.content = e.currentTarget.innerText;
+                props.content = e.currentTarget.innerHTML;
               });
             }}
-            className="relative z-10"
-            style={{ outline: 'none', cursor: 'text' }}
-          >
-            {content}
-          </span>
+            dangerouslySetInnerHTML={{ __html: content }}
+            className="relative z-10 outline-none cursor-text inline-block min-w-[50px]"
+          />
         </span>
       </p>
     </div>

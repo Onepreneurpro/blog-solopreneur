@@ -20,6 +20,50 @@ const updateTextWithEmoji = (currentText: string, newEmoji: string) => {
   return `${newEmoji} ${currentText}`;
 };
 
+const applySelectionFormat = (type: 'highlight' | 'underline' | 'bold' | 'italic', color?: string) => {
+  if (typeof window === 'undefined') return false;
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+    return false;
+  }
+
+  const range = selection.getRangeAt(0);
+
+  if (type === 'highlight') {
+    if (color === 'transparent' || !color) {
+      document.execCommand('removeFormat', false);
+    } else {
+      const span = document.createElement('span');
+      span.style.backgroundColor = color;
+      span.style.padding = '2px 6px';
+      span.style.borderRadius = '4px';
+      span.style.boxDecorationBreak = 'clone';
+      try {
+        range.surroundContents(span);
+      } catch (err) {
+        document.execCommand('hiliteColor', false, color);
+      }
+    }
+  } else if (type === 'underline') {
+    const span = document.createElement('span');
+    span.style.textDecoration = 'underline';
+    if (color) span.style.textDecorationColor = color;
+    span.style.textDecorationThickness = '3px';
+    span.style.textUnderlineOffset = '2px';
+    try {
+      range.surroundContents(span);
+    } catch (err) {
+      document.execCommand('underline', false);
+    }
+  } else if (type === 'bold') {
+    document.execCommand('bold', false);
+  } else if (type === 'italic') {
+    document.execCommand('italic', false);
+  }
+
+  return true;
+};
+
 export const SettingsPanel = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -188,11 +232,14 @@ export const SettingsPanel = () => {
             {/* BOLD & ITALIC BUTTONS */}
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.fontWeight = nodeProps.fontWeight === 'bold' || nodeProps.fontWeight === '900' ? 'normal' : 'bold';
-                  })
-                }
+                onClick={() => {
+                  const formatted = applySelectionFormat('bold');
+                  if (!formatted) {
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.fontWeight = nodeProps.fontWeight === 'bold' || nodeProps.fontWeight === '900' ? 'normal' : 'bold';
+                    });
+                  }
+                }}
                 className={`py-1.5 px-3 rounded-xl border font-black text-xs flex items-center justify-center gap-1.5 transition-colors ${
                   props.fontWeight === 'bold' || props.fontWeight === '900' || props.fontWeight === '800'
                     ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
@@ -204,11 +251,14 @@ export const SettingsPanel = () => {
               </button>
 
               <button
-                onClick={() =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.fontStyle = nodeProps.fontStyle === 'italic' ? 'normal' : 'italic';
-                  })
-                }
+                onClick={() => {
+                  const formatted = applySelectionFormat('italic');
+                  if (!formatted) {
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.fontStyle = nodeProps.fontStyle === 'italic' ? 'normal' : 'italic';
+                    });
+                  }
+                }}
                 className={`py-1.5 px-3 rounded-xl border font-black text-xs flex items-center justify-center gap-1.5 transition-colors ${
                   props.fontStyle === 'italic'
                     ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
@@ -257,7 +307,7 @@ export const SettingsPanel = () => {
             <div className="flex items-center justify-between font-black text-slate-900 text-xs">
               <span className="flex items-center gap-1.5">
                 <Highlighter className="w-4 h-4 text-yellow-600" />
-                <span>🖍️ Surlignage (Feutre Marqueur)</span>
+                <span>🖍️ Surlignage (Mots Sélectionnés)</span>
               </span>
             </div>
 
@@ -275,11 +325,14 @@ export const SettingsPanel = () => {
                 ].map((hl) => (
                   <button
                     key={hl.key}
-                    onClick={() =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.highlightColor = hl.color;
-                      })
-                    }
+                    onClick={() => {
+                      const formatted = applySelectionFormat('highlight', hl.color);
+                      if (!formatted) {
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.highlightColor = hl.color;
+                        });
+                      }
+                    }}
                     className={`h-7 rounded-lg border font-bold text-[9px] flex items-center justify-center transition-all ${
                       (props.highlightColor || 'transparent') === hl.color
                         ? 'ring-2 ring-yellow-500 scale-105 border-yellow-500'
@@ -300,21 +353,29 @@ export const SettingsPanel = () => {
                   <input
                     type="color"
                     value={props.highlightColor || '#fef08a'}
-                    onChange={(e) =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.highlightColor = e.target.value;
-                      })
-                    }
+                    onChange={(e) => {
+                      const color = e.target.value;
+                      const formatted = applySelectionFormat('highlight', color);
+                      if (!formatted) {
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.highlightColor = color;
+                        });
+                      }
+                    }}
                     className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                   />
                   <input
                     type="text"
                     value={props.highlightColor || '#fef08a'}
-                    onChange={(e) =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.highlightColor = e.target.value;
-                      })
-                    }
+                    onChange={(e) => {
+                      const color = e.target.value;
+                      const formatted = applySelectionFormat('highlight', color);
+                      if (!formatted) {
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.highlightColor = color;
+                        });
+                      }
+                    }}
                     className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
                   />
                 </div>
@@ -352,11 +413,14 @@ export const SettingsPanel = () => {
                 <span>✏️ Soulignage Créatif & Chevauchement</span>
               </span>
               <button
-                onClick={() =>
-                  actions.setProp(id, (nodeProps: any) => {
-                    nodeProps.underlineEnabled = !nodeProps.underlineEnabled;
-                  })
-                }
+                onClick={() => {
+                  const formatted = applySelectionFormat('underline', props.underlineColor || '#00A0FF');
+                  if (!formatted) {
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.underlineEnabled = !nodeProps.underlineEnabled;
+                    });
+                  }
+                }}
                 className={`px-2.5 py-1 rounded-lg font-bold text-[10px] transition-colors ${
                   props.underlineEnabled
                     ? 'bg-sky-600 text-white'
