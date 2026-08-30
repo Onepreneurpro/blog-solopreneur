@@ -524,8 +524,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  if (loading) {
-    return <div className="p-12 text-center text-xs text-slate-400 font-bold">Chargement de l éditeur visuel...</div>;
+  if (builderEngine === 'WEBSTUDIO_V3') {
+    return (
+      <WebstudioStudioEngine
+        stepId={stepId || ''}
+        funnelSlug={funnel?.slug}
+        stepSlug={step?.slug}
+        initialData={step?.content}
+        onSaveSuccess={() => setSaveSuccess(true)}
+        onSwitchToMaisonV1={() => setBuilderEngine('MAISON_V1')}
+        onExit={() => router.push(`/admin/tunnels/${params.id}`)}
+      />
+    );
   }
 
   return (
@@ -634,21 +644,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
             <button
               onClick={() => setBuilderEngine('MAISON_V1')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                builderEngine === 'MAISON_V1'
-                  ? 'bg-[#00A0FF] text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              className="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-[#00A0FF] text-white shadow-xs"
             >
               🎨 Maison V1
             </button>
             <button
               onClick={() => setBuilderEngine('WEBSTUDIO_V3')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                builderEngine === 'WEBSTUDIO_V3'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              className="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span>Webstudio V3 (OSS)</span>
@@ -696,45 +698,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         </div>
       </header>
 
-      {/* WEBSTUDIO V3 OPEN SOURCE WORKSPACE BANNER */}
-      {builderEngine === 'WEBSTUDIO_V3' && (
-        <div className="bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 text-white px-6 py-2.5 border-b border-purple-800/40 flex items-center justify-between text-xs font-medium shrink-0">
-          <div className="flex items-center gap-3">
-            <span className="px-2.5 py-1 rounded-lg bg-purple-600/30 text-purple-300 font-mono font-bold text-[11px] border border-purple-500/40 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Webstudio.is Open-Source Engine v0.100</span>
-            </span>
-            <a
-              href="https://github.com/webstudio-is/webstudio"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-300 hover:text-white font-mono underline flex items-center gap-1 text-[11px]"
-            >
-              <Code className="w-3.5 h-3.5 text-purple-400" />
-              <span>github.com/webstudio-is/webstudio</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] font-bold text-slate-300">
-            <span>🌳 DOM Tree Sync : Active</span>
-            <span>🎨 Radix UI Primitives : Enabled</span>
-            <span>⚡ CSS Flex & Grid Tokens : Ready</span>
-          </div>
-        </div>
-      )}
-
-      {/* 2. MAIN BUILDER BODY (WEBSTUDIO ENGINE V3 OR MAISON V1) */}
-      {builderEngine === 'WEBSTUDIO_V3' && (
-        <div className="flex-1 overflow-hidden">
-          <WebstudioStudioEngine
-            stepId={stepId || ''}
-            initialData={step?.content}
-            onSaveSuccess={() => setSaveSuccess(true)}
-          />
-        </div>
-      )}
-
-      {builderEngine === 'MAISON_V1' && (
-        <div className="flex-1 flex overflow-hidden">
+      {/* 2. MAIN BUILDER BODY */}
+      <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT PALETTE / INSPECTOR PANEL (SCREENS 1, 2, 3, 4, 5) */}
         <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden">
@@ -3315,7 +3280,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
         )}
       </div>
-      )}
 
     </div>
   );
