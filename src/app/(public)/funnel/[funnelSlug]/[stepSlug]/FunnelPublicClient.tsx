@@ -193,6 +193,159 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
         <div className="max-w-4xl mx-auto w-full my-8 space-y-8">
           {customElements.map((el: any) => {
+            if (el.type === 'BlockNavArizona') {
+              return (
+                <nav key={el.id} className="bg-[#40B5A6] text-white py-3.5 px-6 rounded-2xl shadow-sm my-4">
+                  <div className="flex items-center justify-center gap-4 sm:gap-8 text-[11px] font-extrabold tracking-widest uppercase">
+                    {['HOME', 'ABOUT', 'SERVICES', 'BLOG', 'CONTACT', 'EXTRA'].map((link, i) => (
+                      <span key={i} className="hover:opacity-80 cursor-pointer">{link}</span>
+                    ))}
+                  </div>
+                </nav>
+              );
+            }
+
+            if (el.type === 'BlockHeroArizona') {
+              return (
+                <div key={el.id} className="bg-[#FEF5D7] p-6 sm:p-10 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800 my-6">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div className="md:col-span-6 aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+                      <img
+                        src={el.data?.img || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80'}
+                        alt="Hero"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="md:col-span-6 bg-white p-6 sm:p-8 rounded-2xl shadow-md space-y-4 border border-amber-100 text-left">
+                      <div className="text-[10px] font-extrabold text-[#D69A3A] uppercase tracking-widest">
+                        {el.data?.tag || 'MARKETING SELLS WHEN'}
+                      </div>
+                      <h1 className="text-2xl sm:text-4xl font-serif font-black text-[#D69A3A]">
+                        {el.data?.title || el.content || 'Your Brand Voice, Dressed in Technicolor'}
+                      </h1>
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                        {el.data?.desc || 'Bold copy that demands attention, sparks connection, and converts — without ever toning it down.'}
+                      </p>
+                      <div>
+                        <button
+                          type="button"
+                          className="bg-[#70A327] hover:bg-[#5e8b20] text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all hover:scale-105"
+                        >
+                          {el.data?.buttonText || 'GET STARTED NOW'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockBioArizona') {
+              return (
+                <div key={el.id} className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100 my-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                    <div className="space-y-4 text-left">
+                      <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#D69A3A]">
+                        {el.data?.title || "Hey, I'm Claire"}
+                      </h2>
+                      <div className="text-sm sm:text-base font-serif font-bold text-[#40B5A6]">
+                        {el.data?.subtitle || 'Welcome to the land of highlighter-worthy copy!'}
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-line">
+                        {el.data?.desc || 'The Painted Paragraph exists to help women take up more space—with words that radiate power, personality, and purpose. Because when your copy clicks, everything changes.'}
+                      </p>
+                      <div>
+                        <button
+                          type="button"
+                          className="bg-[#70A327] hover:bg-[#5e8b20] text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all hover:scale-105"
+                        >
+                          {el.data?.buttonText || 'GET STARTED NOW'}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <div className="rounded-3xl overflow-hidden shadow-xl border-4 border-amber-50 max-w-xs">
+                        <img
+                          src={el.data?.img || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'}
+                          alt="Claire"
+                          className="w-full h-80 object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockSoulSistersArizona') {
+              return (
+                <div key={el.id} className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100 my-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div className="rounded-2xl overflow-hidden shadow-md border border-slate-100">
+                      <img
+                        src={el.data?.img || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80'}
+                        alt="Workspace"
+                        className="w-full h-72 object-cover"
+                      />
+                    </div>
+                    <div className="bg-[#E6F7F5] border border-[#BCEEE6] p-6 rounded-2xl space-y-4 text-left">
+                      <h3 className="text-xl font-serif font-black text-[#40B5A6]">
+                        {el.data?.title || 'We May Be Soul Sisters If...'}
+                      </h3>
+                      <div className="space-y-3">
+                        {(el.data?.items || [
+                          { id: '1', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                          { id: '2', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                          { id: '3', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                          { id: '4', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                        ]).map((it: any, i: number) => (
+                          <div key={i} className="flex items-start gap-2.5 text-xs text-slate-700 font-medium leading-relaxed">
+                            <span className="text-[#E85D75] font-bold text-sm shrink-0">♥</span>
+                            <span>{it.desc}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'Block3ColArcadeArizona') {
+              return (
+                <div key={el.id} className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-8 text-slate-800 border border-slate-100 my-6">
+                  <div className="text-center">
+                    <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#D69A3A]">
+                      {el.data?.title || 'Copy that Pops. Strategy that Sells.'}
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {(el.data?.items || [
+                      { id: '1', subtitle: 'The Masterpiece', title: 'EXCLUSIVE VIP DAYS', theme: 'teal', img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                      { id: '2', subtitle: 'The Gallery', title: 'LAUNCH & COPY STRATEGY', theme: 'mint', img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                      { id: '3', subtitle: 'The Sketch', title: 'BRAND VOICE INTENSIVE', theme: 'yellow', img: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                    ]).map((col: any, i: number) => {
+                      const bgHeader = col.theme === 'mint' ? 'bg-[#52C2A5]' : col.theme === 'yellow' ? 'bg-[#F3C035]' : 'bg-[#40B5A6]';
+                      const textColor = col.theme === 'mint' ? 'text-[#52C2A5]' : col.theme === 'yellow' ? 'text-[#F3C035]' : 'text-[#40B5A6]';
+
+                      return (
+                        <div key={i} className="flex flex-col items-center">
+                          <div className="w-full h-56 rounded-t-[80px] overflow-hidden shadow-sm border border-slate-100">
+                            <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                          </div>
+                          <div className={`text-[10px] font-serif font-extrabold ${textColor} italic my-1.5`}>{col.subtitle}</div>
+                          <div className={`w-full ${bgHeader} text-white p-5 rounded-b-2xl text-center space-y-1.5 shadow-md`}>
+                            <div className="text-xs font-extrabold uppercase tracking-wider text-white">{col.title}</div>
+                            <p className="text-[10px] text-white/90 leading-relaxed font-medium">{col.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             if (el.type === 'Heading') {
               return (
                 <h1 key={el.id} className="text-3xl sm:text-5xl font-heading font-black text-white leading-tight text-center">

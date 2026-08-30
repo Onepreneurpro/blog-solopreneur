@@ -1377,6 +1377,216 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {el.type === 'Divider' && <hr className="border-slate-800 my-4" />}
 
+                    {/* DYNAMIC NATIVE BLOCK RENDERERS FOR THE ARIZONA TEMPLATE */}
+                    {el.type === 'BlockNavArizona' && (
+                      <nav className="bg-[#40B5A6] text-white py-3.5 px-6 rounded-2xl shadow-sm">
+                        <div className="flex items-center justify-center gap-4 sm:gap-8 text-[11px] font-extrabold tracking-widest uppercase">
+                          {['HOME', 'ABOUT', 'SERVICES', 'BLOG', 'CONTACT', 'EXTRA'].map((link, i) => (
+                            <span key={i} className="hover:opacity-80 cursor-pointer">{link}</span>
+                          ))}
+                        </div>
+                      </nav>
+                    )}
+
+                    {el.type === 'BlockHeroArizona' && (
+                      <div className="bg-[#FEF5D7] p-6 sm:p-8 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                          <div className="md:col-span-6 aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+                            <img
+                              src={el.data?.img || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80'}
+                              alt="Hero"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="md:col-span-6 bg-white p-6 sm:p-8 rounded-2xl shadow-md space-y-3 border border-amber-100 text-left">
+                            <input
+                              type="text"
+                              value={el.data?.tag || 'MARKETING SELLS WHEN'}
+                              onChange={(e) => handleUpdateElementData(el.id, { tag: e.target.value })}
+                              className="w-full text-[10px] font-extrabold text-[#D69A3A] uppercase tracking-widest bg-transparent border-b border-transparent focus:border-[#D69A3A] outline-none"
+                            />
+                            <input
+                              type="text"
+                              value={el.data?.title || el.content || 'Your Brand Voice, Dressed in Technicolor'}
+                              onChange={(e) => {
+                                handleUpdateElementData(el.id, { title: e.target.value });
+                                handleUpdateElementContent(el.id, e.target.value);
+                              }}
+                              className="w-full text-2xl sm:text-3xl font-serif font-black text-[#D69A3A] bg-transparent border-b border-transparent focus:border-[#D69A3A] outline-none"
+                            />
+                            <textarea
+                              rows={2}
+                              value={el.data?.desc || 'Bold copy that demands attention, sparks connection, and converts — without ever toning it down.'}
+                              onChange={(e) => handleUpdateElementData(el.id, { desc: e.target.value })}
+                              className="w-full text-xs text-slate-600 font-medium leading-relaxed bg-transparent border border-transparent focus:border-[#D69A3A] outline-none resize-none"
+                            />
+                            <button
+                              type="button"
+                              className="bg-[#70A327] text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow-sm"
+                            >
+                              <input
+                                type="text"
+                                value={el.data?.buttonText || 'GET STARTED NOW'}
+                                onChange={(e) => handleUpdateElementData(el.id, { buttonText: e.target.value })}
+                                className="bg-transparent text-white font-extrabold text-center outline-none border-b border-transparent focus:border-white w-full"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {el.type === 'BlockBioArizona' && (
+                      <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                          <div className="space-y-4 text-left">
+                            <input
+                              type="text"
+                              value={el.data?.title || "Hey, I'm Claire"}
+                              onChange={(e) => handleUpdateElementData(el.id, { title: e.target.value })}
+                              className="w-full text-3xl font-serif font-black text-[#D69A3A] bg-transparent border-b border-transparent focus:border-[#D69A3A] outline-none"
+                            />
+                            <input
+                              type="text"
+                              value={el.data?.subtitle || 'Welcome to the land of highlighter-worthy copy!'}
+                              onChange={(e) => handleUpdateElementData(el.id, { subtitle: e.target.value })}
+                              className="w-full text-sm font-serif font-bold text-[#40B5A6] bg-transparent border-b border-transparent focus:border-[#40B5A6] outline-none"
+                            />
+                            <textarea
+                              rows={5}
+                              value={el.data?.desc || 'The Painted Paragraph exists to help women take up more space—with words that radiate power, personality, and purpose. Because when your copy clicks, everything changes.'}
+                              onChange={(e) => handleUpdateElementData(el.id, { desc: e.target.value })}
+                              className="w-full text-xs text-slate-600 font-medium leading-relaxed bg-transparent border border-transparent focus:border-[#D69A3A] outline-none resize-none"
+                            />
+                            <button
+                              type="button"
+                              className="bg-[#70A327] text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow-sm"
+                            >
+                              <input
+                                type="text"
+                                value={el.data?.buttonText || 'GET STARTED NOW'}
+                                onChange={(e) => handleUpdateElementData(el.id, { buttonText: e.target.value })}
+                                className="bg-transparent text-white font-extrabold text-center outline-none border-b border-transparent focus:border-white w-full"
+                              />
+                            </button>
+                          </div>
+                          <div className="flex justify-center">
+                            <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-amber-50 max-w-xs">
+                              <img
+                                src={el.data?.img || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'}
+                                alt="Claire"
+                                className="w-full h-80 object-cover"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {el.type === 'BlockSoulSistersArizona' && (
+                      <div className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                          <div className="rounded-2xl overflow-hidden shadow-md border border-slate-100">
+                            <img
+                              src={el.data?.img || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80'}
+                              alt="Workspace"
+                              className="w-full h-64 object-cover"
+                            />
+                          </div>
+                          <div className="bg-[#E6F7F5] border border-[#BCEEE6] p-6 rounded-2xl space-y-3 text-left">
+                            <input
+                              type="text"
+                              value={el.data?.title || 'We May Be Soul Sisters If...'}
+                              onChange={(e) => handleUpdateElementData(el.id, { title: e.target.value })}
+                              className="w-full text-xl font-serif font-black text-[#40B5A6] bg-transparent border-b border-transparent focus:border-[#40B5A6] outline-none"
+                            />
+                            <div className="space-y-2">
+                              {(el.data?.items || [
+                                { id: '1', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                                { id: '2', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                                { id: '3', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                                { id: '4', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                              ]).map((it: any, i: number) => (
+                                <div key={i} className="flex items-start gap-2 text-xs text-slate-700 font-medium">
+                                  <span className="text-[#E85D75] font-bold">♥</span>
+                                  <textarea
+                                    rows={2}
+                                    value={it.desc}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      const updatedItems = (el.data?.items || []).map((item: any, idx: number) =>
+                                        idx === i ? { ...item, desc: val } : item
+                                      );
+                                      handleUpdateElementData(el.id, { items: updatedItems });
+                                    }}
+                                    className="w-full text-xs text-slate-700 bg-transparent border border-transparent focus:border-[#40B5A6] outline-none resize-none"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {el.type === 'Block3ColArcadeArizona' && (
+                      <div className="bg-white p-6 rounded-3xl shadow-xl space-y-6 text-slate-800 border border-slate-100">
+                        <div className="text-center">
+                          <input
+                            type="text"
+                            value={el.data?.title || 'Copy that Pops. Strategy that Sells.'}
+                            onChange={(e) => handleUpdateElementData(el.id, { title: e.target.value })}
+                            className="w-full text-center text-2xl font-serif font-black text-[#D69A3A] bg-transparent border-b border-transparent focus:border-[#D69A3A] outline-none"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {(el.data?.items || [
+                            { id: '1', subtitle: 'The Masterpiece', title: 'EXCLUSIVE VIP DAYS', theme: 'teal', img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                            { id: '2', subtitle: 'The Gallery', title: 'LAUNCH & COPY STRATEGY', theme: 'mint', img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                            { id: '3', subtitle: 'The Sketch', title: 'BRAND VOICE INTENSIVE', theme: 'yellow', img: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=500&q=80', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake.' },
+                          ]).map((col: any, i: number) => {
+                            const bgHeader = col.theme === 'mint' ? 'bg-[#52C2A5]' : col.theme === 'yellow' ? 'bg-[#F3C035]' : 'bg-[#40B5A6]';
+                            const textColor = col.theme === 'mint' ? 'text-[#52C2A5]' : col.theme === 'yellow' ? 'text-[#F3C035]' : 'text-[#40B5A6]';
+
+                            return (
+                              <div key={i} className="flex flex-col items-center">
+                                <div className="w-full h-48 rounded-t-[80px] overflow-hidden shadow-sm border border-slate-100">
+                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                </div>
+                                <div className={`text-[10px] font-serif font-extrabold ${textColor} italic my-1.5`}>{col.subtitle}</div>
+                                <div className={`w-full ${bgHeader} text-white p-4 rounded-b-2xl text-center space-y-1 shadow-md`}>
+                                  <input
+                                    type="text"
+                                    value={col.title}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      const updatedItems = (el.data?.items || []).map((item: any, idx: number) =>
+                                        idx === i ? { ...item, title: val } : item
+                                      );
+                                      handleUpdateElementData(el.id, { items: updatedItems });
+                                    }}
+                                    className="w-full text-center text-xs font-extrabold uppercase tracking-wider text-white bg-transparent border-b border-transparent focus:border-white outline-none"
+                                  />
+                                  <textarea
+                                    rows={2}
+                                    value={col.desc}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      const updatedItems = (el.data?.items || []).map((item: any, idx: number) =>
+                                        idx === i ? { ...item, desc: val } : item
+                                      );
+                                      handleUpdateElementData(el.id, { items: updatedItems });
+                                    }}
+                                    className="w-full text-[10px] text-white/90 leading-relaxed bg-transparent border border-transparent focus:border-white outline-none resize-none"
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (
                       <div
@@ -1851,7 +2061,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {/* DEFAULT FALLBACK RENDERER FOR UNHANDLED CUSTOM BLOCKS */}
-                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark', 'Col4', 'Col3', 'Col2'].includes(el.type) && (
+                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark', 'Col4', 'Col3', 'Col2', 'BlockNavArizona', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona'].includes(el.type) && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
