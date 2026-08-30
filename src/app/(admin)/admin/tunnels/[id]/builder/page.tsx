@@ -419,6 +419,49 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   };
 
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
+    // If a container block is selected on the canvas, insert image or element directly into the container!
+    if (selectedElementId) {
+      const selectedEl = elements.find((e) => e.id === selectedElementId);
+      if (
+        selectedEl &&
+        (selectedEl.data?.items ||
+          ['Col4', 'Col3', 'Col2', 'ContentBox', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type))
+      ) {
+        if (type === 'Image') {
+          // If a specific sub-card image is selected in the container
+          if (selectedSubItem && selectedSubItem.blockId === selectedEl.id) {
+            const idx = selectedSubItem.itemIndex;
+            const updatedItems = (selectedEl.data?.items || []).map((item: any, i: number) =>
+              i === idx ? { ...item, img: defaultContent } : item
+            );
+            handleUpdateElementData(selectedEl.id, { items: updatedItems, img: defaultContent });
+            return;
+          }
+
+          // If main block image exists (e.g. BlockHeroArizona / BlockBioArizona)
+          if (['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type)) {
+            handleUpdateElementData(selectedEl.id, { img: defaultContent });
+            return;
+          }
+
+          // Otherwise add a new card item with the image into the container
+          const currentItems = selectedEl.data?.items || [];
+          const newItem = {
+            id: `item-${Date.now()}`,
+            title: `Élément #${currentItems.length + 1}`,
+            desc: 'Description pré-remplie prêt à personnaliser.',
+            img: defaultContent,
+            imgSize: 240,
+            borderRadius: 16,
+            objectFit: 'cover',
+          };
+          handleUpdateElementData(selectedEl.id, { items: [...currentItems, newItem] });
+          return;
+        }
+      }
+    }
+
+    // Default: Add standalone element to canvas
     const newEl: CanvasElement = {
       id: `el-${Date.now()}`,
       type,
@@ -3303,41 +3346,59 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               />
 
                               {/* IMAGE FILE / URL UPLOAD FOR EACH COLUMN */}
-                              <div className="flex items-center gap-1.5">
-                                <input
-                                  type="text"
-                                  value={item.img || ''}
-                                  placeholder="URL Image..."
-                                  onChange={(e) => {
-                                    const updatedItems = elData.items.map((it: any) =>
-                                      it.id === item.id ? { ...it, img: e.target.value } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-mono"
-                                />
-                                <label className="p-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg cursor-pointer shrink-0 text-xs">
-                                  <span>📁</span>
+                              <div className="space-y-1 pt-1">
+                                <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                                  <span>🖼️ Image de la carte</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedSubItem({ blockId: selectedEl.id, itemIndex: idx, subType: 'image' })}
+                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                                      selectedSubItem?.blockId === selectedEl.id && selectedSubItem?.itemIndex === idx
+                                        ? 'bg-[#00A0FF] text-white'
+                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                    }`}
+                                  >
+                                    {selectedSubItem?.blockId === selectedEl.id && selectedSubItem?.itemIndex === idx
+                                      ? '✅ Prêt pour le menu à gauche'
+                                      : 'Cliquer pour l assigner'}
+                                  </button>
+                                </div>
+                                <div className="flex items-center gap-1.5">
                                   <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
+                                    type="text"
+                                    value={item.img || ''}
+                                    placeholder="URL Image..."
                                     onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (uploadEv) => {
-                                          const url = uploadEv.target?.result as string;
-                                          const updatedItems = elData.items.map((it: any) =>
-                                            it.id === item.id ? { ...it, img: url } : it
-                                          );
-                                          handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                        };
-                                        reader.readAsDataURL(file);
-                                      }
+                                      const updatedItems = elData.items.map((it: any) =>
+                                        it.id === item.id ? { ...it, img: e.target.value } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
                                     }}
+                                    className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-mono"
                                   />
-                                </label>
+                                  <label className="px-2 py-1 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-lg cursor-pointer shrink-0 text-xs font-bold flex items-center gap-1 shadow-xs">
+                                    <span>📁 Fichier</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (uploadEv) => {
+                                            const url = uploadEv.target?.result as string;
+                                            const updatedItems = elData.items.map((it: any) =>
+                                              it.id === item.id ? { ...it, img: url } : it
+                                            );
+                                            handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                </div>
                               </div>
 
                               <textarea
