@@ -140,7 +140,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             if (el.type === 'ContentBox') {
               const layoutMode = el.data?.layoutMode || 'grid-3';
               const gridClass =
-                layoutMode === 'vertical'
+                layoutMode === 'masonry'
+                  ? 'columns-1 md:columns-3 gap-6 space-y-6 [&>div]:break-inside-avoid'
+                  : layoutMode === 'vertical'
                   ? 'flex flex-col space-y-4'
                   : layoutMode === 'grid-2'
                   ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-start'

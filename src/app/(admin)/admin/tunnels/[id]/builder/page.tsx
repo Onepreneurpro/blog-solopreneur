@@ -1816,7 +1816,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         ) : (() => {
                           const layoutMode = el.data?.layoutMode || 'grid-3';
                           const gridClass =
-                            layoutMode === 'vertical'
+                            layoutMode === 'masonry'
+                              ? 'columns-1 md:columns-3 gap-4 space-y-4 [&>div]:break-inside-avoid'
+                              : layoutMode === 'vertical'
                               ? 'flex flex-col space-y-4'
                               : layoutMode === 'grid-2'
                               ? 'grid grid-cols-1 md:grid-cols-2 gap-4 items-start'
@@ -1831,7 +1833,33 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               {el.data.children.map((child: CanvasElement, cIdx: number) => (
                                 <div
                                   key={child.id || cIdx}
-                                  className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all"
+                                  draggable
+                                  onDragStart={(e) => {
+                                    e.stopPropagation();
+                                    e.dataTransfer.setData('application/json', JSON.stringify({ isChild: true, parentBlockId: el.id, childIndex: cIdx }));
+                                  }}
+                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                  onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const dataStr = e.dataTransfer.getData('application/json');
+                                    if (!dataStr) return;
+                                    try {
+                                      const data = JSON.parse(dataStr);
+                                      if (data.isChild && data.parentBlockId === el.id) {
+                                        const fromIdx = data.childIndex;
+                                        if (fromIdx !== undefined && fromIdx !== cIdx) {
+                                          const updated = [...el.data.children];
+                                          const [moved] = updated.splice(fromIdx, 1);
+                                          updated.splice(cIdx, 0, moved);
+                                          handleUpdateElementData(el.id, { children: updated });
+                                        }
+                                      }
+                                    } catch (err) {
+                                      console.error(err);
+                                    }
+                                  }}
+                                  className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all cursor-grab active:cursor-grabbing shadow-xs hover:shadow-md"
                                 >
                                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-200/60 pb-1">
                                   <span className="uppercase text-[#00A0FF] font-black">{child.type || 'Élément'}</span>
@@ -3288,6 +3316,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                               {[
+                                { key: 'masonry', label: '🧱 Mosaïque (Combler les vides)' },
                                 { key: 'grid-3', label: '3 Colonnes (33%)' },
                                 { key: 'grid-2', label: '2 Colonnes (50%)' },
                                 { key: 'grid-4', label: '4 Colonnes (25%)' },
