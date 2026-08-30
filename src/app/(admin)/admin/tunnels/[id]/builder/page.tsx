@@ -448,81 +448,405 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       {/* 2. MAIN BUILDER BODY (PALETTE SIDEBAR & CANVAS) */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* LEFT PALETTE PANEL (SCREENS 1, 2, 3) */}
-        <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-y-auto">
+        {/* LEFT PALETTE / INSPECTOR PANEL (SCREENS 1, 2, 3, 4, 5) */}
+        <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-y-auto">
           
-          {/* TABS: ÉLÉMENTS / BLOCS */}
-          <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950">
-            <button
-              onClick={() => setActiveTab('ELEMENTS')}
-              className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
-                activeTab === 'ELEMENTS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Éléments
-            </button>
-            <button
-              onClick={() => setActiveTab('BLOCKS')}
-              className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
-                activeTab === 'BLOCKS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Blocs
-            </button>
-          </div>
+          {/* IF AN ELEMENT IS SELECTED -> SHOW LEFT SIDEBAR INSPECTOR (SCREENSHOTS 3, 4, 5) */}
+          {selectedElementId ? (
+            (() => {
+              const selectedEl = elements.find((el) => el.id === selectedElementId);
+              if (!selectedEl) return null;
+              const elData = selectedEl.data || {};
 
-          {/* PALETTE CONTENT FOR ELEMENTS AND BLOCS TABS */}
-          <div className="p-4 space-y-6 text-xs">
-            
-            {activeTab === 'ELEMENTS' && (
-              <>
-                {/* CATEGORY 1: TEXTE (SCREEN 1) */}
-                <div className="space-y-2.5">
-                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                    Texte
+              return (
+                <div className="flex flex-col h-full text-slate-200">
+                  {/* TOP HEADER MATCHING SCREENSHOT 3: < Retour | Section > Rangée > Image */}
+                  <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setSelectedElementId(null)}
+                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-700 transition-colors"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>&lt; Retour</span>
+                    </button>
+                    <div className="text-[11px] font-bold text-slate-400 truncate">
+                      Section &gt; Rangée &gt; <span className="text-white font-extrabold">{selectedEl.type}</span>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'Text', 'Texte', 'Insérez votre texte ici...')}
-                      onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">Texte</span>
-                    </button>
 
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'Heading', 'Texte', 'Titre de la Page de Capture')}
-                      onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">Titre</span>
-                    </button>
+                  {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
+                  <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1">
+                    
+                    {/* SECTION TITLE / MAIN CONTENT EDITING */}
+                    <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                      <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                        Contenu Principal / Titre
+                      </label>
+                      <input
+                        type="text"
+                        value={elData.title || selectedEl.content || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          handleUpdateElementData(selectedEl.id, { title: val });
+                          handleUpdateElementContent(selectedEl.id, val);
+                        }}
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
+                      />
+                    </div>
 
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
-                      onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
-                    </button>
+                    {/* 1. FICHIER DE L IMAGE (IMAGE UPLOAD & URL - SCREENSHOT 3) */}
+                    {(selectedEl.type === 'Image' || selectedEl.type.includes('Img') || elData.items) && (
+                      <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                          Fichier de l image
+                        </label>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={elData.img || selectedEl.content || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                handleUpdateElementData(selectedEl.id, { img: val });
+                                handleUpdateElementContent(selectedEl.id, val);
+                              }}
+                              placeholder="https://..."
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
+                            />
+                            <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
+                              <span>📤</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = (uploadEv) => {
+                                      const url = uploadEv.target?.result as string;
+                                      handleUpdateElementData(selectedEl.id, { img: url });
+                                      handleUpdateElementContent(selectedEl.id, url);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                          <p className="text-[10px] text-slate-500">
+                            Sélectionnez une image de votre ordinateur ou entrez une URL.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. ACTION SUR UNE IMAGE CLIQUÉE (SCREENSHOT 3) */}
+                    <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Action sur une image cliquée
+                      </label>
+                      <select
+                        value={elData.clickAction || 'None'}
+                        onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                      >
+                        <option value="None">Aucune (None)</option>
+                        <option value="OpenURL">Ouvrir l URL de redirection</option>
+                        <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
+                      </select>
+                    </div>
+
+                    {/* 3. ATTRIBUT ALT & REMPLIR À 100% (SCREENSHOT 3) */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Attribut Alt
+                        </label>
+                        <input
+                          type="text"
+                          value={elData.alt || ''}
+                          onChange={(e) => handleUpdateElementData(selectedEl.id, { alt: e.target.value })}
+                          placeholder="Texte alternatif..."
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
+                        />
+                      </div>
+
+                      <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
+                        <input
+                          type="checkbox"
+                          checked={elData.fullWidth || false}
+                          onChange={(e) => handleUpdateElementData(selectedEl.id, { fullWidth: e.target.checked })}
+                          className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
+                        />
+                        <span>Remplir à 100% en largeur</span>
+                      </label>
+                    </div>
+
+                    {/* 4. TAILLE DE L IMAGE (SLIDER + NUMBER INPUT - SCREENSHOT 3) */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-400">Taille de l image</span>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            value={elData.imgSize || 240}
+                            onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
+                            className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                          />
+                          <span className="text-slate-500 text-[10px]">px</span>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min={50}
+                        max={800}
+                        value={elData.imgSize || 240}
+                        onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
+                        className="w-full accent-[#00A0FF]"
+                      />
+                    </div>
+
+                    {/* 5. ALIGNER (LEFT, CENTER, RIGHT - SCREENSHOT 3) */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        Aligner
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['Left', 'Center', 'Right'].map((align) => (
+                          <button
+                            key={align}
+                            onClick={() => handleUpdateElementData(selectedEl.id, { align })}
+                            className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                              (elData.align || 'Center') === align
+                                ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                            }`}
+                          >
+                            {align === 'Left' ? '← Gauche' : align === 'Center' ? '↔ Centre' : 'Droite →'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 6. MARGES (HAUT, DROITE, BAS, GAUCHE - SCREENSHOT 4) */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        Taille et position / Marges (px)
+                      </label>
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        {[
+                          { key: 'marginTop', label: 'Haut' },
+                          { key: 'marginRight', label: 'Droite' },
+                          { key: 'marginBottom', label: 'Bas' },
+                          { key: 'marginLeft', label: 'Gauche' },
+                        ].map((m) => (
+                          <div key={m.key} className="space-y-1">
+                            <input
+                              type="number"
+                              value={elData[m.key] || 0}
+                              onChange={(e) => handleUpdateElementData(selectedEl.id, { [m.key]: Number(e.target.value) })}
+                              className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono"
+                            />
+                            <span className="text-[9px] font-bold text-slate-500">{m.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 7. BORDURE & ARRONDI (SCREENSHOT 4 & 5) */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-400">Arrondissement des coins</span>
+                        <span className="text-xs font-mono text-slate-300">{elData.borderRadius || 16}px</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={60}
+                        value={elData.borderRadius || 16}
+                        onChange={(e) => handleUpdateElementData(selectedEl.id, { borderRadius: Number(e.target.value) })}
+                        className="w-full accent-[#00A0FF]"
+                      />
+                    </div>
+
+                    {/* 8. SOUS-ÉLÉMENTS ET COLONNES DU BLOC (IF MULTI-COLUMN BLOCK) */}
+                    {elData.items && (
+                      <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                            Cartes & Colonnes ({elData.items.length})
+                          </label>
+                          <button
+                            onClick={() => handleAddItemToBlock(selectedEl.id)}
+                            className="px-2 py-1 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-lg text-[10px] font-bold flex items-center gap-1"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Ajouter</span>
+                          </button>
+                        </div>
+
+                        <div className="space-y-3">
+                          {elData.items.map((item: any, idx: number) => (
+                            <div key={item.id || idx} className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                              <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                <span>Élément #{idx + 1}</span>
+                                <button
+                                  onClick={() => handleRemoveItemFromBlock(selectedEl.id, item.id)}
+                                  className="text-rose-400 hover:text-rose-300 text-[10px]"
+                                >
+                                  Supprimer
+                                </button>
+                              </div>
+
+                              <input
+                                type="text"
+                                value={item.title || ''}
+                                placeholder="Titre..."
+                                onChange={(e) => {
+                                  const updatedItems = elData.items.map((it: any) =>
+                                    it.id === item.id ? { ...it, title: e.target.value } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold"
+                              />
+
+                              {/* IMAGE FILE / URL UPLOAD FOR EACH COLUMN */}
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="text"
+                                  value={item.img || ''}
+                                  placeholder="URL Image..."
+                                  onChange={(e) => {
+                                    const updatedItems = elData.items.map((it: any) =>
+                                      it.id === item.id ? { ...it, img: e.target.value } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-mono"
+                                />
+                                <label className="p-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg cursor-pointer shrink-0 text-xs">
+                                  <span>📁</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = (uploadEv) => {
+                                          const url = uploadEv.target?.result as string;
+                                          const updatedItems = elData.items.map((it: any) =>
+                                            it.id === item.id ? { ...it, img: url } : it
+                                          );
+                                          handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                        };
+                                        reader.readAsDataURL(file);
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
+
+                              <textarea
+                                rows={2}
+                                value={item.desc || ''}
+                                placeholder="Description..."
+                                onChange={(e) => {
+                                  const updatedItems = elData.items.map((it: any) =>
+                                    it.id === item.id ? { ...it, desc: e.target.value } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                   </div>
-                  
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Texte', 'Conteneur d éléments...')}
-                    onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
-                    className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-grab active:cursor-grabbing"
-                  >
-                    <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
-                    <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
-                  </button>
                 </div>
+              );
+            })()
+          ) : (
+            /* IF NO ELEMENT IS SELECTED -> SHOW DEFAULT TABS (ÉLÉMENTS & BLOCS) */
+            <>
+              {/* TABS: ÉLÉMENTS / BLOCS */}
+              <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950">
+                <button
+                  onClick={() => setActiveTab('ELEMENTS')}
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                    activeTab === 'ELEMENTS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Éléments
+                </button>
+                <button
+                  onClick={() => setActiveTab('BLOCKS')}
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                    activeTab === 'BLOCKS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Blocs
+                </button>
+              </div>
+
+              {/* PALETTE CONTENT FOR ELEMENTS AND BLOCS TABS */}
+              <div className="p-4 space-y-6 text-xs">
+                
+                {activeTab === 'ELEMENTS' && (
+                  <>
+                    {/* CATEGORY 1: TEXTE (SCREEN 1) */}
+                    <div className="space-y-2.5">
+                      <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                        Texte
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Text', 'Texte', 'Insérez votre texte ici...')}
+                          onClick={() => handleAddElement('Text', 'Texte', 'Insérez votre texte ici...')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Type className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Texte</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Heading', 'Texte', 'Titre de la Page de Capture')}
+                          onClick={() => handleAddElement('Heading', 'Texte', 'Titre de la Page de Capture')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Heading className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Titre</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
+                          onClick={() => handleAddElement('BulletList', 'Texte', '• Avantage #1\n• Avantage #2')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <List className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Liste à puces</span>
+                        </button>
+                      </div>
+
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Texte', 'Conteneur d éléments...')}
+                        onClick={() => handleAddElement('ContentBox', 'Texte', 'Conteneur d éléments...')}
+                        className="w-full p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center gap-2 transition-all group cursor-grab active:cursor-grabbing"
+                      >
+                        <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                        <span className="text-[11px] font-bold text-slate-300">Boîte de contenu</span>
+                      </button>
+                    </div>
 
                 {/* CATEGORY 2: MÉDIA */}
                 <div className="space-y-2.5">
@@ -916,9 +1240,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 )}
               </div>
             )}
-
           </div>
-        </div>
+        </>
+      )}
+    </div>
 
         {/* RIGHT LIVE CANVAS WORKSPACE */}
         <div
@@ -1191,155 +1516,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         </div>
 
       </div>
-
-      {/* 3. BLOCK CUSTOMIZATION MODAL / DRAWER */}
-      {editingBlock && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 space-y-6 max-h-[85vh] overflow-y-auto text-white shadow-2xl">
-            
-            {/* MODAL HEADER */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center font-bold">
-                  ⚙️
-                </div>
-                <div>
-                  <h3 className="font-heading font-black text-base text-white">
-                    Personnaliser le bloc : {editingBlock.type}
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Modifiez les textes, visuels, et ajoutez/supprimez des sous-éléments.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setEditingBlock(null)}
-                className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* BLOCK TITLES EDITING */}
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">Titre principal du bloc / section</label>
-                <input
-                  type="text"
-                  value={editingBlock.data?.title || editingBlock.content || ''}
-                  onChange={(e) => {
-                    const newTitle = e.target.value;
-                    handleUpdateElementData(editingBlock.id, { title: newTitle });
-                    handleUpdateElementContent(editingBlock.id, newTitle);
-                    setEditingBlock((prev) => prev ? { ...prev, content: newTitle, data: { ...prev.data, title: newTitle } } : null);
-                  }}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
-                />
-              </div>
-
-              {/* ITEMS LIST EDITING (COLUMNS, CARDS, IMAGES) */}
-              {editingBlock.data?.items && (
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-heading font-extrabold text-xs text-slate-300 uppercase tracking-wider">
-                      Sous-éléments du bloc ({editingBlock.data.items.length})
-                    </h4>
-                    <Button
-                      onClick={() => handleAddItemToBlock(editingBlock.id)}
-                      size="sm"
-                      className="bg-[#00A0FF] hover:bg-[#0082D6] !text-white text-xs font-bold gap-1 py-1 rounded-xl"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Ajouter un élément</span>
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                    {editingBlock.data.items.map((item: any, idx: number) => (
-                      <div key={item.id || idx} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-400">
-                          <span>Élément #{idx + 1}</span>
-                          <button
-                            onClick={() => handleRemoveItemFromBlock(editingBlock.id, item.id)}
-                            className="text-rose-400 hover:text-rose-300 flex items-center gap-1 text-[11px]"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Supprimer</span>
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400">Titre</label>
-                            <input
-                              type="text"
-                              value={item.title || ''}
-                              onChange={(e) => {
-                                const newTitle = e.target.value;
-                                const updatedItems = editingBlock.data.items.map((it: any) =>
-                                  it.id === item.id ? { ...it, title: newTitle } : it
-                                );
-                                handleUpdateElementData(editingBlock.id, { items: updatedItems });
-                                setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
-                              }}
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400">URL d Image (facultatif)</label>
-                            <input
-                              type="text"
-                              value={item.img || ''}
-                              onChange={(e) => {
-                                const newImg = e.target.value;
-                                const updatedItems = editingBlock.data.items.map((it: any) =>
-                                  it.id === item.id ? { ...it, img: newImg } : it
-                                );
-                                handleUpdateElementData(editingBlock.id, { items: updatedItems });
-                                setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
-                              }}
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 font-mono"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400">Description / Paragraphe</label>
-                          <textarea
-                            rows={2}
-                            value={item.desc || ''}
-                            onChange={(e) => {
-                              const newDesc = e.target.value;
-                              const updatedItems = editingBlock.data.items.map((it: any) =>
-                                it.id === item.id ? { ...it, desc: newDesc } : it
-                              );
-                              handleUpdateElementData(editingBlock.id, { items: updatedItems });
-                              setEditingBlock((prev) => prev ? { ...prev, data: { ...prev.data, items: updatedItems } } : null);
-                            }}
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 font-medium"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* MODAL FOOTER */}
-            <div className="pt-4 border-t border-slate-800 flex justify-end">
-              <Button
-                onClick={() => setEditingBlock(null)}
-                className="bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-md"
-              >
-                Terminer la personnalisation
-              </Button>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );
