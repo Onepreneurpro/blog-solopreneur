@@ -138,6 +138,18 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             if (el.type === 'ContentBox') {
+              const layoutMode = el.data?.layoutMode || 'grid-3';
+              const gridClass =
+                layoutMode === 'vertical'
+                  ? 'flex flex-col space-y-4'
+                  : layoutMode === 'grid-2'
+                  ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-start'
+                  : layoutMode === 'grid-4'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start'
+                  : layoutMode === 'flex-row'
+                  ? 'flex flex-wrap items-start gap-6'
+                  : 'grid grid-cols-1 md:grid-cols-3 gap-6 items-start';
+
               return (
                 <div key={el.id} className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border border-slate-100 my-6 text-slate-800">
                   {el.data?.title && (
@@ -145,7 +157,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       {el.data.title}
                     </h3>
                   )}
-                  <div className="space-y-4">
+                  <div className={gridClass}>
                     {(el.data?.children || []).map((child: any, cIdx: number) => {
                       if (child.type === 'Heading') {
                         return <h4 key={child.id || cIdx} className="text-xl font-heading font-bold text-slate-900">{child.content}</h4>;

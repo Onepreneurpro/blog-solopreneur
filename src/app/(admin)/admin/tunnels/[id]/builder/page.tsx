@@ -1810,16 +1810,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               Glissez-déposez n importe quel élément ici
                             </div>
                             <div className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
-                              Glissez des images, titres, paragraphes ou boutons depuis le menu à gauche pour les empiler dans ce conteneur.
+                              Glissez des images, titres, paragraphes ou boutons depuis le menu à gauche pour les disposer côte à côte ou en liste dans ce conteneur.
                             </div>
                           </div>
-                        ) : (
-                          <div className="space-y-4">
-                            {el.data.children.map((child: CanvasElement, cIdx: number) => (
-                              <div
-                                key={child.id || cIdx}
-                                className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all"
-                              >
+                        ) : (() => {
+                          const layoutMode = el.data?.layoutMode || 'grid-3';
+                          const gridClass =
+                            layoutMode === 'vertical'
+                              ? 'flex flex-col space-y-4'
+                              : layoutMode === 'grid-2'
+                              ? 'grid grid-cols-1 md:grid-cols-2 gap-4 items-start'
+                              : layoutMode === 'grid-4'
+                              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-start'
+                              : layoutMode === 'flex-row'
+                              ? 'flex flex-wrap items-start gap-4'
+                              : 'grid grid-cols-1 md:grid-cols-3 gap-4 items-start';
+
+                          return (
+                            <div className={gridClass}>
+                              {el.data.children.map((child: CanvasElement, cIdx: number) => (
+                                <div
+                                  key={child.id || cIdx}
+                                  className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all"
+                                >
                                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-200/60 pb-1">
                                   <span className="uppercase text-[#00A0FF] font-black">{child.type || 'Élément'}</span>
                                   <div className="flex items-center gap-2">
@@ -1910,7 +1923,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               </div>
                             ))}
                           </div>
-                        )}
+                        );
+                      })()}
                       </div>
                     )}
 
@@ -3262,6 +3276,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
                                 </select>
                               </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* DISPOSITION INTERNE CÔTE À CÔTE POUR CONTENTBOX */}
+                        {selectedEl.type === 'ContentBox' && (
+                          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              📐 Disposition Interne (Côte à côte)
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { key: 'grid-3', label: '3 Colonnes (33%)' },
+                                { key: 'grid-2', label: '2 Colonnes (50%)' },
+                                { key: 'grid-4', label: '4 Colonnes (25%)' },
+                                { key: 'vertical', label: '1 Colonne (Vertical)' },
+                                { key: 'flex-row', label: 'Ligne Flexible (Wrap)' },
+                              ].map((l) => (
+                                <button
+                                  key={l.key}
+                                  type="button"
+                                  onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: l.key })}
+                                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all ${
+                                    (elData.layoutMode || 'grid-3') === l.key
+                                      ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                  }`}
+                                >
+                                  {l.label}
+                                </button>
+                              ))}
                             </div>
                           </div>
                         )}
