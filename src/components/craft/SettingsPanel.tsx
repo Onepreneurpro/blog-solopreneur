@@ -146,6 +146,38 @@ export const SettingsPanel = () => {
           </div>
         )}
 
+        {/* TARGET SELECTION FOR MULTI-TEXT BLOCKS LIKE CARD */}
+        {name === 'Carte d Information' && (
+          <div className="space-y-1.5 bg-blue-50/60 p-3 rounded-2xl border border-blue-200">
+            <label className="font-bold text-slate-700 text-[11px] flex items-center gap-1">
+              <span>🎯 Appliquer le Style/Effets sur :</span>
+            </label>
+            <div className="grid grid-cols-3 gap-1">
+              {[
+                { key: 'title', label: 'Titre 💡' },
+                { key: 'content', label: 'Texte 📝' },
+                { key: 'both', label: 'Les Deux 🌟' },
+              ].map((target) => (
+                <button
+                  key={target.key}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.targetText = target.key;
+                    })
+                  }
+                  className={`py-1.5 px-2 rounded-lg border font-extrabold text-[10px] transition-colors ${
+                    (props.targetText || 'title') === target.key
+                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-blue-100/50'
+                  }`}
+                >
+                  {target.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* TEXT FORMATTING PALETTE (BOLD, ITALIC, COLOR) */}
         {(props.title !== undefined || props.text !== undefined || props.fontWeight !== undefined) && (
           <div className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">

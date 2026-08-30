@@ -28,6 +28,8 @@ export interface CardProps {
   underlineThickness?: number;
   underlineStyle?: 'solid' | 'wavy' | 'dotted' | 'dashed' | 'double';
   underlineOffset?: number;
+  // TARGET (TITRE VS TEXTE VS LES DEUX)
+  targetText?: 'title' | 'content' | 'both';
 }
 
 export const Card = ({
@@ -52,6 +54,7 @@ export const Card = ({
   underlineThickness = 4,
   underlineStyle = 'solid',
   underlineOffset = 2,
+  targetText = 'title',
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -67,6 +70,9 @@ export const Card = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+
+  const isTitleTargeted = targetText === 'title' || targetText === 'both';
+  const isContentTargeted = targetText === 'content' || targetText === 'both';
 
   const highlightStyles: React.CSSProperties =
     highlightColor && highlightColor !== 'transparent'
@@ -96,9 +102,9 @@ export const Card = ({
         }}
       >
         <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
-          <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <span className="relative inline-block" style={{ ...(isTitleTargeted ? highlightStyles : {}) }}>
             <CreativeUnderlineOverlay
-              enabled={underlineEnabled}
+              enabled={isTitleTargeted && underlineEnabled}
               color={underlineColor}
               thickness={underlineThickness}
               style={underlineStyle}
@@ -109,7 +115,16 @@ export const Card = ({
         </h3>
 
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
-          {content}
+          <span className="relative inline-block" style={{ ...(isContentTargeted ? highlightStyles : {}) }}>
+            <CreativeUnderlineOverlay
+              enabled={isContentTargeted && underlineEnabled}
+              color={underlineColor}
+              thickness={underlineThickness}
+              style={underlineStyle}
+              offset={underlineOffset}
+            />
+            <span className="relative z-10">{content}</span>
+          </span>
         </p>
       </div>
     );
@@ -135,9 +150,9 @@ export const Card = ({
       }}
     >
       <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
-        <span className="relative inline-block" style={{ ...highlightStyles }}>
+        <span className="relative inline-block" style={{ ...(isTitleTargeted ? highlightStyles : {}) }}>
           <CreativeUnderlineOverlay
-            enabled={underlineEnabled}
+            enabled={isTitleTargeted && underlineEnabled}
             color={underlineColor}
             thickness={underlineThickness}
             style={underlineStyle}
@@ -159,17 +174,29 @@ export const Card = ({
         </span>
       </h3>
 
-      <p
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: CardProps) => {
-            props.content = e.currentTarget.innerText;
-          });
-        }}
-        className="text-sm font-medium text-[#475569] leading-relaxed outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md p-1 cursor-text"
-      >
-        {content}
+      <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
+        <span className="relative inline-block" style={{ ...(isContentTargeted ? highlightStyles : {}) }}>
+          <CreativeUnderlineOverlay
+            enabled={isContentTargeted && underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              setProp((props: CardProps) => {
+                props.content = e.currentTarget.innerText;
+              });
+            }}
+            className="relative z-10"
+            style={{ outline: 'none', cursor: 'text' }}
+          >
+            {content}
+          </span>
+        </span>
       </p>
     </div>
   );
@@ -186,6 +213,7 @@ export const Card = ({
     borderRadius: 0,
     shadowPreset: 'none',
     fontFamily: 'Inter',
+    targetText: 'title',
   },
   rules: {
     canDrag: () => true,
