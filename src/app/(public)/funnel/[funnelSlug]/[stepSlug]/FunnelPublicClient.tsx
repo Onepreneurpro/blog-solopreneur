@@ -222,6 +222,107 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
+            if (el.type === 'BlockFeat4ColImg') {
+              return (
+                <div key={el.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl my-8">
+                  {[
+                    { title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                    { title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                    { title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                    { title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                  ].map((col, i) => (
+                    <div key={i} className="flex flex-col items-center text-center space-y-3">
+                      <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
+                        <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                      </div>
+                      <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockFeat3ColImg') {
+              return (
+                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
+                  <div className="text-center space-y-1">
+                    <h4 className="text-[10px] font-black text-[#00A0FF] uppercase tracking-widest">CE QUE VOUS OBTENEZ</h4>
+                    <h2 className="text-2xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
+                      { title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
+                      { title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
+                    ].map((col, i) => (
+                      <div key={i} className="space-y-3">
+                        <div className="aspect-video rounded-2xl overflow-hidden shadow-sm">
+                          <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                        </div>
+                        <h4 className="font-heading font-extrabold text-sm text-slate-900">{col.title}</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed">{col.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockFeat2ColIconsLeft') {
+              return (
+                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-heading font-black text-slate-900">Nos Services & Garanties</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                      { title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
+                      { title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
+                      { title: 'Un Support Excellent', desc: 'Une équipe réactive disponible pour répondre à toutes vos questions.' },
+                      { title: 'Template Responsive', desc: 'Des interfaces optimisées pour tous les écrans mobiles et ordinateurs.' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">
+                          ✓
+                        </div>
+                        <div>
+                          <h4 className="font-heading font-extrabold text-sm text-slate-900">{item.title}</h4>
+                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            if (el.type === 'BlockFeat4ColDark') {
+              return (
+                <div key={el.id} className="p-8 bg-slate-950 text-white rounded-3xl border border-slate-800 space-y-6 shadow-2xl my-8">
+                  <div className="text-center space-y-2">
+                    <h2 className="text-2xl font-heading font-black text-white">Votre titre accrocheur ici pour attirer l attention</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {[
+                      { title: 'Rapidité', desc: 'Déploiement en 1 clic.' },
+                      { title: 'Sécurité', desc: 'Données protégées.' },
+                      { title: 'Performance', desc: 'Vitesse maximale.' },
+                      { title: 'Support', desc: '24/7 disponible.' },
+                    ].map((item, i) => (
+                      <div key={i} className="p-5 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2">
+                        <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center mx-auto font-black text-sm">
+                          {i + 1}
+                        </div>
+                        <h4 className="font-heading font-black text-sm text-white">{item.title}</h4>
+                        <p className="text-xs text-slate-400">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
             if (el.type === 'Countdown') {
               return (
                 <div key={el.id} className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-center space-y-1 my-4">
