@@ -59,6 +59,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [step, setStep] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS'>('ELEMENTS');
+  const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
 
@@ -580,143 +581,239 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             {/* TAB 2: BLOCS PRE-DESIGNED SECTIONS (THE 8 SUB-MENUS) */}
             {activeTab === 'BLOCKS' && (
               <div className="space-y-3">
-                
-                {/* 1. FONCTIONNALITÉS */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>👍</span>
-                    <span>Fonctionnalités</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockFeatures', 'Blocs', 'Features Section (3 Colonnes)')}
-                    onClick={() => handleAddElement('BlockFeatures', 'Blocs', 'Features Section (3 Colonnes)')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Section 3 Avantages</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
+                {activeBlockSubCategory === 'FEATURES' ? (
+                  <div className="space-y-4">
+                    {/* BACK BUTTON MATCHING SCREENSHOTS */}
+                    <button
+                      onClick={() => setActiveBlockSubCategory(null)}
+                      className="w-full p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-2 border border-slate-700 transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>&lt; Retour</span>
+                    </button>
 
-                {/* 2. PIEDS DE PAGE */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>📄</span>
-                    <span>Pieds de page</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
-                    onClick={() => handleAddElement('BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Footer Minimaliste</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
+                    <div className="text-[11px] font-heading font-black text-slate-400 uppercase tracking-wider">
+                      Blocs Prêts à l emploi : Fonctionnalités
+                    </div>
 
-                {/* 3. FORMULAIRES D INSCRIPTION */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>📝</span>
-                    <span>Formulaires d inscription</span>
+                    {/* THE 11 READY-TO-USE FEATURE BLOCKS (FROM USER SCREENSHOTS) */}
+                    <div className="space-y-3">
+                      {[
+                        {
+                          id: 'feat-1',
+                          name: 'Quatre colonnes d éléments (grande image, titre et texte)',
+                          type: 'BlockFeat4ColImg',
+                        },
+                        {
+                          id: 'feat-2',
+                          name: 'Trois colonnes d éléments (grande image, titre, texte)',
+                          type: 'BlockFeat3ColImg',
+                        },
+                        {
+                          id: 'feat-3',
+                          name: '2 colonnes avec grandes icônes sur la gauche',
+                          type: 'BlockFeat2ColIconsLeft',
+                        },
+                        {
+                          id: 'feat-4',
+                          name: 'Quatre colonnes d éléments (grande image, titre, texte et bouton)',
+                          type: 'BlockFeat4ColBtn',
+                        },
+                        {
+                          id: 'feat-5',
+                          name: 'Trois colonnes d éléments (icône, titre, texte et bouton)',
+                          type: 'BlockFeat3ColBtn',
+                        },
+                        {
+                          id: 'feat-6',
+                          name: 'Image à gauche, éléments style cartes à droite (image, titre et texte)',
+                          type: 'BlockFeatImgLeftCardsRight',
+                        },
+                        {
+                          id: 'feat-7',
+                          name: 'Éléments en diagonale (image, titre et texte)',
+                          type: 'BlockFeatDiagonal',
+                        },
+                        {
+                          id: 'feat-8',
+                          name: 'Quatre colonnes d éléments (grande icône, titre, texte)',
+                          type: 'BlockFeat4ColDark',
+                        },
+                        {
+                          id: 'feat-9',
+                          name: 'Liste d éléments style cartes avec carte du milieu en couleur',
+                          type: 'BlockFeatMiddleFeatured',
+                        },
+                        {
+                          id: 'feat-10',
+                          name: 'Éléments style cartes avec bords multicolores (titre, texte, bouton)',
+                          type: 'BlockFeatMulticolorBorders',
+                        },
+                        {
+                          id: 'feat-11',
+                          name: 'Quatre éléments style cartes (icône, titre, texte, bouton)',
+                          type: 'BlockFeat4CardsIcon',
+                        },
+                      ].map((item) => (
+                        <div
+                          key={item.id}
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, item.type, 'Fonctionnalités', item.name)}
+                          onClick={() => handleAddElement(item.type, 'Fonctionnalités', item.name)}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-[#00A0FF] rounded-2xl cursor-grab active:cursor-grabbing transition-all space-y-2 group"
+                        >
+                          <div className="aspect-video bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-2 flex flex-col justify-center items-center text-center">
+                            <div className="w-8 h-8 rounded-lg bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs mb-1">
+                              👍
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-mono line-clamp-1">{item.name}</span>
+                          </div>
+                          <div className="font-heading font-extrabold text-[11px] text-slate-200 group-hover:text-[#00A0FF] transition-colors leading-snug">
+                            {item.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
-                    onClick={() => handleAddElement('BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Opt-in Héro Haute Conversion</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
+                ) : (
+                  /* CATEGORIES LIST (MAIN SUB-MENUS) */
+                  <div className="space-y-3">
+                    
+                    {/* 1. FONCTIONNALITÉS */}
+                    <div
+                      onClick={() => setActiveBlockSubCategory('FEATURES')}
+                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-[#00A0FF] rounded-2xl cursor-pointer transition-all flex items-center justify-between"
+                    >
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>👍</span>
+                        <span>Fonctionnalités</span>
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-[#00A0FF]">
+                        11 blocs &gt;
+                      </span>
+                    </div>
 
-                {/* 4. EN-TÊTES DE PAGE */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>📑</span>
-                    <span>En-têtes de page</span>
+                    {/* 2. PIEDS DE PAGE */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>📄</span>
+                        <span>Pieds de page</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
+                        onClick={() => handleAddElement('BlockFooter', 'Blocs', 'Footer Minimaliste Onepreneur')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Footer Minimaliste</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 3. FORMULAIRES D INSCRIPTION */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>📝</span>
+                        <span>Formulaires d inscription</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
+                        onClick={() => handleAddElement('BlockOptinForm', 'Blocs', 'Formulaire Opt-in Héro haute conversion')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Opt-in Héro Haute Conversion</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 4. EN-TÊTES DE PAGE */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>📑</span>
+                        <span>En-têtes de page</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockHeader', 'Blocs', 'En-tête de page & Logo')}
+                        onClick={() => handleAddElement('BlockHeader', 'Blocs', 'En-tête de page & Logo')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Header Banner & Logo</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 5. PRÉSENTATION DE L ÉQUIPE */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>👥</span>
+                        <span>Présentation de l équipe</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
+                        onClick={() => handleAddElement('BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Cartes Fondateurs</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 6. TÉMOIGNAGES */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>💬</span>
+                        <span>Témoignages</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
+                        onClick={() => handleAddElement('BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Grille d Avis Clients</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 7. TARIFS */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>💲</span>
+                        <span>Tarifs</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
+                        onClick={() => handleAddElement('BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Tableau de Tarifs</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
+                    {/* 8. BIENVENUE */}
+                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                      <div className="font-heading font-black text-xs text-white flex items-center gap-2">
+                        <span>👋</span>
+                        <span>Bienvenue</span>
+                      </div>
+                      <button
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, 'BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
+                        onClick={() => handleAddElement('BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
+                        className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
+                      >
+                        <span>Section Hero Bienvenue</span>
+                        <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
+                      </button>
+                    </div>
+
                   </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockHeader', 'Blocs', 'En-tête de page & Logo')}
-                    onClick={() => handleAddElement('BlockHeader', 'Blocs', 'En-tête de page & Logo')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Header Banner & Logo</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
-
-                {/* 5. PRÉSENTATION DE L ÉQUIPE */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>👥</span>
-                    <span>Présentation de l équipe</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
-                    onClick={() => handleAddElement('BlockTeam', 'Blocs', 'Section Équipe & Fondateurs')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Cartes Fondateurs</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
-
-                {/* 6. TÉMOIGNAGES */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>💬</span>
-                    <span>Témoignages</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
-                    onClick={() => handleAddElement('BlockTestimonials', 'Blocs', 'Avis Clients & Étoiles')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Grille d Avis Clients</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
-
-                {/* 7. TARIFS */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>💲</span>
-                    <span>Tarifs</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
-                    onClick={() => handleAddElement('BlockPricing', 'Blocs', 'Tableau de Tarifs 3 Offres')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Tableau de Tarifs</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
-
-                {/* 8. BIENVENUE */}
-                <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <div className="font-heading font-black text-xs text-white flex items-center gap-2">
-                    <span>👋</span>
-                    <span>Bienvenue</span>
-                  </div>
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
-                    onClick={() => handleAddElement('BlockWelcome', 'Blocs', 'Bannière de Bienvenue Hero')}
-                    className="w-full p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-300 text-left cursor-grab active:cursor-grabbing flex items-center justify-between"
-                  >
-                    <span>Section Hero Bienvenue</span>
-                    <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
-                  </button>
-                </div>
-
+                )}
               </div>
             )}
 
