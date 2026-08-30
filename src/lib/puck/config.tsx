@@ -121,37 +121,81 @@ export const puckConfig: Config<PuckProps> = {
         bgGradient: 'from-blue-600 to-indigo-900',
         imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
       },
-      render: ({ title, subtitle, buttonText, buttonLink, bgGradient, imageUrl }) => (
-        <div className={`w-full py-16 px-6 sm:px-12 bg-gradient-to-r ${bgGradient} text-white rounded-3xl shadow-2xl my-4`}>
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="space-y-6 flex-1 text-center md:text-left">
-              <h1 className="text-3xl sm:text-5xl font-black font-heading leading-tight tracking-tight">
-                {title}
-              </h1>
-              <p className="text-base sm:text-lg text-white/90 leading-relaxed font-medium">
-                {subtitle}
-              </p>
-              <div className="pt-2">
-                <a
-                  href={buttonLink}
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-sm rounded-2xl shadow-xl hover:scale-105 transition-all"
-                >
-                  {buttonText}
-                </a>
+      render: ({ title, subtitle, buttonText, buttonLink, bgGradient, imageUrl, ...props }: any) => {
+        const updateProp = (key: string, value: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: value });
+          }
+        };
+
+        return (
+          <div className={`w-full py-16 px-6 sm:px-12 bg-gradient-to-r ${bgGradient} text-white rounded-3xl shadow-2xl my-4 relative group/hero`}>
+            <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="space-y-6 flex-1 text-center md:text-left">
+                {/* INLINE TITLE ON CANVAS */}
+                <input
+                  type="text"
+                  value={title || ''}
+                  onChange={(e) => updateProp('title', e.target.value)}
+                  className="w-full text-3xl sm:text-5xl font-black font-heading leading-tight tracking-tight bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl px-3 py-1 outline-none transition-all"
+                  placeholder="Titre Héro..."
+                />
+
+                {/* INLINE SUBTITLE ON CANVAS */}
+                <textarea
+                  value={subtitle || ''}
+                  rows={2}
+                  onChange={(e) => updateProp('subtitle', e.target.value)}
+                  className="w-full text-base sm:text-lg text-white/90 leading-relaxed font-medium bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl p-3 outline-none resize-none overflow-hidden transition-all"
+                  placeholder="Sous-titre Héro..."
+                />
+
+                {/* INLINE BUTTON TEXT ON CANVAS */}
+                <div className="pt-2">
+                  <input
+                    type="text"
+                    value={buttonText || ''}
+                    onChange={(e) => updateProp('buttonText', e.target.value)}
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-sm rounded-2xl shadow-xl transition-all outline-none focus:ring-4 focus:ring-white/50 text-center"
+                    placeholder="Bouton..."
+                  />
+                </div>
+              </div>
+
+              {/* INLINE IMAGE UPLOAD ON CANVAS */}
+              <div className="w-full md:w-1/2 flex justify-center">
+                <div className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer">
+                  {imageUrl ? (
+                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px]" />
+                  ) : (
+                    <div className="w-full h-64 bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-xs">
+                      Aucune image
+                    </div>
+                  )}
+
+                  <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-2 p-4">
+                    <span className="text-xl">📤</span>
+                    <span>Changer l image (PC)</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => updateProp('imageUrl', ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
-            {imageUrl && (
-              <div className="w-full md:w-1/2 flex justify-center">
-                <img
-                  src={imageUrl}
-                  alt="Hero illustration"
-                  className="rounded-2xl border-4 border-white/20 shadow-2xl max-h-[340px] object-cover"
-                />
-              </div>
-            )}
           </div>
-        </div>
-      ),
+        );
+      },
     },
 
     Heading: {
@@ -193,7 +237,7 @@ export const puckConfig: Config<PuckProps> = {
         align: 'center',
         color: 'text-slate-900',
       },
-      render: ({ title, size, align, color }) => {
+      render: ({ title, size, align, color, ...props }: any) => {
         const sizeClasses = {
           small: 'text-xl sm:text-2xl',
           medium: 'text-2xl sm:text-3xl',
@@ -207,9 +251,17 @@ export const puckConfig: Config<PuckProps> = {
         };
 
         return (
-          <h2 className={`w-full font-black font-heading tracking-tight my-4 ${sizeClasses[size]} ${alignClasses[align]} ${color}`}>
-            {title}
-          </h2>
+          <input
+            type="text"
+            value={title || ''}
+            onChange={(e) => {
+              if (props.onChange) {
+                props.onChange({ title: e.target.value });
+              }
+            }}
+            className={`w-full font-black font-heading tracking-tight bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl px-3 py-1 outline-none transition-all my-2 ${(sizeClasses as any)[size || 'large']} ${(alignClasses as any)[align || 'center']} ${color}`}
+            placeholder="Titre..."
+          />
         );
       },
     },
@@ -241,7 +293,7 @@ export const puckConfig: Config<PuckProps> = {
         align: 'center',
         size: 'medium',
       },
-      render: ({ content, align, size }) => {
+      render: ({ content, align, size, ...props }: any) => {
         const sizeClasses = {
           small: 'text-xs sm:text-sm',
           medium: 'text-sm sm:text-base',
@@ -254,9 +306,17 @@ export const puckConfig: Config<PuckProps> = {
         };
 
         return (
-          <p className={`w-full text-slate-600 font-medium leading-relaxed my-3 ${sizeClasses[size]} ${alignClasses[align]}`}>
-            {content}
-          </p>
+          <textarea
+            value={content || ''}
+            rows={2}
+            onChange={(e) => {
+              if (props.onChange) {
+                props.onChange({ content: e.target.value });
+              }
+            }}
+            className={`w-full text-slate-600 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl p-2.5 outline-none resize-none overflow-hidden transition-all my-2 ${(sizeClasses as any)[size || 'medium']} ${(alignClasses as any)[align || 'center']}`}
+            placeholder="Paragraphe..."
+          />
         );
       },
     },
@@ -290,7 +350,7 @@ export const puckConfig: Config<PuckProps> = {
         variant: 'primary',
         align: 'center',
       },
-      render: ({ text, href, variant, align }) => {
+      render: ({ text, href, variant, align, ...props }: any) => {
         const variantClasses = {
           primary: 'bg-[#00A0FF] hover:bg-[#0080FF] text-white border-transparent shadow-lg',
           secondary: 'bg-slate-900 hover:bg-slate-800 text-white border-transparent shadow-lg',
@@ -303,13 +363,18 @@ export const puckConfig: Config<PuckProps> = {
         };
 
         return (
-          <div className={`w-full flex my-4 ${alignClasses[align]}`}>
-            <a
-              href={href}
-              className={`px-7 py-3.5 rounded-2xl font-black text-sm transition-all hover:scale-105 cursor-pointer ${variantClasses[variant]}`}
-            >
-              {text}
-            </a>
+          <div className={`w-full flex my-4 ${(alignClasses as any)[align || 'center']}`}>
+            <input
+              type="text"
+              value={text || ''}
+              onChange={(e) => {
+                if (props.onChange) {
+                  props.onChange({ text: e.target.value });
+                }
+              }}
+              className={`px-7 py-3.5 rounded-2xl font-black text-sm transition-all outline-none text-center focus:ring-4 focus:ring-[#00A0FF]/40 ${(variantClasses as any)[variant || 'primary']}`}
+              placeholder="Texte du bouton..."
+            />
           </div>
         );
       },
@@ -354,12 +419,19 @@ export const puckConfig: Config<PuckProps> = {
         item3Title, item3Desc, item3Img,
         item4Title, item4Desc, item4Img,
         imgHeight, borderRadius,
-      }) => {
+        ...props
+      }: any) => {
+        const updateProp = (key: string, val: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: val });
+          }
+        };
+
         const items = [
-          { title: item1Title, desc: item1Desc, img: item1Img },
-          { title: item2Title, desc: item2Desc, img: item2Img },
-          { title: item3Title, desc: item3Desc, img: item3Img },
-          { title: item4Title, desc: item4Desc, img: item4Img },
+          { titleKey: 'item1Title', descKey: 'item1Desc', imgKey: 'item1Img', title: item1Title, desc: item1Desc, img: item1Img },
+          { titleKey: 'item2Title', descKey: 'item2Desc', imgKey: 'item2Img', title: item2Title, desc: item2Desc, img: item2Img },
+          { titleKey: 'item3Title', descKey: 'item3Desc', imgKey: 'item3Img', title: item3Title, desc: item3Desc, img: item3Img },
+          { titleKey: 'item4Title', descKey: 'item4Desc', imgKey: 'item4Img', title: item4Title, desc: item4Desc, img: item4Img },
         ];
 
         return (
@@ -367,18 +439,48 @@ export const puckConfig: Config<PuckProps> = {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {items.map((col, i) => (
                 <div key={i} className="flex flex-col items-center text-center space-y-3">
+                  {/* INLINE IMAGE UPLOAD BUTTON DIRECTLY ON CANVAS BLOCK */}
                   <div
-                    className="w-full overflow-hidden shadow-md border border-slate-100"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
                     <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2">
+                      <span className="text-lg">📤</span>
+                      <span>Changer l image (PC)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
                   </div>
-                  <h3 className="font-heading font-black text-sm tracking-wider uppercase text-slate-900">
-                    {col.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                    {col.desc}
-                  </p>
+
+                  {/* INLINE EDITABLE TITLE DIRECTLY ON CANVAS BLOCK */}
+                  <input
+                    type="text"
+                    value={col.title || ''}
+                    onChange={(e) => updateProp(col.titleKey, e.target.value)}
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all"
+                    placeholder="Titre..."
+                  />
+
+                  {/* INLINE EDITABLE DESCRIPTION DIRECTLY ON CANVAS BLOCK */}
+                  <textarea
+                    value={col.desc || ''}
+                    rows={2}
+                    onChange={(e) => updateProp(col.descKey, e.target.value)}
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all"
+                    placeholder="Description..."
+                  />
                 </div>
               ))}
             </div>
@@ -419,11 +521,18 @@ export const puckConfig: Config<PuckProps> = {
         item2Title, item2Desc, item2Img,
         item3Title, item3Desc, item3Img,
         imgHeight, borderRadius,
-      }) => {
+        ...props
+      }: any) => {
+        const updateProp = (key: string, val: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: val });
+          }
+        };
+
         const items = [
-          { title: item1Title, desc: item1Desc, img: item1Img },
-          { title: item2Title, desc: item2Desc, img: item2Img },
-          { title: item3Title, desc: item3Desc, img: item3Img },
+          { titleKey: 'item1Title', descKey: 'item1Desc', imgKey: 'item1Img', title: item1Title, desc: item1Desc, img: item1Img },
+          { titleKey: 'item2Title', descKey: 'item2Desc', imgKey: 'item2Img', title: item2Title, desc: item2Desc, img: item2Img },
+          { titleKey: 'item3Title', descKey: 'item3Desc', imgKey: 'item3Img', title: item3Title, desc: item3Desc, img: item3Img },
         ];
 
         return (
@@ -432,17 +541,44 @@ export const puckConfig: Config<PuckProps> = {
               {items.map((col, i) => (
                 <div key={i} className="flex flex-col items-center text-center space-y-3">
                   <div
-                    className="w-full overflow-hidden shadow-md border border-slate-100"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
                     <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2">
+                      <span className="text-lg">📤</span>
+                      <span>Changer l image (PC)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
                   </div>
-                  <h3 className="font-heading font-black text-sm tracking-wider uppercase text-slate-900">
-                    {col.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                    {col.desc}
-                  </p>
+
+                  <input
+                    type="text"
+                    value={col.title || ''}
+                    onChange={(e) => updateProp(col.titleKey, e.target.value)}
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all"
+                    placeholder="Titre..."
+                  />
+
+                  <textarea
+                    value={col.desc || ''}
+                    rows={2}
+                    onChange={(e) => updateProp(col.descKey, e.target.value)}
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all"
+                    placeholder="Description..."
+                  />
                 </div>
               ))}
             </div>
@@ -472,12 +608,32 @@ export const puckConfig: Config<PuckProps> = {
         bgColor: 'bg-white text-slate-900',
         borderColor: 'border-slate-200',
       },
-      render: ({ title, content, bgColor, borderColor }) => (
-        <div className={`w-full p-6 my-4 rounded-3xl border shadow-lg space-y-3 ${bgColor} ${borderColor}`}>
-          {title && <h4 className="font-heading font-black text-lg">{title}</h4>}
-          <p className="text-sm font-medium leading-relaxed opacity-90">{content}</p>
-        </div>
-      ),
+      render: ({ title, content, bgColor, borderColor, ...props }: any) => {
+        const updateProp = (key: string, val: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: val });
+          }
+        };
+
+        return (
+          <div className={`w-full p-6 my-4 rounded-3xl border shadow-lg space-y-3 ${bgColor} ${borderColor}`}>
+            <input
+              type="text"
+              value={title || ''}
+              onChange={(e) => updateProp('title', e.target.value)}
+              className="w-full font-heading font-black text-lg bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl px-2 py-1 outline-none transition-all"
+              placeholder="Titre Carte..."
+            />
+            <textarea
+              value={content || ''}
+              rows={2}
+              onChange={(e) => updateProp('content', e.target.value)}
+              className="w-full text-sm font-medium leading-relaxed bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl p-2 outline-none resize-none transition-all opacity-90"
+              placeholder="Contenu Carte..."
+            />
+          </div>
+        );
+      },
     },
 
     LeadForm: {
@@ -493,32 +649,55 @@ export const puckConfig: Config<PuckProps> = {
         buttonText: 'Télécharger mon guide gratuit',
         redirectUrl: '#',
       },
-      render: ({ title, subtitle, buttonText }) => (
-        <div className="w-full max-w-lg mx-auto my-8 p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5">
-          <div className="space-y-2">
-            <h3 className="font-heading font-black text-2xl text-slate-900">{title}</h3>
-            <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+      render: ({ title, subtitle, buttonText, ...props }: any) => {
+        const updateProp = (key: string, val: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: val });
+          }
+        };
+
+        return (
+          <div className="w-full max-w-lg mx-auto my-8 p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5">
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={title || ''}
+                onChange={(e) => updateProp('title', e.target.value)}
+                className="w-full text-center font-heading font-black text-2xl text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white rounded-xl px-2 py-1 outline-none border border-transparent focus:border-[#00A0FF]"
+                placeholder="Titre Formulaire..."
+              />
+              <textarea
+                value={subtitle || ''}
+                rows={2}
+                onChange={(e) => updateProp('subtitle', e.target.value)}
+                className="w-full text-center text-xs text-slate-500 font-medium bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 rounded-xl p-2 outline-none resize-none border border-transparent focus:border-[#00A0FF]"
+                placeholder="Sous-titre Formulaire..."
+              />
+            </div>
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-3.5">
+              <input
+                type="text"
+                placeholder="Votre Prénom..."
+                disabled
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
+              />
+              <input
+                type="email"
+                placeholder="Votre Adresse Email..."
+                disabled
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
+              />
+              <input
+                type="text"
+                value={buttonText || ''}
+                onChange={(e) => updateProp('buttonText', e.target.value)}
+                className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all text-center outline-none focus:ring-4 focus:ring-[#00A0FF]/40"
+                placeholder="Bouton Formulaire..."
+              />
+            </form>
           </div>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-3.5">
-            <input
-              type="text"
-              placeholder="Votre Prénom..."
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
-            />
-            <input
-              type="email"
-              placeholder="Votre Adresse Email..."
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
-            />
-            <button
-              type="submit"
-              className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all"
-            >
-              {buttonText}
-            </button>
-          </form>
-        </div>
-      ),
+        );
+      },
     },
 
     VideoEmbed: {
@@ -530,19 +709,32 @@ export const puckConfig: Config<PuckProps> = {
         videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
         caption: 'Vidéo de démonstration en direct',
       },
-      render: ({ videoUrl, caption }) => (
-        <div className="w-full max-w-3xl mx-auto my-8 space-y-2 text-center">
-          <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
-            <iframe
-              src={videoUrl}
-              title="Vidéo Embed"
-              className="w-full h-full border-0"
-              allowFullScreen
+      render: ({ videoUrl, caption, ...props }: any) => {
+        const updateProp = (key: string, val: any) => {
+          if (props.onChange) {
+            props.onChange({ [key]: val });
+          }
+        };
+
+        return (
+          <div className="w-full max-w-3xl mx-auto my-8 space-y-2 text-center">
+            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
+              <iframe
+                src={videoUrl}
+                title="Vidéo Embed"
+                className="w-full h-full border-0 pointer-events-none"
+              />
+            </div>
+            <input
+              type="text"
+              value={caption || ''}
+              onChange={(e) => updateProp('caption', e.target.value)}
+              className="w-full text-center text-xs text-slate-500 font-bold italic bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-lg px-2 py-1 outline-none"
+              placeholder="Légende vidéo..."
             />
           </div>
-          {caption && <p className="text-xs text-slate-500 font-bold italic">{caption}</p>}
-        </div>
-      ),
+        );
+      },
     },
   },
 };
