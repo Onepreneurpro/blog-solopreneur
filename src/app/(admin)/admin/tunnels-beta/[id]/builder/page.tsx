@@ -114,7 +114,7 @@ export default function PuckBuilderPage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-[#00A0FF] border-t-transparent rounded-full animate-spin" />
         <p className="text-xs font-bold tracking-wider text-slate-400">Chargement de l Éditeur Puck Beta...</p>
       </div>
@@ -122,9 +122,9 @@ export default function PuckBuilderPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
       {/* TOP HEADER */}
-      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-30">
+      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/tunnels-beta"
@@ -170,13 +170,9 @@ export default function PuckBuilderPage() {
         </div>
       </header>
 
-      {/* PUCK EDITOR FULLSCREEN WORKSPACE */}
-      <div className="flex-1 w-full relative bg-slate-100 text-slate-900 overflow-hidden">
+      {/* PUCK EDITOR WORKSPACE WITH NATURAL CHROME WINDOW SCROLL */}
+      <div className="flex-1 w-full bg-slate-100 text-slate-900">
         <style jsx global>{`
-          .Puck {
-            height: calc(100vh - 3.5rem) !important;
-            max-height: calc(100vh - 3.5rem) !important;
-          }
           .Puck-component input,
           .Puck-component textarea,
           .Puck-component label,

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Config } from '@measured/puck';
-import { Trash2, GripVertical } from 'lucide-react';
+import { Trash2, GripVertical, FolderOpen } from 'lucide-react';
 
 export type PuckProps = {
   Hero: {
@@ -116,7 +116,7 @@ export const puckConfig: Config<PuckProps> = {
             { label: 'Émeraude Succès', value: 'from-emerald-800 to-teal-950' },
           ],
         },
-        imageUrl: { type: 'text', label: "URL de l'image (Double-cliquez sur l image pour charger un fichier PC)" },
+        imageUrl: { type: 'text', label: "URL de l'image (Cliquez sur l image pour charger un fichier PC)" },
       },
       defaultProps: {
         title: 'Transformez vos visiteurs en clients fidèles',
@@ -177,24 +177,31 @@ export const puckConfig: Config<PuckProps> = {
                 </div>
               </div>
 
-              {/* INLINE IMAGE FRAME WITH DOUBLE-CLICK UPLOAD & SINGLE-CLICK TRASH */}
+              {/* INLINE IMAGE FRAME WITH INSTANT SINGLE-CLICK FILE UPLOAD */}
               <div className="w-full md:w-1/2 flex justify-center">
                 <div
-                  onDoubleClick={(e) => {
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
                   }}
-                  title="Clic simple pour voir les détails à droite. Double-clic pour ouvrir l explorateur PC."
+                  title="Cliquez pour choisir un fichier image sur votre PC"
                   className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto"
                 >
                   {imageUrl ? (
-                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none" />
+                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none pointer-events-none" />
                   ) : (
                     <div className="w-full h-64 bg-slate-800 flex flex-col items-center justify-center text-slate-400 font-bold text-xs gap-2 p-4">
                       <span>🖼️ Aucune image</span>
-                      <span className="text-[10px] font-normal text-slate-300">Double-cliquez pour charger une photo</span>
+                      <span className="text-[10px] font-normal text-slate-300">Cliquez pour charger une photo</span>
                     </div>
                   )}
+
+                  {/* HOVER OVERLAY */}
+                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
+                    <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                    <span>Changer l image (PC)</span>
+                  </div>
 
                   {/* TRASH ICON BUTTON AT BOTTOM RIGHT */}
                   {imageUrl && (
@@ -206,13 +213,13 @@ export const puckConfig: Config<PuckProps> = {
                         updateProp('imageUrl', '');
                       }}
                       title="Supprimer l image"
-                      className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                      className="absolute bottom-3 right-3 w-8 h-8 bg-rose-600 hover:bg-rose-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
 
-                  {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                  {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -427,7 +434,7 @@ export const puckConfig: Config<PuckProps> = {
       fields: {
         item1Title: { type: 'text', label: 'Titre Col 1' },
         item1Desc: { type: 'textarea', label: 'Desc Col 1' },
-        item1Img: { type: 'text', label: 'Image Col 1 (Double-cliquez sur l image pour choisir un fichier PC)' },
+        item1Img: { type: 'text', label: 'Image Col 1 (Cliquez sur l image pour choisir un fichier PC)' },
         item2Title: { type: 'text', label: 'Titre Col 2' },
         item2Desc: { type: 'textarea', label: 'Desc Col 2' },
         item2Img: { type: 'text', label: 'Image Col 2' },
@@ -549,24 +556,31 @@ export const puckConfig: Config<PuckProps> = {
                     <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
                   </div>
 
-                  {/* IMAGE FRAME WITH DOUBLE CLICK FILE PICKER & SINGLE CLICK TRASH ICON */}
+                  {/* IMAGE FRAME WITH DIRECT INSTANT SINGLE-CLICK FILE PICKER */}
                   <div
-                    onDoubleClick={(e) => {
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Clic simple pour sélectionner. Double-clic pour ouvrir l explorateur PC."
+                    title="Cliquez pour choisir un fichier image sur votre PC"
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
                     {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none" />
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
                     ) : (
                       <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
                         <span>🖼️ Aucune image</span>
-                        <span className="text-[10px] text-slate-400 font-normal">Double-clic pour charger</span>
+                        <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
                       </div>
                     )}
+
+                    {/* HOVER OVERLAY TO CHANGE IMAGE */}
+                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
+                      <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                      <span>Changer l image (PC)</span>
+                    </div>
 
                     {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
                     {col.img && (
@@ -578,13 +592,13 @@ export const puckConfig: Config<PuckProps> = {
                           updateProp(col.imgKey, '');
                         }}
                         title="Supprimer l image (1 clic)"
-                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
 
-                    {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                    {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
                     <input
                       type="file"
                       ref={(el) => { fileInputRefs.current[i] = el; }}
@@ -743,22 +757,29 @@ export const puckConfig: Config<PuckProps> = {
                   </div>
 
                   <div
-                    onDoubleClick={(e) => {
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Clic simple pour sélectionner. Double-clic pour ouvrir l explorateur PC."
+                    title="Cliquez pour choisir un fichier image sur votre PC"
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
                     {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none" />
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
                     ) : (
                       <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
                         <span>🖼️ Aucune image</span>
-                        <span className="text-[10px] text-slate-400 font-normal">Double-clic pour charger</span>
+                        <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
                       </div>
                     )}
+
+                    {/* HOVER OVERLAY TO CHANGE IMAGE */}
+                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
+                      <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                      <span>Changer l image (PC)</span>
+                    </div>
 
                     {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
                     {col.img && (
@@ -770,13 +791,13 @@ export const puckConfig: Config<PuckProps> = {
                           updateProp(col.imgKey, '');
                         }}
                         title="Supprimer l image (1 clic)"
-                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30"
+                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
 
-                    {/* HIDDEN FILE INPUT TRIGGERED ON DOUBLE-CLICK */}
+                    {/* HIDDEN FILE INPUT TRIGGERED ON CLICK */}
                     <input
                       type="file"
                       ref={(el) => { fileInputRefs.current[i] = el; }}
