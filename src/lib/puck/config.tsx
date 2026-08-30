@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Config } from '@measured/puck';
-import { Trash2, Upload } from 'lucide-react';
+import { Trash2, GripVertical } from 'lucide-react';
 
 export type PuckProps = {
   Hero: {
@@ -116,7 +116,7 @@ export const puckConfig: Config<PuckProps> = {
             { label: 'Émeraude Succès', value: 'from-emerald-800 to-teal-950' },
           ],
         },
-        imageUrl: { type: 'text', label: "URL de l'image illustrative (Double-cliquez l'image pour charger un fichier PC)" },
+        imageUrl: { type: 'text', label: "URL de l'image (Double-cliquez sur l image pour charger un fichier PC)" },
       },
       defaultProps: {
         title: 'Transformez vos visiteurs en clients fidèles',
@@ -186,7 +186,7 @@ export const puckConfig: Config<PuckProps> = {
                     e.stopPropagation();
                     fileInputRef.current?.click();
                   }}
-                  title="Double-cliquez pour ouvrir l explorateur de fichiers (PC)"
+                  title="Double-cliquez pour ouvrir l explorateur PC"
                   className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto"
                 >
                   {imageUrl ? (
@@ -429,7 +429,7 @@ export const puckConfig: Config<PuckProps> = {
       fields: {
         item1Title: { type: 'text', label: 'Titre Col 1' },
         item1Desc: { type: 'textarea', label: 'Desc Col 1' },
-        item1Img: { type: 'text', label: 'Image Col 1 (URL ou Double-cliquez sur le bloc pour choisir un fichier PC)' },
+        item1Img: { type: 'text', label: 'Image Col 1 (Double-cliquez sur le bloc pour choisir un fichier PC)' },
         item2Title: { type: 'text', label: 'Titre Col 2' },
         item2Desc: { type: 'textarea', label: 'Desc Col 2' },
         item2Img: { type: 'text', label: 'Image Col 2' },
@@ -502,46 +502,55 @@ export const puckConfig: Config<PuckProps> = {
               {items.map((col, i) => (
                 <div
                   key={i}
-                  draggable
-                  onDragStart={(e) => {
-                    e.stopPropagation();
-                    e.dataTransfer.setData('text/plain', i.toString());
-                  }}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const fromIdxStr = e.dataTransfer.getData('text/plain');
-                    const fromIdx = parseInt(fromIdxStr, 10);
-                    if (!isNaN(fromIdx) && fromIdx !== i) {
-                      const newItems = [...items];
-                      const temp = { ...newItems[fromIdx] };
-                      newItems[fromIdx] = { ...newItems[i] };
-                      newItems[i] = temp;
-
-                      updateProp(items[0].titleKey, newItems[0].title);
-                      updateProp(items[0].descKey, newItems[0].desc);
-                      updateProp(items[0].imgKey, newItems[0].img);
-
-                      updateProp(items[1].titleKey, newItems[1].title);
-                      updateProp(items[1].descKey, newItems[1].desc);
-                      updateProp(items[1].imgKey, newItems[1].img);
-
-                      updateProp(items[2].titleKey, newItems[2].title);
-                      updateProp(items[2].descKey, newItems[2].desc);
-                      updateProp(items[2].imgKey, newItems[2].img);
-
-                      updateProp(items[3].titleKey, newItems[3].title);
-                      updateProp(items[3].descKey, newItems[3].desc);
-                      updateProp(items[3].imgKey, newItems[3].img);
-                    }
-                  }}
-                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-grab active:cursor-grabbing"
-                  title="Glissez-déposez cette colonne pour réorganiser"
+                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
                 >
+                  {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+                  <div
+                    draggable
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onDragStart={(e) => {
+                      e.stopPropagation();
+                      e.dataTransfer.setData('text/plain', i.toString());
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const fromIdxStr = e.dataTransfer.getData('text/plain');
+                      const fromIdx = parseInt(fromIdxStr, 10);
+                      if (!isNaN(fromIdx) && fromIdx !== i) {
+                        const newItems = [...items];
+                        const temp = { ...newItems[fromIdx] };
+                        newItems[fromIdx] = { ...newItems[i] };
+                        newItems[i] = temp;
+
+                        updateProp(items[0].titleKey, newItems[0].title);
+                        updateProp(items[0].descKey, newItems[0].desc);
+                        updateProp(items[0].imgKey, newItems[0].img);
+
+                        updateProp(items[1].titleKey, newItems[1].title);
+                        updateProp(items[1].descKey, newItems[1].desc);
+                        updateProp(items[1].imgKey, newItems[1].img);
+
+                        updateProp(items[2].titleKey, newItems[2].title);
+                        updateProp(items[2].descKey, newItems[2].desc);
+                        updateProp(items[2].imgKey, newItems[2].img);
+
+                        updateProp(items[3].titleKey, newItems[3].title);
+                        updateProp(items[3].descKey, newItems[3].desc);
+                        updateProp(items[3].imgKey, newItems[3].img);
+                      }
+                    }}
+                    title="Glisser-déposer pour réorganiser la colonne"
+                    className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                  >
+                    <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
+                    <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
+                  </div>
+
                   {/* IMAGE FRAME WITH DOUBLE CLICK FILE PICKER & SINGLE CLICK TRASH ICON */}
                   <div
                     onMouseDown={(e) => e.stopPropagation()}
@@ -550,7 +559,7 @@ export const puckConfig: Config<PuckProps> = {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Clic simple pour voir les options dans la barre droite. Double-clic pour ouvrir l explorateur PC."
+                    title="Double-cliquez pour ouvrir l explorateur de fichiers (PC)"
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
@@ -602,7 +611,7 @@ export const puckConfig: Config<PuckProps> = {
                     value={col.title || ''}
                     {...stopProps}
                     onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
                     placeholder="Titre..."
                   />
 
@@ -612,7 +621,7 @@ export const puckConfig: Config<PuckProps> = {
                     rows={2}
                     {...stopProps}
                     onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20"
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
                     placeholder="Description..."
                   />
                 </div>
@@ -692,42 +701,51 @@ export const puckConfig: Config<PuckProps> = {
               {items.map((col, i) => (
                 <div
                   key={i}
-                  draggable
-                  onDragStart={(e) => {
-                    e.stopPropagation();
-                    e.dataTransfer.setData('text/plain', i.toString());
-                  }}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const fromIdxStr = e.dataTransfer.getData('text/plain');
-                    const fromIdx = parseInt(fromIdxStr, 10);
-                    if (!isNaN(fromIdx) && fromIdx !== i) {
-                      const newItems = [...items];
-                      const temp = { ...newItems[fromIdx] };
-                      newItems[fromIdx] = { ...newItems[i] };
-                      newItems[i] = temp;
-
-                      updateProp(items[0].titleKey, newItems[0].title);
-                      updateProp(items[0].descKey, newItems[0].desc);
-                      updateProp(items[0].imgKey, newItems[0].img);
-
-                      updateProp(items[1].titleKey, newItems[1].title);
-                      updateProp(items[1].descKey, newItems[1].desc);
-                      updateProp(items[1].imgKey, newItems[1].img);
-
-                      updateProp(items[2].titleKey, newItems[2].title);
-                      updateProp(items[2].descKey, newItems[2].desc);
-                      updateProp(items[2].imgKey, newItems[2].img);
-                    }
-                  }}
-                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-grab active:cursor-grabbing"
-                  title="Glissez-déposez cette colonne pour réorganiser"
+                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
                 >
+                  {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+                  <div
+                    draggable
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onDragStart={(e) => {
+                      e.stopPropagation();
+                      e.dataTransfer.setData('text/plain', i.toString());
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const fromIdxStr = e.dataTransfer.getData('text/plain');
+                      const fromIdx = parseInt(fromIdxStr, 10);
+                      if (!isNaN(fromIdx) && fromIdx !== i) {
+                        const newItems = [...items];
+                        const temp = { ...newItems[fromIdx] };
+                        newItems[fromIdx] = { ...newItems[i] };
+                        newItems[i] = temp;
+
+                        updateProp(items[0].titleKey, newItems[0].title);
+                        updateProp(items[0].descKey, newItems[0].desc);
+                        updateProp(items[0].imgKey, newItems[0].img);
+
+                        updateProp(items[1].titleKey, newItems[1].title);
+                        updateProp(items[1].descKey, newItems[1].desc);
+                        updateProp(items[1].imgKey, newItems[1].img);
+
+                        updateProp(items[2].titleKey, newItems[2].title);
+                        updateProp(items[2].descKey, newItems[2].desc);
+                        updateProp(items[2].imgKey, newItems[2].img);
+                      }
+                    }}
+                    title="Glisser-déposer pour réorganiser la colonne"
+                    className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                  >
+                    <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
+                    <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
+                  </div>
+
                   <div
                     onMouseDown={(e) => e.stopPropagation()}
                     onClick={(e) => e.stopPropagation()}
@@ -735,7 +753,7 @@ export const puckConfig: Config<PuckProps> = {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Clic simple pour voir les options dans la barre droite. Double-clic pour ouvrir l explorateur PC."
+                    title="Double-cliquez pour ouvrir l explorateur PC"
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
@@ -786,7 +804,7 @@ export const puckConfig: Config<PuckProps> = {
                     value={col.title || ''}
                     {...stopProps}
                     onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
                     placeholder="Titre..."
                   />
 
@@ -795,7 +813,7 @@ export const puckConfig: Config<PuckProps> = {
                     rows={2}
                     {...stopProps}
                     onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20"
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
                     placeholder="Description..."
                   />
                 </div>
@@ -846,7 +864,7 @@ export const puckConfig: Config<PuckProps> = {
               value={title || ''}
               {...stopProps}
               onChange={(e) => updateProp('title', e.target.value)}
-              className="w-full font-heading font-black text-lg bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
+              className="w-full font-heading font-black text-lg bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
               placeholder="Titre Carte..."
             />
             <textarea
@@ -854,7 +872,7 @@ export const puckConfig: Config<PuckProps> = {
               rows={2}
               {...stopProps}
               onChange={(e) => updateProp('content', e.target.value)}
-              className="w-full text-sm font-medium leading-relaxed bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl p-2 outline-none resize-none transition-all opacity-90 pointer-events-auto relative z-20"
+              className="w-full text-sm font-medium leading-relaxed bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl p-2 outline-none resize-none transition-all opacity-90 pointer-events-auto relative z-20 cursor-text"
               placeholder="Contenu Carte..."
             />
           </div>
@@ -895,7 +913,7 @@ export const puckConfig: Config<PuckProps> = {
                 value={title || ''}
                 {...stopProps}
                 onChange={(e) => updateProp('title', e.target.value)}
-                className="w-full text-center font-heading font-black text-2xl text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white rounded-xl px-2 py-1 outline-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20"
+                className="w-full text-center font-heading font-black text-2xl text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white rounded-xl px-2 py-1 outline-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20 cursor-text"
                 placeholder="Titre Formulaire..."
               />
               <textarea
@@ -903,7 +921,7 @@ export const puckConfig: Config<PuckProps> = {
                 rows={2}
                 {...stopProps}
                 onChange={(e) => updateProp('subtitle', e.target.value)}
-                className="w-full text-center text-xs text-slate-500 font-medium bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 rounded-xl p-2 outline-none resize-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20"
+                className="w-full text-center text-xs text-slate-500 font-medium bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 rounded-xl p-2 outline-none resize-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20 cursor-text"
                 placeholder="Sous-titre Formulaire..."
               />
             </div>
@@ -925,7 +943,7 @@ export const puckConfig: Config<PuckProps> = {
                 value={buttonText || ''}
                 {...stopProps}
                 onChange={(e) => updateProp('buttonText', e.target.value)}
-                className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all text-center outline-none focus:ring-4 focus:ring-[#00A0FF]/40 pointer-events-auto relative z-20"
+                className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all text-center outline-none focus:ring-4 focus:ring-[#00A0FF]/40 pointer-events-auto relative z-20 cursor-text"
                 placeholder="Bouton Formulaire..."
               />
             </form>
@@ -969,7 +987,7 @@ export const puckConfig: Config<PuckProps> = {
               value={caption || ''}
               {...stopProps}
               onChange={(e) => updateProp('caption', e.target.value)}
-              className="w-full text-center text-xs text-slate-500 font-bold italic bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-lg px-2 py-1 outline-none pointer-events-auto relative z-20"
+              className="w-full text-center text-xs text-slate-500 font-bold italic bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-lg px-2 py-1 outline-none pointer-events-auto relative z-20 cursor-text"
               placeholder="Légende vidéo..."
             />
           </div>
