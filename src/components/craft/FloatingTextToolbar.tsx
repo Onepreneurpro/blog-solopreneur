@@ -62,6 +62,17 @@ export const FloatingTextToolbar = () => {
           top: Math.max(12, rect.top - 58),
           left: clampedLeft,
         });
+
+        // Detect current underline thickness if selecting an existing underline
+        let parent = range.commonAncestorContainer;
+        if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
+        const existingUnderline = (parent as HTMLElement).closest('span[style*="text-decoration"], u') as HTMLElement | null;
+        if (existingUnderline) {
+          const computedThickness = parseFloat(window.getComputedStyle(existingUnderline).textDecorationThickness);
+          if (!isNaN(computedThickness) && computedThickness > 0) {
+            setUnderlineThickness(Math.round(computedThickness));
+          }
+        }
       }
     };
 
@@ -103,7 +114,6 @@ export const FloatingTextToolbar = () => {
     document.execCommand('styleWithCSS', false, 'true');
     document.execCommand('hiliteColor', false, color);
 
-    // Style the highlight span cleanly
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
@@ -114,9 +124,9 @@ export const FloatingTextToolbar = () => {
     const highlightSpan = (parent as HTMLElement).closest('span[style*="background-color"]');
     if (highlightSpan) {
       const el = highlightSpan as HTMLElement;
-      el.style.padding = '2px 6px';
-      el.style.borderRadius = '4px';
-      el.style.boxDecorationBreak = 'clone';
+      el.style.setProperty('padding', '2px 6px', 'important');
+      el.style.setProperty('border-radius', '4px', 'important');
+      el.style.setProperty('box-decoration-break', 'clone', 'important');
       (el.style as any).webkitBoxDecorationBreak = 'clone';
     }
   };
@@ -136,21 +146,22 @@ export const FloatingTextToolbar = () => {
     if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
 
     // Check if selection is inside an existing styled span
-    let targetSpan = (parent as HTMLElement).closest('span[style*="text-decoration"], u') as HTMLElement | null;
+    let targetSpan = (parent as HTMLElement).closest('span[style*="text-decoration"], u, font') as HTMLElement | null;
 
     if (!targetSpan) {
       document.execCommand('styleWithCSS', false, 'true');
       document.execCommand('underline', false);
       const newParent = selection.getRangeAt(0).commonAncestorContainer;
       const elem = newParent.nodeType === Node.TEXT_NODE ? newParent.parentElement : (newParent as HTMLElement);
-      targetSpan = elem?.closest('span[style*="text-decoration"], u') as HTMLElement | null;
+      targetSpan = elem?.closest('span[style*="text-decoration"], u, font') as HTMLElement | null;
     }
 
     if (targetSpan) {
-      targetSpan.style.textDecoration = `underline ${style}`;
-      targetSpan.style.textDecorationColor = color;
-      targetSpan.style.textDecorationThickness = `${thickness}px`;
-      targetSpan.style.textUnderlineOffset = '3px';
+      targetSpan.style.setProperty('text-decoration-line', 'underline', 'important');
+      targetSpan.style.setProperty('text-decoration-style', style, 'important');
+      targetSpan.style.setProperty('text-decoration-color', color, 'important');
+      targetSpan.style.setProperty('text-decoration-thickness', `${thickness}px`, 'important');
+      targetSpan.style.setProperty('text-underline-offset', '3px', 'important');
     }
   };
 
