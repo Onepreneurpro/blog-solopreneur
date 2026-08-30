@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, getUnderlineAndHighlightStyles } from './Text';
 
 export interface CardProps {
   title?: string;
@@ -19,6 +19,15 @@ export interface CardProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
+  // HIGHLIGHT (SURLIGNAGE)
+  highlightColor?: string;
+  highlightPadding?: number;
+  // UNDERLINE (SOULIGNAGE AVANCÉ)
+  underlineEnabled?: boolean;
+  underlineColor?: string;
+  underlineThickness?: number;
+  underlineStyle?: 'solid' | 'wavy' | 'dotted' | 'dashed' | 'double';
+  underlineOffset?: number;
 }
 
 export const Card = ({
@@ -36,6 +45,13 @@ export const Card = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  highlightColor,
+  highlightPadding = 6,
+  underlineEnabled = false,
+  underlineColor = '#00A0FF',
+  underlineThickness = 4,
+  underlineStyle = 'solid',
+  underlineOffset = 2,
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -51,6 +67,15 @@ export const Card = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
+    underlineEnabled,
+    underlineColor,
+    underlineThickness,
+    underlineStyle,
+    underlineOffset,
+    highlightColor,
+    highlightPadding
+  );
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -67,7 +92,10 @@ export const Card = ({
           boxShadow,
         }}
       >
-        <h3 className="font-heading font-black text-lg text-slate-900 px-1">
+        <h3
+          style={{ ...underlineHighlightStyles }}
+          className="font-heading font-black text-lg text-slate-900 px-1 inline-block"
+        >
           {title}
         </h3>
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
@@ -104,7 +132,8 @@ export const Card = ({
             props.title = e.currentTarget.innerText;
           });
         }}
-        className="font-heading font-black text-lg text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md px-1 cursor-text"
+        style={{ ...underlineHighlightStyles }}
+        className="font-heading font-black text-lg text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md px-1 cursor-text inline-block"
       >
         {title}
       </h3>

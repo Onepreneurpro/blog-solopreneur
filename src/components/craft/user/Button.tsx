@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, getUnderlineAndHighlightStyles } from './Text';
 
 export interface ButtonProps {
   text?: string;
@@ -10,6 +10,8 @@ export interface ButtonProps {
   bgImage?: string;
   textColor?: string;
   fontFamily?: string;
+  fontWeight?: string;
+  fontStyle?: 'normal' | 'italic';
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
   href?: string;
@@ -22,6 +24,15 @@ export interface ButtonProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
+  // HIGHLIGHT (SURLIGNAGE)
+  highlightColor?: string;
+  highlightPadding?: number;
+  // UNDERLINE (SOULIGNAGE AVANCÉ)
+  underlineEnabled?: boolean;
+  underlineColor?: string;
+  underlineThickness?: number;
+  underlineStyle?: 'solid' | 'wavy' | 'dotted' | 'dashed' | 'double';
+  underlineOffset?: number;
 }
 
 export const Button = ({
@@ -30,6 +41,8 @@ export const Button = ({
   bgImage,
   textColor = '#ffffff',
   fontFamily = 'Inter',
+  fontWeight = 'bold',
+  fontStyle = 'normal',
   borderRadius = 0,
   align = 'center',
   href = '#',
@@ -42,6 +55,13 @@ export const Button = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  highlightColor,
+  highlightPadding = 6,
+  underlineEnabled = false,
+  underlineColor = '#00A0FF',
+  underlineThickness = 4,
+  underlineStyle = 'solid',
+  underlineOffset = 2,
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -63,6 +83,15 @@ export const Button = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
+    underlineEnabled,
+    underlineColor,
+    underlineThickness,
+    underlineStyle,
+    underlineOffset,
+    highlightColor,
+    highlightPadding
+  );
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -74,10 +103,13 @@ export const Button = ({
             ...bgStyles,
             color: textColor,
             fontFamily,
+            fontWeight,
+            fontStyle,
             borderRadius: `${borderRadius}px`,
             padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
+            ...underlineHighlightStyles,
           }}
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
@@ -111,11 +143,14 @@ export const Button = ({
           ...bgStyles,
           color: textColor,
           fontFamily,
+          fontWeight,
+          fontStyle,
           borderRadius: `${borderRadius}px`,
           padding: `${paddingY}px ${paddingX}px`,
           minHeight: height ? `${height}px` : undefined,
           boxShadow,
           outline: 'none',
+          ...underlineHighlightStyles,
         }}
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >
@@ -132,6 +167,8 @@ export const Button = ({
     bgColor: '#00A0FF',
     textColor: '#ffffff',
     fontFamily: 'Inter',
+    fontWeight: 'bold',
+    fontStyle: 'normal',
     borderRadius: 0,
     align: 'center',
     href: '#',

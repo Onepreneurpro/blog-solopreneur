@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useEditor } from '@craftjs/core';
-import { Settings, Trash2 } from 'lucide-react';
+import { Settings, Trash2, Bold, Italic, Underline, Highlighter, Smile } from 'lucide-react';
 
 const updateTextWithEmoji = (currentText: string, newEmoji: string) => {
   if (!currentText) return newEmoji;
@@ -21,6 +21,8 @@ const updateTextWithEmoji = (currentText: string, newEmoji: string) => {
 };
 
 export const SettingsPanel = () => {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const { selected, actions } = useEditor((state, query) => {
     const [currentNodeId] = state.events.selected;
     let selectedNode;
@@ -76,6 +78,374 @@ export const SettingsPanel = () => {
       </div>
 
       <div className="p-4 space-y-4 overflow-y-auto flex-1 text-xs">
+        {/* COMPACT EMOJI SELECTOR BUTTON & POPUP */}
+        {(props.title !== undefined || props.text !== undefined) && (
+          <div className="space-y-2 bg-amber-50/60 p-3 rounded-2xl border border-amber-200 relative">
+            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+              <span className="flex items-center gap-1.5">
+                <Smile className="w-4 h-4 text-amber-500" />
+                <span>Icône Émoji du Texte</span>
+              </span>
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-[11px] flex items-center gap-1 transition-transform active:scale-95 shadow-xs"
+              >
+                <span>Choisir Émoji</span>
+                <span className="text-[9px]">{showEmojiPicker ? '▲' : '▼'}</span>
+              </button>
+            </div>
+
+            {/* COMPACT POPUP GRID */}
+            {showEmojiPicker && (
+              <div className="space-y-2 pt-2 border-t border-amber-200/80 animate-in fade-in">
+                <div className="grid grid-cols-6 gap-1 bg-white p-2 rounded-xl border border-amber-200 shadow-sm max-h-48 overflow-y-auto">
+                  {[
+                    '💡', '🚀', '🔥', '⚡', '⭐', '🎁',
+                    '🎯', '✅', '🔒', '👉', '🏆', '💎',
+                    '❤️', '💼', '💰', '📌', '✨', '🎉',
+                    '🔑', '📢', '📈', '🎓', '🥇', '👑',
+                    '💬', '📦', '🏷️', '🛒', '🛍️', '💳',
+                    '📅', '⏰', '🌟', '💥', '🎨', '📝',
+                  ].map((emo) => (
+                    <button
+                      key={emo}
+                      onClick={() => {
+                        actions.setProp(id, (nodeProps: any) => {
+                          if (nodeProps.title !== undefined) {
+                            nodeProps.title = updateTextWithEmoji(nodeProps.title, emo);
+                          } else if (nodeProps.text !== undefined) {
+                            nodeProps.text = updateTextWithEmoji(nodeProps.text, emo);
+                          }
+                        });
+                        setShowEmojiPicker(false);
+                      }}
+                      className="p-1 rounded-lg text-lg text-center transition-transform hover:scale-125 hover:bg-amber-100"
+                    >
+                      {emo}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    actions.setProp(id, (nodeProps: any) => {
+                      if (nodeProps.title !== undefined) {
+                        nodeProps.title = updateTextWithEmoji(nodeProps.title, '');
+                      } else if (nodeProps.text !== undefined) {
+                        nodeProps.text = updateTextWithEmoji(nodeProps.text, '');
+                      }
+                    });
+                    setShowEmojiPicker(false);
+                  }}
+                  className="w-full py-1 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-lg text-[10px] font-bold transition-colors"
+                >
+                  Retirer l émoji du texte
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TEXT FORMATTING PALETTE (BOLD, ITALIC, COLOR) */}
+        {(props.title !== undefined || props.text !== undefined || props.fontWeight !== undefined) && (
+          <div className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+            <label className="font-black text-slate-900 flex items-center justify-between text-xs">
+              <span>🎨 Palette Formater le Texte</span>
+            </label>
+
+            {/* BOLD & ITALIC BUTTONS */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.fontWeight = nodeProps.fontWeight === 'bold' || nodeProps.fontWeight === '900' ? 'normal' : 'bold';
+                  })
+                }
+                className={`py-1.5 px-3 rounded-xl border font-black text-xs flex items-center justify-center gap-1.5 transition-colors ${
+                  props.fontWeight === 'bold' || props.fontWeight === '900' || props.fontWeight === '800'
+                    ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <Bold className="w-4 h-4" />
+                <span>Gras</span>
+              </button>
+
+              <button
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.fontStyle = nodeProps.fontStyle === 'italic' ? 'normal' : 'italic';
+                  })
+                }
+                className={`py-1.5 px-3 rounded-xl border font-black text-xs flex items-center justify-center gap-1.5 transition-colors ${
+                  props.fontStyle === 'italic'
+                    ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <Italic className="w-4 h-4" />
+                <span>Italique</span>
+              </button>
+            </div>
+
+            {/* TEXT COLOR */}
+            {props.textColor !== undefined && (
+              <div className="space-y-1 pt-1 border-t border-slate-200">
+                <label className="font-bold text-slate-700 text-[11px]">Couleur du Texte</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={props.textColor || '#0f172a'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.textColor = e.target.value;
+                      })
+                    }
+                    className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={props.textColor || '#0f172a'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.textColor = e.target.value;
+                      })
+                    }
+                    className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* HIGHLIGHT (SURLIGNAGE SUR MESURE / FEUTRE) */}
+        {(props.title !== undefined || props.text !== undefined) && (
+          <div className="space-y-3 bg-yellow-50/60 p-3.5 rounded-2xl border border-yellow-200">
+            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+              <span className="flex items-center gap-1.5">
+                <Highlighter className="w-4 h-4 text-yellow-600" />
+                <span>🖍️ Surlignage (Feutre Marqueur)</span>
+              </span>
+            </div>
+
+            {/* QUICK PRESET HIGHLIGHT COLORS */}
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 text-[11px]">Couleur de Surlignage</label>
+              <div className="grid grid-cols-6 gap-1.5">
+                {[
+                  { key: 'transparent', color: 'transparent', label: 'Aucun' },
+                  { key: '#fef08a', color: '#fef08a', label: 'Jaune' },
+                  { key: '#bbf7d0', color: '#bbf7d0', label: 'Vert' },
+                  { key: '#fbcfe8', color: '#fbcfe8', label: 'Rose' },
+                  { key: '#bae6fd', color: '#bae6fd', label: 'Bleu' },
+                  { key: '#fed7aa', color: '#fed7aa', label: 'Orange' },
+                ].map((hl) => (
+                  <button
+                    key={hl.key}
+                    onClick={() =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.highlightColor = hl.color;
+                      })
+                    }
+                    className={`h-7 rounded-lg border font-bold text-[9px] flex items-center justify-center transition-all ${
+                      (props.highlightColor || 'transparent') === hl.color
+                        ? 'ring-2 ring-yellow-500 scale-105 border-yellow-500'
+                        : 'border-slate-300 hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: hl.color === 'transparent' ? '#ffffff' : hl.color }}
+                  >
+                    {hl.color === 'transparent' ? '❌' : ''}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* CUSTOM HIGHLIGHT COLOR & PADDING */}
+            {props.highlightColor && props.highlightColor !== 'transparent' && (
+              <div className="space-y-2 pt-2 border-t border-yellow-200/80">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={props.highlightColor || '#fef08a'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.highlightColor = e.target.value;
+                      })
+                    }
+                    className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={props.highlightColor || '#fef08a'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.highlightColor = e.target.value;
+                      })
+                    }
+                    className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                    <span>Épaisseur / Largeur Surlignage</span>
+                    <span>{props.highlightPadding !== undefined ? props.highlightPadding : 6}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={2}
+                    max={16}
+                    step={1}
+                    value={props.highlightPadding !== undefined ? props.highlightPadding : 6}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.highlightPadding = parseInt(e.target.value, 10);
+                      })
+                    }
+                    className="w-full accent-yellow-600"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* UNDERLINE (SOULIGNAGE CRÉATIF AVEC DÉCALAGE / CHEVAUCHEMENT TEXTE) */}
+        {(props.title !== undefined || props.text !== undefined) && (
+          <div className="space-y-3 bg-sky-50/60 p-3.5 rounded-2xl border border-sky-200">
+            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+              <span className="flex items-center gap-1.5">
+                <Underline className="w-4 h-4 text-sky-600" />
+                <span>✏️ Soulignage Créatif & Chevauchement</span>
+              </span>
+              <button
+                onClick={() =>
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.underlineEnabled = !nodeProps.underlineEnabled;
+                  })
+                }
+                className={`px-2.5 py-1 rounded-lg font-bold text-[10px] transition-colors ${
+                  props.underlineEnabled
+                    ? 'bg-sky-600 text-white'
+                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-sky-100/50'
+                }`}
+              >
+                {props.underlineEnabled ? 'Actif' : 'Inactif'}
+              </button>
+            </div>
+
+            {props.underlineEnabled && (
+              <div className="space-y-3 pt-2 border-t border-sky-200/80 animate-in fade-in">
+                {/* UNDERLINE COLOR */}
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 text-[11px]">Couleur du Trait de Soulignement</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={props.underlineColor || '#00A0FF'}
+                      onChange={(e) =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.underlineColor = e.target.value;
+                        })
+                      }
+                      className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={props.underlineColor || '#00A0FF'}
+                      onChange={(e) =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.underlineColor = e.target.value;
+                        })
+                      }
+                      className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* UNDERLINE STYLE (SOLIDE, ONDULÉ WAVY, POINTILLÉ, TIRET, DOUBLE) */}
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 text-[11px]">Style de Trait</label>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { key: 'solid', label: 'Solide' },
+                      { key: 'wavy', label: 'Ondulé 🌊' },
+                      { key: 'dotted', label: 'Points •' },
+                      { key: 'dashed', label: 'Tirets -' },
+                      { key: 'double', label: 'Double =' },
+                    ].map((st) => (
+                      <button
+                        key={st.key}
+                        onClick={() =>
+                          actions.setProp(id, (nodeProps: any) => {
+                            nodeProps.underlineStyle = st.key;
+                          })
+                        }
+                        className={`py-1 px-1.5 rounded-lg border font-extrabold text-[10px] transition-colors ${
+                          (props.underlineStyle || 'solid') === st.key
+                            ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-100/50'
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* UNDERLINE THICKNESS (ÉPAISSEUR DU TRAIT) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                    <span>Épaisseur du Trait</span>
+                    <span>{props.underlineThickness !== undefined ? props.underlineThickness : 4}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={12}
+                    step={1}
+                    value={props.underlineThickness !== undefined ? props.underlineThickness : 4}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.underlineThickness = parseInt(e.target.value, 10);
+                      })
+                    }
+                    className="w-full accent-sky-600"
+                  />
+                </div>
+
+                {/* UNDERLINE VERTICAL OFFSET / OVERLAP INTERFERENCE WITH TEXT */}
+                <div className="space-y-1 bg-white p-2.5 rounded-xl border border-sky-200">
+                  <div className="flex justify-between font-black text-slate-900 text-[11px]">
+                    <span>↕️ Position / Chevauchement avec le Texte</span>
+                    <span className="text-sky-600 font-mono">
+                      {props.underlineOffset !== undefined ? props.underlineOffset : 2}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={-12}
+                    max={14}
+                    step={1}
+                    value={props.underlineOffset !== undefined ? props.underlineOffset : 2}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.underlineOffset = parseInt(e.target.value, 10);
+                      })
+                    }
+                    className="w-full accent-sky-600"
+                  />
+                  <div className="flex justify-between text-[9px] text-slate-500 font-semibold px-0.5">
+                    <span>⬆️ Interfère / Remonte sur les lettres (-12px)</span>
+                    <span>Sous le texte (14px) ⬇️</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* BLOCK WIDTH CONTROL (SLIDER & PRESETS) */}
         {props.width !== undefined && (
           <div className="space-y-2 bg-blue-50/60 p-3 rounded-2xl border border-blue-200">
@@ -157,59 +527,6 @@ export const SettingsPanel = () => {
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* EMOJI QUICK SELECTOR FOR TEXT & TITLES */}
-        {(props.title !== undefined || props.text !== undefined) && (
-          <div className="space-y-2 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
-            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
-              <span>😀 Choisir un Émoji d Accroche</span>
-              <span className="text-amber-600 font-mono text-xs font-bold">1 Clic</span>
-            </div>
-
-            {/* 36 EMOJIS QUICK GRID */}
-            <div className="grid grid-cols-6 gap-1 bg-white p-2 rounded-xl border border-amber-200 shadow-xs">
-              {[
-                '💡', '🚀', '🔥', '⚡', '⭐', '🎁',
-                '🎯', '✅', '🔒', '👉', '🏆', '💎',
-                '❤️', '💼', '💰', '📌', '✨', '🎉',
-                '🔑', '📢', '📈', '🎓', '🥇', '👑',
-                '💬', '📦', '🏷️', '🛒', '🛍️', '💳',
-                '📅', '⏰', '🌟', '💥', '🎨', '📝',
-              ].map((emo) => (
-                <button
-                  key={emo}
-                  onClick={() =>
-                    actions.setProp(id, (nodeProps: any) => {
-                      if (nodeProps.title !== undefined) {
-                        nodeProps.title = updateTextWithEmoji(nodeProps.title, emo);
-                      } else if (nodeProps.text !== undefined) {
-                        nodeProps.text = updateTextWithEmoji(nodeProps.text, emo);
-                      }
-                    })
-                  }
-                  className="p-1 rounded-lg text-lg text-center transition-transform hover:scale-125 hover:bg-amber-100"
-                >
-                  {emo}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() =>
-                actions.setProp(id, (nodeProps: any) => {
-                  if (nodeProps.title !== undefined) {
-                    nodeProps.title = updateTextWithEmoji(nodeProps.title, '');
-                  } else if (nodeProps.text !== undefined) {
-                    nodeProps.text = updateTextWithEmoji(nodeProps.text, '');
-                  }
-                })
-              }
-              className="w-full py-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl text-[10px] font-extrabold transition-colors"
-            >
-              Retirer l émoji du texte
-            </button>
           </div>
         )}
 

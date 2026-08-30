@@ -9,6 +9,7 @@ export interface TextProps {
   textAlign?: 'left' | 'center' | 'right';
   textColor?: string;
   fontWeight?: string;
+  fontStyle?: 'normal' | 'italic';
   fontFamily?: string;
   tagName?: 'h1' | 'h2' | 'h3' | 'p';
   width?: number;
@@ -21,6 +22,15 @@ export interface TextProps {
   shadowOpacity?: number;
   bgColor?: string;
   bgImage?: string;
+  // HIGHLIGHT (SURLIGNAGE)
+  highlightColor?: string;
+  highlightPadding?: number;
+  // UNDERLINE (SOULIGNAGE AVANCÉ)
+  underlineEnabled?: boolean;
+  underlineColor?: string;
+  underlineThickness?: number;
+  underlineStyle?: 'solid' | 'wavy' | 'dotted' | 'dashed' | 'double';
+  underlineOffset?: number;
 }
 
 export const getBoxShadow = (
@@ -55,12 +65,44 @@ export const getBackgroundStyles = (bgColor?: string, bgImage?: string) => {
   return styles;
 };
 
+export const getUnderlineAndHighlightStyles = (
+  underlineEnabled?: boolean,
+  underlineColor = '#00A0FF',
+  underlineThickness = 4,
+  underlineStyle = 'solid',
+  underlineOffset = 2,
+  highlightColor?: string,
+  highlightPadding = 6
+): React.CSSProperties => {
+  const styles: React.CSSProperties = {};
+
+  if (underlineEnabled) {
+    styles.textDecorationLine = 'underline';
+    styles.textDecorationColor = underlineColor;
+    styles.textDecorationThickness = `${underlineThickness}px`;
+    styles.textDecorationStyle = underlineStyle as any;
+    styles.textUnderlineOffset = `${underlineOffset}px`;
+  }
+
+  if (highlightColor && highlightColor !== 'transparent') {
+    styles.backgroundColor = highlightColor;
+    styles.paddingLeft = `${highlightPadding}px`;
+    styles.paddingRight = `${highlightPadding}px`;
+    styles.borderRadius = '4px';
+    styles.boxDecorationBreak = 'clone';
+    styles.WebkitBoxDecorationBreak = 'clone';
+  }
+
+  return styles;
+};
+
 export const Text = ({
   text = 'Titre ou texte éditable',
   fontSize = 24,
   textAlign = 'center',
   textColor = '#0f172a',
   fontWeight = 'bold',
+  fontStyle = 'normal',
   fontFamily = 'Inter',
   tagName = 'h2',
   width = 100,
@@ -73,6 +115,13 @@ export const Text = ({
   shadowOpacity = 20,
   bgColor,
   bgImage,
+  highlightColor,
+  highlightPadding = 6,
+  underlineEnabled = false,
+  underlineColor = '#00A0FF',
+  underlineThickness = 4,
+  underlineStyle = 'solid',
+  underlineOffset = 2,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -89,6 +138,15 @@ export const Text = ({
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
+  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
+    underlineEnabled,
+    underlineColor,
+    underlineThickness,
+    underlineStyle,
+    underlineOffset,
+    highlightColor,
+    highlightPadding
+  );
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -109,9 +167,11 @@ export const Text = ({
             textAlign,
             color: textColor,
             fontWeight,
+            fontStyle,
             fontFamily,
+            ...underlineHighlightStyles,
           }}
-          className="tracking-tight leading-tight w-full"
+          className="tracking-tight leading-tight w-full inline-block"
         >
           {text}
         </Tag>
@@ -149,11 +209,13 @@ export const Text = ({
           textAlign,
           color: textColor,
           fontWeight,
+          fontStyle,
           fontFamily,
           outline: 'none',
           cursor: 'text',
+          ...underlineHighlightStyles,
         }}
-        className="tracking-tight leading-tight w-full min-w-[50px]"
+        className="tracking-tight leading-tight w-full min-w-[50px] inline-block"
       >
         {text}
       </Tag>
@@ -169,6 +231,7 @@ export const Text = ({
     textAlign: 'center',
     textColor: '#0f172a',
     fontWeight: 'bold',
+    fontStyle: 'normal',
     fontFamily: 'Inter',
     tagName: 'h2',
     width: 100,
