@@ -1947,17 +1947,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
                         )}
 
-                        {/* FULL-WIDTH THIN MAGNETIC ALIGNMENT LINE SPANNING ACROSS ALL BLOCKS IN THE ROW */}
-                        {snapGuide?.active && (
-                          <div className="relative w-full py-1 z-50">
-                            <div className="w-full h-[2.5px] bg-[#FF007F] shadow-[0_0_12px_#FF007F] animate-pulse flex items-center justify-center">
-                              <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-lg">
-                                🧲 Ligne d alignement magnétique ({snapGuide.val}px)
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
                           {(el.data?.items || [
                             { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
@@ -2001,6 +1990,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         transform: `scale(${(col.imgZoom || 100) / 100})`,
                                       }}
                                     />
+
+                                    {/* FULL-WIDTH THIN BOTTOM MAGNETIC ALIGNMENT LINE SUPPORTING ALL CARDS */}
+                                    {isImgSel && snapGuide?.active && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3px] bg-[#FF007F] shadow-[0_0_14px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-2xl border border-white translate-y-3">
+                                          🧲 Alignement magnétique bas ({snapGuide.val}px)
+                                        </span>
+                                      </div>
+                                    )}
 
                                     {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
@@ -2144,16 +2142,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
+                                    {/* FULL-WIDTH THIN BOTTOM MAGNETIC ALIGNMENT LINE SUPPORTING ALL CARDS */}
+                                    {isImgSel && snapGuide?.active && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3px] bg-[#FF007F] shadow-[0_0_14px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-2xl border border-white translate-y-3">
+                                          🧲 Alignement magnétique bas ({snapGuide.val}px)
+                                        </span>
+                                      </div>
+                                    )}
+
                                     {/* INTERACTIVE DRAG RESIZE HANDLES (LES 8 POINTS D ACCROCHE) */}
                                     {isImgSel && (
                                       <>
-                                        {/* MAGNETIC ALIGNMENT SNAP BADGE */}
-                                        {snapGuide?.active && (
-                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#FF007F] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-xl flex items-center gap-1 z-50 animate-pulse pointer-events-none whitespace-nowrap">
-                                            <span>🧲 Aimanté aux éléments de la section ({snapGuide.val}px)</span>
-                                          </div>
-                                        )}
-
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tl')}
                                           className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
