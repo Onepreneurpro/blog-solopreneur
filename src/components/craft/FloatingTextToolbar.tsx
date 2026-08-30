@@ -14,6 +14,7 @@ export const FloatingTextToolbar = () => {
   const [underlineStyle, setUnderlineStyle] = useState<'solid' | 'wavy' | 'dotted' | 'dashed' | 'double'>('wavy');
   const [underlineColor, setUnderlineColor] = useState('#00A0FF');
   const [underlineThickness, setUnderlineThickness] = useState(4);
+  const [underlineOffset, setUnderlineOffset] = useState(-2);
 
   // HIGHLIGHT CUSTOM COLOR STATE
   const [customHighlightColor, setCustomHighlightColor] = useState('#fef08a');
@@ -63,14 +64,19 @@ export const FloatingTextToolbar = () => {
           left: clampedLeft,
         });
 
-        // Detect current underline thickness if selecting an existing underline
+        // Detect current underline properties if selecting an existing underline
         let parent = range.commonAncestorContainer;
         if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
         const existingUnderline = (parent as HTMLElement).closest('span[style*="text-decoration"], u') as HTMLElement | null;
         if (existingUnderline) {
-          const computedThickness = parseFloat(window.getComputedStyle(existingUnderline).textDecorationThickness);
+          const comp = window.getComputedStyle(existingUnderline);
+          const computedThickness = parseFloat(comp.textDecorationThickness);
           if (!isNaN(computedThickness) && computedThickness > 0) {
             setUnderlineThickness(Math.round(computedThickness));
+          }
+          const computedOffset = parseFloat(comp.textUnderlineOffset);
+          if (!isNaN(computedOffset)) {
+            setUnderlineOffset(Math.round(computedOffset));
           }
         }
       }
@@ -134,7 +140,8 @@ export const FloatingTextToolbar = () => {
   const applyCurrentUnderline = (
     style = underlineStyle,
     color = underlineColor,
-    thickness = underlineThickness
+    thickness = underlineThickness,
+    offset = underlineOffset
   ) => {
     if (typeof window === 'undefined') return;
 
@@ -161,7 +168,7 @@ export const FloatingTextToolbar = () => {
       targetSpan.style.setProperty('text-decoration-style', style, 'important');
       targetSpan.style.setProperty('text-decoration-color', color, 'important');
       targetSpan.style.setProperty('text-decoration-thickness', `${thickness}px`, 'important');
-      targetSpan.style.setProperty('text-underline-offset', '3px', 'important');
+      targetSpan.style.setProperty('text-underline-offset', `${offset}px`, 'important');
     }
   };
 
@@ -283,7 +290,7 @@ export const FloatingTextToolbar = () => {
         )}
       </div>
 
-      {/* SOULIGNAGE (STYLE, ÉPAISSEUR ET COULEURS) */}
+      {/* SOULIGNAGE (STYLE, ÉPAISSEUR, POSITION ET COULEURS) */}
       <div className="relative">
         <button
           onMouseDown={(e) => {
@@ -380,17 +387,43 @@ export const FloatingTextToolbar = () => {
               <input
                 type="range"
                 min={1}
-                max={12}
+                max={14}
                 step={1}
                 value={underlineThickness}
                 onChange={(e) => {
                   const thickness = parseInt(e.target.value, 10);
                   setUnderlineThickness(thickness);
-                  applyCurrentUnderline(underlineStyle, underlineColor, thickness);
+                  applyCurrentUnderline(underlineStyle, underlineColor, thickness, underlineOffset);
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
                 className="w-full accent-[#00A0FF] cursor-pointer"
               />
+            </div>
+
+            {/* POSITION / OVERLAP SLIDER */}
+            <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="flex justify-between font-black text-xs text-slate-800">
+                <span>↕️ Position / Recouvrement</span>
+                <span className="text-[#00A0FF] font-mono">{underlineOffset}px</span>
+              </div>
+              <input
+                type="range"
+                min={-8}
+                max={10}
+                step={1}
+                value={underlineOffset}
+                onChange={(e) => {
+                  const offset = parseInt(e.target.value, 10);
+                  setUnderlineOffset(offset);
+                  applyCurrentUnderline(underlineStyle, underlineColor, underlineThickness, offset);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="w-full accent-[#00A0FF] cursor-pointer"
+              />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-0.5">
+                <span>⬆️ Sur les lettres (-8px)</span>
+                <span>Sous le texte (10px) ⬇️</span>
+              </div>
             </div>
 
             <button
