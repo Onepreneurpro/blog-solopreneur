@@ -10,8 +10,12 @@ import {
   Layout,
   X,
   FilePlus,
+  CheckCircle2,
+  Palette,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ALL_TEMPLATES, PageTemplate } from '@/lib/templates/salesPageTemplates';
 
 export default function TunnelsBeta2Page() {
   const [funnels, setFunnels] = useState<any[]>([]);
@@ -20,7 +24,9 @@ export default function TunnelsBeta2Page() {
   // ADD PAGE MODAL STATE
   const [selectedFunnelId, setSelectedFunnelId] = useState<string | null>(null);
   const [newPageName, setNewPageName] = useState('');
-  const [newPageType, setNewPageType] = useState('OPTIN_PAGE');
+  const [newPageType, setNewPageType] = useState('SALES_PAGE');
+  const [selectedTemplate, setSelectedTemplate] = useState<PageTemplate | null>(ALL_TEMPLATES[0]);
+  const [modalStep, setModalStep] = useState<'details' | 'templates'>('details');
   const [creatingPage, setCreatingPage] = useState(false);
   const [deletingStepId, setDeletingStepId] = useState<string | null>(null);
 
@@ -62,9 +68,8 @@ export default function TunnelsBeta2Page() {
     }
   };
 
-  // CREATE A NEW STEP / PAGE
-  const handleCreateStep = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // CREATE A NEW STEP / PAGE WITH TEMPLATE
+  const handleCreateStep = async (templateJson?: any) => {
     if (!selectedFunnelId || !newPageName.trim()) return;
 
     setCreatingPage(true);
@@ -76,12 +81,14 @@ export default function TunnelsBeta2Page() {
           funnelId: selectedFunnelId,
           name: newPageName.trim(),
           type: newPageType,
+          contentJson: templateJson || selectedTemplate?.contentJson || null,
         }),
       });
 
       if (res.ok) {
         setNewPageName('');
         setSelectedFunnelId(null);
+        setModalStep('details');
         await fetchFunnels();
       }
     } catch (err) {
@@ -162,7 +169,11 @@ export default function TunnelsBeta2Page() {
                     Pages du Tunnel :
                   </span>
                   <button
-                    onClick={() => setSelectedFunnelId(funnel.id)}
+                    onClick={() => {
+                      setSelectedFunnelId(funnel.id);
+                      setModalStep('details');
+                      setSelectedTemplate(ALL_TEMPLATES[0]);
+                    }}
                     className="flex items-center gap-1 text-xs font-bold text-[#00A0FF] hover:text-[#0080FF] hover:underline transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -216,72 +227,207 @@ export default function TunnelsBeta2Page() {
         </div>
       )}
 
-      {/* MODAL FOR ADDING A NEW PAGE */}
+      {/* MODAL FOR ADDING A NEW PAGE WITH TEMPLATE SELECTION GALLERY */}
       {selectedFunnelId && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <FilePlus className="w-5 h-5 text-[#00A0FF]" />
-                <h3 className="font-heading font-black text-base text-slate-900">
-                  Ajouter une nouvelle page
-                </h3>
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in select-none overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-3xl w-full shadow-2xl space-y-6 max-h-[90vh] flex flex-col my-auto">
+            {/* MODAL HEADER */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#00A0FF] border border-blue-200 flex items-center justify-center">
+                  <FilePlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-lg text-slate-900">
+                    {modalStep === 'details' ? 'Créer une nouvelle page' : '🎨 Choisir un Template'}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {modalStep === 'details'
+                      ? 'Renseignez le nom et le type de page pour continuer'
+                      : 'Sélectionnez un modèle design haut de gamme pour démarrer instantanément'}
+                  </p>
+                </div>
               </div>
               <button
-                onClick={() => setSelectedFunnelId(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                onClick={() => {
+                  setSelectedFunnelId(null);
+                  setModalStep('details');
+                }}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateStep} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700">Nom de la Page *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="ex: Page de Vente Offre Spéciale"
-                  value={newPageName}
-                  onChange={(e) => setNewPageName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
-                />
-              </div>
+            {/* STEP 1: PAGE DETAILS */}
+            {modalStep === 'details' ? (
+              <div className="space-y-5 flex-1">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-800">Nom de la Page *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ex: Page de Vente Digital Product Pro"
+                    value={newPageName}
+                    onChange={(e) => setNewPageName(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700">Type de Page</label>
-                <select
-                  value={newPageType}
-                  onChange={(e) => setNewPageType(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
-                >
-                  <option value="OPTIN_PAGE">Page de Capture (Optin)</option>
-                  <option value="SALES_PAGE">Page de Vente (Sales Page)</option>
-                  <option value="CHECKOUT_PAGE">Bon de Commande (Checkout)</option>
-                  <option value="THANK_YOU_PAGE">Page de Remerciement (Thank You)</option>
-                  <option value="UPSELL_PAGE">Page d Offre Supérieure (Upsell)</option>
-                  <option value="CUSTOM_PAGE">Page Personnalisée</option>
-                </select>
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-800">Type de Page</label>
+                  <select
+                    value={newPageType}
+                    onChange={(e) => setNewPageType(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] cursor-pointer"
+                  >
+                    <option value="SALES_PAGE">Page de Vente (Sales Page)</option>
+                    <option value="OPTIN_PAGE">Page de Capture (Optin)</option>
+                    <option value="CHECKOUT_PAGE">Bon de Commande (Checkout)</option>
+                    <option value="THANK_YOU_PAGE">Page de Remerciement (Thank You)</option>
+                    <option value="UPSELL_PAGE">Page d Offre Supérieure (Upsell)</option>
+                    <option value="CUSTOM_PAGE">Page Personnalisée</option>
+                  </select>
+                </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <Button
-                  type="button"
-                  onClick={() => setSelectedFunnelId(null)}
-                  variant="outline"
-                  className="text-xs font-bold rounded-xl"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={creatingPage || !newPageName.trim()}
-                  className="bg-[#00A0FF] hover:bg-[#0080FF] text-white text-xs font-black rounded-xl shadow-md"
-                >
-                  {creatingPage ? 'Création...' : 'Créer la page 🚀'}
-                </Button>
+                {/* TEMPLATE QUICK PREVIEW BOX */}
+                <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-emerald-600" />
+                      <span>Template Sélectionné :</span>
+                    </span>
+                    <span className="text-[10px] font-black bg-emerald-600 text-white px-2.5 py-0.5 rounded-full">
+                      ★ RECOMMANDÉ
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-emerald-200 shadow-xs">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-900 to-green-950 flex items-center justify-center text-white shrink-0 font-black text-xs">
+                      🟢
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900">
+                        {ALL_TEMPLATES[0].name}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
+                        10 sections à haute conversion (Hero, Vidéo, Compétences, Tarifs 19€, FAQ...)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleCreateStep(null)}
+                    disabled={creatingPage || !newPageName.trim()}
+                    className="text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900"
+                  >
+                    ⚡ Page Vierge (Sans Template)
+                  </Button>
+
+                  <Button
+                    type="button"
+                    disabled={!newPageName.trim()}
+                    onClick={() => setModalStep('templates')}
+                    className="bg-[#00A0FF] hover:bg-[#0080FF] text-white text-xs font-black rounded-xl shadow-md gap-2"
+                  >
+                    <span>Voir Tous Les Templates (3)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-            </form>
+            ) : (
+              /* STEP 2: TEMPLATE GALLERY SELECTION */
+              <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {ALL_TEMPLATES.map((tmpl) => {
+                    const isSelected = selectedTemplate?.id === tmpl.id;
+
+                    return (
+                      <div
+                        key={tmpl.id}
+                        onClick={() => setSelectedTemplate(tmpl)}
+                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 relative group ${
+                          isSelected
+                            ? 'border-emerald-500 bg-emerald-50/30 ring-2 ring-emerald-400 shadow-md'
+                            : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
+                        }`}
+                      >
+                        {/* BADGE */}
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${tmpl.badgeColor}`}>
+                            {tmpl.badge}
+                          </span>
+                          {isSelected && (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600 fill-emerald-100" />
+                          )}
+                        </div>
+
+                        {/* MOCK VISUAL PREVIEW CARD */}
+                        <div className={`w-full h-32 rounded-xl bg-gradient-to-b ${tmpl.previewBg} p-2.5 flex flex-col justify-between border border-slate-700/30 shadow-inner relative overflow-hidden`}>
+                          <div className="h-2 w-16 bg-red-500/80 rounded-full mx-auto" />
+                          <div className="space-y-1 text-center my-auto">
+                            <div className="h-3 w-3/4 bg-white/90 rounded-md mx-auto" />
+                            <div className="h-2 w-1/2 bg-emerald-400/80 rounded-md mx-auto" />
+                          </div>
+                          <div className="h-4 w-24 bg-emerald-500 rounded-full mx-auto shadow-xs" />
+                        </div>
+
+                        {/* TEMPLATE DETAILS */}
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-black text-slate-900 leading-snug">
+                            {tmpl.name}
+                          </h4>
+                          <p className="text-[10px] text-slate-500 font-medium leading-relaxed line-clamp-3">
+                            {tmpl.description}
+                          </p>
+                        </div>
+
+                        {/* SELECT BUTTON */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTemplate(tmpl);
+                            handleCreateStep(tmpl.contentJson);
+                          }}
+                          className={`w-full py-2 rounded-xl text-xs font-black transition-all ${
+                            isSelected
+                              ? 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700'
+                              : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+                          }`}
+                        >
+                          {isSelected ? '✓ Créer avec ce template' : 'Choisir ce template'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 shrink-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModalStep('details')}
+                    className="text-xs font-bold rounded-xl text-slate-600"
+                  >
+                    ← Retour
+                  </Button>
+
+                  <Button
+                    type="button"
+                    disabled={creatingPage || !selectedTemplate}
+                    onClick={() => handleCreateStep(selectedTemplate?.contentJson)}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-lg gap-2"
+                  >
+                    <span>{creatingPage ? 'Création...' : `Créer la page avec "${selectedTemplate?.name || ''}" 🚀`}</span>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
