@@ -42,95 +42,6 @@ export const Image = ({
     right: 'justify-end',
   };
 
-  const handleHeightResizeMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const startY = e.clientY;
-    const startHeight = height || 250;
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const deltaY = moveEvent.clientY - startY;
-      const newHeight = Math.min(800, Math.max(80, startHeight + deltaY));
-
-      setProp((props: ImageProps) => {
-        props.height = Math.round(newHeight);
-      });
-    };
-
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
-  const handleRightWidthResizeMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const resizerEl = e.currentTarget as HTMLElement;
-    const parentEl = resizerEl.parentElement?.parentElement?.parentElement as HTMLElement;
-    if (!parentEl) return;
-
-    const parentRect = parentEl.getBoundingClientRect();
-    const parentWidth = parentRect.width;
-    const startX = e.clientX;
-    const startWidth = width || 100;
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
-      const newWidth = Math.min(100, Math.max(15, startWidth + deltaPercent * 2));
-
-      setProp((props: ImageProps) => {
-        props.width = Math.round(newWidth);
-      });
-    };
-
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
-  const handleLeftWidthResizeMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const resizerEl = e.currentTarget as HTMLElement;
-    const parentEl = resizerEl.parentElement?.parentElement?.parentElement as HTMLElement;
-    if (!parentEl) return;
-
-    const parentRect = parentEl.getBoundingClientRect();
-    const parentWidth = parentRect.width;
-    const startX = e.clientX;
-    const startWidth = width || 100;
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = startX - moveEvent.clientX;
-      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
-      const newWidth = Math.min(100, Math.max(15, startWidth + deltaPercent * 2));
-
-      setProp((props: ImageProps) => {
-        props.width = Math.round(newWidth);
-      });
-    };
-
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -147,7 +58,7 @@ export const Image = ({
     );
   }
 
-  // BUILDER EDITOR VIEW: 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER / LEFT, RIGHT & BOTTOM RESIZERS
+  // BUILDER EDITOR VIEW (CLEAN & NATURAL): 1 CLICK = SELECT / DOUBLE CLICK = FILE PICKER
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -163,7 +74,7 @@ export const Image = ({
           e.stopPropagation();
           fileInputRef.current?.click();
         }}
-        title="1 clic : Sélectionner | Double-clic : Choisir photo | Bords : Redimensionner largeur/hauteur"
+        title="1 clic : Sélectionner | Double-clic : Choisir photo (PC)"
         className="relative group/img w-full overflow-hidden shadow-xl cursor-pointer"
         style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
       >
@@ -208,33 +119,6 @@ export const Image = ({
             <Trash2 className="w-4 h-4" />
           </button>
         )}
-
-        {/* LEFT BORDER WIDTH RESIZER HANDLE BAR */}
-        <div
-          onMouseDown={handleLeftWidthResizeMouseDown}
-          title="Tirez la bordure gauche pour agrandir"
-          className="absolute top-0 bottom-0 left-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/left-resizer z-40 rounded-l-xl select-none"
-        >
-          <div className="w-1 h-8 bg-[#00A0FF] group-hover/left-resizer:bg-white rounded-full transition-colors" />
-        </div>
-
-        {/* RIGHT BORDER WIDTH RESIZER HANDLE BAR */}
-        <div
-          onMouseDown={handleRightWidthResizeMouseDown}
-          title="Tirez la bordure droite pour agrandir"
-          className="absolute top-0 bottom-0 right-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/right-resizer z-40 rounded-r-xl select-none"
-        >
-          <div className="w-1 h-8 bg-[#00A0FF] group-hover/right-resizer:bg-white rounded-full transition-colors" />
-        </div>
-
-        {/* BOTTOM HEIGHT RESIZER HANDLE BAR */}
-        <div
-          onMouseDown={handleHeightResizeMouseDown}
-          title="Tirez vers le bas ou le haut pour modifier la hauteur"
-          className="absolute bottom-0 left-0 right-0 h-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-row-resize flex items-center justify-center transition-colors group/bottom-resizer z-40 rounded-b-xl select-none"
-        >
-          <div className="w-12 h-1 bg-[#00A0FF] group-hover/bottom-resizer:bg-white rounded-full transition-colors" />
-        </div>
 
         {/* HIDDEN FILE INPUT */}
         <input
