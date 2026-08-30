@@ -86,6 +86,33 @@ export const SettingsPanel = () => {
               ))}
             </div>
 
+            {props.columns === 2 && (
+              <div className="space-y-1.5 pt-2 border-t border-emerald-200">
+                <label className="font-bold text-slate-700">Proportions 2 Colonnes</label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { label: '50 / 50', widths: [50, 50] },
+                    { label: '66 / 33', widths: [66, 34] },
+                    { label: '33 / 66', widths: [34, 66] },
+                    { label: '75 / 25', widths: [75, 25] },
+                    { label: '25 / 75', widths: [25, 75] },
+                  ].map((preset, i) => (
+                    <button
+                      key={i}
+                      onClick={() =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.columnWidths = preset.widths;
+                        })
+                      }
+                      className="py-1.5 px-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold text-[10px] text-slate-800 transition-colors"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {props.gap !== undefined && (
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between font-bold text-slate-700">
