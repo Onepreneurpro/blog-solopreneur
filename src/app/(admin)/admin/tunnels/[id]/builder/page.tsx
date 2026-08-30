@@ -43,7 +43,6 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import WebstudioStudioEngine from '@/components/builder/WebstudioStudioEngine';
 
 interface CanvasElement {
   id: string;
@@ -64,10 +63,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS'>('ELEMENTS');
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
-  const engineParam = searchParams?.get('engine');
-  const [builderEngine, setBuilderEngine] = useState<'MAISON_V1' | 'WEBSTUDIO_V3'>(
-    engineParam === 'webstudio_v3' ? 'WEBSTUDIO_V3' : 'MAISON_V1'
-  );
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedSubItem, setSelectedSubItem] = useState<{
@@ -524,20 +519,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  if (builderEngine === 'WEBSTUDIO_V3') {
-    return (
-      <WebstudioStudioEngine
-        stepId={stepId || ''}
-        funnelSlug={funnel?.slug}
-        stepSlug={step?.slug}
-        initialData={step?.content}
-        onSaveSuccess={() => setSaveSuccess(true)}
-        onSwitchToMaisonV1={() => setBuilderEngine('MAISON_V1')}
-        onExit={() => router.push(`/admin/tunnels/${params.id}`)}
-      />
-    );
-  }
-
   return (
     <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden">
       
@@ -637,23 +618,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
-            </button>
-          </div>
-
-          {/* BUILDER ENGINE SWITCHER (MAISON V1 vs WEBSTUDIO V3) */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
-            <button
-              onClick={() => setBuilderEngine('MAISON_V1')}
-              className="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-[#00A0FF] text-white shadow-xs"
-            >
-              🎨 Maison V1
-            </button>
-            <button
-              onClick={() => setBuilderEngine('WEBSTUDIO_V3')}
-              className="px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Webstudio V3 (OSS)</span>
             </button>
           </div>
 

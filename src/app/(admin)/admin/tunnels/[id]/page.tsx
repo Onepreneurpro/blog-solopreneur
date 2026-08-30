@@ -476,21 +476,7 @@ export default function AdminFunnelDetailPage({ params }: { params: { id: string
                         className="w-full bg-[#00A0FF] hover:bg-[#0082D6] !text-white font-heading font-black text-xs gap-2 py-2.5 rounded-xl shadow-md justify-center"
                       >
                         <Edit3 className="w-4 h-4 !text-white stroke-[2.5]" />
-                        <span>Modifier la page (Maison V1)</span>
-                      </Button>
-                    </Link>
-
-                    {/* FUNNEL BUILDER V3 (WEBSTUDIO OPEN SOURCE) */}
-                    <Link
-                      href={`/admin/tunnels/${funnel.id}/builder?stepId=${selectedStep.id}&engine=webstudio_v3`}
-                      className="w-full"
-                    >
-                      <Button
-                        size="sm"
-                        className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-indigo-700 !text-white font-heading font-black text-xs gap-2 py-2.5 rounded-xl shadow-lg justify-center border border-purple-400/30"
-                      >
-                        <Sparkles className="w-4 h-4 !text-amber-300 stroke-[2.5]" />
-                        <span>Funnel Builder V3 (Webstudio OSS)</span>
+                        <span>🎨 Modifier dans le Builder Maison</span>
                       </Button>
                     </Link>
 

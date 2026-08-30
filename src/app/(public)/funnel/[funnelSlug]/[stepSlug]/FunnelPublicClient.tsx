@@ -4,16 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, ArrowRight, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Editor, Frame } from '@craftjs/core';
-import { Container } from '@/components/craft/user/Container';
-import { Text } from '@/components/craft/user/Text';
-import { Button as CraftButton } from '@/components/craft/user/Button';
-import { Image as CraftImage } from '@/components/craft/user/Image';
-import { FeatureGrid } from '@/components/craft/user/FeatureGrid';
-import { Card } from '@/components/craft/user/Card';
-import { LeadForm } from '@/components/craft/user/LeadForm';
-import { Video } from '@/components/craft/user/Video';
-import { Grid } from '@/components/craft/user/Grid';
 
 interface FunnelPublicClientProps {
   funnel: any;
@@ -28,26 +18,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Check if content is saved Craft.js JSON, Webstudio JSON project or legacy array
-  let craftData: string | null = null;
+  // Check if content is saved Maison Builder customElements array
   let customElements: any[] | null = null;
-  let webstudioProject: any = null;
-  let isFullWidth = true;
 
   if (step?.content) {
     try {
       const parsed = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
-      if (parsed?.root && (parsed?.engine === 'webstudio-is/webstudio' || parsed?.version)) {
-        webstudioProject = parsed;
-      } else if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed)) {
         customElements = parsed;
-      } else {
-        craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
-        if (parsed?.ROOT?.props?.pageLayoutMode === 'centered') {
-          isFullWidth = false;
-        } else {
-          isFullWidth = true;
-        }
+      } else if (parsed?.elements && Array.isArray(parsed.elements)) {
+        customElements = parsed.elements;
       }
     } catch (e) {
       console.error('Error parsing step content:', e);
@@ -122,75 +102,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           >
             Retourner sur la page d accueil →
           </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // RENDER WEBSTUDIO PROJECT PUBLICLY
-  if (webstudioProject) {
-    const renderNode = (node: any): React.ReactNode => {
-      const safeTag = (node.tag === 'body' || node.tag === 'html') ? 'div' : (node.tag || 'div');
-      const Tag = safeTag as keyof JSX.IntrinsicElements;
-      return (
-        <Tag key={node.id} style={node.style}>
-          {node.content}
-          {node.children && node.children.map(renderNode)}
-        </Tag>
-      );
-    };
-
-    return (
-      <div className="min-h-screen w-full">
-        {renderNode(webstudioProject.root)}
-      </div>
-    );
-  }
-
-  // RENDER CRAFT.JS SAVED CANVAS CONTENT PUBLICLY
-  if (craftData) {
-    if (isFullWidth) {
-      return (
-        <div className="min-h-screen bg-white text-slate-900 w-full overflow-x-hidden">
-          <Editor
-            resolver={{
-              Container,
-              Text,
-              Button: CraftButton,
-              Image: CraftImage,
-              FeatureGrid,
-              Card,
-              LeadForm,
-              Video,
-              Grid,
-            }}
-            enabled={false}
-          >
-            <Frame data={craftData} />
-          </Editor>
-        </div>
-      );
-    }
-
-    return (
-      <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col items-center justify-center py-6 px-4">
-        <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[800px]">
-          <Editor
-            resolver={{
-              Container,
-              Text,
-              Button: CraftButton,
-              Image: CraftImage,
-              FeatureGrid,
-              Card,
-              LeadForm,
-              Video,
-              Grid,
-            }}
-            enabled={false}
-          >
-            <Frame data={craftData} />
-          </Editor>
         </div>
       </div>
     );
