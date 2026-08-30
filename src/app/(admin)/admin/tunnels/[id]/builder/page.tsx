@@ -2069,26 +2069,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* 📌 PERMANENT BLUE REFERENCE LINE (100% EXACTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
-                                    {col.isFixedReference && (
-                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                          <span>📌</span>
-                                          <span>Ligne de Référence Fixée ({col.imgSize || 280}px)</span>
-                                        </span>
-                                      </div>
-                                    )}
-
-                                    {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
-                                    {isImgSel && snapGuide?.active && !col.isFixedReference && (
-                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                          <span>🧲</span>
-                                          <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
-                                        </span>
-                                      </div>
-                                    )}
-
                                     {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
                                       <>
@@ -2143,6 +2123,32 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       </>
                                     )}
                                   </div>
+
+                                  {/* 📌 PERMANENT BLUE REFERENCE LINE (OUTSIDE OVERFLOW-HIDDEN, 100% PERFECTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
+                                  {col.isFixedReference && (
+                                    <div
+                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center"
+                                      style={{ top: `${col.imgSize || 280}px` }}
+                                    >
+                                      <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                        <span>📌</span>
+                                        <span>Ligne de Référence Fixée ({col.imgSize || 280}px)</span>
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
+                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (
+                                    <div
+                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
+                                      style={{ top: `${snapGuide.val}px` }}
+                                    >
+                                      <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                        <span>🧲</span>
+                                        <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* CLICKABLE TITLE WITH HIGHLIGHT */}
@@ -2239,72 +2245,86 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* 📌 PERMANENT BLUE REFERENCE LINE (100% EXACTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
-                                    {col.isFixedReference && (
-                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                          <span>📌</span>
-                                          <span>Ligne de Référence Fixée ({col.imgSize || 220}px)</span>
-                                        </span>
-                                      </div>
-                                    )}
-
-                                    {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
-                                    {isImgSel && snapGuide?.active && !col.isFixedReference && (
-                                      <div className="absolute -bottom-0.5 -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                          <span>🧲</span>
-                                          <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
-                                        </span>
-                                      </div>
-                                    )}
-
-                                    {/* INTERACTIVE DRAG RESIZE HANDLES (LES 8 POINTS D ACCROCHE) */}
+                                    {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
                                       <>
+                                        {/* 1. TOP-LEFT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tl')}
-                                          className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Haut-Gauche)"
+                                          className="absolute top-0 left-0 w-6 h-6 cursor-nwse-resize z-30 hover:bg-[#00A0FF]/30 rounded-tl-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
+                                        {/* 2. TOP-RIGHT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tr')}
-                                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Haut-Droit)"
+                                          className="absolute top-0 right-0 w-6 h-6 cursor-nesw-resize z-30 hover:bg-[#00A0FF]/30 rounded-tr-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
+                                        {/* 3. BOTTOM-LEFT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-bl')}
-                                          className="absolute -bottom-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Bas-Gauche)"
+                                          className="absolute bottom-0 left-0 w-6 h-6 cursor-nesw-resize z-30 hover:bg-[#00A0FF]/30 rounded-bl-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
+                                        {/* 4. BOTTOM-RIGHT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-br')}
-                                          className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Bas-Droit)"
+                                          className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize z-30 hover:bg-[#00A0FF]/30 rounded-br-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
+                                        {/* 5. TOP EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-t')}
-                                          className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord supérieur (Hauteur)"
+                                          className="absolute top-0 left-6 right-6 h-3 cursor-ns-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord supérieur"
                                         />
+                                        {/* 6. BOTTOM EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-b')}
-                                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord inférieur (Hauteur)"
+                                          className="absolute bottom-0 left-6 right-6 h-3 cursor-ns-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord inférieur"
                                         />
+                                        {/* 7. LEFT EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-l')}
-                                          className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord gauche (Largeur)"
+                                          className="absolute top-6 bottom-6 left-0 w-3 cursor-ew-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord gauche"
                                         />
+                                        {/* 8. RIGHT EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-r')}
-                                          className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord droit (Largeur)"
+                                          className="absolute top-6 bottom-6 right-0 w-3 cursor-ew-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord droit"
                                         />
                                       </>
                                     )}
                                   </div>
+
+                                  {/* 📌 PERMANENT BLUE REFERENCE LINE (OUTSIDE OVERFLOW-HIDDEN, 100% PERFECTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
+                                  {col.isFixedReference && (
+                                    <div
+                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center"
+                                      style={{ top: `${col.imgSize || 220}px` }}
+                                    >
+                                      <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                        <span>📌</span>
+                                        <span>Ligne de Référence Fixée ({col.imgSize || 220}px)</span>
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
+                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (
+                                    <div
+                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
+                                      style={{ top: `${snapGuide.val}px` }}
+                                    >
+                                      <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                        <span>🧲</span>
+                                        <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                                 <h4
                                   onClick={(e) => {
