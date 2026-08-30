@@ -572,7 +572,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     value={currentSubItem.imgSize || 240}
                                     onChange={(e) => {
                                       const val = Number(e.target.value);
-                                      const updatedItems = elData.items.map((it: any, idx: number) =>
+                                      const updatedItems = elItems.map((it: any, idx: number) =>
                                         idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
                                       );
                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
@@ -589,7 +589,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 value={currentSubItem.imgSize || 240}
                                 onChange={(e) => {
                                   const val = Number(e.target.value);
-                                  const updatedItems = elData.items.map((it: any, idx: number) =>
+                                  const updatedItems = elItems.map((it: any, idx: number) =>
                                     idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
                                   );
                                   handleUpdateElementData(selectedEl.id, { items: updatedItems });
@@ -598,28 +598,110 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               />
                             </div>
 
-                            {/* BORDURE & ARRONDI */}
+                            {/* ARRONDISSEMENT DES COINS */}
                             <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                               <div className="flex items-center justify-between text-xs font-bold">
                                 <span className="text-slate-400">Arrondissement des coins</span>
                                 <span className="text-xs font-mono text-slate-300">
-                                  {currentSubItem.borderRadius || 16}px
+                                  {currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}px
                                 </span>
                               </div>
                               <input
                                 type="range"
                                 min={0}
                                 max={60}
-                                value={currentSubItem.borderRadius || 16}
+                                value={currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}
                                 onChange={(e) => {
                                   const val = Number(e.target.value);
-                                  const updatedItems = elData.items.map((it: any, idx: number) =>
+                                  const updatedItems = elItems.map((it: any, idx: number) =>
                                     idx === selectedSubItem.itemIndex ? { ...it, borderRadius: val } : it
                                   );
                                   handleUpdateElementData(selectedEl.id, { items: updatedItems });
                                 }}
                                 className="w-full accent-[#00A0FF]"
                               />
+                            </div>
+
+                            {/* ACTION SUR UNE IMAGE CLIQUÉE (WITH URL INPUT) */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                Action sur une image cliquée
+                              </label>
+                              <select
+                                value={currentSubItem.clickAction || 'OpenURL'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const updatedItems = elItems.map((it: any, idx: number) =>
+                                    idx === selectedSubItem.itemIndex ? { ...it, clickAction: val } : it
+                                  );
+                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                }}
+                                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                              >
+                                <option value="None">Aucune (None)</option>
+                                <option value="OpenURL">Ouvrir l URL de redirection</option>
+                                <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
+                              </select>
+
+                              {/* REDIRECTION URL INPUT WHEN OpenURL IS SELECTED */}
+                              {(currentSubItem.clickAction || 'OpenURL') === 'OpenURL' && (
+                                <div className="space-y-1 pt-1">
+                                  <label className="text-[10px] font-bold text-slate-400">
+                                    URL de redirection (ex: https://...)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={currentSubItem.redirectUrl || ''}
+                                    placeholder="https://votre-site.com/offre"
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      const updatedItems = elItems.map((it: any, idx: number) =>
+                                        idx === selectedSubItem.itemIndex ? { ...it, redirectUrl: val } : it
+                                      );
+                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                    }}
+                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono"
+                                  />
+                                </div>
+                              )}
+                            </div>
+
+                            {/* ATTRIBUT ALT & REMPLIR À 100% */}
+                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  Attribut Alt
+                                </label>
+                                <input
+                                  type="text"
+                                  value={currentSubItem.alt || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, alt: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  placeholder="Texte alternatif..."
+                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
+                                />
+                              </div>
+
+                              <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
+                                <input
+                                  type="checkbox"
+                                  checked={currentSubItem.fullWidth || false}
+                                  onChange={(e) => {
+                                    const val = e.target.checked;
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex ? { ...it, fullWidth: val } : it
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
+                                />
+                                <span>Remplir à 100% en largeur</span>
+                              </label>
                             </div>
                           </>
                         )}
@@ -1582,7 +1664,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         {el.data?.title && (
                           <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
                         )}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start">
                           {(el.data?.items || [
                             { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
                             { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
@@ -1595,23 +1677,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             return (
                               <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
-                                {/* CLICKABLE IMAGE CONTAINER WITH BLUE HIGHLIGHT RING */}
+                                {/* CLICKABLE IMAGE CONTAINER WITH DYNAMIC HEIGHT & BORDER RADIUS */}
                                 <div
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                   }}
-                                  className={`w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md transition-all cursor-pointer ${
+                                  className={`w-full overflow-hidden shadow-md transition-all cursor-pointer ${
                                     isImgSel
                                       ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
                                       : 'hover:ring-4 hover:ring-[#00A0FF]/60'
                                   }`}
                                   style={{
-                                    borderRadius: `${col.borderRadius || 16}px`,
+                                    height: col.imgSize ? `${col.imgSize}px` : '280px',
+                                    borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
                                   }}
                                 >
-                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                  <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
                                 </div>
 
                                 {/* CLICKABLE TITLE WITH HIGHLIGHT */}
@@ -1658,7 +1741,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <h4 className="text-[10px] font-black text-[#00A0FF] uppercase tracking-widest">CE QUE VOUS OBTENEZ</h4>
                           <h2 className="text-xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                           {(el.data?.items || [
                             { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
                             { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
@@ -1676,13 +1759,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     setSelectedElementId(el.id);
                                     setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                   }}
-                                  className={`aspect-video rounded-2xl overflow-hidden shadow-sm transition-all cursor-pointer ${
+                                  className={`w-full overflow-hidden shadow-sm transition-all cursor-pointer ${
                                     isImgSel
                                       ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
                                       : 'hover:ring-4 hover:ring-[#00A0FF]/60'
                                   }`}
+                                  style={{
+                                    height: col.imgSize ? `${col.imgSize}px` : '220px',
+                                    borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
+                                  }}
                                 >
-                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                  <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
                                 </div>
                                 <h4
                                   onClick={(e) => {

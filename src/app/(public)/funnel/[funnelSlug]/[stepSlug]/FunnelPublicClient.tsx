@@ -223,22 +223,47 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             if (el.type === 'BlockFeat4ColImg') {
+              const items = el.data?.items || [
+                { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+              ];
+
               return (
-                <div key={el.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl my-8">
-                  {[
-                    { title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                    { title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                    { title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                    { title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                  ].map((col, i) => (
-                    <div key={i} className="flex flex-col items-center text-center space-y-3">
-                      <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
-                        <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                      </div>
-                      <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
-                      <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
-                    </div>
-                  ))}
+                <div key={el.id} className="p-6 sm:p-8 bg-white text-slate-900 rounded-3xl shadow-2xl space-y-6 my-8">
+                  {el.data?.title && (
+                    <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+                    {items.map((col: any, i: number) => {
+                      const imgElement = (
+                        <div
+                          className="w-full overflow-hidden shadow-md"
+                          style={{
+                            height: col.imgSize ? `${col.imgSize}px` : '280px',
+                            borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
+                          }}
+                        >
+                          <img src={col.img} alt={col.alt || col.title} className="w-full h-full object-cover" />
+                        </div>
+                      );
+
+                      return (
+                        <div key={col.id || i} className="flex flex-col items-center text-center space-y-3">
+                          {col.redirectUrl && col.clickAction === 'OpenURL' ? (
+                            <a href={col.redirectUrl} target="_blank" rel="noopener noreferrer" className="w-full block hover:opacity-90 transition-opacity">
+                              {imgElement}
+                            </a>
+                          ) : (
+                            imgElement
+                          )}
+                          <h3 className="font-heading font-black text-base text-slate-900 tracking-wider uppercase">{col.title}</h3>
+                          <p className="text-xs text-slate-500 leading-relaxed font-medium">{col.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             }
