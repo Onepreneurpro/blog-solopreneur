@@ -81,6 +81,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   // CANVAS BACKGROUND ALIGNMENT GRID STATE (GRILLAGE À CARREAUX ON/OFF)
   const [showCanvasGrid, setShowCanvasGrid] = useState<boolean>(true);
 
+  // PAGE DISPLAY WIDTH MODE STATE (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%)
+  const [pageWidthMode, setPageWidthMode] = useState<'standard' | 'wide' | 'full'>('standard');
+
+  const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
+    setPageWidthMode(mode);
+    setElements((prev) =>
+      prev.map((el) => ({
+        ...el,
+        data: { ...el.data, pageWidthMode: mode },
+      }))
+    );
+  };
+
   // LEFT INSPECTOR COLLAPSIBLE SECTIONS ACCORDION STATE
   const [openAccordion, setOpenAccordion] = useState<Record<string, boolean>>({
     imageFile: true,
@@ -131,7 +144,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           if (targetStep?.content) {
             try {
               const parsed = JSON.parse(targetStep.content);
-              if (Array.isArray(parsed)) setElements(parsed);
+              if (Array.isArray(parsed)) {
+                setElements(parsed);
+                const foundMode = parsed.find((el: any) => el.data?.pageWidthMode)?.data?.pageWidthMode;
+                if (foundMode && ['standard', 'wide', 'full'].includes(foundMode)) {
+                  setPageWidthMode(foundMode);
+                }
+              }
             } catch (e) {
               console.error(e);
             }
@@ -763,9 +782,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         {/* RIGHT ACTION BUTTONS */}
         <div className="flex items-center gap-3">
           
-          {/* DESKTOP / MOBILE / GRID TOGGLE BUTTONS */}
+          {/* DESKTOP / MOBILE / GRID TOGGLE & DISPLAY WIDTH BUTTONS */}
           <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
             <button
+              type="button"
               onClick={() => setPreviewMode('DESKTOP')}
               className={`p-1.5 rounded-lg transition-all ${
                 previewMode === 'DESKTOP' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
@@ -775,6 +795,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <Monitor className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={() => setPreviewMode('MOBILE')}
               className={`p-1.5 rounded-lg transition-all ${
                 previewMode === 'MOBILE' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
@@ -785,6 +806,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             </button>
             <div className="h-4 w-px bg-slate-800 my-auto" />
             <button
+              type="button"
               onClick={() => setShowCanvasGrid(!showCanvasGrid)}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                 showCanvasGrid
@@ -793,8 +815,40 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               }`}
               title="Activer/Désactiver le grillage à carreaux pour l alignement"
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
+              <span>🏁 Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
+            </button>
+          </div>
+
+          {/* PAGE DISPLAY WIDTH SELECTOR (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%) */}
+          <div className="hidden lg:flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
+            <button
+              type="button"
+              onClick={() => handleSetPageWidthMode('standard')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                pageWidthMode === 'standard' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Affichage Standard (896px - Centré)"
+            >
+              📱 Standard (896px)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetPageWidthMode('wide')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                pageWidthMode === 'wide' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Affichage Large (1152px - Étendu)"
+            >
+              💻 Large (1152px)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetPageWidthMode('full')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                pageWidthMode === 'full' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Affichage Plein Écran (100% - Full Width)"
+            >
             </button>
           </div>
 
@@ -1324,7 +1378,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         >
           <div
             className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl transition-all space-y-6 ${
-              previewMode === 'MOBILE' ? 'max-w-sm' : 'max-w-4xl'
+              previewMode === 'MOBILE'
+                ? 'max-w-sm'
+                : pageWidthMode === 'full'
+                ? 'max-w-full'
+                : pageWidthMode === 'wide'
+                ? 'max-w-6xl'
+                : 'max-w-4xl'
             } ${
               showCanvasGrid
                 ? 'bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
@@ -3419,6 +3479,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                           </div>
                         )}
+
+                        {/* 📐 LARGEUR DE L'AFFICHAGE DU BUILDER ET DU TUNNEL */}
+                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                            <span>📐 Largeur de l Affichage</span>
+                            <span className="text-[9px] font-mono text-slate-400">
+                              {pageWidthMode === 'standard' ? '896px' : pageWidthMode === 'wide' ? '1152px' : '100% Full'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {[
+                              { key: 'standard', label: '📱 Standard (896px)' },
+                              { key: 'wide', label: '💻 Large (1152px)' },
+                              { key: 'full', label: '🖥️ Plein Écran' },
+                            ].map((w) => (
+                              <button
+                                key={w.key}
+                                type="button"
+                                onClick={() => handleSetPageWidthMode(w.key as any)}
+                                className={`py-2 px-1 text-[10px] font-bold rounded-xl border transition-all text-center ${
+                                  pageWidthMode === w.key
+                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
+                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                }`}
+                              >
+                                {w.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
 
                         {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
                         <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">

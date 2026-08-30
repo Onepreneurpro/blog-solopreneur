@@ -109,6 +109,15 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
   // RENDER MAISON BUILDER PAGE IF CUSTOM ELEMENTS ARRAY
   if (customElements) {
+    const pageWidthMode = customElements.find((el: any) => el.data?.pageWidthMode)?.data?.pageWidthMode || 'standard';
+
+    const publicWidthClass =
+      pageWidthMode === 'full'
+        ? 'w-full max-w-full px-4 sm:px-8'
+        : pageWidthMode === 'wide'
+        ? 'max-w-6xl mx-auto w-full'
+        : 'max-w-4xl mx-auto w-full';
+
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-12">
         <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
@@ -123,7 +132,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           </span>
         </div>
 
-        <div className="max-w-4xl mx-auto w-full my-8 space-y-8">
+        <div className={`${publicWidthClass} my-8 space-y-8`}>
           {customElements.map((el: any) => {
             if (el.type === 'BlockNavArizona') {
               return (
