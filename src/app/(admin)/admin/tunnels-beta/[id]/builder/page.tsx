@@ -114,7 +114,7 @@ export default function PuckBuilderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
+      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-[#00A0FF] border-t-transparent rounded-full animate-spin" />
         <p className="text-xs font-bold tracking-wider text-slate-400">Chargement de l Éditeur Puck Beta...</p>
       </div>
@@ -122,7 +122,7 @@ export default function PuckBuilderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
       {/* TOP HEADER */}
       <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-30">
         <div className="flex items-center gap-3">
@@ -171,8 +171,12 @@ export default function PuckBuilderPage() {
       </header>
 
       {/* PUCK EDITOR FULLSCREEN WORKSPACE */}
-      <div className="flex-1 w-full relative bg-slate-100 text-slate-900">
+      <div className="flex-1 w-full relative bg-slate-100 text-slate-900 overflow-hidden">
         <style jsx global>{`
+          .Puck {
+            height: calc(100vh - 3.5rem) !important;
+            max-height: calc(100vh - 3.5rem) !important;
+          }
           .Puck-component input,
           .Puck-component textarea,
           .Puck-component label,
@@ -180,9 +184,8 @@ export default function PuckBuilderPage() {
           [data-puck-component] input,
           [data-puck-component] textarea,
           [data-puck-component] label,
-          [data-puck-component] button,
-          input, textarea {
-            pointer-events: auto !important;
+          [data-puck-component] button {
+            pointer-events: auto;
           }
         `}</style>
         <Puck

@@ -180,17 +180,15 @@ export const puckConfig: Config<PuckProps> = {
               {/* INLINE IMAGE FRAME WITH DOUBLE-CLICK UPLOAD & SINGLE-CLICK TRASH */}
               <div className="w-full md:w-1/2 flex justify-center">
                 <div
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onClick={(e) => e.stopPropagation()}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
                   }}
-                  title="Double-cliquez pour ouvrir l explorateur PC"
+                  title="Clic simple pour voir les détails à droite. Double-clic pour ouvrir l explorateur PC."
                   className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto"
                 >
                   {imageUrl ? (
-                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none pointer-events-none" />
+                    <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px] select-none" />
                   ) : (
                     <div className="w-full h-64 bg-slate-800 flex flex-col items-center justify-center text-slate-400 font-bold text-xs gap-2 p-4">
                       <span>🖼️ Aucune image</span>
@@ -429,7 +427,7 @@ export const puckConfig: Config<PuckProps> = {
       fields: {
         item1Title: { type: 'text', label: 'Titre Col 1' },
         item1Desc: { type: 'textarea', label: 'Desc Col 1' },
-        item1Img: { type: 'text', label: 'Image Col 1 (Double-cliquez sur le bloc pour choisir un fichier PC)' },
+        item1Img: { type: 'text', label: 'Image Col 1 (Double-cliquez sur l image pour choisir un fichier PC)' },
         item2Title: { type: 'text', label: 'Titre Col 2' },
         item2Desc: { type: 'textarea', label: 'Desc Col 2' },
         item2Img: { type: 'text', label: 'Image Col 2' },
@@ -553,18 +551,16 @@ export const puckConfig: Config<PuckProps> = {
 
                   {/* IMAGE FRAME WITH DOUBLE CLICK FILE PICKER & SINGLE CLICK TRASH ICON */}
                   <div
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Double-cliquez pour ouvrir l explorateur de fichiers (PC)"
+                    title="Clic simple pour sélectionner. Double-clic pour ouvrir l explorateur PC."
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
                     {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none" />
                     ) : (
                       <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
                         <span>🖼️ Aucune image</span>
@@ -747,18 +743,16 @@ export const puckConfig: Config<PuckProps> = {
                   </div>
 
                   <div
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       fileInputRefs.current[i]?.click();
                     }}
-                    title="Double-cliquez pour ouvrir l explorateur PC"
+                    title="Clic simple pour sélectionner. Double-clic pour ouvrir l explorateur PC."
                     className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
                     {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none" />
                     ) : (
                       <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
                         <span>🖼️ Aucune image</span>
