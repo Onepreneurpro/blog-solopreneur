@@ -539,16 +539,28 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               const title = el.data?.title || el.content || defaultData.title;
               const cols = (el.type.includes('4') || el.type === 'Col4') ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
 
+              const mainBg = el.data?.bgColor || '#ffffff';
+              const cardBg = el.data?.cardBgColor || 'transparent';
+              const textColor = el.data?.textColor || '#0f172a';
+
               return (
-                <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
+                <div
+                  key={el.id}
+                  style={{ backgroundColor: mainBg, color: textColor }}
+                  className="space-y-6 p-6 sm:p-8 rounded-3xl border border-slate-100/60 shadow-xl my-6"
+                >
                   {title && (
-                    <h3 className="text-2xl font-heading font-black text-white text-center">
+                    <h3 className="text-2xl font-heading font-black text-center" style={{ color: textColor }}>
                       {title}
                     </h3>
                   )}
                   <div className={`grid ${cols} gap-6`}>
                     {items.map((it: any, idx: number) => (
-                      <div key={idx} className="space-y-3 flex flex-col items-center text-center bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                      <div
+                        key={idx}
+                        style={{ backgroundColor: cardBg, color: textColor }}
+                        className="space-y-3 flex flex-col items-center text-center p-4 rounded-2xl"
+                      >
                         {it.img && (
                           <div className="w-full flex justify-center">
                             <div
