@@ -671,12 +671,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT PALETTE / INSPECTOR PANEL (SCREENS 1, 2, 3, 4, 5) */}
-        <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-y-auto">
+        <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden">
           
           {/* PERMANENT LEFT PALETTE (ÉLÉMENTS & BLOCS) */}
             <>
               {/* TABS: ÉLÉMENTS / BLOCS */}
-              <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950">
+              <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950 shrink-0">
                 <button
                   onClick={() => setActiveTab('ELEMENTS')}
                   className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
@@ -696,7 +696,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               </div>
 
               {/* PALETTE CONTENT FOR ELEMENTS AND BLOCS TABS */}
-              <div className="p-4 space-y-6 text-xs">
+              <div className="p-4 space-y-6 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
                 
                 {activeTab === 'ELEMENTS' && (
                   <>
@@ -1931,8 +1931,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
         {/* RIGHT SIDEBAR INSPECTOR PANEL (Appears on right when an element is clicked) */}
         {selectedElementId && (
-          <div className="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-200">
-            {            (() => {
+          <div className="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 h-full overflow-hidden shadow-2xl animate-in slide-in-from-right duration-200">
+            {(() => {
               const selectedEl = elements.find((el) => el.id === selectedElementId);
               if (!selectedEl) return null;
               const rawData = selectedEl.data || {};
@@ -1949,9 +1949,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   : null;
 
               return (
-                <div className="flex flex-col h-full text-slate-200">
+                <div className="flex flex-col h-full text-slate-200 overflow-hidden">
                   {/* TOP HEADER MATCHING SCREENSHOT 3: < Retour | Section > Rangée > Image */}
-                  <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2">
+                  <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2 shrink-0">
                     <button
                       onClick={() => {
                         setSelectedElementId(null);
@@ -1990,7 +1990,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
 
                   {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
-                  <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1">
+                  <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
                     
                     {/* IF A SPECIFIC SUB-ITEM (IMAGE, TITLE, DESC) WAS CLICKED DIRECTLY */}
                     {selectedSubItem && currentSubItem ? (
