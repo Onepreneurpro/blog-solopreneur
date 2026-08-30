@@ -21,8 +21,6 @@ export interface TextProps {
   shadowOpacity?: number;
   bgColor?: string;
   bgImage?: string;
-  emoji?: string;
-  emojiPosition?: 'left' | 'right';
 }
 
 export const getBoxShadow = (
@@ -75,8 +73,6 @@ export const Text = ({
   shadowOpacity = 20,
   bgColor,
   bgImage,
-  emoji,
-  emojiPosition = 'left',
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -94,18 +90,11 @@ export const Text = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
-  const flexJustify =
-    textAlign === 'left'
-      ? 'justify-start'
-      : textAlign === 'right'
-      ? 'justify-end'
-      : 'justify-center';
-
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div
-        className="my-2 p-3 max-w-full mx-auto flex items-center"
+        className="my-2 p-3 max-w-full mx-auto flex items-center justify-center"
         style={{
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
@@ -114,32 +103,18 @@ export const Text = ({
           ...bgStyles,
         }}
       >
-        <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
-          {emoji && emojiPosition === 'left' && (
-            <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none">
-              {emoji}
-            </span>
-          )}
-
-          <Tag
-            style={{
-              fontSize: `${fontSize}px`,
-              textAlign,
-              color: textColor,
-              fontWeight,
-              fontFamily,
-            }}
-            className="tracking-tight leading-tight"
-          >
-            {text}
-          </Tag>
-
-          {emoji && emojiPosition === 'right' && (
-            <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none">
-              {emoji}
-            </span>
-          )}
-        </div>
+        <Tag
+          style={{
+            fontSize: `${fontSize}px`,
+            textAlign,
+            color: textColor,
+            fontWeight,
+            fontFamily,
+          }}
+          className="tracking-tight leading-tight w-full"
+        >
+          {text}
+        </Tag>
       </div>
     );
   }
@@ -150,7 +125,7 @@ export const Text = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-3 relative transition-all mx-auto flex items-center ${
+      className={`my-2 p-3 relative transition-all mx-auto flex items-center justify-center ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
       style={{
@@ -161,41 +136,27 @@ export const Text = ({
         ...bgStyles,
       }}
     >
-      <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
-        {emoji && emojiPosition === 'left' && (
-          <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none select-none">
-            {emoji}
-          </span>
-        )}
-
-        <Tag
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={(e) => {
-            setProp((props: TextProps) => {
-              props.text = e.currentTarget.innerText;
-            });
-          }}
-          style={{
-            fontSize: `${fontSize}px`,
-            textAlign,
-            color: textColor,
-            fontWeight,
-            fontFamily,
-            outline: 'none',
-            cursor: 'text',
-          }}
-          className="tracking-tight leading-tight min-w-[50px]"
-        >
-          {text}
-        </Tag>
-
-        {emoji && emojiPosition === 'right' && (
-          <span style={{ fontSize: `${fontSize * 1.1}px` }} className="shrink-0 leading-none select-none">
-            {emoji}
-          </span>
-        )}
-      </div>
+      <Tag
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          setProp((props: TextProps) => {
+            props.text = e.currentTarget.innerText;
+          });
+        }}
+        style={{
+          fontSize: `${fontSize}px`,
+          textAlign,
+          color: textColor,
+          fontWeight,
+          fontFamily,
+          outline: 'none',
+          cursor: 'text',
+        }}
+        className="tracking-tight leading-tight w-full min-w-[50px]"
+      >
+        {text}
+      </Tag>
     </div>
   );
 };
@@ -213,7 +174,6 @@ export const Text = ({
     width: 100,
     borderRadius: 0,
     shadowPreset: 'none',
-    emojiPosition: 'left',
   },
   rules: {
     canDrag: () => true,

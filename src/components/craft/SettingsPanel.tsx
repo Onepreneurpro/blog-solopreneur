@@ -4,6 +4,22 @@ import React from 'react';
 import { useEditor } from '@craftjs/core';
 import { Settings, Trash2 } from 'lucide-react';
 
+const updateTextWithEmoji = (currentText: string, newEmoji: string) => {
+  if (!currentText) return newEmoji;
+
+  const emojiRegex = /^[\p{Extended_Pictographic}\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]\s*/u;
+
+  if (!newEmoji) {
+    return currentText.replace(emojiRegex, '').trim();
+  }
+
+  if (emojiRegex.test(currentText)) {
+    return currentText.replace(emojiRegex, `${newEmoji} `);
+  }
+
+  return `${newEmoji} ${currentText}`;
+};
+
 export const SettingsPanel = () => {
   const { selected, actions } = useEditor((state, query) => {
     const [currentNodeId] = state.events.selected;
@@ -144,96 +160,61 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* EMOJI PICKER & CUSTOM EMOJI INPUT */}
-        {(props.emoji !== undefined || name === 'Carte d Information' || name === 'Texte / Titre' || name === 'Bouton d Action') && (
-          <div className="space-y-2.5 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
+        {/* EMOJI QUICK SELECTOR FOR TEXT & TITLES */}
+        {(props.title !== undefined || props.text !== undefined) && (
+          <div className="space-y-2 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
             <div className="flex items-center justify-between font-black text-slate-900 text-xs">
-              <span>😀 Icône Émoji du Titre / Bloc</span>
-              <span className="text-amber-600 font-mono text-base font-bold">{props.emoji || 'Aucun'}</span>
+              <span>😀 Choisir un Émoji d Accroche</span>
+              <span className="text-amber-600 font-mono text-xs font-bold">1 Clic</span>
             </div>
 
-            {/* EMOJI QUICK PRESETS GRID */}
+            {/* 36 EMOJIS QUICK GRID */}
             <div className="grid grid-cols-6 gap-1 bg-white p-2 rounded-xl border border-amber-200 shadow-xs">
               {[
                 '💡', '🚀', '🔥', '⚡', '⭐', '🎁',
                 '🎯', '✅', '🔒', '👉', '🏆', '💎',
                 '❤️', '💼', '💰', '📌', '✨', '🎉',
                 '🔑', '📢', '📈', '🎓', '🥇', '👑',
+                '💬', '📦', '🏷️', '🛒', '🛍️', '💳',
+                '📅', '⏰', '🌟', '💥', '🎨', '📝',
               ].map((emo) => (
                 <button
                   key={emo}
                   onClick={() =>
                     actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.emoji = emo;
+                      if (nodeProps.title !== undefined) {
+                        nodeProps.title = updateTextWithEmoji(nodeProps.title, emo);
+                      } else if (nodeProps.text !== undefined) {
+                        nodeProps.text = updateTextWithEmoji(nodeProps.text, emo);
+                      }
                     })
                   }
-                  className={`p-1 rounded-lg text-lg text-center transition-transform hover:scale-125 ${
-                    props.emoji === emo ? 'bg-amber-200 ring-2 ring-amber-400' : 'hover:bg-slate-100'
-                  }`}
+                  className="p-1 rounded-lg text-lg text-center transition-transform hover:scale-125 hover:bg-amber-100"
                 >
                   {emo}
                 </button>
               ))}
             </div>
 
-            {/* CUSTOM EMOJI INPUT & POSITION */}
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Coller n importe quel émoji..."
-                  value={props.emoji || ''}
-                  onChange={(e) =>
-                    actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.emoji = e.target.value;
-                    })
+            <button
+              onClick={() =>
+                actions.setProp(id, (nodeProps: any) => {
+                  if (nodeProps.title !== undefined) {
+                    nodeProps.title = updateTextWithEmoji(nodeProps.title, '');
+                  } else if (nodeProps.text !== undefined) {
+                    nodeProps.text = updateTextWithEmoji(nodeProps.text, '');
                   }
-                  className="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs"
-                />
-                {props.emoji && (
-                  <button
-                    onClick={() =>
-                      actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.emoji = '';
-                      })
-                    }
-                    className="px-3 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100"
-                  >
-                    Effacer
-                  </button>
-                )}
-              </div>
-
-              {props.emoji && (
-                <div className="flex items-center justify-between pt-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Position d émoji</label>
-                  <div className="grid grid-cols-2 gap-1 w-36">
-                    {['left', 'right'].map((pos) => (
-                      <button
-                        key={pos}
-                        onClick={() =>
-                          actions.setProp(id, (nodeProps: any) => {
-                            nodeProps.emojiPosition = pos;
-                          })
-                        }
-                        className={`py-1 rounded-lg border font-extrabold text-[10px] capitalize transition-colors ${
-                          (props.emojiPosition || 'left') === pos
-                            ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
-                        }`}
-                      >
-                        {pos === 'left' ? 'Gauche' : 'Droite'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+                })
+              }
+              className="w-full py-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl text-[10px] font-extrabold transition-colors"
+            >
+              Retirer l émoji du texte
+            </button>
           </div>
         )}
 
         {/* GOOGLE FONTS SELECTOR */}
-        {props.fontFamily !== undefined && (
+        {(props.fontFamily !== undefined || props.title !== undefined || props.text !== undefined) && (
           <div className="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200">
             <label className="font-black text-slate-900 flex items-center justify-between text-xs">
               <span>🔤 Police Google Font</span>
@@ -246,7 +227,7 @@ export const SettingsPanel = () => {
                   nodeProps.fontFamily = e.target.value;
                 })
               }
-              className="w-full p-2 bg-white border border-slate-200 rounded-xl text-slate-900 font-extrabold text-xs outline-none focus:ring-2 focus:ring-[#00A0FF]"
+              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-extrabold text-xs outline-none focus:ring-2 focus:ring-[#00A0FF] cursor-pointer"
             >
               <option value="Inter">Inter (Sans-serif Moderne)</option>
               <option value="Poppins">Poppins (Design Dynamique)</option>
@@ -254,11 +235,22 @@ export const SettingsPanel = () => {
               <option value="Playfair Display">Playfair Display (Serif Luxueux)</option>
               <option value="Roboto">Roboto (Clair & Standard)</option>
               <option value="Oswald">Oswald (Titres Condensés)</option>
+
               <option value="Lora">Lora (Serif Éditorial)</option>
               <option value="Raleway">Raleway (Minimaliste Chic)</option>
               <option value="Cinzel">Cinzel (Haut de Gamme)</option>
-              <option value="Caveat">Caveat (Écriture Script / Manuscrite)</option>
+              <option value="Caveat">Caveat (Script Manuscrite)</option>
               <option value="Plus Jakarta Sans">Plus Jakarta Sans (Tech Bold)</option>
+              <option value="Bebas Neue">Bebas Neue (Titres Impactants)</option>
+              <option value="DM Sans">DM Sans (Épuré & Contemporain)</option>
+              <option value="Outfit">Outfit (Moderne Geometric)</option>
+
+              <option value="Syne">Syne (Design Avant-Garde)</option>
+              <option value="Space Grotesk">Space Grotesk (Futuriste Tech)</option>
+              <option value="Unbounded">Unbounded (Luxe Ultra-Bold)</option>
+              <option value="Cormorant Garamond">Cormorant Garamond (Classique Sublime)</option>
+              <option value="Pacifico">Pacifico (Script Fun & Casual)</option>
+              <option value="Dancing Script">Dancing Script (Écriture Élégante)</option>
             </select>
           </div>
         )}

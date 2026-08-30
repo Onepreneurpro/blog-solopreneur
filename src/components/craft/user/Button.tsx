@@ -22,12 +22,10 @@ export interface ButtonProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
-  emoji?: string;
-  emojiPosition?: 'left' | 'right';
 }
 
 export const Button = ({
-  text = 'Commencer maintenant',
+  text = 'Commencer maintenant 🚀',
   bgColor = '#00A0FF',
   bgImage,
   textColor = '#ffffff',
@@ -44,8 +42,6 @@ export const Button = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
-  emoji = '🚀',
-  emojiPosition = 'right',
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -83,11 +79,9 @@ export const Button = ({
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
           }}
-          className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden gap-2"
+          className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
-          {emoji && emojiPosition === 'left' && <span className="text-lg leading-none shrink-0">{emoji}</span>}
-          <span>{text}</span>
-          {emoji && emojiPosition === 'right' && <span className="text-lg leading-none shrink-0">{emoji}</span>}
+          {text}
         </a>
       </div>
     );
@@ -106,6 +100,13 @@ export const Button = ({
     >
       <button
         type="button"
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          setProp((props: ButtonProps) => {
+            props.text = e.currentTarget.innerText;
+          });
+        }}
         style={{
           ...bgStyles,
           color: textColor,
@@ -116,22 +117,9 @@ export const Button = ({
           boxShadow,
           outline: 'none',
         }}
-        className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden gap-2"
+        className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >
-        {emoji && emojiPosition === 'left' && <span className="text-lg leading-none shrink-0 select-none">{emoji}</span>}
-        <span
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={(e) => {
-            setProp((props: ButtonProps) => {
-              props.text = e.currentTarget.innerText;
-            });
-          }}
-          className="outline-none"
-        >
-          {text}
-        </span>
-        {emoji && emojiPosition === 'right' && <span className="text-lg leading-none shrink-0 select-none">{emoji}</span>}
+        {text}
       </button>
     </div>
   );
@@ -140,7 +128,7 @@ export const Button = ({
 (Button as any).craft = {
   displayName: 'Bouton d Action',
   props: {
-    text: 'Commencer maintenant',
+    text: 'Commencer maintenant 🚀',
     bgColor: '#00A0FF',
     textColor: '#ffffff',
     fontFamily: 'Inter',
@@ -151,8 +139,6 @@ export const Button = ({
     paddingX: 28,
     width: 100,
     shadowPreset: 'none',
-    emoji: '🚀',
-    emojiPosition: 'right',
   },
   rules: {
     canDrag: () => true,

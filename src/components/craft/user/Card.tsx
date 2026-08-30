@@ -19,12 +19,10 @@ export interface CardProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
-  emoji?: string;
-  emojiPosition?: 'left' | 'right';
 }
 
 export const Card = ({
-  title = 'Conseil Pro',
+  title = '💡 Conseil Pro',
   content = 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
   bgColor = '#ffffff',
   bgImage,
@@ -38,8 +36,6 @@ export const Card = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
-  emoji = '💡',
-  emojiPosition = 'left',
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -71,17 +67,9 @@ export const Card = ({
           boxShadow,
         }}
       >
-        <div className="flex items-center gap-2.5 px-1">
-          {emoji && emojiPosition === 'left' && (
-            <span className="text-2xl leading-none shrink-0">{emoji}</span>
-          )}
-          <h3 className="font-heading font-black text-lg text-slate-900">
-            {title}
-          </h3>
-          {emoji && emojiPosition === 'right' && (
-            <span className="text-2xl leading-none shrink-0">{emoji}</span>
-          )}
-        </div>
+        <h3 className="font-heading font-black text-lg text-slate-900 px-1">
+          {title}
+        </h3>
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
           {content}
         </p>
@@ -108,26 +96,18 @@ export const Card = ({
         boxShadow,
       }}
     >
-      <div className="flex items-center gap-2.5 px-1">
-        {emoji && emojiPosition === 'left' && (
-          <span className="text-2xl leading-none shrink-0 select-none">{emoji}</span>
-        )}
-        <h3
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={(e) => {
-            setProp((props: CardProps) => {
-              props.title = e.currentTarget.innerText;
-            });
-          }}
-          className="font-heading font-black text-lg text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md px-1 cursor-text flex-1"
-        >
-          {title}
-        </h3>
-        {emoji && emojiPosition === 'right' && (
-          <span className="text-2xl leading-none shrink-0 select-none">{emoji}</span>
-        )}
-      </div>
+      <h3
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          setProp((props: CardProps) => {
+            props.title = e.currentTarget.innerText;
+          });
+        }}
+        className="font-heading font-black text-lg text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md px-1 cursor-text"
+      >
+        {title}
+      </h3>
 
       <p
         contentEditable
@@ -148,15 +128,14 @@ export const Card = ({
 (Card as any).craft = {
   displayName: 'Carte d Information',
   props: {
-    title: 'Conseil Pro',
+    title: '💡 Conseil Pro',
     content: 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
     bgColor: '#ffffff',
     padding: 24,
     width: 100,
     borderRadius: 0,
     shadowPreset: 'none',
-    emoji: '💡',
-    emojiPosition: 'left',
+    fontFamily: 'Inter',
   },
   rules: {
     canDrag: () => true,
