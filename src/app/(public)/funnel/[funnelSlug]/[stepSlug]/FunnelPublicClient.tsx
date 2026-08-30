@@ -300,15 +300,35 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
-            if (el.type === 'BlockFeat4ColImg' || el.type === 'BlockFeat3ColImg') {
-              const items = el.data?.items || [];
-              const cols = el.type === 'BlockFeat4ColImg' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+            if (el.type === 'BlockFeat4ColImg' || el.type === 'Col4' || el.type === 'BlockFeat3ColImg' || el.type === 'Col3') {
+              const defaultData = el.type.includes('4') || el.type === 'Col4'
+                ? {
+                    title: 'GRILLE 4 COLONNES',
+                    items: [
+                      { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                      { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                      { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                      { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                    ],
+                  }
+                : {
+                    title: 'Le Savoir-Faire des Experts à Votre Portée',
+                    items: [
+                      { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies et testées sur le terrain.' },
+                      { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer immédiatement à l action.' },
+                      { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif d entrepreneurs passionnés.' },
+                    ],
+                  };
+
+              const items = el.data?.items && el.data.items.length > 0 ? el.data.items : defaultData.items;
+              const title = el.data?.title || el.content || defaultData.title;
+              const cols = (el.type.includes('4') || el.type === 'Col4') ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
 
               return (
                 <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
-                  {el.data?.title && (
+                  {title && (
                     <h3 className="text-2xl font-heading font-black text-white text-center">
-                      {el.data.title}
+                      {title}
                     </h3>
                   )}
                   <div className={`grid ${cols} gap-6`}>
@@ -328,14 +348,25 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
-            if (el.type === 'BlockFeat2ColIconsLeft' || el.type === 'BlockFeat4ColDark') {
-              const items = el.data?.items || [];
+            if (el.type === 'BlockFeat2ColIconsLeft' || el.type === 'Col2' || el.type === 'BlockFeat4ColDark') {
+              const defaultData = {
+                title: 'Nos Services & Garanties',
+                items: [
+                  { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
+                  { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
+                  { id: '3', title: 'Un Support Excellent', desc: 'Une équipe réactive disponible pour répondre à toutes vos questions.' },
+                  { id: '4', title: 'Template Responsive', desc: 'Des interfaces optimisées pour tous les écrans mobiles et ordinateurs.' },
+                ],
+              };
+
+              const items = el.data?.items && el.data.items.length > 0 ? el.data.items : defaultData.items;
+              const title = el.data?.title || el.content || defaultData.title;
 
               return (
                 <div key={el.id} className="space-y-6 bg-slate-900/60 p-6 sm:p-8 rounded-3xl border border-slate-800">
-                  {el.data?.title && (
+                  {title && (
                     <h3 className="text-2xl font-heading font-black text-white text-center">
-                      {el.data.title}
+                      {title}
                     </h3>
                   )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
