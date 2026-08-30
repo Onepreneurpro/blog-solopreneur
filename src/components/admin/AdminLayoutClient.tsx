@@ -92,7 +92,7 @@ export function AdminLayoutClient({ user, children }: AdminLayoutClientProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Bypass outer AdminLayout for full-screen builder pages (Craft.js / Tunnels Beta 2)
+  // Bypass outer AdminLayout for full-screen builder pages
   if (pathname?.includes('/builder')) {
     return <>{children}</>;
   }
