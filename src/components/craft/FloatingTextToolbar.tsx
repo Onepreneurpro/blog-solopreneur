@@ -57,10 +57,10 @@ export const FloatingTextToolbar = () => {
         const spaceBelow = window.innerHeight - rect.bottom;
         setOpenUpward(spaceBelow < 340);
 
-        const clampedLeft = Math.max(150, Math.min(window.innerWidth - 150, rect.left + rect.width / 2));
+        const clampedLeft = Math.max(160, Math.min(window.innerWidth - 160, rect.left + rect.width / 2));
 
         setPosition({
-          top: Math.max(12, rect.top - 54),
+          top: Math.max(12, rect.top - 58),
           left: clampedLeft,
         });
       }
@@ -106,7 +106,7 @@ export const FloatingTextToolbar = () => {
     wrapSelectionWithStyle(cssText);
   };
 
-  const menuPosClass = openUpward ? 'bottom-full mb-2' : 'top-full mt-2';
+  const menuPosClass = openUpward ? 'bottom-full mb-3' : 'top-full mt-3';
 
   return (
     <div
@@ -115,7 +115,7 @@ export const FloatingTextToolbar = () => {
         left: `${position.left}px`,
         transform: 'translateX(-50%)',
       }}
-      className="fixed z-[99999] bg-slate-900 text-white rounded-2xl shadow-2xl p-1.5 flex items-center gap-1 border border-slate-700 animate-in fade-in zoom-in-95 duration-150 select-none"
+      className="fixed z-[99999] bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1.5 border-2 border-slate-200 animate-in fade-in zoom-in-95 duration-150 select-none"
     >
       {/* BOLD */}
       <button
@@ -123,10 +123,10 @@ export const FloatingTextToolbar = () => {
           e.preventDefault();
           applyFormat('bold');
         }}
-        className="p-2 hover:bg-slate-800 rounded-xl transition-colors font-black text-xs flex items-center gap-1"
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
         title="Mettre en Gras"
       >
-        <Bold className="w-4 h-4 text-white" />
+        <Bold className="w-4 h-4 text-slate-900" />
       </button>
 
       {/* ITALIC */}
@@ -135,15 +135,15 @@ export const FloatingTextToolbar = () => {
           e.preventDefault();
           applyFormat('italic');
         }}
-        className="p-2 hover:bg-slate-800 rounded-xl transition-colors font-black text-xs flex items-center gap-1"
+        className="p-2 hover:bg-slate-100 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-slate-900"
         title="Mettre en Italique"
       >
-        <Italic className="w-4 h-4 text-white" />
+        <Italic className="w-4 h-4 text-slate-900" />
       </button>
 
-      <div className="w-px h-5 bg-slate-700 my-auto" />
+      <div className="w-px h-5 bg-slate-200 my-auto" />
 
-      {/* HIGHLIGHT (FEUTRE SURLIGNEUR AVEC PLUS DE COULEURS) */}
+      {/* HIGHLIGHT (FEUTRE SURLIGNEUR) */}
       <div className="relative">
         <button
           onMouseDown={(e) => {
@@ -152,17 +152,17 @@ export const FloatingTextToolbar = () => {
             setShowUnderlineMenu(false);
             setShowTextColorMenu(false);
           }}
-          className="p-2 hover:bg-slate-800 rounded-xl transition-colors flex items-center gap-1.5 text-xs font-extrabold text-amber-300"
+          className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-full transition-colors flex items-center gap-1.5 text-xs font-black text-amber-950"
           title="Surligner avec du Feutre"
         >
-          <Highlighter className="w-4 h-4 text-amber-300" />
+          <Highlighter className="w-4 h-4 text-amber-600" />
           <span>Feutre</span>
         </button>
 
         {showHighlightMenu && (
-          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[200px] ${menuPosClass}`}>
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Couleur de Feutre</span>
-            <div className="grid grid-cols-5 gap-1.5">
+          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3 z-50 min-w-[220px] ${menuPosClass}`}>
+            <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur de Feutre</span>
+            <div className="grid grid-cols-5 gap-2">
               {[
                 { color: '#fef08a', label: 'Jaune' },
                 { color: '#bbf7d0', label: 'Vert' },
@@ -182,7 +182,7 @@ export const FloatingTextToolbar = () => {
                     wrapSelectionWithStyle(`background-color: ${c.color}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`);
                     setShowHighlightMenu(false);
                   }}
-                  className="w-7 h-7 rounded-lg border border-slate-600 transition-transform hover:scale-110 cursor-pointer"
+                  className="w-7 h-7 rounded-xl border border-slate-300 transition-transform hover:scale-115 shadow-xs cursor-pointer"
                   style={{ backgroundColor: c.color }}
                   title={c.label}
                 />
@@ -190,13 +190,13 @@ export const FloatingTextToolbar = () => {
             </div>
 
             {/* CUSTOM HIGHLIGHT COLOR PICKER */}
-            <div className="flex items-center gap-2 pt-1 border-t border-slate-800">
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
               <input
                 type="color"
                 value={customHighlightColor}
                 onChange={(e) => setCustomHighlightColor(e.target.value)}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-7 h-7 rounded-lg border border-slate-600 cursor-pointer p-0.5 bg-transparent"
+                className="w-8 h-8 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
               />
               <button
                 onMouseDown={(e) => {
@@ -204,7 +204,7 @@ export const FloatingTextToolbar = () => {
                   wrapSelectionWithStyle(`background-color: ${customHighlightColor}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`);
                   setShowHighlightMenu(false);
                 }}
-                className="flex-1 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[10px] rounded-lg transition-colors"
+                className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
               >
                 Appliquer couleur
               </button>
@@ -216,7 +216,7 @@ export const FloatingTextToolbar = () => {
                 applyFormat('removeFormat');
                 setShowHighlightMenu(false);
               }}
-              className="w-full py-1 text-[10px] text-rose-400 hover:bg-slate-800 rounded-lg font-bold text-center border border-rose-950/40"
+              className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
             >
               ❌ Retirer le feutre
             </button>
@@ -233,19 +233,19 @@ export const FloatingTextToolbar = () => {
             setShowHighlightMenu(false);
             setShowTextColorMenu(false);
           }}
-          className="p-2 hover:bg-slate-800 rounded-xl transition-colors flex items-center gap-1.5 text-xs font-extrabold text-sky-300"
+          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 rounded-full transition-colors flex items-center gap-1.5 text-xs font-black text-sky-950"
           title="Réglages du Soulignement"
         >
-          <Underline className="w-4 h-4 text-sky-300" />
+          <Underline className="w-4 h-4 text-sky-600" />
           <span>Souligner</span>
         </button>
 
         {showUnderlineMenu && (
-          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-3 shadow-2xl flex flex-col gap-2.5 z-50 min-w-[250px] ${menuPosClass}`}>
+          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 z-50 min-w-[280px] ${menuPosClass}`}>
             {/* STYLE SELECTOR */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Style de Trait</span>
-              <div className="grid grid-cols-3 gap-1">
+            <div className="space-y-1.5">
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Style de Trait</span>
+              <div className="grid grid-cols-3 gap-1.5">
                 {[
                   { key: 'solid', label: 'Solide' },
                   { key: 'wavy', label: 'Ondulé 🌊' },
@@ -261,10 +261,10 @@ export const FloatingTextToolbar = () => {
                       setUnderlineStyle(style);
                       applyCurrentUnderline(style);
                     }}
-                    className={`py-1 px-1.5 rounded-lg border font-bold text-[10px] transition-colors ${
+                    className={`py-1.5 px-2 rounded-xl border-2 font-black text-xs transition-colors ${
                       underlineStyle === st.key
-                        ? 'bg-sky-500 text-slate-950 border-sky-400 font-black'
-                        : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'
+                        ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     {st.label}
@@ -274,9 +274,9 @@ export const FloatingTextToolbar = () => {
             </div>
 
             {/* COLOR SWATCHES FOR UNDERLINE */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Couleur du Trait</span>
-              <div className="flex items-center gap-1.5">
+            <div className="space-y-1.5 pt-1 border-t border-slate-100">
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur du Trait</span>
+              <div className="flex items-center gap-2">
                 {[
                   { color: '#00A0FF', label: 'Bleu' },
                   { color: '#ef4444', label: 'Rouge' },
@@ -292,8 +292,8 @@ export const FloatingTextToolbar = () => {
                       setUnderlineColor(c.color);
                       applyCurrentUnderline(underlineStyle, c.color);
                     }}
-                    className={`w-6 h-6 rounded-lg border transition-transform ${
-                      underlineColor === c.color ? 'ring-2 ring-sky-400 scale-110 border-white' : 'border-slate-600'
+                    className={`w-7 h-7 rounded-xl border-2 transition-transform ${
+                      underlineColor === c.color ? 'ring-2 ring-sky-500 scale-110 border-white' : 'border-slate-300'
                     }`}
                     style={{ backgroundColor: c.color }}
                   />
@@ -307,16 +307,16 @@ export const FloatingTextToolbar = () => {
                     applyCurrentUnderline(underlineStyle, color);
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="w-6 h-6 rounded-lg border border-slate-600 cursor-pointer p-0.5 bg-transparent"
+                  className="w-7 h-7 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
                 />
               </div>
             </div>
 
             {/* THICKNESS SLIDER */}
-            <div className="space-y-1 bg-slate-800/80 p-2 rounded-xl border border-slate-700">
-              <div className="flex justify-between font-bold text-[10px] text-slate-300">
+            <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="flex justify-between font-black text-xs text-slate-800">
                 <span>Épaisseur du Trait</span>
-                <span className="text-sky-400 font-mono">{underlineThickness}px</span>
+                <span className="text-[#00A0FF] font-mono">{underlineThickness}px</span>
               </div>
               <input
                 type="range"
@@ -330,15 +330,15 @@ export const FloatingTextToolbar = () => {
                   applyCurrentUnderline(underlineStyle, underlineColor, thickness);
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-full accent-sky-400 cursor-pointer"
+                className="w-full accent-[#00A0FF] cursor-pointer"
               />
             </div>
 
             {/* VERTICAL OFFSET / OVERLAP SLIDER */}
-            <div className="space-y-1 bg-slate-800/80 p-2 rounded-xl border border-slate-700">
-              <div className="flex justify-between font-bold text-[10px] text-slate-300">
+            <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="flex justify-between font-black text-xs text-slate-800">
                 <span>↕️ Position / Chevauchement</span>
-                <span className="text-sky-400 font-mono">{underlineOffset}px</span>
+                <span className="text-[#00A0FF] font-mono">{underlineOffset}px</span>
               </div>
               <input
                 type="range"
@@ -352,9 +352,9 @@ export const FloatingTextToolbar = () => {
                   applyCurrentUnderline(underlineStyle, underlineColor, underlineThickness, offset);
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-full accent-sky-400 cursor-pointer"
+                className="w-full accent-[#00A0FF] cursor-pointer"
               />
-              <div className="flex justify-between text-[8px] text-slate-400 font-medium px-0.5">
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-0.5">
                 <span>⬆️ Sur les lettres (-8px)</span>
                 <span>Sous le texte (12px) ⬇️</span>
               </div>
@@ -366,7 +366,7 @@ export const FloatingTextToolbar = () => {
                 applyFormat('removeFormat');
                 setShowUnderlineMenu(false);
               }}
-              className="w-full py-1 text-[10px] text-rose-400 hover:bg-slate-800 rounded-lg font-bold text-center border border-rose-950/40"
+              className="w-full py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-center border border-rose-200 transition-colors"
             >
               Effacer le soulignage
             </button>
@@ -383,16 +383,16 @@ export const FloatingTextToolbar = () => {
             setShowHighlightMenu(false);
             setShowUnderlineMenu(false);
           }}
-          className="p-2 hover:bg-slate-800 rounded-xl transition-colors font-black text-xs flex items-center gap-1 text-emerald-400"
+          className="p-2 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-full transition-colors font-black text-xs flex items-center gap-1 text-emerald-950"
           title="Couleur du texte"
         >
-          <Palette className="w-4 h-4 text-emerald-400" />
+          <Palette className="w-4 h-4 text-emerald-600" />
         </button>
 
         {showTextColorMenu && (
-          <div className={`absolute left-0 bg-slate-900 border border-slate-700 rounded-2xl p-2.5 shadow-2xl flex flex-col gap-2 z-50 min-w-[180px] ${menuPosClass}`}>
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Couleur de Texte</span>
-            <div className="grid grid-cols-5 gap-1.5">
+          <div className={`absolute left-1/2 -translate-x-1/2 bg-white border-2 border-slate-200 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3 z-50 min-w-[200px] ${menuPosClass}`}>
+            <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Couleur de Texte</span>
+            <div className="grid grid-cols-5 gap-2">
               {[
                 { color: '#00A0FF', label: 'Bleu' },
                 { color: '#ef4444', label: 'Rouge' },
@@ -412,20 +412,20 @@ export const FloatingTextToolbar = () => {
                     applyFormat('foreColor', c.color);
                     setShowTextColorMenu(false);
                   }}
-                  className="w-6 h-6 rounded-lg border border-slate-600 transition-transform hover:scale-110 cursor-pointer"
+                  className="w-7 h-7 rounded-xl border border-slate-300 transition-transform hover:scale-115 shadow-xs cursor-pointer"
                   style={{ backgroundColor: c.color }}
                   title={c.label}
                 />
               ))}
             </div>
 
-            <div className="flex items-center gap-2 pt-1 border-t border-slate-800">
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
               <input
                 type="color"
                 value={customTextColor}
                 onChange={(e) => setCustomTextColor(e.target.value)}
                 onMouseDown={(e) => e.stopPropagation()}
-                className="w-7 h-7 rounded-lg border border-slate-600 cursor-pointer p-0.5 bg-transparent"
+                className="w-8 h-8 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white"
               />
               <button
                 onMouseDown={(e) => {
@@ -433,7 +433,7 @@ export const FloatingTextToolbar = () => {
                   applyFormat('foreColor', customTextColor);
                   setShowTextColorMenu(false);
                 }}
-                className="flex-1 py-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-[10px] rounded-lg transition-colors"
+                className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
               >
                 Appliquer
               </button>
@@ -448,7 +448,7 @@ export const FloatingTextToolbar = () => {
           e.preventDefault();
           applyFormat('removeFormat');
         }}
-        className="p-2 hover:bg-slate-800 text-rose-400 rounded-xl transition-colors font-black text-xs flex items-center gap-1"
+        className="p-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded-full transition-colors text-rose-700 font-black text-xs flex items-center gap-1"
         title="Effacer les mises en forme"
       >
         <RemoveFormatting className="w-4 h-4" />
