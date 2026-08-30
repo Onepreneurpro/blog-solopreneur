@@ -1987,29 +1987,32 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     })()}
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
-                    {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (
-                      <div
-                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onDrop={(e) => handleBlockDrop(e, el.id)}
-                        className={`space-y-4 p-6 rounded-3xl shadow-xl relative transition-all ${
-                          showCanvasGrid
-                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
-                            : 'bg-white'
-                        }`}
-                      >
-                        <div className="text-center">
-                          <input
-                            type="text"
-                            value={el.data?.title || el.content || 'BASES ET NUTRITION'}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              handleUpdateElementData(el.id, { title: val });
-                              handleUpdateElementContent(el.id, val);
-                            }}
-                            className="w-full text-center text-xl font-heading font-black text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
-                            placeholder="Titre de la section..."
-                          />
-                        </div>
+                    {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (() => {
+                      const mainBg = el.data?.bgColor || '#ffffff';
+                      const cardBg = el.data?.cardBgColor || 'transparent';
+                      const textColor = el.data?.textColor || '#0f172a';
+
+                      return (
+                        <div
+                          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          onDrop={(e) => handleBlockDrop(e, el.id)}
+                          style={{ backgroundColor: mainBg, color: textColor }}
+                          className="space-y-4 p-6 rounded-3xl shadow-xl relative transition-all"
+                        >
+                          <div className="text-center">
+                            <input
+                              type="text"
+                              value={el.data?.title || el.content || 'BASES ET NUTRITION'}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                handleUpdateElementData(el.id, { title: val });
+                                handleUpdateElementContent(el.id, val);
+                              }}
+                              style={{ color: textColor }}
+                              className="w-full text-center text-xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
+                              placeholder="Titre de la section..."
+                            />
+                          </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
                           {(el.data?.items || [
@@ -2168,17 +2171,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           })}
                         </div>
                       </div>
-                    )}
+                    );
+                  })()}
 
-                    {(el.type === 'BlockFeat3ColImg' || el.type === 'Col3') && (
+                  {(el.type === 'BlockFeat3ColImg' || el.type === 'Col3') && (() => {
+                    const mainBg = el.data?.bgColor || '#ffffff';
+                    const cardBg = el.data?.cardBgColor || 'transparent';
+                    const textColor = el.data?.textColor || '#0f172a';
+
+                    return (
                       <div
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={(e) => handleBlockDrop(e, el.id)}
-                        className={`p-6 rounded-3xl shadow-xl space-y-6 relative transition-all ${
-                          showCanvasGrid
-                            ? 'bg-white bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
-                            : 'bg-white text-slate-900'
-                        }`}
+                        style={{ backgroundColor: mainBg, color: textColor }}
+                        className="p-6 rounded-3xl shadow-xl space-y-6 relative transition-all"
                       >
                         <div className="text-center space-y-1">
                           <input
@@ -2354,10 +2360,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           })}
                         </div>
                       </div>
-                    )}
+                    );
+                  })()}
 
-                    {(el.type === 'BlockFeat2ColIconsLeft' || el.type === 'Col2') && (
-                      <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-6">
+                  {(el.type === 'BlockFeat2ColIconsLeft' || el.type === 'Col2') && (() => {
+                    const mainBg = el.data?.bgColor || '#ffffff';
+                    const cardBg = el.data?.cardBgColor || '#f8fafc';
+                    const textColor = el.data?.textColor || '#0f172a';
+
+                    return (
+                      <div
+                        style={{ backgroundColor: mainBg, color: textColor }}
+                        className="p-6 rounded-3xl shadow-xl space-y-6"
+                      >
                         <div className="text-center">
                           <input
                             type="text"
@@ -2409,7 +2424,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           ))}
                         </div>
                       </div>
-                    )}
+                    );
+                  })()}
 
                     {el.type === 'BlockFeat4ColDark' && (
                       <div className="p-8 bg-slate-950 text-white rounded-3xl border border-slate-800 space-y-6 shadow-2xl">

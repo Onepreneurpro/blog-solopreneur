@@ -375,18 +375,25 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             if (el.type === 'Heading') {
+              const bg = el.data?.bgColor && el.data.bgColor !== 'transparent' ? el.data.bgColor : undefined;
+              const color = el.data?.textColor || undefined;
               return (
-                <h1 key={el.id} className="text-3xl sm:text-5xl font-heading font-black text-white leading-tight text-center">
-                  {el.content}
-                </h1>
+                <div key={el.id} className="text-center py-2" style={{ backgroundColor: bg }}>
+                  <h1 className="text-3xl sm:text-5xl font-heading font-black text-slate-900 leading-tight" style={{ color }}>
+                    {el.content}
+                  </h1>
+                </div>
               );
             }
 
             if (el.type === 'Text') {
+              const bg = el.data?.bgColor && el.data.bgColor !== 'transparent' ? el.data.bgColor : undefined;
+              const color = el.data?.textColor || undefined;
               return (
                 <div
                   key={el.id}
-                  className="text-base text-slate-300 leading-relaxed font-medium text-center max-w-2xl mx-auto"
+                  className="text-base text-slate-700 leading-relaxed font-medium text-center max-w-2xl mx-auto p-2 rounded-xl"
+                  style={{ backgroundColor: bg, color }}
                   dangerouslySetInnerHTML={{ __html: el.content }}
                 />
               );
