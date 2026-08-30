@@ -555,40 +555,57 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     </h3>
                   )}
                   <div className={`grid ${cols} gap-6`}>
-                    {items.map((it: any, idx: number) => (
-                      <div
-                        key={idx}
-                        style={{ backgroundColor: cardBg, color: textColor }}
-                        className="space-y-3 flex flex-col items-center text-center p-4 rounded-2xl"
-                      >
-                        {it.img && (
-                          <div className="w-full flex justify-center">
-                            <div
-                              className="relative overflow-hidden shadow-md transition-all w-full"
-                              style={{
-                                width: it.imgWidth ? `${it.imgWidth}px` : '100%',
-                                maxWidth: '100%',
-                                height: it.imgSize ? `${it.imgSize}px` : '220px',
-                                borderRadius: `${it.borderRadius !== undefined ? it.borderRadius : 16}px`,
-                              }}
-                            >
-                              <img
-                                src={it.img}
-                                alt={it.alt || it.title}
-                                className="w-full h-full transition-transform duration-100 select-none"
+                    {items.map((it: any, idx: number) => {
+                      const imgHeight = it.imgHeight || el.data?.imgHeight || (it.imgSize ? `${it.imgSize}px` : '220px');
+                      const imgShape = it.imgShape || el.data?.imgShape || 'arcade';
+                      const borderRadius =
+                        it.borderRadius !== undefined && it.borderRadius !== 16
+                          ? `${it.borderRadius}px`
+                          : imgShape === 'arcade'
+                          ? '80px 80px 16px 16px'
+                          : imgShape === 'circle'
+                          ? '9999px'
+                          : imgShape === 'square'
+                          ? '0px'
+                          : '24px';
+                      const imgFit = it.imgObjectFit || el.data?.imgObjectFit || it.objectFit || 'cover';
+                      const imgPos = it.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
+                      return (
+                        <div
+                          key={idx}
+                          style={{ backgroundColor: cardBg, color: textColor }}
+                          className="space-y-3 flex flex-col items-center text-center p-4 rounded-2xl"
+                        >
+                          {it.img && (
+                            <div className="w-full flex justify-center">
+                              <div
+                                className={`relative overflow-hidden shadow-md transition-all w-full ${imgHeight.startsWith('h-') ? imgHeight : ''}`}
                                 style={{
-                                  objectFit: (it.objectFit as any) || 'cover',
-                                  objectPosition: `${it.posX !== undefined ? it.posX : 50}% ${it.posY !== undefined ? it.posY : 50}%`,
-                                  transform: `scale(${(it.imgZoom || 100) / 100})`,
+                                  width: it.imgWidth ? `${it.imgWidth}px` : '100%',
+                                  maxWidth: '100%',
+                                  height: imgHeight.startsWith('h-') ? undefined : imgHeight,
+                                  borderRadius,
                                 }}
-                              />
+                              >
+                                <img
+                                  src={it.img}
+                                  alt={it.alt || it.title}
+                                  className="w-full h-full transition-transform duration-100 select-none"
+                                  style={{
+                                    objectFit: (imgFit as any) || 'cover',
+                                    objectPosition: imgPos.includes('%') ? imgPos : `${it.posX !== undefined ? it.posX : 50}% ${it.posY !== undefined ? it.posY : 50}%`,
+                                    transform: `scale(${(it.imgZoom || 100) / 100})`,
+                                  }}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        <h4 className="font-heading font-extrabold text-sm text-white uppercase">{it.title}</h4>
-                        <p className="text-xs text-slate-400 font-medium leading-relaxed">{it.desc}</p>
-                      </div>
-                    ))}
+                          )}
+                          <h4 className="font-heading font-extrabold text-sm uppercase">{it.title}</h4>
+                          <p className="text-xs font-medium leading-relaxed opacity-80">{it.desc}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );

@@ -2025,41 +2025,58 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             const isTitleSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'title';
                             const isDescSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'desc';
 
+                            const imgHeight = col.imgHeight || el.data?.imgHeight || (col.imgSize ? `${col.imgSize}px` : '280px');
+                            const imgShape = col.imgShape || el.data?.imgShape || 'arcade';
+                            const borderRadius =
+                              col.borderRadius !== undefined && col.borderRadius !== 16
+                                ? `${col.borderRadius}px`
+                                : imgShape === 'arcade'
+                                ? '80px 80px 16px 16px'
+                                : imgShape === 'circle'
+                                ? '9999px'
+                                : imgShape === 'square'
+                                ? '0px'
+                                : '24px';
+                            const imgFit = col.imgObjectFit || el.data?.imgObjectFit || col.objectFit || 'cover';
+                            const imgPos = col.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
                             return (
                               <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
-                                {/* CLICKABLE & DROPPABLE IMAGE CONTAINER */}
-                                <div className="relative flex justify-center w-full">
-                                  <div
-                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                    onDrop={(e) => handleCardDrop(e, el.id, i)}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSnapGuide(null);
-                                      setSelectedElementId(el.id);
-                                      setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
-                                    }}
-                                    className={`relative overflow-hidden shadow-md transition-all cursor-pointer ${
-                                      isImgSel
-                                        ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.02] shadow-2xl'
-                                        : 'hover:ring-4 hover:ring-[#00A0FF]/60'
-                                    }`}
-                                    style={{
-                                      width: col.imgWidth ? `${col.imgWidth}px` : '100%',
-                                      maxWidth: '100%',
-                                      height: col.imgSize ? `${col.imgSize}px` : '280px',
-                                      borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
-                                    }}
-                                  >
-                                    <img
-                                      src={col.img}
-                                      alt={col.alt || col.title}
-                                      className="w-full h-full transition-transform duration-100 select-none pointer-events-none"
-                                      style={{
-                                        objectFit: (col.objectFit as any) || 'cover',
-                                        objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
-                                        transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                  {/* CLICKABLE & DROPPABLE IMAGE CONTAINER */}
+                                  <div className="relative flex justify-center w-full">
+                                    <div
+                                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                      onDrop={(e) => handleCardDrop(e, el.id, i)}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSnapGuide(null);
+                                        setSelectedElementId(el.id);
+                                        setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                       }}
-                                    />
+                                      className={`relative overflow-hidden shadow-md transition-all cursor-pointer ${
+                                        imgHeight.startsWith('h-') ? imgHeight : ''
+                                      } ${
+                                        isImgSel
+                                          ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.02] shadow-2xl'
+                                          : 'hover:ring-4 hover:ring-[#00A0FF]/60'
+                                      }`}
+                                      style={{
+                                        width: col.imgWidth ? `${col.imgWidth}px` : '100%',
+                                        maxWidth: '100%',
+                                        height: imgHeight.startsWith('h-') ? undefined : imgHeight,
+                                        borderRadius,
+                                      }}
+                                    >
+                                      <img
+                                        src={col.img}
+                                        alt={col.alt || col.title}
+                                        className="w-full h-full transition-transform duration-100 select-none pointer-events-none"
+                                        style={{
+                                          objectFit: (imgFit as any) || 'cover',
+                                          objectPosition: imgPos.includes('%') ? imgPos : `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                          transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                        }}
+                                      />
 
                                     {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
@@ -2217,6 +2234,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             const isTitleSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'title';
                             const isDescSel = selectedSubItem?.blockId === el.id && selectedSubItem?.itemIndex === i && selectedSubItem?.subType === 'desc';
 
+                            const imgHeight = col.imgHeight || el.data?.imgHeight || (col.imgSize ? `${col.imgSize}px` : '220px');
+                            const imgShape = col.imgShape || el.data?.imgShape || 'arcade';
+                            const borderRadius =
+                              col.borderRadius !== undefined && col.borderRadius !== 16
+                                ? `${col.borderRadius}px`
+                                : imgShape === 'arcade'
+                                ? '80px 80px 16px 16px'
+                                : imgShape === 'circle'
+                                ? '9999px'
+                                : imgShape === 'square'
+                                ? '0px'
+                                : '24px';
+                            const imgFit = col.imgObjectFit || el.data?.imgObjectFit || col.objectFit || 'cover';
+                            const imgPos = col.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
                             return (
                               <div key={col.id || i} className="space-y-3">
                                 <div className="relative flex justify-center w-full">
@@ -2229,6 +2261,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                     }}
                                     className={`relative overflow-hidden shadow-sm transition-all cursor-pointer ${
+                                      imgHeight.startsWith('h-') ? imgHeight : ''
+                                    } ${
                                       isImgSel
                                         ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.02] shadow-2xl'
                                         : 'hover:ring-4 hover:ring-[#00A0FF]/60'
@@ -2236,8 +2270,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     style={{
                                       width: col.imgWidth ? `${col.imgWidth}px` : '100%',
                                       maxWidth: '100%',
-                                      height: col.imgSize ? `${col.imgSize}px` : '220px',
-                                      borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
+                                      height: imgHeight.startsWith('h-') ? undefined : imgHeight,
+                                      borderRadius,
                                     }}
                                   >
                                     <img
@@ -2245,8 +2279,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       alt={col.alt || col.title}
                                       className="w-full h-full transition-transform duration-100 select-none pointer-events-none"
                                       style={{
-                                        objectFit: (col.objectFit as any) || 'cover',
-                                        objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                        objectFit: (imgFit as any) || 'cover',
+                                        objectPosition: imgPos.includes('%') ? imgPos : `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
                                         transform: `scale(${(col.imgZoom || 100) / 100})`,
                                       }}
                                     />
