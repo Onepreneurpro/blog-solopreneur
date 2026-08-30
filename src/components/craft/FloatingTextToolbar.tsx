@@ -14,7 +14,6 @@ export const FloatingTextToolbar = () => {
   const [underlineStyle, setUnderlineStyle] = useState<'solid' | 'wavy' | 'dotted' | 'dashed' | 'double'>('wavy');
   const [underlineColor, setUnderlineColor] = useState('#00A0FF');
   const [underlineThickness, setUnderlineThickness] = useState(4);
-  const [underlineOffset, setUnderlineOffset] = useState(40); // 40% coverage default for overlap
 
   // HIGHLIGHT CUSTOM COLOR STATE
   const [customHighlightColor, setCustomHighlightColor] = useState('#fef08a');
@@ -82,97 +81,76 @@ export const FloatingTextToolbar = () => {
   };
 
   const removeAllFormattingFromSelection = () => {
+    document.execCommand('removeFormat', false);
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+    if (!selection || selection.rangeCount === 0) return;
 
     const range = selection.getRangeAt(0);
     let container = range.commonAncestorContainer;
     if (container.nodeType === Node.TEXT_NODE) container = container.parentElement!;
 
-    const element = container as HTMLElement;
-    const formattingSpans = element.querySelectorAll('span[style]');
-    formattingSpans.forEach((sp) => {
-      const html = sp.innerHTML;
-      sp.outerHTML = html;
+    const elem = container as HTMLElement;
+    const styledSpans = elem.querySelectorAll('span[style], u');
+    styledSpans.forEach((sp) => {
+      const parent = sp.parentNode;
+      while (sp.firstChild) parent?.insertBefore(sp.firstChild, sp);
+      parent?.removeChild(sp);
     });
-
-    document.execCommand('removeFormat', false);
   };
 
   const applyCurrentHighlight = (color: string) => {
+    if (typeof window === 'undefined') return;
+    document.execCommand('styleWithCSS', false, 'true');
+    document.execCommand('hiliteColor', false, color);
+
+    // Style the highlight span cleanly
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+    if (!selection || selection.rangeCount === 0) return;
 
     const range = selection.getRangeAt(0);
     let parent = range.commonAncestorContainer;
     if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
 
-    const existingSpan = (parent as HTMLElement).closest('span[style*="background"]');
-    if (existingSpan) {
-      (existingSpan as HTMLElement).style.backgroundImage = 'none';
-      (existingSpan as HTMLElement).style.backgroundColor = color;
-    } else {
-      const span = document.createElement('span');
-      span.style.cssText = `background-color: ${color}; padding: 2px 6px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;`;
-      try {
-        range.surroundContents(span);
-      } catch (e) {
-        const contents = range.extractContents();
-        span.appendChild(contents);
-        range.insertNode(span);
-      }
+    const highlightSpan = (parent as HTMLElement).closest('span[style*="background-color"]');
+    if (highlightSpan) {
+      const el = highlightSpan as HTMLElement;
+      el.style.padding = '2px 6px';
+      el.style.borderRadius = '4px';
+      el.style.boxDecorationBreak = 'clone';
+      (el.style as any).webkitBoxDecorationBreak = 'clone';
     }
   };
 
   const applyCurrentUnderline = (
     style = underlineStyle,
     color = underlineColor,
-    thickness = underlineThickness,
-    coverage = underlineOffset
+    thickness = underlineThickness
   ) => {
+    if (typeof window === 'undefined') return;
+
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+    if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
 
     const range = selection.getRangeAt(0);
     let parent = range.commonAncestorContainer;
     if (parent.nodeType === Node.TEXT_NODE) parent = parent.parentElement!;
 
-    const existingSpan = (parent as HTMLElement).closest('span[style*="text-decoration"], span[style*="background-image"]');
+    // Check if selection is inside an existing styled span
+    let targetSpan = (parent as HTMLElement).closest('span[style*="text-decoration"], u') as HTMLElement | null;
 
-    if (style === 'solid') {
-      // Overlap accent bar via linear-gradient without pushing text
-      const cssStyle = `background-image: linear-gradient(to top, ${color} ${coverage}%, transparent ${coverage}%); padding: 0 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 2px; text-decoration: none;`;
+    if (!targetSpan) {
+      document.execCommand('styleWithCSS', false, 'true');
+      document.execCommand('underline', false);
+      const newParent = selection.getRangeAt(0).commonAncestorContainer;
+      const elem = newParent.nodeType === Node.TEXT_NODE ? newParent.parentElement : (newParent as HTMLElement);
+      targetSpan = elem?.closest('span[style*="text-decoration"], u') as HTMLElement | null;
+    }
 
-      if (existingSpan) {
-        (existingSpan as HTMLElement).style.cssText = cssStyle;
-      } else {
-        const span = document.createElement('span');
-        span.style.cssText = cssStyle;
-        try {
-          range.surroundContents(span);
-        } catch (e) {
-          const contents = range.extractContents();
-          span.appendChild(contents);
-          range.insertNode(span);
-        }
-      }
-    } else {
-      // Native text decoration for wavy, dotted, dashed, double
-      const cssStyle = `text-decoration: underline ${style}; text-decoration-color: ${color}; text-decoration-thickness: ${thickness}px; text-underline-offset: 3px; background-image: none;`;
-
-      if (existingSpan) {
-        (existingSpan as HTMLElement).style.cssText = cssStyle;
-      } else {
-        const span = document.createElement('span');
-        span.style.cssText = cssStyle;
-        try {
-          range.surroundContents(span);
-        } catch (e) {
-          const contents = range.extractContents();
-          span.appendChild(contents);
-          range.insertNode(span);
-        }
-      }
+    if (targetSpan) {
+      targetSpan.style.textDecoration = `underline ${style}`;
+      targetSpan.style.textDecorationColor = color;
+      targetSpan.style.textDecorationThickness = `${thickness}px`;
+      targetSpan.style.textUnderlineOffset = '3px';
     }
   };
 
@@ -294,7 +272,7 @@ export const FloatingTextToolbar = () => {
         )}
       </div>
 
-      {/* SOULIGNAGE & CHEVAUCHEMENT (OVERLAP ACCENT LINE) */}
+      {/* SOULIGNAGE (STYLE, ÉPAISSEUR ET COULEURS) */}
       <div className="relative">
         <button
           onMouseDown={(e) => {
@@ -304,7 +282,7 @@ export const FloatingTextToolbar = () => {
             setShowTextColorMenu(false);
           }}
           className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 rounded-full transition-colors flex items-center gap-1.5 text-xs font-black text-sky-950"
-          title="Réglages du Soulignement & Chevauchement"
+          title="Réglages du Soulignement"
         >
           <Underline className="w-4 h-4 text-sky-600" />
           <span>Souligner</span>
@@ -382,54 +360,26 @@ export const FloatingTextToolbar = () => {
               </div>
             </div>
 
-            {/* THICKNESS SLIDER (FOR NATIVE UNDERLINES LIKE WAVY/DOTTED) */}
-            {underlineStyle !== 'solid' && (
-              <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <div className="flex justify-between font-black text-xs text-slate-800">
-                  <span>Épaisseur du Trait</span>
-                  <span className="text-[#00A0FF] font-mono">{underlineThickness}px</span>
-                </div>
-                <input
-                  type="range"
-                  min={1}
-                  max={12}
-                  step={1}
-                  value={underlineThickness}
-                  onChange={(e) => {
-                    const thickness = parseInt(e.target.value, 10);
-                    setUnderlineThickness(thickness);
-                    applyCurrentUnderline(underlineStyle, underlineColor, thickness);
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  className="w-full accent-[#00A0FF] cursor-pointer"
-                />
-              </div>
-            )}
-
-            {/* CHEVAUCHEMENT / OVERLAP SLIDER (COVERAGE ON LETTERS WITHOUT PUSHING LAYOUT) */}
+            {/* THICKNESS SLIDER */}
             <div className="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <div className="flex justify-between font-black text-xs text-slate-800">
-                <span>↕️ Recouvrement / Chevauchement</span>
-                <span className="text-[#00A0FF] font-mono">{underlineOffset}%</span>
+                <span>Épaisseur du Trait</span>
+                <span className="text-[#00A0FF] font-mono">{underlineThickness}px</span>
               </div>
               <input
                 type="range"
-                min={15}
-                max={75}
-                step={5}
-                value={underlineOffset}
+                min={1}
+                max={12}
+                step={1}
+                value={underlineThickness}
                 onChange={(e) => {
-                  const coverage = parseInt(e.target.value, 10);
-                  setUnderlineOffset(coverage);
-                  applyCurrentUnderline(underlineStyle, underlineColor, underlineThickness, coverage);
+                  const thickness = parseInt(e.target.value, 10);
+                  setUnderlineThickness(thickness);
+                  applyCurrentUnderline(underlineStyle, underlineColor, thickness);
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
                 className="w-full accent-[#00A0FF] cursor-pointer"
               />
-              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-0.5">
-                <span>Trait bas (15%)</span>
-                <span>Couvre la moitié du texte (50%)</span>
-              </div>
             </div>
 
             <button
