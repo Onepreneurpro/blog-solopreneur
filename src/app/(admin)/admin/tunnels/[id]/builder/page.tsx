@@ -3665,7 +3665,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         )}
 
                     {/* 4.5 CONTRÔLE AVANCÉ DES IMAGES DU BLOC */}
-                    {(elData.img !== undefined || elData.items || ['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona', 'Image', 'BlockFeat4ColImg', 'BlockFeat3ColImg'].includes(selectedEl.type)) && (
+                    {(elData.img !== undefined || elData.items || ['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona', 'Image', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'Col4', 'Col3', 'Col2', 'BlockFeat2ColIconsLeft', 'ContentBox'].includes(selectedEl.type)) && (
                       <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
                         <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
                           <span>🖼️ Contrôle des Images du Bloc</span>
