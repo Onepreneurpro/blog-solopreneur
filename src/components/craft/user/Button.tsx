@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 
 export interface ButtonProps {
   text?: string;
@@ -24,6 +24,10 @@ export const Button = ({
   paddingY = 14,
   paddingX = 28,
 }: ButtonProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     connectors: { connect, drag },
     selected,
@@ -38,6 +42,27 @@ export const Button = ({
     right: 'justify-end',
   };
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div className={`my-3 flex ${alignClasses[align]}`}>
+        <a
+          href={href || '#'}
+          style={{
+            backgroundColor: bgColor,
+            color: textColor,
+            borderRadius: `${borderRadius}px`,
+            padding: `${paddingY}px ${paddingX}px`,
+          }}
+          className="font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading inline-block text-center"
+        >
+          {text}
+        </a>
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {

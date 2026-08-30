@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 
 export interface CardProps {
   title?: string;
@@ -14,6 +14,10 @@ export const Card = ({
   content = 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
   bgColor = '#ffffff',
 }: CardProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     connectors: { connect, drag },
     selected,
@@ -22,6 +26,24 @@ export const Card = ({
     selected: node.events.selected,
   }));
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div
+        className="my-4 p-6 rounded-3xl border border-slate-200 shadow-lg space-y-2"
+        style={{ backgroundColor: bgColor }}
+      >
+        <h3 className="font-heading font-black text-lg text-slate-900 px-1">
+          {title}
+        </h3>
+        <p className="text-sm font-medium text-slate-600 leading-relaxed p-1">
+          {content}
+        </p>
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {

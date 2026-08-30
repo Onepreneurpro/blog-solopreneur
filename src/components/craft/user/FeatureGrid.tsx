@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
 
 export interface FeatureGridProps {
@@ -42,6 +42,10 @@ export const FeatureGrid = ({
   imgHeight = 220,
   borderRadius = 16,
 }: FeatureGridProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     id,
     connectors: { connect, drag },
@@ -53,6 +57,35 @@ export const FeatureGrid = ({
 
   const gridCols = columns === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4';
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div className="my-6 p-6 bg-white rounded-3xl border border-slate-200 shadow-xl">
+        <div className={`grid ${gridCols} gap-6`}>
+          {items.map((col, i) => (
+            <div key={i} className="flex flex-col items-center text-center space-y-3">
+              <div
+                className="w-full overflow-hidden shadow-md"
+                style={{ height: `${imgHeight}px`, borderRadius: `${borderRadius}px` }}
+              >
+                {col.img ? (
+                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                ) : null}
+              </div>
+              <h3 className="font-heading font-black text-sm tracking-wider uppercase text-slate-900">
+                {col.title}
+              </h3>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                {col.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {

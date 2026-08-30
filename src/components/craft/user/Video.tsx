@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 
 export interface VideoProps {
   videoUrl?: string;
@@ -12,6 +12,10 @@ export const Video = ({
   videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   caption = 'Vidéo de démonstration en direct',
 }: VideoProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     connectors: { connect, drag },
     selected,
@@ -20,6 +24,26 @@ export const Video = ({
     selected: node.events.selected,
   }));
 
+  // PUBLIC READ-ONLY VIEW FOR VISITORS
+  if (!enabled) {
+    return (
+      <div className="my-8 max-w-3xl mx-auto space-y-2 text-center">
+        <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
+          <iframe
+            src={videoUrl}
+            title="Vidéo Craft"
+            className="w-full h-full border-0"
+            allowFullScreen
+          />
+        </div>
+        <p className="text-xs text-slate-500 font-bold italic p-1">
+          {caption}
+        </p>
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {

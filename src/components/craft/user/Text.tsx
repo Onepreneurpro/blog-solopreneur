@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 
 export interface TextProps {
   text?: string;
@@ -20,6 +20,10 @@ export const Text = ({
   fontWeight = 'bold',
   tagName = 'h2',
 }: TextProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     connectors: { connect, drag },
     selected,
@@ -30,6 +34,26 @@ export const Text = ({
 
   const Tag = tagName;
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div className="my-2 p-1">
+        <Tag
+          style={{
+            fontSize: `${fontSize}px`,
+            textAlign,
+            color: textColor,
+            fontWeight,
+          }}
+          className="font-heading tracking-tight leading-tight"
+        >
+          {text}
+        </Tag>
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {

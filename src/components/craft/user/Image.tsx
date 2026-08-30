@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 import { FolderOpen, Trash2 } from 'lucide-react';
 
 export interface ImageProps {
@@ -19,6 +19,10 @@ export const Image = ({
   borderRadius = 20,
   align = 'center',
 }: ImageProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     id,
     connectors: { connect, drag },
@@ -36,6 +40,23 @@ export const Image = ({
     right: 'justify-end',
   };
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div className={`my-4 flex ${alignClasses[align]}`}>
+        {src ? (
+          <div
+            className="max-w-full overflow-hidden shadow-xl"
+            style={{ borderRadius: `${borderRadius}px`, height: `${height}px` }}
+          >
+            <img src={src} alt={alt} className="w-full h-full object-cover" />
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -75,7 +96,7 @@ export const Image = ({
             </span>
           </div>
 
-          {/* TRASH ICON BUTTON AT BOTTOM RIGHT */}
+          {/* TRASH ICON BUTTON */}
           {src && (
             <button
               type="button"

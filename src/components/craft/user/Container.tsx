@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 
 export interface ContainerProps {
   bgGradient?: string;
@@ -20,6 +20,10 @@ export const Container = ({
   borderRadius = 24,
   children,
 }: ContainerProps) => {
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled,
+  }));
+
   const {
     connectors: { connect, drag },
     selected,
@@ -32,6 +36,24 @@ export const Container = ({
       ? bgGradient
       : { backgroundColor: bgColor };
 
+  // PUBLIC READ-ONLY VIEW
+  if (!enabled) {
+    return (
+      <div
+        className={`relative ${bgGradient && bgGradient !== 'none' ? bgGradient : ''}`}
+        style={{
+          ...(typeof bgStyle === 'object' ? bgStyle : {}),
+          padding: `${padding}px`,
+          margin: `${margin}px 0`,
+          borderRadius: `${borderRadius}px`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
