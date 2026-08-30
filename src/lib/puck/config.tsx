@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Config } from '@measured/puck';
-import { Trash2, GripVertical, FolderOpen } from 'lucide-react';
+import { Trash2, GripVertical, FolderOpen, Upload } from 'lucide-react';
 
 export type PuckProps = {
   Hero: {
@@ -127,6 +127,8 @@ export const puckConfig: Config<PuckProps> = {
         imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
       },
       render: ({ title, subtitle, buttonText, buttonLink, bgGradient, imageUrl, ...props }: any) => {
+        const heroInputId = `hero-file-input-${props.id || 'default'}`;
+
         const updateProp = (key: string, value: any) => {
           if (props.onChange) {
             props.onChange({ [key]: value });
@@ -175,9 +177,10 @@ export const puckConfig: Config<PuckProps> = {
                 </div>
               </div>
 
-              {/* INLINE IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL */}
-              <div className="w-full md:w-1/2 flex justify-center">
+              {/* INLINE IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL WITH HTMLFOR */}
+              <div className="w-full md:w-1/2 flex justify-center relative">
                 <label
+                  htmlFor={heroInputId}
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                   title="Cliquez pour choisir un fichier image sur votre PC"
@@ -193,9 +196,9 @@ export const puckConfig: Config<PuckProps> = {
                   )}
 
                   {/* HOVER OVERLAY */}
-                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
-                    <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
-                    <span>Changer l image (PC)</span>
+                  <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-2 z-20">
+                    <FolderOpen className="w-8 h-8 text-[#00A0FF]" />
+                    <span className="px-3 py-1.5 bg-[#00A0FF] text-white font-black rounded-lg shadow-md">📁 Choisir une photo (PC)</span>
                   </div>
 
                   {/* TRASH ICON BUTTON AT BOTTOM RIGHT */}
@@ -214,22 +217,23 @@ export const puckConfig: Config<PuckProps> = {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
-
-                  {/* HIDDEN NATIVE FILE INPUT */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (ev) => updateProp('imageUrl', ev.target?.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
                 </label>
+
+                {/* HIDDEN NATIVE FILE INPUT LINKED BY ID */}
+                <input
+                  id={heroInputId}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => updateProp('imageUrl', ev.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -470,6 +474,8 @@ export const puckConfig: Config<PuckProps> = {
         imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
+        const blockId = props.id || 'feat4col';
+
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -497,135 +503,143 @@ export const puckConfig: Config<PuckProps> = {
             }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {items.map((col, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
-                >
-                  {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+              {items.map((col, i) => {
+                const colInputId = `col-file-input-${blockId}-${i}`;
+
+                return (
                   <div
-                    draggable
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onDragStart={(e) => {
-                      e.stopPropagation();
-                      e.dataTransfer.setData('text/plain', i.toString());
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const fromIdxStr = e.dataTransfer.getData('text/plain');
-                      const fromIdx = parseInt(fromIdxStr, 10);
-                      if (!isNaN(fromIdx) && fromIdx !== i) {
-                        const newItems = [...items];
-                        const temp = { ...newItems[fromIdx] };
-                        newItems[fromIdx] = { ...newItems[i] };
-                        newItems[i] = temp;
-
-                        updateProp(items[0].titleKey, newItems[0].title);
-                        updateProp(items[0].descKey, newItems[0].desc);
-                        updateProp(items[0].imgKey, newItems[0].img);
-
-                        updateProp(items[1].titleKey, newItems[1].title);
-                        updateProp(items[1].descKey, newItems[1].desc);
-                        updateProp(items[1].imgKey, newItems[1].img);
-
-                        updateProp(items[2].titleKey, newItems[2].title);
-                        updateProp(items[2].descKey, newItems[2].desc);
-                        updateProp(items[2].imgKey, newItems[2].img);
-
-                        updateProp(items[3].titleKey, newItems[3].title);
-                        updateProp(items[3].descKey, newItems[3].desc);
-                        updateProp(items[3].imgKey, newItems[3].img);
-                      }
-                    }}
-                    title="Glisser-déposer pour réorganiser la colonne"
-                    className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                    key={i}
+                    className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
                   >
-                    <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
-                    <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
-                  </div>
+                    {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+                    <div
+                      draggable
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onDragStart={(e) => {
+                        e.stopPropagation();
+                        e.dataTransfer.setData('text/plain', i.toString());
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const fromIdxStr = e.dataTransfer.getData('text/plain');
+                        const fromIdx = parseInt(fromIdxStr, 10);
+                        if (!isNaN(fromIdx) && fromIdx !== i) {
+                          const newItems = [...items];
+                          const temp = { ...newItems[fromIdx] };
+                          newItems[fromIdx] = { ...newItems[i] };
+                          newItems[i] = temp;
 
-                  {/* IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL */}
-                  <label
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
-                    title="Cliquez pour choisir un fichier image sur votre PC"
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
-                    style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
-                  >
-                    {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
-                    ) : (
-                      <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
-                        <span>🖼️ Aucune image</span>
-                        <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
-                      </div>
-                    )}
+                          updateProp(items[0].titleKey, newItems[0].title);
+                          updateProp(items[0].descKey, newItems[0].desc);
+                          updateProp(items[0].imgKey, newItems[0].img);
 
-                    {/* HOVER OVERLAY TO CHANGE IMAGE */}
-                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
-                      <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
-                      <span>Changer l image (PC)</span>
-                    </div>
+                          updateProp(items[1].titleKey, newItems[1].title);
+                          updateProp(items[1].descKey, newItems[1].desc);
+                          updateProp(items[1].imgKey, newItems[1].img);
 
-                    {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
-                    {col.img && (
-                      <button
-                        type="button"
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          updateProp(col.imgKey, '');
-                        }}
-                        title="Supprimer l image (1 clic)"
-                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                          updateProp(items[2].titleKey, newItems[2].title);
+                          updateProp(items[2].descKey, newItems[2].desc);
+                          updateProp(items[2].imgKey, newItems[2].img);
 
-                    {/* HIDDEN NATIVE FILE INPUT */}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
-                          reader.readAsDataURL(file);
+                          updateProp(items[3].titleKey, newItems[3].title);
+                          updateProp(items[3].descKey, newItems[3].desc);
+                          updateProp(items[3].imgKey, newItems[3].img);
                         }
                       }}
+                      title="Glisser-déposer pour réorganiser la colonne"
+                      className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                    >
+                      <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
+                      <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
+                    </div>
+
+                    {/* IMAGE FRAME WRAPPED IN NATIVE FILE PICKER LABEL WITH HTMLFOR */}
+                    <div className="w-full relative">
+                      <label
+                        htmlFor={colInputId}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Cliquez pour choisir un fichier image sur votre PC"
+                        className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
+                        style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
+                      >
+                        {col.img ? (
+                          <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                        ) : (
+                          <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
+                            <span>🖼️ Aucune image</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
+                          </div>
+                        )}
+
+                        {/* HOVER OVERLAY */}
+                        <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20 p-2 text-center">
+                          <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                          <span className="px-2.5 py-1 bg-[#00A0FF] text-white font-black text-[10px] rounded-md shadow-md">📁 Choisir photo (PC)</span>
+                        </div>
+
+                        {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
+                        {col.img && (
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              updateProp(col.imgKey, '');
+                            }}
+                            title="Supprimer l image (1 clic)"
+                            className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </label>
+
+                      {/* HIDDEN NATIVE FILE INPUT LINKED BY ID */}
+                      <input
+                        id={colInputId}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* INLINE EDITABLE TITLE DIRECTLY ON CANVAS BLOCK */}
+                    <input
+                      type="text"
+                      value={col.title || ''}
+                      {...stopProps}
+                      onChange={(e) => updateProp(col.titleKey, e.target.value)}
+                      className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
+                      placeholder="Titre..."
                     />
-                  </label>
 
-                  {/* INLINE EDITABLE TITLE DIRECTLY ON CANVAS BLOCK */}
-                  <input
-                    type="text"
-                    value={col.title || ''}
-                    {...stopProps}
-                    onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
-                    placeholder="Titre..."
-                  />
-
-                  {/* INLINE EDITABLE DESCRIPTION DIRECTLY ON CANVAS BLOCK */}
-                  <textarea
-                    value={col.desc || ''}
-                    rows={2}
-                    {...stopProps}
-                    onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
-                    placeholder="Description..."
-                  />
-                </div>
-              ))}
+                    {/* INLINE EDITABLE DESCRIPTION DIRECTLY ON CANVAS BLOCK */}
+                    <textarea
+                      value={col.desc || ''}
+                      rows={2}
+                      {...stopProps}
+                      onChange={(e) => updateProp(col.descKey, e.target.value)}
+                      className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
+                      placeholder="Description..."
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -670,6 +684,8 @@ export const puckConfig: Config<PuckProps> = {
         imgHeight, borderRadius, padding, margin,
         ...props
       }: any) => {
+        const blockId = props.id || 'feat3col';
+
         const updateProp = (key: string, val: any) => {
           if (props.onChange) {
             props.onChange({ [key]: val });
@@ -696,128 +712,136 @@ export const puckConfig: Config<PuckProps> = {
             }}
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {items.map((col, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
-                >
-                  {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+              {items.map((col, i) => {
+                const colInputId = `col3-file-input-${blockId}-${i}`;
+
+                return (
                   <div
-                    draggable
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onDragStart={(e) => {
-                      e.stopPropagation();
-                      e.dataTransfer.setData('text/plain', i.toString());
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const fromIdxStr = e.dataTransfer.getData('text/plain');
-                      const fromIdx = parseInt(fromIdxStr, 10);
-                      if (!isNaN(fromIdx) && fromIdx !== i) {
-                        const newItems = [...items];
-                        const temp = { ...newItems[fromIdx] };
-                        newItems[fromIdx] = { ...newItems[i] };
-                        newItems[i] = temp;
-
-                        updateProp(items[0].titleKey, newItems[0].title);
-                        updateProp(items[0].descKey, newItems[0].desc);
-                        updateProp(items[0].imgKey, newItems[0].img);
-
-                        updateProp(items[1].titleKey, newItems[1].title);
-                        updateProp(items[1].descKey, newItems[1].desc);
-                        updateProp(items[1].imgKey, newItems[1].img);
-
-                        updateProp(items[2].titleKey, newItems[2].title);
-                        updateProp(items[2].descKey, newItems[2].desc);
-                        updateProp(items[2].imgKey, newItems[2].img);
-                      }
-                    }}
-                    title="Glisser-déposer pour réorganiser la colonne"
-                    className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                    key={i}
+                    className="flex flex-col items-center text-center space-y-3 relative group/col cursor-default"
                   >
-                    <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
-                    <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
-                  </div>
+                    {/* DISCRETE DRAG HANDLE ICON AT TOP FOR REORDERING COLUMNS */}
+                    <div
+                      draggable
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onDragStart={(e) => {
+                        e.stopPropagation();
+                        e.dataTransfer.setData('text/plain', i.toString());
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const fromIdxStr = e.dataTransfer.getData('text/plain');
+                        const fromIdx = parseInt(fromIdxStr, 10);
+                        if (!isNaN(fromIdx) && fromIdx !== i) {
+                          const newItems = [...items];
+                          const temp = { ...newItems[fromIdx] };
+                          newItems[fromIdx] = { ...newItems[i] };
+                          newItems[i] = temp;
 
-                  <label
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
-                    title="Cliquez pour choisir un fichier image sur votre PC"
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
-                    style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
-                  >
-                    {col.img ? (
-                      <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
-                    ) : (
-                      <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
-                        <span>🖼️ Aucune image</span>
-                        <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
-                      </div>
-                    )}
+                          updateProp(items[0].titleKey, newItems[0].title);
+                          updateProp(items[0].descKey, newItems[0].desc);
+                          updateProp(items[0].imgKey, newItems[0].img);
 
-                    {/* HOVER OVERLAY TO CHANGE IMAGE */}
-                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20">
-                      <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
-                      <span>Changer l image (PC)</span>
-                    </div>
+                          updateProp(items[1].titleKey, newItems[1].title);
+                          updateProp(items[1].descKey, newItems[1].desc);
+                          updateProp(items[1].imgKey, newItems[1].img);
 
-                    {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
-                    {col.img && (
-                      <button
-                        type="button"
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          updateProp(col.imgKey, '');
-                        }}
-                        title="Supprimer l image (1 clic)"
-                        className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    {/* HIDDEN NATIVE FILE INPUT */}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
-                          reader.readAsDataURL(file);
+                          updateProp(items[2].titleKey, newItems[2].title);
+                          updateProp(items[2].descKey, newItems[2].desc);
+                          updateProp(items[2].imgKey, newItems[2].img);
                         }
                       }}
+                      title="Glisser-déposer pour réorganiser la colonne"
+                      className="w-full py-1 flex items-center justify-center text-slate-400 hover:text-[#00A0FF] hover:bg-slate-100 rounded-lg cursor-grab active:cursor-grabbing transition-colors group/handle pointer-events-auto"
+                    >
+                      <GripVertical className="w-4 h-4 opacity-50 group-hover/handle:opacity-100" />
+                      <span className="text-[9px] font-mono font-bold uppercase ml-1 opacity-0 group-hover/handle:opacity-100">Déplacer Col #{i + 1}</span>
+                    </div>
+
+                    <div className="w-full relative">
+                      <label
+                        htmlFor={colInputId}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Cliquez pour choisir un fichier image sur votre PC"
+                        className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto block"
+                        style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
+                      >
+                        {col.img ? (
+                          <img src={col.img} alt={col.title} className="w-full h-full object-cover select-none pointer-events-none" />
+                        ) : (
+                          <div className="w-full h-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 font-bold text-xs p-3 gap-1">
+                            <span>🖼️ Aucune image</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Cliquez pour charger</span>
+                          </div>
+                        )}
+
+                        {/* HOVER OVERLAY */}
+                        <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold pointer-events-none gap-1 z-20 p-2 text-center">
+                          <FolderOpen className="w-6 h-6 text-[#00A0FF]" />
+                          <span className="px-2.5 py-1 bg-[#00A0FF] text-white font-black text-[10px] rounded-md shadow-md">📁 Choisir photo (PC)</span>
+                        </div>
+
+                        {/* TRASH ICON BUTTON AT BOTTOM RIGHT CORNER (SUPPRIMER L IMAGE EN 1 CLIC) */}
+                        {col.img && (
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              updateProp(col.imgKey, '');
+                            }}
+                            title="Supprimer l image (1 clic)"
+                            className="absolute bottom-2 right-2 w-7 h-7 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-90 group-hover/img:opacity-100 z-30 pointer-events-auto"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </label>
+
+                      {/* HIDDEN NATIVE FILE INPUT LINKED BY ID */}
+                      <input
+                        id={colInputId}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => updateProp(col.imgKey, ev.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <input
+                      type="text"
+                      value={col.title || ''}
+                      {...stopProps}
+                      onChange={(e) => updateProp(col.titleKey, e.target.value)}
+                      className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
+                      placeholder="Titre..."
                     />
-                  </label>
 
-                  <input
-                    type="text"
-                    value={col.title || ''}
-                    {...stopProps}
-                    onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20 cursor-text"
-                    placeholder="Titre..."
-                  />
-
-                  <textarea
-                    value={col.desc || ''}
-                    rows={2}
-                    {...stopProps}
-                    onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
-                    placeholder="Description..."
-                  />
-                </div>
-              ))}
+                    <textarea
+                      value={col.desc || ''}
+                      rows={2}
+                      {...stopProps}
+                      onChange={(e) => updateProp(col.descKey, e.target.value)}
+                      className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20 cursor-text"
+                      placeholder="Description..."
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
