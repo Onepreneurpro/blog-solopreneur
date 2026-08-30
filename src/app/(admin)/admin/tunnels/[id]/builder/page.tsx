@@ -486,7 +486,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   };
 
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
-    // If a container block is selected on the canvas, insert image or element directly into the container!
+    // If a container block is selected on the canvas, insert element (Text, Heading, Image, Video, Button, etc.) directly into the container!
     if (selectedElementId) {
       const selectedEl = elements.find((e) => e.id === selectedElementId);
       if (
@@ -494,37 +494,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         (selectedEl.data?.items ||
           ['Col4', 'Col3', 'Col2', 'ContentBox', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type))
       ) {
-        if (type === 'Image') {
-          // If a specific sub-card image is selected in the container
-          if (selectedSubItem && selectedSubItem.blockId === selectedEl.id) {
-            const idx = selectedSubItem.itemIndex;
-            const updatedItems = (selectedEl.data?.items || []).map((item: any, i: number) =>
+        // If a specific sub-card in the container is selected:
+        if (selectedSubItem && selectedSubItem.blockId === selectedEl.id) {
+          const idx = selectedSubItem.itemIndex;
+          const currentItems = selectedEl.data?.items || [];
+
+          if (type === 'Image') {
+            const updatedItems = currentItems.map((item: any, i: number) =>
               i === idx ? { ...item, img: defaultContent } : item
             );
             handleUpdateElementData(selectedEl.id, { items: updatedItems, img: defaultContent });
             return;
           }
 
-          // If main block image exists (e.g. BlockHeroArizona / BlockBioArizona)
-          if (['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type)) {
-            handleUpdateElementData(selectedEl.id, { img: defaultContent });
+          if (type === 'Heading' || type === 'Text') {
+            const updatedItems = currentItems.map((item: any, i: number) =>
+              i === idx ? { ...item, title: defaultContent, desc: defaultContent } : item
+            );
+            handleUpdateElementData(selectedEl.id, { items: updatedItems, title: defaultContent });
             return;
           }
 
-          // Otherwise add a new card item with the image into the container
-          const currentItems = selectedEl.data?.items || [];
-          const newItem = {
-            id: `item-${Date.now()}`,
-            title: `Élément #${currentItems.length + 1}`,
-            desc: 'Description pré-remplie prêt à personnaliser.',
-            img: defaultContent,
-            imgSize: 240,
-            borderRadius: 16,
-            objectFit: 'cover',
-          };
-          handleUpdateElementData(selectedEl.id, { items: [...currentItems, newItem] });
+          if (type === 'ButtonCTA') {
+            const updatedItems = currentItems.map((item: any, i: number) =>
+              i === idx ? { ...item, buttonText: defaultContent } : item
+            );
+            handleUpdateElementData(selectedEl.id, { items: updatedItems, buttonText: defaultContent });
+            return;
+          }
+        }
+
+        // Main block image for Arizona blocks (BlockHeroArizona, BlockBioArizona, etc.)
+        if (type === 'Image' && ['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona'].includes(selectedEl.type)) {
+          handleUpdateElementData(selectedEl.id, { img: defaultContent });
           return;
         }
+
+        // Otherwise add a new card item containing that element into the container
+        const currentItems = selectedEl.data?.items || [];
+        const newItem = {
+          id: `item-${Date.now()}`,
+          title: type === 'Heading' || type === 'Text' ? defaultContent : `Élément #${currentItems.length + 1}`,
+          desc: type === 'Text' ? defaultContent : 'Description pré-remplie prêt à personnaliser.',
+          img: type === 'Image' ? defaultContent : 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80',
+          buttonText: type === 'ButtonCTA' ? defaultContent : undefined,
+          imgSize: 240,
+          borderRadius: 16,
+          objectFit: 'cover',
+        };
+        handleUpdateElementData(selectedEl.id, { items: [...currentItems, newItem] });
+        return;
       }
     }
 
@@ -1707,6 +1726,92 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               </div>
                             );
                           })}
+                        </div>
+                      </div>
+                    )}
+
+                    {el.type === 'ContentBox' && (
+                      <div
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={(e) => handleBlockDrop(e, el.id)}
+                        className="bg-white p-6 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/40 hover:border-[#00A0FF] relative transition-all"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || 'Conteneur d éléments...'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="text-xl font-heading font-black text-slate-800 bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
+                          />
+                          <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 flex items-center gap-1">
+                            <span>📦 Boîte flexible réceptrice</span>
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {(el.data?.items || [
+                            { id: '1', title: 'Élément #1', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80' },
+                            { id: '2', title: 'Élément #2', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80' },
+                            { id: '3', title: 'Élément #3', desc: 'Description pré-remplie prêt à personnaliser.', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80' },
+                          ]).map((col: any, i: number) => (
+                            <div
+                              key={col.id || i}
+                              className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative group/card hover:shadow-md transition-all"
+                            >
+                              <div
+                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                onDrop={(e) => handleCardDrop(e, el.id, i)}
+                                className="w-full h-40 rounded-xl overflow-hidden bg-slate-200 relative cursor-pointer group/img"
+                              >
+                                {col.img ? (
+                                  <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                                    📷 Déposer une image ici
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-[#00A0FF]/30 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white font-bold text-xs pointer-events-none transition-opacity">
+                                  🎯 Déposer l image
+                                </div>
+                              </div>
+
+                              <input
+                                type="text"
+                                value={col.title}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const updatedItems = (el.data?.items || []).map((it: any, idx: number) =>
+                                    idx === i ? { ...it, title: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items: updatedItems });
+                                }}
+                                className="w-full font-bold text-sm text-slate-800 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                              />
+
+                              <textarea
+                                rows={2}
+                                value={col.desc}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const updatedItems = (el.data?.items || []).map((it: any, idx: number) =>
+                                    idx === i ? { ...it, desc: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items: updatedItems });
+                                }}
+                                className="w-full text-xs text-slate-600 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                              />
+
+                              {col.buttonText && (
+                                <button type="button" className="w-full py-2 bg-[#00A0FF] text-white rounded-xl font-bold text-xs">
+                                  {col.buttonText}
+                                </button>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
