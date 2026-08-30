@@ -242,6 +242,72 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return { title: name, items: [] };
   };
 
+  // MOUSE INTERACTIVE DRAG RESIZING HANDLER FOR CANVAS SELECTION BOXES
+  const handleStartSubItemResize = (
+    e: React.MouseEvent,
+    blockId: string,
+    itemIndex: number,
+    mode: 'both' | 'width' | 'height'
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+
+    const el = elements.find((item) => item.id === blockId);
+    if (!el) return;
+
+    const elItems =
+      el.data?.items && el.data.items.length > 0
+        ? el.data.items
+        : getDefaultBlockData(el.type, el.content).items;
+
+    const currentItem = elItems[itemIndex];
+    if (!currentItem) return;
+
+    const startW = currentItem.imgWidth || 280;
+    const startH = currentItem.imgSize || 240;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+
+      const newW = mode !== 'height' ? Math.max(50, Math.min(800, Math.round(startW + deltaX))) : startW;
+      const newH = mode !== 'width' ? Math.max(50, Math.min(800, Math.round(startH + deltaY))) : startH;
+
+      setElements((prev) =>
+        prev.map((item) => {
+          if (item.id !== blockId) return item;
+          const itemsList =
+            item.data?.items && item.data.items.length > 0
+              ? item.data.items
+              : getDefaultBlockData(item.type, item.content).items;
+
+          const updatedItems = itemsList.map((it: any, idx: number) =>
+            idx === itemIndex ? { ...it, imgWidth: newW, imgSize: newH } : it
+          );
+
+          return {
+            ...item,
+            data: {
+              ...(item.data || {}),
+              items: updatedItems,
+            },
+          };
+        })
+      );
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
     const newEl: CanvasElement = {
       id: `el-${Date.now()}`,
@@ -1813,34 +1879,60 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             return (
                               <div key={col.id || i} className="flex flex-col items-center text-center space-y-3 relative group/col">
                                 {/* CLICKABLE IMAGE CONTAINER WITH DYNAMIC WIDTH, HEIGHT & BORDER RADIUS */}
-                                <div
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedElementId(el.id);
-                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
-                                  }}
-                                  className={`overflow-hidden shadow-md transition-all cursor-pointer ${
-                                    isImgSel
-                                      ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
-                                      : 'hover:ring-4 hover:ring-[#00A0FF]/60'
-                                  }`}
-                                  style={{
-                                    width: col.imgWidth ? `${col.imgWidth}px` : '100%',
-                                    maxWidth: '100%',
-                                    height: col.imgSize ? `${col.imgSize}px` : '280px',
-                                    borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
-                                  }}
-                                >
-                                  <img
-                                    src={col.img}
-                                    alt={col.alt || col.title}
-                                    className="w-full h-full transition-transform duration-100"
-                                    style={{
-                                      objectFit: (col.objectFit as any) || 'cover',
-                                      objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
-                                      transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                <div className="relative flex justify-center w-full">
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedElementId(el.id);
+                                      setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                     }}
-                                  />
+                                    className={`relative overflow-hidden shadow-md transition-all cursor-pointer ${
+                                      isImgSel
+                                        ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.02] shadow-2xl'
+                                        : 'hover:ring-4 hover:ring-[#00A0FF]/60'
+                                    }`}
+                                    style={{
+                                      width: col.imgWidth ? `${col.imgWidth}px` : '100%',
+                                      maxWidth: '100%',
+                                      height: col.imgSize ? `${col.imgSize}px` : '280px',
+                                      borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
+                                    }}
+                                  >
+                                    <img
+                                      src={col.img}
+                                      alt={col.alt || col.title}
+                                      className="w-full h-full transition-transform duration-100 select-none pointer-events-none"
+                                      style={{
+                                        objectFit: (col.objectFit as any) || 'cover',
+                                        objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                        transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                      }}
+                                    />
+
+                                    {/* INTERACTIVE DRAG RESIZE HANDLES (POIGNÉES DE REDIMENSIONNEMENT SUR LE CADRE) */}
+                                    {isImgSel && (
+                                      <>
+                                        {/* BOTTOM-RIGHT CORNER HANDLE (BOTH WIDTH & HEIGHT) */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'both')}
+                                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-se-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Cliquer et glisser pour agrandir/réduire le cadre"
+                                        />
+                                        {/* RIGHT CENTER HANDLE (WIDTH) */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'width')}
+                                          className="absolute top-1/2 -right-1 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-e-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Glisser pour modifier la largeur"
+                                        />
+                                        {/* BOTTOM CENTER HANDLE (HEIGHT) */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'height')}
+                                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-s-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Glisser pour modifier la hauteur"
+                                        />
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
 
                                 {/* CLICKABLE TITLE WITH HIGHLIGHT */}
@@ -1899,32 +1991,57 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             return (
                               <div key={col.id || i} className="space-y-3">
-                                <div
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedElementId(el.id);
-                                    setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
-                                  }}
-                                  className={`w-full overflow-hidden shadow-sm transition-all cursor-pointer ${
-                                    isImgSel
-                                      ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.03] shadow-2xl'
-                                      : 'hover:ring-4 hover:ring-[#00A0FF]/60'
-                                  }`}
-                                  style={{
-                                    height: col.imgSize ? `${col.imgSize}px` : '220px',
-                                    borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
-                                  }}
-                                >
-                                  <img
-                                    src={col.img}
-                                    alt={col.alt || col.title}
-                                    className="w-full h-full transition-transform duration-100"
-                                    style={{
-                                      objectFit: (col.objectFit as any) || 'cover',
-                                      objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
-                                      transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                <div className="relative flex justify-center w-full">
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedElementId(el.id);
+                                      setSelectedSubItem({ blockId: el.id, itemIndex: i, subType: 'image' });
                                     }}
-                                  />
+                                    className={`relative overflow-hidden shadow-sm transition-all cursor-pointer ${
+                                      isImgSel
+                                        ? 'ring-4 ring-[#00A0FF] ring-offset-2 scale-[1.02] shadow-2xl'
+                                        : 'hover:ring-4 hover:ring-[#00A0FF]/60'
+                                    }`}
+                                    style={{
+                                      width: col.imgWidth ? `${col.imgWidth}px` : '100%',
+                                      maxWidth: '100%',
+                                      height: col.imgSize ? `${col.imgSize}px` : '220px',
+                                      borderRadius: `${col.borderRadius !== undefined ? col.borderRadius : 16}px`,
+                                    }}
+                                  >
+                                    <img
+                                      src={col.img}
+                                      alt={col.alt || col.title}
+                                      className="w-full h-full transition-transform duration-100 select-none pointer-events-none"
+                                      style={{
+                                        objectFit: (col.objectFit as any) || 'cover',
+                                        objectPosition: `${col.posX !== undefined ? col.posX : 50}% ${col.posY !== undefined ? col.posY : 50}%`,
+                                        transform: `scale(${(col.imgZoom || 100) / 100})`,
+                                      }}
+                                    />
+
+                                    {/* INTERACTIVE DRAG RESIZE HANDLES */}
+                                    {isImgSel && (
+                                      <>
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'both')}
+                                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-se-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Cliquer et glisser pour agrandir/réduire le cadre"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'width')}
+                                          className="absolute top-1/2 -right-1 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-e-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Glisser pour modifier la largeur"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'height')}
+                                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-s-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Glisser pour modifier la hauteur"
+                                        />
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                                 <h4
                                   onClick={(e) => {
