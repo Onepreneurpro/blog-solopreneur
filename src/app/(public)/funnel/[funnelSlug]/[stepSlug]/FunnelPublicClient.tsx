@@ -168,9 +168,27 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                         return <p key={child.id || cIdx} className="text-sm text-slate-600 font-medium leading-relaxed">{child.content}</p>;
                       }
                       if (child.type === 'Image') {
+                        const imgHeight = child.imgHeight || el.data?.imgHeight || 'h-56';
+                        const imgShape = child.imgShape || el.data?.imgShape || 'arcade';
+                        const shapeClass =
+                          imgShape === 'arcade'
+                            ? 'rounded-t-[80px]'
+                            : imgShape === 'circle'
+                            ? 'rounded-full'
+                            : imgShape === 'square'
+                            ? 'rounded-none'
+                            : 'rounded-3xl';
+                        const imgFit = child.imgObjectFit || el.data?.imgObjectFit || 'object-cover';
+                        const imgPos = child.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
                         return (
-                          <div key={child.id || cIdx} className="w-full rounded-2xl overflow-hidden shadow-md max-h-96">
-                            <img src={child.content} alt="Content" className="w-full h-full object-cover" />
+                          <div key={child.id || cIdx} className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-md`}>
+                            <img
+                              src={child.content}
+                              alt="Content"
+                              className={`w-full h-full ${imgFit}`}
+                              style={{ objectPosition: imgPos }}
+                            />
                           </div>
                         );
                       }

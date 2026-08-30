@@ -1937,11 +1937,32 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   />
                                 )}
 
-                                {child.type === 'Image' && (
-                                  <div className="w-full h-56 rounded-xl overflow-hidden bg-slate-100 relative">
-                                    <img src={child.content} alt="Child" className="w-full h-full object-cover" />
-                                  </div>
-                                )}
+                                {child.type === 'Image' && (() => {
+                                  const c = child as any;
+                                  const imgHeight = c.imgHeight || c.data?.imgHeight || el.data?.imgHeight || 'h-56';
+                                  const imgShape = c.imgShape || c.data?.imgShape || el.data?.imgShape || 'arcade';
+                                  const shapeClass =
+                                    imgShape === 'arcade'
+                                      ? 'rounded-t-[80px]'
+                                      : imgShape === 'circle'
+                                      ? 'rounded-full'
+                                      : imgShape === 'square'
+                                      ? 'rounded-none'
+                                      : 'rounded-3xl';
+                                  const imgFit = c.imgObjectFit || c.data?.imgObjectFit || el.data?.imgObjectFit || 'object-cover';
+                                  const imgPos = c.imgObjectPosition || c.data?.imgObjectPosition || el.data?.imgObjectPosition || 'center';
+
+                                  return (
+                                    <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-md bg-slate-100 relative flex items-center justify-center`}>
+                                      <img
+                                        src={child.content}
+                                        alt="Child"
+                                        className={`w-full h-full ${imgFit}`}
+                                        style={{ objectPosition: imgPos }}
+                                      />
+                                    </div>
+                                  );
+                                })()}
 
                                 {child.type === 'ButtonCTA' && (
                                   <button type="button" className="w-full py-3 bg-[#00A0FF] text-white rounded-xl font-bold text-sm shadow-md">
