@@ -122,9 +122,9 @@ export default function PuckBuilderPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-slate-900 text-slate-100 flex flex-col w-screen min-h-screen overflow-y-auto">
+    <div className="fixed inset-0 z-[99999] bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden">
       {/* TOP HEADER */}
-      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 sticky top-0 z-40">
+      <header className="h-14 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/tunnels-beta"
@@ -170,29 +170,13 @@ export default function PuckBuilderPage() {
         </div>
       </header>
 
-      {/* PUCK EDITOR FULLSCREEN WORKSPACE ALLOWING NATURAL CONTENT EXPANSION */}
-      <div className="flex-1 w-full relative bg-slate-100 text-slate-900">
+      {/* PUCK EDITOR FULLSCREEN WORKSPACE */}
+      <div className="flex-1 w-full relative bg-slate-100 text-slate-900 overflow-hidden">
         <style jsx global>{`
           .Puck {
-            height: auto !important;
-            min-height: calc(100vh - 3.5rem) !important;
-            max-height: none !important;
-            overflow: visible !important;
+            height: calc(100vh - 3.5rem) !important;
+            max-height: calc(100vh - 3.5rem) !important;
           }
-
-          [class*="_Sidebar_"],
-          [class*="_PuckCanvas_"],
-          [class*="PuckCanvas"],
-          [class*="Sidebar"],
-          .Puck-sidebar,
-          .Puck-canvas {
-            height: auto !important;
-            min-height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            overflow-y: visible !important;
-          }
-
           label, label * {
             cursor: pointer !important;
             pointer-events: auto !important;
