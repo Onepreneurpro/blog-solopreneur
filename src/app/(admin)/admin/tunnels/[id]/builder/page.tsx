@@ -43,6 +43,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import WebstudioStudioEngine from '@/components/builder/WebstudioStudioEngine';
 
 interface CanvasElement {
   id: string;
@@ -721,8 +722,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         </div>
       )}
 
-      {/* 2. MAIN BUILDER BODY (PALETTE SIDEBAR & CANVAS) */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* 2. MAIN BUILDER BODY (WEBSTUDIO ENGINE V3 OR MAISON V1) */}
+      {builderEngine === 'WEBSTUDIO_V3' && (
+        <div className="flex-1 overflow-hidden">
+          <WebstudioStudioEngine
+            stepId={stepId || ''}
+            initialData={step?.content}
+            onSaveSuccess={() => setSaveSuccess(true)}
+          />
+        </div>
+      )}
+
+      {builderEngine === 'MAISON_V1' && (
+        <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT PALETTE / INSPECTOR PANEL (SCREENS 1, 2, 3, 4, 5) */}
         <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden">
@@ -3303,6 +3315,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
         )}
       </div>
+      )}
 
     </div>
   );

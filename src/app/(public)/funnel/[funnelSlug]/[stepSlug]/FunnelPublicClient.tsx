@@ -28,24 +28,25 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Check if content is saved Craft.js JSON structure or legacy array
+  // Check if content is saved Craft.js JSON, Webstudio JSON project or legacy array
   let craftData: string | null = null;
   let customElements: any[] | null = null;
+  let webstudioProject: any = null;
   let isFullWidth = true;
 
   if (step?.content) {
     try {
       const parsed = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
-      if (parsed && (parsed.ROOT || parsed.content || typeof parsed === 'object')) {
-        if (Array.isArray(parsed)) {
-          customElements = parsed;
+      if (parsed?.root && (parsed?.engine === 'webstudio-is/webstudio' || parsed?.version)) {
+        webstudioProject = parsed;
+      } else if (Array.isArray(parsed)) {
+        customElements = parsed;
+      } else {
+        craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
+        if (parsed?.ROOT?.props?.pageLayoutMode === 'centered') {
+          isFullWidth = false;
         } else {
-          craftData = typeof step.content === 'string' ? step.content : JSON.stringify(step.content);
-          if (parsed?.ROOT?.props?.pageLayoutMode === 'centered') {
-            isFullWidth = false;
-          } else {
-            isFullWidth = true;
-          }
+          isFullWidth = true;
         }
       }
     } catch (e) {
@@ -122,6 +123,25 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             Retourner sur la page d accueil →
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  // RENDER WEBSTUDIO PROJECT PUBLICLY
+  if (webstudioProject) {
+    const renderNode = (node: any): React.ReactNode => {
+      const Tag = (node.tag || 'div') as keyof JSX.IntrinsicElements;
+      return (
+        <Tag key={node.id} style={node.style}>
+          {node.content}
+          {node.children && node.children.map(renderNode)}
+        </Tag>
+      );
+    };
+
+    return (
+      <div className="min-h-screen w-full">
+        {renderNode(webstudioProject.root)}
       </div>
     );
   }
