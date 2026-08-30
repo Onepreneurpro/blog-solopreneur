@@ -14,6 +14,136 @@ export interface MaisonTemplate {
 }
 
 export const MAISON_TEMPLATES: MaisonTemplate[] = [
+  // 0. TEMPLATE CLONE OFFICIAL: THE ARIZONA (COPYWRITER & BRAND VOICE)
+  {
+    id: 'the-arizona-technicolor',
+    name: '🌵 The Arizona — Copywriter & Technicolor Brand Voice',
+    category: 'Branding & Copywriting',
+    previewImage: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80',
+    description: 'Clone officiel du modèle The Arizona : palette crème, jaune & turquoise, typographies rétro, sections Hey Claire, Soul Sisters et 3 cartes d arcades.',
+    elements: [
+      {
+        id: 'el-arizona-1',
+        type: 'Heading',
+        category: 'Texte',
+        content: 'Your Brand Voice, Dressed in Technicolor',
+        data: {
+          subtitle: 'MARKETING SELLS WHEN',
+        },
+      },
+      {
+        id: 'el-arizona-2',
+        type: 'Text',
+        category: 'Texte',
+        content: 'Bold copy that demands attention, sparks connection, and converts — without ever toning it down.',
+      },
+      {
+        id: 'el-arizona-3',
+        type: 'ButtonCTA',
+        category: 'Formulaire',
+        content: 'GET STARTED NOW',
+        data: {
+          buttonText: 'GET STARTED NOW',
+        },
+      },
+      {
+        id: 'el-arizona-4',
+        type: 'Image',
+        category: 'Média',
+        content: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80',
+        data: {
+          img: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80',
+          alt: 'Technicolor Desk Setup',
+          imgSize: 340,
+          borderRadius: 24,
+        },
+      },
+      {
+        id: 'el-arizona-5',
+        type: 'Heading',
+        category: 'Texte',
+        content: "Hey, I'm Claire",
+      },
+      {
+        id: 'el-arizona-6',
+        type: 'Text',
+        category: 'Texte',
+        content: 'Welcome to the land of highlighter-worthy copy!\n\nThe Painted Paragraph exists to help women take up more space—with words that radiate power, personality, and purpose. Because when your copy clicks, everything changes. Pudding jujubes gingerbread jujubes bamboo sweet powder. Candy canes icing danish shortbread chupa chups topping. Croissant fruitcake sweet roll candy cane gingerbread dessert candy cake. Bonbon gummy bears dragée icing apple pie sweet carrot cake.',
+      },
+      {
+        id: 'el-arizona-7',
+        type: 'ButtonCTA',
+        category: 'Formulaire',
+        content: 'GET STARTED NOW',
+        data: {
+          buttonText: 'GET STARTED NOW',
+        },
+      },
+      {
+        id: 'el-arizona-8',
+        type: 'Image',
+        category: 'Média',
+        content: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
+        data: {
+          img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
+          alt: 'Claire Portrait',
+          imgSize: 380,
+          borderRadius: 24,
+        },
+      },
+      {
+        id: 'el-arizona-9',
+        type: 'BlockFeat2ColIconsLeft',
+        category: 'Fonctionnalités',
+        content: 'We May Be Soul Sisters If...',
+        data: {
+          title: 'We May Be Soul Sisters If...',
+          items: [
+            { id: '1', title: '♥ Creative Vision', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+            { id: '2', title: '♥ Bold Messaging', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+            { id: '3', title: '♥ Authentic Voice', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+            { id: '4', title: '♥ High-Converting Copy', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+          ],
+        },
+      },
+      {
+        id: 'el-arizona-10',
+        type: 'BlockFeat3ColImg',
+        category: 'Fonctionnalités',
+        content: 'Copy that Pops. Strategy that Sells.',
+        data: {
+          title: 'Copy that Pops. Strategy that Sells.',
+          subtitle: 'OUR SIGNATURE SERVICES',
+          items: [
+            {
+              id: '1',
+              title: 'EXCLUSIVE VIP DAYS',
+              img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=400&q=80',
+              desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.',
+              imgSize: 320,
+              borderRadius: 24,
+            },
+            {
+              id: '2',
+              title: 'LAUNCH & COPY STRATEGY',
+              img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=400&q=80',
+              desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.',
+              imgSize: 320,
+              borderRadius: 24,
+            },
+            {
+              id: '3',
+              title: 'BRAND VOICE INTENSIVE',
+              img: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=400&q=80',
+              desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.',
+              imgSize: 320,
+              borderRadius: 24,
+            },
+          ],
+        },
+      },
+    ],
+  },
   // 1. TEMPLATE VERT DIGITAL PRODUCT PRO (CLONE DE LA PHOTO)
   {
     id: 'green-sales-pro',
