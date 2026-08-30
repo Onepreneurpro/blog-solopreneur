@@ -92,11 +92,6 @@ export function AdminLayoutClient({ user, children }: AdminLayoutClientProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Bypass outer AdminLayout for full-screen builder pages (Puck / Tunnel Builders)
-  if (pathname?.includes('/builder')) {
-    return <>{children}</>;
-  }
-
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-slate-100 text-slate-900 overflow-x-hidden relative pb-24">
       {/* LEFT NAVIGATION SIDEBAR - PURE ORIGINAL FULL-SIZE MENU */}

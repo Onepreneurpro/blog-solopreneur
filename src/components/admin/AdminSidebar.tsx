@@ -58,7 +58,6 @@ const ADMIN_LINKS: SidebarGroup[] = [
     group: 'TUNNELS DE VENTE & AUTOMATISATION',
     items: [
       { label: 'Tunnels de Vente', href: '/admin/tunnels', icon: Zap },
-      { label: 'Tunnels Beta (Puck)', href: '/admin/tunnels-beta', icon: Layout },
       { label: 'Contacts Leads', href: '/admin/leads', icon: UserCheck },
       { label: 'Campagnes d Emails', href: '/admin/campagnes', icon: Megaphone },
     ],
