@@ -128,6 +128,11 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         return (
           <div className={`w-full py-16 px-6 sm:px-12 bg-gradient-to-r ${bgGradient} text-white rounded-3xl shadow-2xl my-4 relative group/hero`}>
             <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
@@ -136,8 +141,9 @@ export const puckConfig: Config<PuckProps> = {
                 <input
                   type="text"
                   value={title || ''}
+                  {...stopProps}
                   onChange={(e) => updateProp('title', e.target.value)}
-                  className="w-full text-3xl sm:text-5xl font-black font-heading leading-tight tracking-tight bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl px-3 py-1 outline-none transition-all"
+                  className="w-full text-3xl sm:text-5xl font-black font-heading leading-tight tracking-tight bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl px-3 py-1 outline-none transition-all pointer-events-auto relative z-20"
                   placeholder="Titre Héro..."
                 />
 
@@ -145,8 +151,9 @@ export const puckConfig: Config<PuckProps> = {
                 <textarea
                   value={subtitle || ''}
                   rows={2}
+                  {...stopProps}
                   onChange={(e) => updateProp('subtitle', e.target.value)}
-                  className="w-full text-base sm:text-lg text-white/90 leading-relaxed font-medium bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl p-3 outline-none resize-none overflow-hidden transition-all"
+                  className="w-full text-base sm:text-lg text-white/90 leading-relaxed font-medium bg-transparent hover:bg-white/10 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-2xl p-3 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20"
                   placeholder="Sous-titre Héro..."
                 />
 
@@ -155,8 +162,9 @@ export const puckConfig: Config<PuckProps> = {
                   <input
                     type="text"
                     value={buttonText || ''}
+                    {...stopProps}
                     onChange={(e) => updateProp('buttonText', e.target.value)}
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-sm rounded-2xl shadow-xl transition-all outline-none focus:ring-4 focus:ring-white/50 text-center"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-sm rounded-2xl shadow-xl transition-all outline-none focus:ring-4 focus:ring-white/50 text-center pointer-events-auto relative z-20"
                     placeholder="Bouton..."
                   />
                 </div>
@@ -164,7 +172,7 @@ export const puckConfig: Config<PuckProps> = {
 
               {/* INLINE IMAGE UPLOAD ON CANVAS */}
               <div className="w-full md:w-1/2 flex justify-center">
-                <div className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer">
+                <div className="relative group/img rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl max-h-[340px] w-full cursor-pointer pointer-events-auto">
                   {imageUrl ? (
                     <img src={imageUrl} alt="Hero illustration" className="w-full h-full object-cover max-h-[340px]" />
                   ) : (
@@ -173,7 +181,10 @@ export const puckConfig: Config<PuckProps> = {
                     </div>
                   )}
 
-                  <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-2 p-4">
+                  <label
+                    {...stopProps}
+                    className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-2 p-4 z-20"
+                  >
                     <span className="text-xl">📤</span>
                     <span>Changer l image (PC)</span>
                     <input
@@ -254,12 +265,14 @@ export const puckConfig: Config<PuckProps> = {
           <input
             type="text"
             value={title || ''}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
               if (props.onChange) {
                 props.onChange({ title: e.target.value });
               }
             }}
-            className={`w-full font-black font-heading tracking-tight bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl px-3 py-1 outline-none transition-all my-2 ${(sizeClasses as any)[size || 'large']} ${(alignClasses as any)[align || 'center']} ${color}`}
+            className={`w-full font-black font-heading tracking-tight bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl px-3 py-1 outline-none transition-all my-2 pointer-events-auto relative z-20 ${(sizeClasses as any)[size || 'large']} ${(alignClasses as any)[align || 'center']} ${color}`}
             placeholder="Titre..."
           />
         );
@@ -309,12 +322,14 @@ export const puckConfig: Config<PuckProps> = {
           <textarea
             value={content || ''}
             rows={2}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
               if (props.onChange) {
                 props.onChange({ content: e.target.value });
               }
             }}
-            className={`w-full text-slate-600 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl p-2.5 outline-none resize-none overflow-hidden transition-all my-2 ${(sizeClasses as any)[size || 'medium']} ${(alignClasses as any)[align || 'center']}`}
+            className={`w-full text-slate-600 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] focus:ring-2 focus:ring-[#00A0FF]/30 rounded-2xl p-2.5 outline-none resize-none overflow-hidden transition-all my-2 pointer-events-auto relative z-20 ${(sizeClasses as any)[size || 'medium']} ${(alignClasses as any)[align || 'center']}`}
             placeholder="Paragraphe..."
           />
         );
@@ -367,12 +382,14 @@ export const puckConfig: Config<PuckProps> = {
             <input
               type="text"
               value={text || ''}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => {
                 if (props.onChange) {
                   props.onChange({ text: e.target.value });
                 }
               }}
-              className={`px-7 py-3.5 rounded-2xl font-black text-sm transition-all outline-none text-center focus:ring-4 focus:ring-[#00A0FF]/40 ${(variantClasses as any)[variant || 'primary']}`}
+              className={`px-7 py-3.5 rounded-2xl font-black text-sm transition-all outline-none text-center focus:ring-4 focus:ring-[#00A0FF]/40 pointer-events-auto relative z-20 ${(variantClasses as any)[variant || 'primary']}`}
               placeholder="Texte du bouton..."
             />
           </div>
@@ -427,6 +444,11 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         const items = [
           { titleKey: 'item1Title', descKey: 'item1Desc', imgKey: 'item1Img', title: item1Title, desc: item1Desc, img: item1Img },
           { titleKey: 'item2Title', descKey: 'item2Desc', imgKey: 'item2Img', title: item2Title, desc: item2Desc, img: item2Img },
@@ -435,17 +457,20 @@ export const puckConfig: Config<PuckProps> = {
         ];
 
         return (
-          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl">
+          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {items.map((col, i) => (
                 <div key={i} className="flex flex-col items-center text-center space-y-3">
                   {/* INLINE IMAGE UPLOAD BUTTON DIRECTLY ON CANVAS BLOCK */}
                   <div
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 240}px`, borderRadius: `${borderRadius || 16}px` }}
                   >
                     <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                    <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2">
+                    <label
+                      {...stopProps}
+                      className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2 z-20"
+                    >
                       <span className="text-lg">📤</span>
                       <span>Changer l image (PC)</span>
                       <input
@@ -468,8 +493,9 @@ export const puckConfig: Config<PuckProps> = {
                   <input
                     type="text"
                     value={col.title || ''}
+                    {...stopProps}
                     onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all"
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
                     placeholder="Titre..."
                   />
 
@@ -477,8 +503,9 @@ export const puckConfig: Config<PuckProps> = {
                   <textarea
                     value={col.desc || ''}
                     rows={2}
+                    {...stopProps}
                     onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all"
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20"
                     placeholder="Description..."
                   />
                 </div>
@@ -529,6 +556,11 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         const items = [
           { titleKey: 'item1Title', descKey: 'item1Desc', imgKey: 'item1Img', title: item1Title, desc: item1Desc, img: item1Img },
           { titleKey: 'item2Title', descKey: 'item2Desc', imgKey: 'item2Img', title: item2Title, desc: item2Desc, img: item2Img },
@@ -536,16 +568,19 @@ export const puckConfig: Config<PuckProps> = {
         ];
 
         return (
-          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl">
+          <div className="w-full my-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-xl pointer-events-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {items.map((col, i) => (
                 <div key={i} className="flex flex-col items-center text-center space-y-3">
                   <div
-                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer"
+                    className="w-full overflow-hidden shadow-md border border-slate-100 relative group/img cursor-pointer pointer-events-auto"
                     style={{ height: `${imgHeight || 260}px`, borderRadius: `${borderRadius || 20}px` }}
                   >
                     <img src={col.img} alt={col.title} className="w-full h-full object-cover" />
-                    <label className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2">
+                    <label
+                      {...stopProps}
+                      className="absolute inset-0 bg-slate-950/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer gap-1.5 p-2 z-20"
+                    >
                       <span className="text-lg">📤</span>
                       <span>Changer l image (PC)</span>
                       <input
@@ -567,16 +602,18 @@ export const puckConfig: Config<PuckProps> = {
                   <input
                     type="text"
                     value={col.title || ''}
+                    {...stopProps}
                     onChange={(e) => updateProp(col.titleKey, e.target.value)}
-                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all"
+                    className="w-full text-center font-heading font-black text-sm tracking-wider uppercase text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white focus:ring-2 focus:ring-[#00A0FF] rounded-lg px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
                     placeholder="Titre..."
                   />
 
                   <textarea
                     value={col.desc || ''}
                     rows={2}
+                    {...stopProps}
                     onChange={(e) => updateProp(col.descKey, e.target.value)}
-                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all"
+                    className="w-full text-center text-xs text-slate-500 font-medium leading-relaxed bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 focus:ring-2 focus:ring-[#00A0FF] rounded-lg p-1.5 outline-none resize-none overflow-hidden transition-all pointer-events-auto relative z-20"
                     placeholder="Description..."
                   />
                 </div>
@@ -615,20 +652,27 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         return (
-          <div className={`w-full p-6 my-4 rounded-3xl border shadow-lg space-y-3 ${bgColor} ${borderColor}`}>
+          <div className={`w-full p-6 my-4 rounded-3xl border shadow-lg space-y-3 ${bgColor} ${borderColor} pointer-events-auto`}>
             <input
               type="text"
               value={title || ''}
+              {...stopProps}
               onChange={(e) => updateProp('title', e.target.value)}
-              className="w-full font-heading font-black text-lg bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl px-2 py-1 outline-none transition-all"
+              className="w-full font-heading font-black text-lg bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl px-2 py-1 outline-none transition-all pointer-events-auto relative z-20"
               placeholder="Titre Carte..."
             />
             <textarea
               value={content || ''}
               rows={2}
+              {...stopProps}
               onChange={(e) => updateProp('content', e.target.value)}
-              className="w-full text-sm font-medium leading-relaxed bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl p-2 outline-none resize-none transition-all opacity-90"
+              className="w-full text-sm font-medium leading-relaxed bg-transparent hover:bg-slate-100/50 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-xl p-2 outline-none resize-none transition-all opacity-90 pointer-events-auto relative z-20"
               placeholder="Contenu Carte..."
             />
           </div>
@@ -656,21 +700,28 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         return (
-          <div className="w-full max-w-lg mx-auto my-8 p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5">
+          <div className="w-full max-w-lg mx-auto my-8 p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl text-center space-y-5 pointer-events-auto">
             <div className="space-y-2">
               <input
                 type="text"
                 value={title || ''}
+                {...stopProps}
                 onChange={(e) => updateProp('title', e.target.value)}
-                className="w-full text-center font-heading font-black text-2xl text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white rounded-xl px-2 py-1 outline-none border border-transparent focus:border-[#00A0FF]"
+                className="w-full text-center font-heading font-black text-2xl text-slate-900 bg-transparent hover:bg-slate-100/80 focus:bg-white rounded-xl px-2 py-1 outline-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20"
                 placeholder="Titre Formulaire..."
               />
               <textarea
                 value={subtitle || ''}
                 rows={2}
+                {...stopProps}
                 onChange={(e) => updateProp('subtitle', e.target.value)}
-                className="w-full text-center text-xs text-slate-500 font-medium bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 rounded-xl p-2 outline-none resize-none border border-transparent focus:border-[#00A0FF]"
+                className="w-full text-center text-xs text-slate-500 font-medium bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 rounded-xl p-2 outline-none resize-none border border-transparent focus:border-[#00A0FF] pointer-events-auto relative z-20"
                 placeholder="Sous-titre Formulaire..."
               />
             </div>
@@ -690,8 +741,9 @@ export const puckConfig: Config<PuckProps> = {
               <input
                 type="text"
                 value={buttonText || ''}
+                {...stopProps}
                 onChange={(e) => updateProp('buttonText', e.target.value)}
-                className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all text-center outline-none focus:ring-4 focus:ring-[#00A0FF]/40"
+                className="w-full py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg transition-all text-center outline-none focus:ring-4 focus:ring-[#00A0FF]/40 pointer-events-auto relative z-20"
                 placeholder="Bouton Formulaire..."
               />
             </form>
@@ -716,8 +768,13 @@ export const puckConfig: Config<PuckProps> = {
           }
         };
 
+        const stopProps = {
+          onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
         return (
-          <div className="w-full max-w-3xl mx-auto my-8 space-y-2 text-center">
+          <div className="w-full max-w-3xl mx-auto my-8 space-y-2 text-center pointer-events-auto">
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
               <iframe
                 src={videoUrl}
@@ -728,8 +785,9 @@ export const puckConfig: Config<PuckProps> = {
             <input
               type="text"
               value={caption || ''}
+              {...stopProps}
               onChange={(e) => updateProp('caption', e.target.value)}
-              className="w-full text-center text-xs text-slate-500 font-bold italic bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-lg px-2 py-1 outline-none"
+              className="w-full text-center text-xs text-slate-500 font-bold italic bg-transparent hover:bg-slate-100/80 focus:bg-white focus:text-slate-900 border border-transparent focus:border-[#00A0FF] rounded-lg px-2 py-1 outline-none pointer-events-auto relative z-20"
               placeholder="Légende vidéo..."
             />
           </div>

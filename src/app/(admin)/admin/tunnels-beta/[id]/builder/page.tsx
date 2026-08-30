@@ -172,6 +172,19 @@ export default function PuckBuilderPage() {
 
       {/* PUCK EDITOR FULLSCREEN WORKSPACE */}
       <div className="flex-1 w-full relative bg-slate-100 text-slate-900">
+        <style jsx global>{`
+          .Puck-component input,
+          .Puck-component textarea,
+          .Puck-component label,
+          .Puck-component button,
+          [data-puck-component] input,
+          [data-puck-component] textarea,
+          [data-puck-component] label,
+          [data-puck-component] button,
+          input, textarea {
+            pointer-events: auto !important;
+          }
+        `}</style>
         <Puck
           config={puckConfig}
           data={initialData}
