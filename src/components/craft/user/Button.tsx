@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, iconMap } from './Text';
 
 export interface ButtonProps {
   text?: string;
   bgColor?: string;
   bgImage?: string;
   textColor?: string;
+  fontFamily?: string;
   borderRadius?: number;
   align?: 'left' | 'center' | 'right';
   href?: string;
@@ -21,6 +22,9 @@ export interface ButtonProps {
   shadowOffsetY?: number;
   shadowColor?: string;
   shadowOpacity?: number;
+  icon?: string;
+  iconPosition?: 'left' | 'right';
+  iconColor?: string;
 }
 
 export const Button = ({
@@ -28,6 +32,7 @@ export const Button = ({
   bgColor = '#00A0FF',
   bgImage,
   textColor = '#ffffff',
+  fontFamily = 'Inter',
   borderRadius = 0,
   align = 'center',
   href = '#',
@@ -40,6 +45,9 @@ export const Button = ({
   shadowOffsetY = 10,
   shadowColor = '#000000',
   shadowOpacity = 20,
+  icon = 'none',
+  iconPosition = 'left',
+  iconColor,
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -62,6 +70,9 @@ export const Button = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
+  const IconComponent = icon && icon !== 'none' ? iconMap[icon] : null;
+  const finalIconColor = iconColor || textColor;
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
@@ -71,14 +82,21 @@ export const Button = ({
           style={{
             ...bgStyles,
             color: textColor,
+            fontFamily,
             borderRadius: `${borderRadius}px`,
             padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
           }}
-          className="w-full font-black text-sm hover:opacity-90 transition-all font-heading flex items-center justify-center text-center overflow-hidden"
+          className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden gap-2"
         >
-          {text}
+          {IconComponent && iconPosition === 'left' && (
+            <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0" />
+          )}
+          <span>{text}</span>
+          {IconComponent && iconPosition === 'right' && (
+            <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0" />
+          )}
         </a>
       </div>
     );
@@ -97,25 +115,36 @@ export const Button = ({
     >
       <button
         type="button"
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: ButtonProps) => {
-            props.text = e.currentTarget.innerText;
-          });
-        }}
         style={{
           ...bgStyles,
           color: textColor,
+          fontFamily,
           borderRadius: `${borderRadius}px`,
           padding: `${paddingY}px ${paddingX}px`,
           minHeight: height ? `${height}px` : undefined,
           boxShadow,
           outline: 'none',
         }}
-        className="w-full font-black text-sm hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center overflow-hidden"
+        className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden gap-2"
       >
-        {text}
+        {IconComponent && iconPosition === 'left' && (
+          <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0 pointer-events-none" />
+        )}
+        <span
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            setProp((props: ButtonProps) => {
+              props.text = e.currentTarget.innerText;
+            });
+          }}
+          className="outline-none"
+        >
+          {text}
+        </span>
+        {IconComponent && iconPosition === 'right' && (
+          <IconComponent style={{ color: finalIconColor }} className="w-4 h-4 shrink-0 pointer-events-none" />
+        )}
       </button>
     </div>
   );
@@ -127,6 +156,7 @@ export const Button = ({
     text: 'Commencer maintenant 🚀',
     bgColor: '#00A0FF',
     textColor: '#ffffff',
+    fontFamily: 'Inter',
     borderRadius: 0,
     align: 'center',
     href: '#',
@@ -134,6 +164,7 @@ export const Button = ({
     paddingX: 28,
     width: 100,
     shadowPreset: 'none',
+    icon: 'none',
   },
   rules: {
     canDrag: () => true,

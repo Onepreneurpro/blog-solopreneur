@@ -2,6 +2,37 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
+import {
+  Lightbulb,
+  Rocket,
+  Flame,
+  Zap,
+  Star,
+  Gift,
+  Target,
+  CheckCircle2,
+  Lock,
+  MousePointer,
+  Trophy,
+  Gem,
+  Heart,
+} from 'lucide-react';
+
+export const iconMap: Record<string, React.ElementType> = {
+  lightbulb: Lightbulb,
+  rocket: Rocket,
+  flame: Flame,
+  zap: Zap,
+  star: Star,
+  gift: Gift,
+  target: Target,
+  check: CheckCircle2,
+  lock: Lock,
+  pointer: MousePointer,
+  trophy: Trophy,
+  gem: Gem,
+  heart: Heart,
+};
 
 export interface TextProps {
   text?: string;
@@ -9,6 +40,7 @@ export interface TextProps {
   textAlign?: 'left' | 'center' | 'right';
   textColor?: string;
   fontWeight?: string;
+  fontFamily?: string;
   tagName?: 'h1' | 'h2' | 'h3' | 'p';
   width?: number;
   height?: number;
@@ -20,6 +52,9 @@ export interface TextProps {
   shadowOpacity?: number;
   bgColor?: string;
   bgImage?: string;
+  icon?: string;
+  iconPosition?: 'left' | 'right';
+  iconColor?: string;
 }
 
 export const getBoxShadow = (
@@ -60,6 +95,7 @@ export const Text = ({
   textAlign = 'center',
   textColor = '#0f172a',
   fontWeight = 'bold',
+  fontFamily = 'Inter',
   tagName = 'h2',
   width = 100,
   height,
@@ -71,6 +107,9 @@ export const Text = ({
   shadowOpacity = 20,
   bgColor,
   bgImage,
+  icon = 'none',
+  iconPosition = 'left',
+  iconColor,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -88,11 +127,21 @@ export const Text = ({
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
 
+  const IconComponent = icon && icon !== 'none' ? iconMap[icon] : null;
+  const finalIconColor = iconColor || textColor;
+
+  const flexJustify =
+    textAlign === 'left'
+      ? 'justify-start'
+      : textAlign === 'right'
+      ? 'justify-end'
+      : 'justify-center';
+
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
       <div
-        className="my-2 p-3 max-w-full mx-auto flex items-center justify-center"
+        className="my-2 p-3 max-w-full mx-auto flex items-center"
         style={{
           width: `${width}%`,
           minHeight: height ? `${height}px` : undefined,
@@ -101,17 +150,34 @@ export const Text = ({
           ...bgStyles,
         }}
       >
-        <Tag
-          style={{
-            fontSize: `${fontSize}px`,
-            textAlign,
-            color: textColor,
-            fontWeight,
-          }}
-          className="font-heading tracking-tight leading-tight w-full"
-        >
-          {text}
-        </Tag>
+        <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
+          {IconComponent && iconPosition === 'left' && (
+            <IconComponent
+              style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
+              className="shrink-0 inline-block"
+            />
+          )}
+
+          <Tag
+            style={{
+              fontSize: `${fontSize}px`,
+              textAlign,
+              color: textColor,
+              fontWeight,
+              fontFamily,
+            }}
+            className="tracking-tight leading-tight"
+          >
+            {text}
+          </Tag>
+
+          {IconComponent && iconPosition === 'right' && (
+            <IconComponent
+              style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
+              className="shrink-0 inline-block"
+            />
+          )}
+        </div>
       </div>
     );
   }
@@ -122,7 +188,7 @@ export const Text = ({
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-3 relative transition-all mx-auto flex items-center justify-center ${
+      className={`my-2 p-3 relative transition-all mx-auto flex items-center ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
       style={{
@@ -133,26 +199,43 @@ export const Text = ({
         ...bgStyles,
       }}
     >
-      <Tag
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: TextProps) => {
-            props.text = e.currentTarget.innerText;
-          });
-        }}
-        style={{
-          fontSize: `${fontSize}px`,
-          textAlign,
-          color: textColor,
-          fontWeight,
-          outline: 'none',
-          cursor: 'text',
-        }}
-        className="font-heading tracking-tight leading-tight w-full"
-      >
-        {text}
-      </Tag>
+      <div className={`flex items-center gap-2.5 w-full ${flexJustify}`}>
+        {IconComponent && iconPosition === 'left' && (
+          <IconComponent
+            style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
+            className="shrink-0 inline-block"
+          />
+        )}
+
+        <Tag
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            setProp((props: TextProps) => {
+              props.text = e.currentTarget.innerText;
+            });
+          }}
+          style={{
+            fontSize: `${fontSize}px`,
+            textAlign,
+            color: textColor,
+            fontWeight,
+            fontFamily,
+            outline: 'none',
+            cursor: 'text',
+          }}
+          className="tracking-tight leading-tight min-w-[50px]"
+        >
+          {text}
+        </Tag>
+
+        {IconComponent && iconPosition === 'right' && (
+          <IconComponent
+            style={{ color: finalIconColor, width: `${fontSize * 1.1}px`, height: `${fontSize * 1.1}px` }}
+            className="shrink-0 inline-block"
+          />
+        )}
+      </div>
     </div>
   );
 };
@@ -165,10 +248,13 @@ export const Text = ({
     textAlign: 'center',
     textColor: '#0f172a',
     fontWeight: 'bold',
+    fontFamily: 'Inter',
     tagName: 'h2',
     width: 100,
     borderRadius: 0,
     shadowPreset: 'none',
+    icon: 'none',
+    iconPosition: 'left',
   },
   rules: {
     canDrag: () => true,

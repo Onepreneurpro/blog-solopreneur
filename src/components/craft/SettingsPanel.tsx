@@ -39,7 +39,7 @@ export const SettingsPanel = () => {
   const { id, name, isDeletable, props } = selected;
 
   return (
-    <div className="w-80 bg-white border-l border-slate-200 flex flex-col h-full shrink-0">
+    <div className="w-80 bg-white border-l border-slate-200 flex flex-col h-full shrink-0 select-none">
       <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
         <div>
           <span className="text-[9px] font-mono font-bold text-[#00A0FF] uppercase bg-[#00A0FF]/10 border border-[#00A0FF]/30 px-2 py-0.5 rounded-full">
@@ -144,6 +144,132 @@ export const SettingsPanel = () => {
           </div>
         )}
 
+        {/* GOOGLE FONTS SELECTOR */}
+        {props.fontFamily !== undefined && (
+          <div className="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <label className="font-black text-slate-900 flex items-center justify-between text-xs">
+              <span>🔤 Police Google Font</span>
+              <span className="text-[#00A0FF] font-mono text-[10px]">{props.fontFamily || 'Inter'}</span>
+            </label>
+            <select
+              value={props.fontFamily || 'Inter'}
+              onChange={(e) =>
+                actions.setProp(id, (nodeProps: any) => {
+                  nodeProps.fontFamily = e.target.value;
+                })
+              }
+              className="w-full p-2 bg-white border border-slate-200 rounded-xl text-slate-900 font-extrabold text-xs outline-none focus:ring-2 focus:ring-[#00A0FF]"
+            >
+              <option value="Inter">Inter (Sans-serif Moderne)</option>
+              <option value="Poppins">Poppins (Design Dynamique)</option>
+              <option value="Montserrat">Montserrat (Élégant & Structuré)</option>
+              <option value="Playfair Display">Playfair Display (Serif Luxueux)</option>
+              <option value="Roboto">Roboto (Clair & Standard)</option>
+              <option value="Oswald">Oswald (Titres Condensés)</option>
+              <option value="Lora">Lora (Serif Éditorial)</option>
+              <option value="Raleway">Raleway (Minimaliste Chic)</option>
+              <option value="Cinzel">Cinzel (Haut de Gamme)</option>
+              <option value="Caveat">Caveat (Écriture Script / Manuscrite)</option>
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans (Tech Bold)</option>
+            </select>
+          </div>
+        )}
+
+        {/* ICON SELECTOR & COLOR */}
+        {props.icon !== undefined && (
+          <div className="space-y-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
+            <div className="flex items-center justify-between font-black text-slate-900 text-xs">
+              <span>💡 Icône du Bloc</span>
+              <span className="text-amber-600 font-mono text-[10px] uppercase font-bold">
+                {props.icon || 'none'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 text-[11px]">Choisir une icône</label>
+                <select
+                  value={props.icon || 'none'}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.icon = e.target.value;
+                    })
+                  }
+                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="none">Sans icône</option>
+                  <option value="lightbulb">💡 Ampoule / Conseil</option>
+                  <option value="rocket">🚀 Fusée / Offre</option>
+                  <option value="flame">🔥 Feu / Tendance</option>
+                  <option value="zap">⚡ Éclair / Rapide</option>
+                  <option value="star">⭐ Étoile / Premium</option>
+                  <option value="gift">🎁 Cadeau / Offert</option>
+                  <option value="target">🎯 Cible / Objectif</option>
+                  <option value="check">✅ Validé / Check</option>
+                  <option value="lock">🔒 Cadenas / Sécurisé</option>
+                  <option value="pointer">👉 Main / Clic</option>
+                  <option value="trophy">🏆 Trophée / Vainqueur</option>
+                  <option value="gem">💎 Diamant / Luxe</option>
+                  <option value="heart">❤️ Cœur / Coup de Cœur</option>
+                </select>
+              </div>
+
+              {props.icon && props.icon !== 'none' && (
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 text-[11px]">Position d icône</label>
+                  <div className="grid grid-cols-2 gap-1 pt-0.5">
+                    {['left', 'right'].map((pos) => (
+                      <button
+                        key={pos}
+                        onClick={() =>
+                          actions.setProp(id, (nodeProps: any) => {
+                            nodeProps.iconPosition = pos;
+                          })
+                        }
+                        className={`py-1.5 rounded-lg border font-extrabold text-[10px] capitalize transition-colors ${
+                          (props.iconPosition || 'left') === pos
+                            ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
+                        }`}
+                      >
+                        {pos === 'left' ? 'Gauche' : 'Droite'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {props.icon && props.icon !== 'none' && (
+              <div className="space-y-1 pt-1.5 border-t border-amber-200/80">
+                <label className="font-bold text-slate-700 text-[11px]">Couleur de l icône</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={props.iconColor || '#00A0FF'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.iconColor = e.target.value;
+                      })
+                    }
+                    className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={props.iconColor || '#00A0FF'}
+                    onChange={(e) =>
+                      actions.setProp(id, (nodeProps: any) => {
+                        nodeProps.iconColor = e.target.value;
+                      })
+                    }
+                    className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* BACKGROUND COLOR & BACKGROUND IMAGE CONTROL FOR ALL COMPONENTS */}
         <div className="space-y-3 bg-purple-50/60 p-3.5 rounded-2xl border border-purple-200">
           <label className="font-black text-slate-900 flex items-center gap-1.5 text-xs">
@@ -196,7 +322,7 @@ export const SettingsPanel = () => {
             </div>
 
             <label className="block cursor-pointer">
-              <div className="p-2 bg-white border border-dashed border-purple-300 rounded-xl flex items-center justify-center text-purple-700 font-bold text-xs gap-1.5 hover:bg-purple-100/50 transition-colors shadow-sm">
+              <div className="p-2 bg-white border border-dashed border-purple-300 rounded-xl flex items-center justify-center text-purple-700 font-bold text-xs gap-1.5 hover:bg-purple-100/50 transition-colors shadow-xs">
                 <span>📁 Choisir une photo de fond (PC)</span>
               </div>
               <input
@@ -307,7 +433,7 @@ export const SettingsPanel = () => {
                 }
                 className={`py-1.5 px-2 rounded-lg border font-extrabold text-[10px] transition-colors ${
                   props.shadowPreset === preset.key
-                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                    ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-100/50'
                 }`}
               >
@@ -485,7 +611,7 @@ export const SettingsPanel = () => {
                   }
                   className={`py-2 px-2 rounded-xl border font-black text-xs transition-all ${
                     props.columns === numCols
-                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-sm'
+                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
