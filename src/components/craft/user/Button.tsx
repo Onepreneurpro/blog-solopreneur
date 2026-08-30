@@ -13,6 +13,7 @@ export interface ButtonProps {
   paddingY?: number;
   paddingX?: number;
   width?: number;
+  height?: number;
 }
 
 export const Button = ({
@@ -25,6 +26,7 @@ export const Button = ({
   paddingY = 14,
   paddingX = 28,
   width = 100,
+  height = 50,
 }: ButtonProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -55,8 +57,9 @@ export const Button = ({
             color: textColor,
             borderRadius: `${borderRadius}px`,
             padding: `${paddingY}px ${paddingX}px`,
+            minHeight: height ? `${height}px` : undefined,
           }}
-          className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading inline-block text-center"
+          className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading flex items-center justify-center text-center"
         >
           {text}
         </a>
@@ -64,7 +67,7 @@ export const Button = ({
     );
   }
 
-  // BUILDER EDITOR VIEW (CLEAN & NATURAL)
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -89,9 +92,10 @@ export const Button = ({
           color: textColor,
           borderRadius: `${borderRadius}px`,
           padding: `${paddingY}px ${paddingX}px`,
+          minHeight: height ? `${height}px` : undefined,
           outline: 'none',
         }}
-        className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading cursor-text"
+        className="w-full font-black text-sm shadow-xl hover:opacity-90 transition-all font-heading cursor-text flex items-center justify-center text-center"
       >
         {text}
       </button>
@@ -111,6 +115,7 @@ export const Button = ({
     paddingY: 14,
     paddingX: 28,
     width: 100,
+    height: 50,
   },
   rules: {
     canDrag: () => true,

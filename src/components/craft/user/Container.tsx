@@ -10,6 +10,7 @@ export interface ContainerProps {
   margin?: number;
   borderRadius?: number;
   width?: number;
+  height?: number;
   children?: React.ReactNode;
 }
 
@@ -20,6 +21,7 @@ export const Container = ({
   margin = 8,
   borderRadius = 20,
   width = 100,
+  height,
   children,
 }: ContainerProps) => {
   const { enabled } = useEditor((state) => ({
@@ -49,6 +51,7 @@ export const Container = ({
           margin: `${margin}px auto`,
           borderRadius: `${borderRadius}px`,
           width: `${width}%`,
+          minHeight: height ? `${height}px` : undefined,
         }}
       >
         {children}
@@ -56,7 +59,7 @@ export const Container = ({
     );
   }
 
-  // BUILDER EDITOR VIEW (CLEAN & NATURAL)
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
@@ -71,6 +74,7 @@ export const Container = ({
         margin: `${margin}px auto`,
         borderRadius: `${borderRadius}px`,
         width: `${width}%`,
+        minHeight: height ? `${height}px` : undefined,
       }}
     >
       {children}

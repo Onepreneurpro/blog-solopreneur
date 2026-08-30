@@ -8,6 +8,8 @@ export interface CardProps {
   content?: string;
   bgColor?: string;
   padding?: number;
+  width?: number;
+  height?: number;
 }
 
 export const Card = ({
@@ -15,6 +17,8 @@ export const Card = ({
   content = 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
   bgColor = '#ffffff',
   padding = 24,
+  width = 100,
+  height,
 }: CardProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -32,8 +36,13 @@ export const Card = ({
   if (!enabled) {
     return (
       <div
-        className="my-4 rounded-3xl border border-slate-200 shadow-lg space-y-2"
-        style={{ backgroundColor: bgColor, padding: `${padding}px` }}
+        className="my-4 rounded-3xl border border-slate-200 shadow-lg space-y-2 mx-auto"
+        style={{
+          backgroundColor: bgColor,
+          padding: `${padding}px`,
+          width: `${width}%`,
+          minHeight: height ? `${height}px` : undefined,
+        }}
       >
         <h3 className="font-heading font-black text-lg text-slate-900 px-1">
           {title}
@@ -45,16 +54,21 @@ export const Card = ({
     );
   }
 
-  // BUILDER EDITOR VIEW (CLEAN & NATURAL)
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-4 relative rounded-3xl border border-slate-200 shadow-lg space-y-2 transition-all ${
+      className={`my-4 relative rounded-3xl border border-slate-200 shadow-lg space-y-2 transition-all mx-auto ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-300'
       }`}
-      style={{ backgroundColor: bgColor, padding: `${padding}px` }}
+      style={{
+        backgroundColor: bgColor,
+        padding: `${padding}px`,
+        width: `${width}%`,
+        minHeight: height ? `${height}px` : undefined,
+      }}
     >
       <h3
         contentEditable
@@ -91,6 +105,7 @@ export const Card = ({
     content: 'Présentez vos arguments clés sous forme de carte claire, élégante et percutante.',
     bgColor: '#ffffff',
     padding: 24,
+    width: 100,
   },
   rules: {
     canDrag: () => true,

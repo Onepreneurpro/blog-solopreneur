@@ -102,16 +102,16 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* IMAGE HEIGHT CONTROL */}
+        {/* UNIFIED HEIGHT CONTROL FOR ALL COMPONENTS */}
         {props.height !== undefined && (
           <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
             <div className="flex justify-between font-black text-slate-900 text-xs">
-              <span>↕️ Hauteur de l Image (Height)</span>
+              <span>↕️ Hauteur du Bloc (Height)</span>
               <span className="text-[#00A0FF] font-mono">{props.height}px</span>
             </div>
             <input
               type="range"
-              min={80}
+              min={30}
               max={650}
               step={10}
               value={props.height}
@@ -122,6 +122,25 @@ export const SettingsPanel = () => {
               }
               className="w-full accent-[#00A0FF]"
             />
+            <div className="grid grid-cols-4 gap-1 pt-0.5">
+              {[50, 150, 300, 500].map((h) => (
+                <button
+                  key={h}
+                  onClick={() =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.height = h;
+                    })
+                  }
+                  className={`py-1 rounded font-black text-[10px] transition-colors ${
+                    props.height === h
+                      ? 'bg-[#00A0FF] text-white'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {h}px
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -129,7 +148,7 @@ export const SettingsPanel = () => {
         {props.paddingY !== undefined && (
           <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
             <div className="flex justify-between font-black text-slate-900 text-xs">
-              <span>↕️ Hauteur du Bouton</span>
+              <span>↕️ Hauteur du Bouton (Padding Y)</span>
               <span className="text-[#00A0FF] font-mono">{props.paddingY}px</span>
             </div>
             <input
@@ -152,7 +171,7 @@ export const SettingsPanel = () => {
         {props.padding !== undefined && (
           <div className="space-y-2 bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200">
             <div className="flex justify-between font-black text-slate-900 text-xs">
-              <span>↕️ Hauteur Interne (Padding / Épaisseur)</span>
+              <span>↕️ Hauteur Interne (Padding)</span>
               <span className="text-[#00A0FF] font-mono">{props.padding}px</span>
             </div>
             <input

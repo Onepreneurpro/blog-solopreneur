@@ -11,6 +11,7 @@ export interface TextProps {
   fontWeight?: string;
   tagName?: 'h1' | 'h2' | 'h3' | 'p';
   width?: number;
+  height?: number;
 }
 
 export const Text = ({
@@ -21,6 +22,7 @@ export const Text = ({
   fontWeight = 'bold',
   tagName = 'h2',
   width = 100,
+  height = 60,
 }: TextProps) => {
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -39,7 +41,13 @@ export const Text = ({
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
     return (
-      <div className="my-2 p-1 max-w-full mx-auto" style={{ width: `${width}%` }}>
+      <div
+        className="my-2 p-1 max-w-full mx-auto flex items-center justify-center"
+        style={{
+          width: `${width}%`,
+          minHeight: height ? `${height}px` : undefined,
+        }}
+      >
         <Tag
           style={{
             fontSize: `${fontSize}px`,
@@ -47,7 +55,7 @@ export const Text = ({
             color: textColor,
             fontWeight,
           }}
-          className="font-heading tracking-tight leading-tight"
+          className="font-heading tracking-tight leading-tight w-full"
         >
           {text}
         </Tag>
@@ -55,16 +63,19 @@ export const Text = ({
     );
   }
 
-  // BUILDER EDITOR VIEW (CLEAN & NATURAL)
+  // BUILDER EDITOR VIEW
   return (
     <div
       ref={(ref: HTMLDivElement | null) => {
         if (ref) connect(drag(ref));
       }}
-      className={`my-2 p-1 relative rounded-lg transition-all mx-auto ${
+      className={`my-2 p-1 relative rounded-lg transition-all mx-auto flex items-center justify-center ${
         selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
       }`}
-      style={{ width: `${width}%` }}
+      style={{
+        width: `${width}%`,
+        minHeight: height ? `${height}px` : undefined,
+      }}
     >
       <Tag
         contentEditable
@@ -82,7 +93,7 @@ export const Text = ({
           outline: 'none',
           cursor: 'text',
         }}
-        className="font-heading tracking-tight leading-tight min-h-[1em]"
+        className="font-heading tracking-tight leading-tight w-full"
       >
         {text}
       </Tag>
@@ -100,6 +111,7 @@ export const Text = ({
     fontWeight: 'bold',
     tagName: 'h2',
     width: 100,
+    height: 60,
   },
   rules: {
     canDrag: () => true,
