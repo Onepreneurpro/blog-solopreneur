@@ -275,6 +275,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     const startW = currentItem.imgWidth || 280;
     const startH = currentItem.imgSize || 240;
+    const aspectRatio = startW / startH;
 
     // Collect sibling heights & widths for magnetic alignment snap
     const siblingHeights = elItems
@@ -291,18 +292,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       let rawW = startW;
       let rawH = startH;
 
-      if (dir === 'corner-br') {
-        rawW = startW + deltaX;
-        rawH = startH + deltaY;
-      } else if (dir === 'corner-bl') {
-        rawW = startW - deltaX;
-        rawH = startH + deltaY;
-      } else if (dir === 'corner-tr') {
-        rawW = startW + deltaX;
-        rawH = startH - deltaY;
-      } else if (dir === 'corner-tl') {
-        rawW = startW - deltaX;
-        rawH = startH - deltaY;
+      if (dir.startsWith('corner')) {
+        // PROPORTIONAL CORNER SCALING (KEEPS 100% EXACT ASPECT RATIO)
+        let scale = 1;
+        if (dir === 'corner-br') scale = (startW + deltaX) / startW;
+        else if (dir === 'corner-bl') scale = (startW - deltaX) / startW;
+        else if (dir === 'corner-tr') scale = (startW + deltaX) / startW;
+        else if (dir === 'corner-tl') scale = (startW - deltaX) / startW;
+
+        scale = Math.max(0.2, Math.min(3, scale));
+        rawW = Math.round(startW * scale);
+        rawH = Math.round(rawW / aspectRatio);
       } else if (dir === 'edge-r') {
         rawW = startW + deltaX;
       } else if (dir === 'edge-l') {
@@ -316,28 +316,36 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       rawW = Math.max(50, Math.min(800, Math.round(rawW)));
       rawH = Math.max(50, Math.min(800, Math.round(rawH)));
 
-      // MAGNETIC SNAP ALIGNMENT LOGIC (THRESHOLD = 14px)
+      // MAGNETIC SNAP ALIGNMENT LOGIC (STRONG 24px THRESHOLD)
       let finalH = rawH;
+      let finalW = rawW;
       let snappedH = false;
       for (const siblingH of siblingHeights) {
-        if (Math.abs(rawH - siblingH) <= 14) {
+        if (Math.abs(rawH - siblingH) <= 24) {
           finalH = siblingH;
+          if (dir.startsWith('corner')) {
+            finalW = Math.round(finalH * aspectRatio);
+          }
           snappedH = true;
           break;
         }
       }
 
-      let finalW = rawW;
       let snappedW = false;
-      for (const siblingW of siblingWidths) {
-        if (Math.abs(rawW - siblingW) <= 14) {
-          finalW = siblingW;
-          snappedW = true;
-          break;
+      if (!snappedH) {
+        for (const siblingW of siblingWidths) {
+          if (Math.abs(rawW - siblingW) <= 24) {
+            finalW = siblingW;
+            if (dir.startsWith('corner')) {
+              finalH = Math.round(finalW / aspectRatio);
+            }
+            snappedW = true;
+            break;
+          }
         }
       }
 
-      // SHOW MAGNETIC SNAP GUIDE VISUAL BADGE & LINE
+      // SHOW FULL-WIDTH MAGNETIC SNAP ALIGNMENT LINE
       if (snappedH || snappedW) {
         setSnapGuide({
           active: true,
@@ -1934,11 +1942,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {el.type === 'BlockFeat4ColImg' && (
-                      <div className="space-y-4 p-6 bg-white text-slate-900 rounded-3xl shadow-xl">
+                      <div className="space-y-4 p-6 bg-white text-slate-900 rounded-3xl shadow-xl relative">
                         {el.data?.title && (
                           <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
                         )}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start">
+
+                        {/* FULL-WIDTH THIN MAGNETIC ALIGNMENT LINE SPANNING ACROSS ALL BLOCKS IN THE ROW */}
+                        {snapGuide?.active && (
+                          <div className="relative w-full py-1 z-50">
+                            <div className="w-full h-[2.5px] bg-[#FF007F] shadow-[0_0_12px_#FF007F] animate-pulse flex items-center justify-center">
+                              <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-lg">
+                                🧲 Ligne d alignement magnétique ({snapGuide.val}px)
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-start relative">
                           {(el.data?.items || [
                             { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
                             { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
@@ -1982,63 +2002,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* INTERACTIVE DRAG RESIZE HANDLES (LES 8 POINTS D ACCROCHE & BORDS DU CADRE) */}
+                                    {/* CLEAN DOT-FREE FRAME DRAG ZONES (4 CORNERS + 4 EDGES) */}
                                     {isImgSel && (
                                       <>
-                                        {/* MAGNETIC ALIGNMENT SNAP BADGE & GUIDE LINE */}
-                                        {snapGuide?.active && (
-                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#FF007F] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-xl flex items-center gap-1 z-50 animate-pulse pointer-events-none whitespace-nowrap">
-                                            <span>🧲 Aimanté aux éléments de la section ({snapGuide.val}px)</span>
-                                          </div>
-                                        )}
-
-                                        {/* 1. TOP-LEFT CORNER */}
+                                        {/* 1. TOP-LEFT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tl')}
-                                          className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Haut-Gauche)"
+                                          className="absolute top-0 left-0 w-6 h-6 cursor-nwse-resize z-30 hover:bg-[#00A0FF]/30 rounded-tl-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
-                                        {/* 2. TOP-RIGHT CORNER */}
+                                        {/* 2. TOP-RIGHT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tr')}
-                                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Haut-Droit)"
+                                          className="absolute top-0 right-0 w-6 h-6 cursor-nesw-resize z-30 hover:bg-[#00A0FF]/30 rounded-tr-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
-                                        {/* 3. BOTTOM-LEFT CORNER */}
+                                        {/* 3. BOTTOM-LEFT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-bl')}
-                                          className="absolute -bottom-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Bas-Gauche)"
+                                          className="absolute bottom-0 left-0 w-6 h-6 cursor-nesw-resize z-30 hover:bg-[#00A0FF]/30 rounded-bl-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
-                                        {/* 4. BOTTOM-RIGHT CORNER */}
+                                        {/* 4. BOTTOM-RIGHT CORNER DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-br')}
-                                          className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer pour redimensionner (Bas-Droit)"
+                                          className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize z-30 hover:bg-[#00A0FF]/30 rounded-br-lg transition-colors"
+                                          title="Tirer pour redimensionner proportionnellement"
                                         />
-                                        {/* 5. TOP EDGE */}
+                                        {/* 5. TOP EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-t')}
-                                          className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord supérieur (Hauteur)"
+                                          className="absolute top-0 left-6 right-6 h-3 cursor-ns-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord supérieur"
                                         />
-                                        {/* 6. BOTTOM EDGE */}
+                                        {/* 6. BOTTOM EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-b')}
-                                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord inférieur (Hauteur)"
+                                          className="absolute bottom-0 left-6 right-6 h-3 cursor-ns-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord inférieur"
                                         />
-                                        {/* 7. LEFT EDGE */}
+                                        {/* 7. LEFT EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-l')}
-                                          className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord gauche (Largeur)"
+                                          className="absolute top-6 bottom-6 left-0 w-3 cursor-ew-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord gauche"
                                         />
-                                        {/* 8. RIGHT EDGE */}
+                                        {/* 8. RIGHT EDGE DRAG ZONE */}
                                         <div
                                           onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-r')}
-                                          className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Tirer le bord droit (Largeur)"
+                                          className="absolute top-6 bottom-6 right-0 w-3 cursor-ew-resize z-30 hover:bg-[#00A0FF]/20 transition-colors"
+                                          title="Tirer le bord droit"
                                         />
                                       </>
                                     )}
