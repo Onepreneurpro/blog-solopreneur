@@ -1,0 +1,64 @@
+'use client';
+
+import React from 'react';
+import { useNode } from '@craftjs/core';
+
+export interface VideoProps {
+  videoUrl?: string;
+  caption?: string;
+}
+
+export const Video = ({
+  videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  caption = 'Vidéo de démonstration en direct',
+}: VideoProps) => {
+  const {
+    connectors: { connect, drag },
+    selected,
+    actions: { setProp },
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  }));
+
+  return (
+    <div
+      ref={(ref: HTMLDivElement | null) => {
+        if (ref) connect(drag(ref));
+      }}
+      className={`my-8 max-w-3xl mx-auto space-y-2 text-center transition-all ${
+        selected ? 'ring-2 ring-[#00A0FF] p-1 rounded-3xl' : ''
+      }`}
+    >
+      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-black">
+        <iframe
+          src={videoUrl}
+          title="Vidéo Craft"
+          className="w-full h-full border-0 pointer-events-none"
+        />
+      </div>
+      <p
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          setProp((props: VideoProps) => {
+            props.caption = e.currentTarget.innerText;
+          });
+        }}
+        className="text-xs text-slate-500 font-bold italic outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md p-1 cursor-text"
+      >
+        {caption}
+      </p>
+    </div>
+  );
+};
+
+(Video as any).craft = {
+  displayName: 'Intégration Vidéo',
+  props: {
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    caption: 'Vidéo de démonstration en direct',
+  },
+  rules: {
+    canDrag: () => true,
+  },
+};

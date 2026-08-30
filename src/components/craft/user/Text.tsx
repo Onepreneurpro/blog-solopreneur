@@ -1,0 +1,79 @@
+'use client';
+
+import React from 'react';
+import { useNode } from '@craftjs/core';
+
+export interface TextProps {
+  text?: string;
+  fontSize?: number;
+  textAlign?: 'left' | 'center' | 'right';
+  textColor?: string;
+  fontWeight?: string;
+  tagName?: 'h1' | 'h2' | 'h3' | 'p';
+}
+
+export const Text = ({
+  text = 'Titre ou texte éditable',
+  fontSize = 24,
+  textAlign = 'center',
+  textColor = '#0f172a',
+  fontWeight = 'bold',
+  tagName = 'h2',
+}: TextProps) => {
+  const {
+    connectors: { connect, drag },
+    selected,
+    actions: { setProp },
+  } = useNode((node) => ({
+    selected: node.events.selected,
+  }));
+
+  const Tag = tagName;
+
+  return (
+    <div
+      ref={(ref: HTMLDivElement | null) => {
+        if (ref) connect(drag(ref));
+      }}
+      className={`my-2 p-1 rounded-lg transition-all ${
+        selected ? 'ring-2 ring-[#00A0FF]' : 'hover:ring-1 hover:ring-blue-200'
+      }`}
+    >
+      <Tag
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          setProp((props: TextProps) => {
+            props.text = e.currentTarget.innerText;
+          });
+        }}
+        style={{
+          fontSize: `${fontSize}px`,
+          textAlign,
+          color: textColor,
+          fontWeight,
+          outline: 'none',
+          cursor: 'text',
+        }}
+        className="font-heading tracking-tight leading-tight min-h-[1em]"
+      >
+        {text}
+      </Tag>
+    </div>
+  );
+};
+
+(Text as any).craft = {
+  displayName: 'Texte / Titre',
+  props: {
+    text: 'Cliquez ici pour modifier ce texte...',
+    fontSize: 24,
+    textAlign: 'center',
+    textColor: '#0f172a',
+    fontWeight: 'bold',
+    tagName: 'h2',
+  },
+  rules: {
+    canDrag: () => true,
+  },
+};

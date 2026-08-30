@@ -12,6 +12,7 @@
     "db:seed": "node --import tsx/esm prisma/seed.ts"
   },
   "dependencies": {
+    "@craftjs/core": "^0.2.12",
     "@measured/puck": "^0.20.2",
     "@prisma/client": "^5.22.0",
     "@puckeditor/core": "^0.23.0",
