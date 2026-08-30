@@ -34,6 +34,7 @@ import {
   Copy,
   ChevronUp,
   ChevronDown,
+  ChevronRight,
   GripVertical,
   Plus,
   Sparkles,
@@ -78,6 +79,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   // CANVAS BACKGROUND ALIGNMENT GRID STATE (GRILLAGE À CARREAUX ON/OFF)
   const [showCanvasGrid, setShowCanvasGrid] = useState<boolean>(true);
+
+  // LEFT INSPECTOR COLLAPSIBLE SECTIONS ACCORDION STATE
+  const [openAccordion, setOpenAccordion] = useState<Record<string, boolean>>({
+    imageFile: true,
+    align: true,
+    dimensions: true,
+    crop: true,
+    border: true,
+    spacing: true,
+    action: false,
+  });
+  const toggleAccordion = (sec: string) => setOpenAccordion((prev) => ({ ...prev, [sec]: !prev[sec] }));
 
   // Canvas elements state
   const [elements, setElements] = useState<CanvasElement[]>([
@@ -689,405 +702,530 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         {/* 1. IF CLICKED SUB-ITEM IS AN IMAGE */}
                         {selectedSubItem.subType === 'image' && (
                           <>
-                            <div className="space-y-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
-                              <div className="flex items-center justify-between">
-                                <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                                  Image (Élément #{selectedSubItem.itemIndex + 1})
-                                </label>
-                                {currentSubItem.img && (
-                                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded-full">
-                                    ✓ Active
-                                  </span>
-                                )}
-                              </div>
+                             {/* 1. SECTION FICHIER DE L IMAGE */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('imageFile')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">🖼️</span>
+                                   <span>Fichier de l Image</span>
+                                 </span>
+                                 {openAccordion.imageFile ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
 
-                              {/* BOUTON D IMPORTATION UNIQUE DEPUIS LE PC AVEC APERÇU (SANS URL EXPOSÉE) */}
-                              <div className="flex items-center gap-2 pt-1">
-                                {currentSubItem.img && (
-                                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
-                                    <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
-                                  </div>
-                                )}
+                               {openAccordion.imageFile && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   <div className="flex items-center justify-between">
+                                     <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                                       Élément #{selectedSubItem.itemIndex + 1}
+                                     </label>
+                                     {currentSubItem.img && (
+                                       <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded-full">
+                                         ✓ Active
+                                       </span>
+                                     )}
+                                   </div>
 
-                                <label className="flex-1 py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
-                                  <span>📤</span>
-                                  <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (uploadEv) => {
-                                          const url = uploadEv.target?.result as string;
-                                          const updatedItems = elItems.map((it: any, idx: number) =>
-                                            idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
-                                          );
-                                          handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                        };
-                                        reader.readAsDataURL(file);
-                                      }
-                                    }}
-                                  />
-                                </label>
-                              </div>
-                            </div>
+                                   <div className="flex items-center gap-2 pt-1">
+                                     {currentSubItem.img && (
+                                       <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
+                                         <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
+                                       </div>
+                                     )}
 
-                            {/* FIXER COMME RÉFÉRENCE ET BOUTON D ALIGNEMENT AUTOMATIQUE DES IMAGES */}
-                            <div
-                              className={`p-3.5 rounded-2xl border space-y-3 transition-all ${
-                                currentSubItem.isFixedReference
-                                  ? 'bg-[#00A0FF]/15 border-[#00A0FF] shadow-lg ring-1 ring-[#00A0FF]'
-                                  : 'bg-slate-950 border-slate-800'
-                              }`}
-                            >
-                              <label className="flex items-center justify-between text-xs font-bold text-white cursor-pointer select-none">
-                                <span className="flex items-center gap-2">
-                                  <span className="text-base">📌</span>
-                                  <span className={currentSubItem.isFixedReference ? 'text-[#00A0FF]' : 'text-slate-200'}>
-                                    Fixer comme référence
-                                  </span>
-                                </span>
-                                <input
-                                  type="checkbox"
-                                  checked={!!currentSubItem.isFixedReference}
-                                  onChange={(e) => {
-                                    const val = e.target.checked;
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex
-                                        ? { ...it, isFixedReference: val }
-                                        : { ...it, isFixedReference: false }
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-700 cursor-pointer accent-[#00A0FF]"
-                                />
-                              </label>
+                                     <label className="flex-1 py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                                       <span>📤</span>
+                                       <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
+                                       <input
+                                         type="file"
+                                         accept="image/*"
+                                         className="hidden"
+                                         onChange={(e) => {
+                                           const file = e.target.files?.[0];
+                                           if (file) {
+                                             const reader = new FileReader();
+                                             reader.onload = (uploadEv) => {
+                                               const url = uploadEv.target?.result as string;
+                                               const updatedItems = elItems.map((it: any, idx: number) =>
+                                                 idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
+                                               );
+                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                             };
+                                             reader.readAsDataURL(file);
+                                           }
+                                         }}
+                                       />
+                                     </label>
+                                   </div>
+                                 </div>
+                               )}
+                             </div>
 
-                              <p className="text-[10px] text-slate-400 leading-relaxed">
-                                {currentSubItem.isFixedReference
-                                  ? `Modèle fixé (${currentSubItem.imgWidth || 280}px × ${currentSubItem.imgSize || 280}px). Cliquez ci-dessous pour tout aligner.`
-                                  : 'Cochez pour définir cette image comme modèle de taille.'}
-                              </p>
+                             {/* 2. SECTION ALIGNEMENT ET RÉFÉRENCE */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('align')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-base">📌</span>
+                                   <span>Alignement & Référence</span>
+                                 </span>
+                                 {openAccordion.align ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
 
-                              {/* BOUTON ALIGNER AUTOMATIQUEMENT TOUTES LES IMAGES DU BLOC */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const refItem = elItems.find((it: any) => it.isFixedReference) || currentSubItem;
-                                  const targetW = refItem.imgWidth || 280;
-                                  const targetH = refItem.imgSize || 280;
+                               {openAccordion.align && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   <label className="flex items-center justify-between text-xs font-bold text-white cursor-pointer select-none">
+                                     <span className="flex items-center gap-2">
+                                       <span className="text-base">📌</span>
+                                       <span className={currentSubItem.isFixedReference ? 'text-[#00A0FF]' : 'text-slate-200'}>
+                                         Fixer comme référence
+                                       </span>
+                                     </span>
+                                     <input
+                                       type="checkbox"
+                                       checked={!!currentSubItem.isFixedReference}
+                                       onChange={(e) => {
+                                         const val = e.target.checked;
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex
+                                             ? { ...it, isFixedReference: val }
+                                             : { ...it, isFixedReference: false }
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-700 cursor-pointer accent-[#00A0FF]"
+                                     />
+                                   </label>
 
-                                  const updatedItems = elItems.map((it: any) => ({
-                                    ...it,
-                                    imgWidth: targetW,
-                                    imgSize: targetH,
-                                  }));
+                                   <p className="text-[10px] text-slate-400 leading-relaxed">
+                                     {currentSubItem.isFixedReference
+                                       ? `Modèle fixé (${currentSubItem.imgWidth || 280}px × ${currentSubItem.imgSize || 280}px). Cliquez ci-dessous pour tout aligner.`
+                                       : 'Cochez pour définir cette image comme modèle de taille.'}
+                                   </p>
 
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-                              >
-                                <span>📐</span>
-                                <span>Aligner toutes les images du bloc</span>
-                              </button>
-                            </div>
+                                   <button
+                                     type="button"
+                                     onClick={() => {
+                                       const refItem = elItems.find((it: any) => it.isFixedReference) || currentSubItem;
+                                       const targetW = refItem.imgWidth || 280;
+                                       const targetH = refItem.imgSize || 280;
 
-                            {/* LARGEUR DE L IMAGE */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-slate-400">Largeur de l image</span>
-                                <div className="flex items-center gap-1">
-                                  <input
-                                    type="number"
-                                    value={currentSubItem.imgWidth || 280}
-                                    onChange={(e) => {
-                                      const val = Number(e.target.value);
-                                      const updatedItems = elItems.map((it: any, idx: number) =>
-                                        idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                    }}
-                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                                  />
-                                  <span className="text-slate-500 text-[10px]">px</span>
-                                </div>
-                              </div>
-                              <input
-                                type="range"
-                                min={50}
-                                max={800}
-                                value={currentSubItem.imgWidth || 280}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  const updatedItems = elItems.map((it: any, idx: number) =>
-                                    idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full accent-[#00A0FF]"
-                              />
-                            </div>
+                                       const updatedItems = elItems.map((it: any) => ({
+                                         ...it,
+                                         imgWidth: targetW,
+                                         imgSize: targetH,
+                                       }));
 
-                            {/* HAUTEUR / TAILLE DE L IMAGE */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-slate-400">Hauteur / Taille de l image</span>
-                                <div className="flex items-center gap-1">
-                                  <input
-                                    type="number"
-                                    value={currentSubItem.imgSize || 240}
-                                    onChange={(e) => {
-                                      const val = Number(e.target.value);
-                                      const updatedItems = elItems.map((it: any, idx: number) =>
-                                        idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                    }}
-                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                                  />
-                                  <span className="text-slate-500 text-[10px]">px</span>
-                                </div>
-                              </div>
-                              <input
-                                type="range"
-                                min={50}
-                                max={800}
-                                value={currentSubItem.imgSize || 240}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  const updatedItems = elItems.map((it: any, idx: number) =>
-                                    idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full accent-[#00A0FF]"
-                              />
-                            </div>
+                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                     }}
+                                     className="w-full py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                   >
+                                     <span>📐</span>
+                                     <span>Aligner toutes les images du bloc</span>
+                                   </button>
+                                 </div>
+                               )}
+                             </div>
 
-                            {/* ZOOM & ÉCHELLE DE L IMAGE INTERNE */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-[#00A0FF]">🔍 Zoom / Échelle interne</span>
-                                <span className="text-xs font-mono text-white">
-                                  {currentSubItem.imgZoom || 100}%
-                                </span>
-                              </div>
-                              <input
-                                type="range"
-                                min={100}
-                                max={300}
-                                value={currentSubItem.imgZoom || 100}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  const updatedItems = elItems.map((it: any, idx: number) =>
-                                    idx === selectedSubItem.itemIndex ? { ...it, imgZoom: val } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full accent-[#00A0FF]"
-                              />
-                            </div>
+                             {/* 3. SECTION DIMENSIONS DE L IMAGE (LARGEUR / HAUTEUR / ZOOM) */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('dimensions')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">📐</span>
+                                   <span>Dimensions & Échelle (Largeur / Hauteur / Zoom)</span>
+                                 </span>
+                                 {openAccordion.dimensions ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
 
-                            {/* POSITIONMENT INTERNE (RECADRAGE HAUT/BAS & GAUCHE/DROITE) */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                                🎯 Recadrage & Position Interne
-                              </div>
+                               {openAccordion.dimensions && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-4 bg-slate-950/60">
+                                   {/* LARGEUR DE L IMAGE */}
+                                   <div className="space-y-2">
+                                     <div className="flex items-center justify-between text-xs font-bold">
+                                       <span className="text-slate-300">Largeur de l image</span>
+                                       <div className="flex items-center gap-1">
+                                         <input
+                                           type="number"
+                                           value={currentSubItem.imgWidth || 280}
+                                           onChange={(e) => {
+                                             const val = Number(e.target.value);
+                                             const updatedItems = elItems.map((it: any, idx: number) =>
+                                               idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
+                                             );
+                                             handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                           }}
+                                           className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                                         />
+                                         <span className="text-slate-500 text-[10px]">px</span>
+                                       </div>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={50}
+                                       max={800}
+                                       value={currentSubItem.imgWidth || 280}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
 
-                              {/* POSITION X (HORIZONTALE) */}
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                  <span>Position Horizontale (X)</span>
-                                  <span className="font-mono text-slate-400">
-                                    {currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%
-                                  </span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min={0}
-                                  max={100}
-                                  value={currentSubItem.posX !== undefined ? currentSubItem.posX : 50}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, posX: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full accent-[#00A0FF]"
-                                />
-                              </div>
+                                   {/* HAUTEUR / TAILLE DE L IMAGE */}
+                                   <div className="space-y-2">
+                                     <div className="flex items-center justify-between text-xs font-bold">
+                                       <span className="text-slate-300">Hauteur / Taille de l image</span>
+                                       <div className="flex items-center gap-1">
+                                         <input
+                                           type="number"
+                                           value={currentSubItem.imgSize || 240}
+                                           onChange={(e) => {
+                                             const val = Number(e.target.value);
+                                             const updatedItems = elItems.map((it: any, idx: number) =>
+                                               idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
+                                             );
+                                             handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                           }}
+                                           className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
+                                         />
+                                         <span className="text-slate-500 text-[10px]">px</span>
+                                       </div>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={50}
+                                       max={800}
+                                       value={currentSubItem.imgSize || 240}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
 
-                              {/* POSITION Y (VERTICALE) */}
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                  <span>Position Verticale (Y)</span>
-                                  <span className="font-mono text-slate-400">
-                                    {currentSubItem.posY !== undefined ? currentSubItem.posY : 50}%
-                                  </span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min={0}
-                                  max={100}
-                                  value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, posY: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full accent-[#00A0FF]"
-                                />
-                              </div>
+                                   {/* ZOOM & ÉCHELLE DE L IMAGE INTERNE */}
+                                   <div className="space-y-2">
+                                     <div className="flex items-center justify-between text-xs font-bold">
+                                       <span className="text-[#00A0FF]">🔍 Zoom / Échelle interne</span>
+                                       <span className="text-xs font-mono text-white">
+                                         {currentSubItem.imgZoom || 100}%
+                                       </span>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={100}
+                                       max={300}
+                                       value={currentSubItem.imgZoom || 100}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, imgZoom: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
+                                 </div>
+                               )}
+                             </div>
 
-                              {/* MODE D AJUSTEMENT (OBJECT-FIT) */}
-                              <div className="space-y-1 pt-1">
-                                <label className="text-[10px] font-bold text-slate-400">Mode d ajustement</label>
-                                <select
-                                  value={currentSubItem.objectFit || 'cover'}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, objectFit: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                                >
-                                  <option value="cover">Remplir le cadre (Cover)</option>
-                                  <option value="contain">Ajuster sans rogner (Contain)</option>
-                                  <option value="fill">Étirer (Fill)</option>
-                                </select>
-                              </div>
-                            </div>
+                             {/* 4. SECTION RECADRAGE ET POSITION INTERNE */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('crop')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">🎯</span>
+                                   <span>Recadrage & Position Interne</span>
+                                 </span>
+                                 {openAccordion.crop ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
 
-                            {/* ARRONDISSEMENT DES COINS */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-slate-400">Arrondissement des coins</span>
-                                <span className="text-xs font-mono text-slate-300">
-                                  {currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}px
-                                </span>
-                              </div>
-                              <input
-                                type="range"
-                                min={0}
-                                max={60}
-                                value={currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  const updatedItems = elItems.map((it: any, idx: number) =>
-                                    idx === selectedSubItem.itemIndex ? { ...it, borderRadius: val } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full accent-[#00A0FF]"
-                              />
-                            </div>
+                               {openAccordion.crop && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   {/* POSITION X (HORIZONTALE) */}
+                                   <div className="space-y-1">
+                                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                       <span>Position Horizontale (X)</span>
+                                       <span className="font-mono text-slate-400">
+                                         {currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%
+                                       </span>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={0}
+                                       max={100}
+                                       value={currentSubItem.posX !== undefined ? currentSubItem.posX : 50}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, posX: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
 
-                            {/* 📏 ESPACEMENTS & MARGES DE L ÉLÉMENT (PADDING & MARGIN) */}
-                            <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                                📏 Espacements & Marges (Padding / Margin)
-                              </div>
+                                   {/* POSITION Y (VERTICALE) */}
+                                   <div className="space-y-1">
+                                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                       <span>Position Verticale (Y)</span>
+                                       <span className="font-mono text-slate-400">
+                                         {currentSubItem.posY !== undefined ? currentSubItem.posY : 50}%
+                                       </span>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={0}
+                                       max={100}
+                                       value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, posY: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
 
-                              {/* MARGE EXTERNE (MARGIN Y) */}
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                  <span>Marge Externe Haut/Bas (Margin Y)</span>
-                                  <span className="font-mono text-slate-400">
-                                    {currentSubItem.marginY || 0}px
-                                  </span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min={0}
-                                  max={80}
-                                  value={currentSubItem.marginY || 0}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, marginY: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full accent-[#00A0FF]"
-                                />
-                              </div>
+                                   {/* MODE D AJUSTEMENT (OBJECT-FIT) */}
+                                   <div className="space-y-1 pt-1">
+                                     <label className="text-[10px] font-bold text-slate-400 block">Mode d ajustement</label>
+                                     <select
+                                       value={currentSubItem.objectFit || 'cover'}
+                                       onChange={(e) => {
+                                         const val = e.target.value;
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, objectFit: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                                     >
+                                       <option value="cover">Remplir le cadre (Cover)</option>
+                                       <option value="contain">Ajuster sans rogner (Contain)</option>
+                                       <option value="fill">Étirer (Fill)</option>
+                                     </select>
+                                   </div>
+                                 </div>
+                               )}
+                             </div>
 
-                              {/* REMPLISSAGE INTERNE (PADDING) */}
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                  <span>Remplissage Interne (Padding)</span>
-                                  <span className="font-mono text-slate-400">
-                                    {currentSubItem.padding || 0}px
-                                  </span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min={0}
-                                  max={60}
-                                  value={currentSubItem.padding || 0}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, padding: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-full accent-[#00A0FF]"
-                                />
-                              </div>
-                            </div>
+                             {/* 5. SECTION ARRONDISSEMENT ET BORDURES */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('border')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">✨</span>
+                                   <span>Arrondissement des coins</span>
+                                 </span>
+                                 {openAccordion.border ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
 
-                            {/* ACTION SUR UNE IMAGE CLIQUÉE (WITH URL INPUT) */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                Action sur une image cliquée
-                              </label>
-                              <select
-                                value={currentSubItem.clickAction || 'OpenURL'}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  const updatedItems = elItems.map((it: any, idx: number) =>
-                                    idx === selectedSubItem.itemIndex ? { ...it, clickAction: val } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                              >
-                                <option value="None">Aucune (None)</option>
-                                <option value="OpenURL">Ouvrir l URL de redirection</option>
-                                <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
-                              </select>
+                               {openAccordion.border && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   <div className="flex items-center justify-between text-xs font-bold">
+                                     <span className="text-slate-300">Arrondissement des coins</span>
+                                     <span className="text-xs font-mono text-slate-300">
+                                       {currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}px
+                                     </span>
+                                   </div>
+                                   <input
+                                     type="range"
+                                     min={0}
+                                     max={60}
+                                     value={currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}
+                                     onChange={(e) => {
+                                       const val = Number(e.target.value);
+                                       const updatedItems = elItems.map((it: any, idx: number) =>
+                                         idx === selectedSubItem.itemIndex ? { ...it, borderRadius: val } : it
+                                       );
+                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                     }}
+                                     className="w-full accent-[#00A0FF]"
+                                   />
+                                 </div>
+                               )}
+                             </div>
 
-                              {/* REDIRECTION URL INPUT WHEN OpenURL IS SELECTED */}
-                              {(currentSubItem.clickAction || 'OpenURL') === 'OpenURL' && (
-                                <div className="space-y-1 pt-1">
-                                  <label className="text-[10px] font-bold text-slate-400">
-                                    URL de redirection (ex: https://...)
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={currentSubItem.redirectUrl || ''}
-                                    placeholder="https://votre-site.com/offre"
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      const updatedItems = elItems.map((it: any, idx: number) =>
-                                        idx === selectedSubItem.itemIndex ? { ...it, redirectUrl: val } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                    }}
-                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono"
-                                  />
-                                </div>
-                              )}
-                            </div>
+                             {/* 6. SECTION ESPACEMENTS ET MARGES */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('spacing')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">📏</span>
+                                   <span>Espacements & Marges (Padding / Margin)</span>
+                                 </span>
+                                 {openAccordion.spacing ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
+
+                               {openAccordion.spacing && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   <div className="space-y-1">
+                                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                       <span>Marge Externe Haut/Bas (Margin Y)</span>
+                                       <span className="font-mono text-slate-400">
+                                         {currentSubItem.marginY || 0}px
+                                       </span>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={0}
+                                       max={80}
+                                       value={currentSubItem.marginY || 0}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, marginY: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
+
+                                   <div className="space-y-1">
+                                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                                       <span>Remplissage Interne (Padding)</span>
+                                       <span className="font-mono text-slate-400">
+                                         {currentSubItem.padding || 0}px
+                                       </span>
+                                     </div>
+                                     <input
+                                       type="range"
+                                       min={0}
+                                       max={60}
+                                       value={currentSubItem.padding || 0}
+                                       onChange={(e) => {
+                                         const val = Number(e.target.value);
+                                         const updatedItems = elItems.map((it: any, idx: number) =>
+                                           idx === selectedSubItem.itemIndex ? { ...it, padding: val } : it
+                                         );
+                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                       }}
+                                       className="w-full accent-[#00A0FF]"
+                                     />
+                                   </div>
+                                 </div>
+                               )}
+                             </div>
+
+                             {/* 7. SECTION ACTION SUR CLIC ET REDIRECTION */}
+                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
+                               <button
+                                 type="button"
+                                 onClick={() => toggleAccordion('action')}
+                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
+                               >
+                                 <span className="font-bold text-xs text-white flex items-center gap-2">
+                                   <span className="text-[#00A0FF]">🔗</span>
+                                   <span>Action sur Clic & Redirection</span>
+                                 </span>
+                                 {openAccordion.action ? (
+                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
+                                 ) : (
+                                   <ChevronRight className="w-4 h-4 text-slate-500" />
+                                 )}
+                               </button>
+
+                               {openAccordion.action && (
+                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
+                                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                     Action sur une image cliquée
+                                   </label>
+                                   <select
+                                     value={currentSubItem.clickAction || 'OpenURL'}
+                                     onChange={(e) => {
+                                       const val = e.target.value;
+                                       const updatedItems = elItems.map((it: any, idx: number) =>
+                                         idx === selectedSubItem.itemIndex ? { ...it, clickAction: val } : it
+                                       );
+                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                     }}
+                                     className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
+                                   >
+                                     <option value="None">Aucune (None)</option>
+                                     <option value="OpenURL">Ouvrir l URL de redirection</option>
+                                     <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
+                                   </select>
+
+                                   {(currentSubItem.clickAction || 'OpenURL') === 'OpenURL' && (
+                                     <div className="space-y-1 pt-1">
+                                       <label className="text-[10px] font-bold text-slate-400">
+                                         URL de redirection (ex: https://...)
+                                       </label>
+                                       <input
+                                         type="text"
+                                         value={currentSubItem.redirectUrl || ''}
+                                         placeholder="https://votre-site.com/offre"
+                                         onChange={(e) => {
+                                           const val = e.target.value;
+                                           const updatedItems = elItems.map((it: any, idx: number) =>
+                                             idx === selectedSubItem.itemIndex ? { ...it, redirectUrl: val } : it
+                                           );
+                                           handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                         }}
+                                         className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono"
+                                       />
+                                     </div>
+                                   )}
+                                 </div>
+                               )}
+                             </div>
 
                             {/* ATTRIBUT ALT & REMPLIR À 100% */}
                             <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
