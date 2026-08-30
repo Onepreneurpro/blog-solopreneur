@@ -1382,7 +1382,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
             </button>
 
             {openBubblePopover === 'underline' && (
-              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="absolute left-0 bottom-full mb-3 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                     <Underline className="w-4 h-4 text-[#00A0FF]" />
@@ -1508,7 +1508,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
             </button>
 
             {openBubblePopover === 'text' && (
-              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="absolute left-0 bottom-full mb-3 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                     <Palette className="w-4 h-4 text-emerald-600" />
@@ -1576,7 +1576,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
             </button>
 
             {openBubblePopover === 'neon' && (
-              <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="absolute left-0 bottom-full mb-3 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                     <Highlighter className="w-4 h-4 text-amber-600" />

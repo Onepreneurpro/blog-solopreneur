@@ -15,6 +15,7 @@ import {
 
 export const FloatingTextToolbar = () => {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const [popoverUpward, setPopoverUpward] = useState(true);
   const [openPopover, setOpenPopover] = useState<'underline' | 'text' | 'neon' | null>(null);
 
   const [underlineThickness, setUnderlineThickness] = useState('3px');
@@ -100,6 +101,9 @@ export const FloatingTextToolbar = () => {
       const rect = range.getBoundingClientRect();
 
       if (rect && rect.width > 0 && rect.height > 0) {
+        const spaceAbove = rect.top;
+        setPopoverUpward(spaceAbove > 260);
+
         const clampedLeft = Math.max(200, Math.min(window.innerWidth - 200, rect.left + rect.width / 2));
         setPosition({
           top: Math.max(12, rect.top - 58),
@@ -211,6 +215,8 @@ export const FloatingTextToolbar = () => {
     document.execCommand('removeFormat', false);
   };
 
+  const popoverPosClass = popoverUpward ? 'bottom-full mb-3' : 'top-full mt-3';
+
   return (
     <div
       style={{
@@ -276,7 +282,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {openPopover === 'underline' && (
-          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+          <div className={`absolute left-0 bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95 ${popoverPosClass}`}>
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                 <Underline className="w-4 h-4 text-[#00A0FF]" />
@@ -398,7 +404,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {openPopover === 'text' && (
-          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+          <div className={`absolute left-0 bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95 ${popoverPosClass}`}>
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                 <Palette className="w-4 h-4 text-emerald-600" />
@@ -462,7 +468,7 @@ export const FloatingTextToolbar = () => {
         </button>
 
         {openPopover === 'neon' && (
-          <div className="absolute left-0 top-full mt-2 z-[100000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+          <div className={`absolute left-0 bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95 ${popoverPosClass}`}>
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                 <Highlighter className="w-4 h-4 text-amber-600" />
