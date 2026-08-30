@@ -6,7 +6,7 @@ import { Container } from './Container';
 import { Text } from './Text';
 
 export interface GridProps {
-  columns?: 2 | 3 | 4;
+  columns?: 1 | 2 | 3 | 4;
   columnWidths?: number[];
   gap?: number;
   bgColor?: string;
@@ -35,7 +35,9 @@ export const Grid = ({
   }));
 
   const defaultWidths =
-    columns === 2
+    columns === 1
+      ? [100]
+      : columns === 2
       ? [50, 50]
       : columns === 3
       ? [33.33, 33.33, 33.34]
@@ -106,12 +108,14 @@ export const Grid = ({
         }}
       >
         <div className="flex flex-col md:flex-row w-full items-stretch" style={{ gap: `${gap}px` }}>
-          <div style={{ flex: `${widths[0] || 50} 1 0%` }} className="w-full min-w-0">
+          <div style={{ flex: `${widths[0] || 100} 1 0%` }} className="w-full min-w-0">
             <Element is={Container} id="col-1" canvas />
           </div>
-          <div style={{ flex: `${widths[1] || 50} 1 0%` }} className="w-full min-w-0">
-            <Element is={Container} id="col-2" canvas />
-          </div>
+          {columns >= 2 && (
+            <div style={{ flex: `${widths[1] || 50} 1 0%` }} className="w-full min-w-0">
+              <Element is={Container} id="col-2" canvas />
+            </div>
+          )}
           {columns >= 3 && (
             <div style={{ flex: `${widths[2] || 33} 1 0%` }} className="w-full min-w-0">
               <Element is={Container} id="col-3" canvas />
@@ -144,27 +148,36 @@ export const Grid = ({
     >
       <div className="craft-grid-container flex flex-col md:flex-row w-full items-stretch" style={{ gap: `${gap}px` }}>
         {/* COLUMN #1 */}
-        <div style={{ flex: `${widths[0] || 50} 1 0%` }} className="w-full min-w-0 min-h-[140px] relative">
+        <div style={{ flex: `${widths[0] || 100} 1 0%` }} className="w-full min-w-0 min-h-[140px] relative">
           <Element is={Container} id="col-1" padding={20} bgColor="#f8fafc" borderRadius={16} canvas>
-            <Text text="📦 Colonne #1 (Glissez un élément)" fontSize={14} textColor="#94a3b8" textAlign="center" />
+            <Text
+              text={columns === 1 ? '📦 Section Vierge (Glissez des éléments ici)' : '📦 Colonne #1 (Glissez un élément)'}
+              fontSize={14}
+              textColor="#94a3b8"
+              textAlign="center"
+            />
           </Element>
         </div>
 
-        {/* RESIZER HANDLE BETWEEN COL 1 & 2 */}
-        <div
-          onMouseDown={(e) => handleMouseDown(0, e)}
-          title="Tirez à gauche ou à droite pour redimensionner les colonnes"
-          className="w-3 bg-blue-100 hover:bg-[#00A0FF] active:bg-[#0080FF] border border-blue-300 hover:border-[#00A0FF] rounded-full cursor-col-resize flex items-center justify-center shrink-0 transition-colors group/resizer my-2 select-none z-30"
-        >
-          <div className="w-1 h-8 bg-[#00A0FF] group-hover/resizer:bg-white rounded-full transition-colors" />
-        </div>
+        {/* COLUMN #2 (IF APPLICABLE) */}
+        {columns >= 2 && (
+          <>
+            {/* RESIZER HANDLE BETWEEN COL 1 & 2 */}
+            <div
+              onMouseDown={(e) => handleMouseDown(0, e)}
+              title="Tirez à gauche ou à droite pour redimensionner les colonnes"
+              className="w-3 bg-blue-100 hover:bg-[#00A0FF] active:bg-[#0080FF] border border-blue-300 hover:border-[#00A0FF] rounded-full cursor-col-resize flex items-center justify-center shrink-0 transition-colors group/resizer my-2 select-none z-30"
+            >
+              <div className="w-1 h-8 bg-[#00A0FF] group-hover/resizer:bg-white rounded-full transition-colors" />
+            </div>
 
-        {/* COLUMN #2 */}
-        <div style={{ flex: `${widths[1] || 50} 1 0%` }} className="w-full min-w-0 min-h-[140px] relative">
-          <Element is={Container} id="col-2" padding={20} bgColor="#f8fafc" borderRadius={16} canvas>
-            <Text text="📦 Colonne #2 (Glissez un élément)" fontSize={14} textColor="#94a3b8" textAlign="center" />
-          </Element>
-        </div>
+            <div style={{ flex: `${widths[1] || 50} 1 0%` }} className="w-full min-w-0 min-h-[140px] relative">
+              <Element is={Container} id="col-2" padding={20} bgColor="#f8fafc" borderRadius={16} canvas>
+                <Text text="📦 Colonne #2 (Glissez un élément)" fontSize={14} textColor="#94a3b8" textAlign="center" />
+              </Element>
+            </div>
+          </>
+        )}
 
         {/* COLUMN #3 (IF APPLICABLE) */}
         {columns >= 3 && (
@@ -209,7 +222,7 @@ export const Grid = ({
 };
 
 (Grid as any).craft = {
-  displayName: 'Grille Vierge (Multi-Colonnes)',
+  displayName: 'Grille Vierge / Section',
   props: {
     columns: 2,
     columnWidths: [50, 50],

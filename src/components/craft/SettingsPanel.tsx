@@ -596,28 +596,32 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* GRID COLUMNS SELECTOR (2, 3, 4 COLUMNS) */}
+        {/* GRID COLUMNS SELECTOR (1, 2, 3, 4 COLUMNS) */}
         {props.columns !== undefined && (
           <div className="space-y-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200">
             <label className="font-black text-slate-900 flex items-center gap-1.5 text-xs">
-              <span>📐 Modèle de Grille (Colonnes)</span>
+              <span>📐 Modèle de Grille / Section (Colonnes)</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[2, 3, 4].map((numCols) => (
+            <div className="grid grid-cols-4 gap-1.5">
+              {[1, 2, 3, 4].map((numCols) => (
                 <button
                   key={numCols}
                   onClick={() =>
                     actions.setProp(id, (nodeProps: any) => {
                       nodeProps.columns = numCols;
+                      if (numCols === 1) nodeProps.columnWidths = [100];
+                      else if (numCols === 2) nodeProps.columnWidths = [50, 50];
+                      else if (numCols === 3) nodeProps.columnWidths = [33.33, 33.33, 33.34];
+                      else nodeProps.columnWidths = [25, 25, 25, 25];
                     })
                   }
-                  className={`py-2 px-2 rounded-xl border font-black text-xs transition-all ${
+                  className={`py-2 px-1 rounded-xl border font-black text-xs transition-all ${
                     props.columns === numCols
                       ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  {numCols} Cols
+                  {numCols === 1 ? '1 Col' : `${numCols} Cols`}
                 </button>
               ))}
             </div>

@@ -20,6 +20,7 @@ import {
   CreditCard,
   Mail,
   Video as VideoIcon,
+  Square,
   GripVertical,
   Columns,
 } from 'lucide-react';
@@ -28,6 +29,12 @@ export const Toolbox = () => {
   const { connectors } = useEditor();
 
   const components = [
+    {
+      label: 'Section Vierge (1 Colonne)',
+      icon: Square,
+      color: 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100 font-extrabold shadow-sm',
+      element: <GridComponent columns={1} />,
+    },
     {
       label: 'Grille Vierge (2, 3, 4 Cols)',
       icon: Columns,
