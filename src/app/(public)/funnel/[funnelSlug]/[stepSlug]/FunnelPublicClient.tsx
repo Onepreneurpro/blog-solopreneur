@@ -139,6 +139,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
             if (el.type === 'ContentBox') {
               const layoutMode = el.data?.layoutMode || 'grid-3';
+              const mainBg = el.data?.bgColor || '#ffffff';
+              const cardBg = el.data?.cardBgColor || '#ffffff';
+              const textColor = el.data?.textColor || '#1e293b';
+
               const gridClass =
                 layoutMode === 'masonry'
                   ? 'columns-1 md:columns-3 gap-6 space-y-6 [&>div]:break-inside-avoid'
@@ -153,19 +157,34 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                   : 'grid grid-cols-1 md:grid-cols-3 gap-6 items-start';
 
               return (
-                <div key={el.id} className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border border-slate-100 my-6 text-slate-800">
+                <div
+                  key={el.id}
+                  style={{ backgroundColor: mainBg, color: textColor }}
+                  className="p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border border-slate-100 my-6"
+                >
                   {el.data?.title && (
-                    <h3 className="text-2xl font-heading font-black text-slate-900 border-b border-slate-100 pb-3">
+                    <h3 className="text-2xl font-heading font-black border-b border-slate-100/60 pb-3" style={{ color: textColor }}>
                       {el.data.title}
                     </h3>
                   )}
                   <div className={gridClass}>
                     {(el.data?.children || []).map((child: any, cIdx: number) => {
+                      const childCardBg = child.bgColor || cardBg;
+                      const childTextColor = child.textColor || textColor;
+
                       if (child.type === 'Heading') {
-                        return <h4 key={child.id || cIdx} className="text-xl font-heading font-bold text-slate-900">{child.content}</h4>;
+                        return (
+                          <div key={child.id || cIdx} className="p-4 rounded-2xl border border-slate-100" style={{ backgroundColor: childCardBg }}>
+                            <h4 className="text-xl font-heading font-bold" style={{ color: childTextColor }}>{child.content}</h4>
+                          </div>
+                        );
                       }
                       if (child.type === 'Text') {
-                        return <p key={child.id || cIdx} className="text-sm text-slate-600 font-medium leading-relaxed">{child.content}</p>;
+                        return (
+                          <div key={child.id || cIdx} className="p-4 rounded-2xl border border-slate-100" style={{ backgroundColor: childCardBg }}>
+                            <p className="text-sm font-medium leading-relaxed" style={{ color: childTextColor }}>{child.content}</p>
+                          </div>
+                        );
                       }
                       if (child.type === 'Image') {
                         const imgHeight = child.imgHeight || el.data?.imgHeight || 'h-56';

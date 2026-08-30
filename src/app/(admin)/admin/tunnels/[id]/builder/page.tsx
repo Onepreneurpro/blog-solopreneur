@@ -1778,27 +1778,34 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
 
-                    {el.type === 'ContentBox' && (
-                      <div
-                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onDrop={(e) => handleBlockDrop(e, el.id)}
-                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
-                      >
-                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                          <input
-                            type="text"
-                            value={el.data?.title || el.content || 'Conteneur d éléments...'}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              handleUpdateElementData(el.id, { title: val });
-                              handleUpdateElementContent(el.id, val);
-                            }}
-                            className="text-xl font-heading font-black text-slate-800 bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
-                          />
-                          <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 flex items-center gap-1">
-                            <span>📦 Boîte Conteneur Réceptrice</span>
-                          </span>
-                        </div>
+                    {el.type === 'ContentBox' && (() => {
+                      const mainBg = el.data?.bgColor || '#ffffff';
+                      const cardBg = el.data?.cardBgColor || '#f8fafc';
+                      const textColor = el.data?.textColor || '#1e293b';
+
+                      return (
+                        <div
+                          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          onDrop={(e) => handleBlockDrop(e, el.id)}
+                          style={{ backgroundColor: mainBg, color: textColor }}
+                          className="p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-100/60 pb-3">
+                            <input
+                              type="text"
+                              value={el.data?.title || el.content || 'Conteneur d éléments...'}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                handleUpdateElementData(el.id, { title: val });
+                                handleUpdateElementContent(el.id, val);
+                              }}
+                              style={{ color: textColor }}
+                              className="text-xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
+                            />
+                            <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 flex items-center gap-1">
+                              <span>📦 Boîte Conteneur Réceptrice</span>
+                            </span>
+                          </div>
 
                         {/* RENDER NESTED CHILDREN IN THE CONTAINER */}
                         {(!el.data?.children || el.data.children.length === 0) ? (
@@ -1859,7 +1866,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       console.error(err);
                                     }
                                   }}
-                                  className="p-4 bg-slate-50 border border-slate-200 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all cursor-grab active:cursor-grabbing shadow-xs hover:shadow-md"
+                                  style={{ backgroundColor: (child as any).bgColor || cardBg, color: (child as any).textColor || textColor }}
+                                  className="p-4 border border-slate-200/80 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all cursor-grab active:cursor-grabbing shadow-xs hover:shadow-md"
                                 >
                                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-200/60 pb-1">
                                   <span className="uppercase text-[#00A0FF] font-black">{child.type || 'Élément'}</span>
@@ -1974,8 +1982,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           </div>
                         );
                       })()}
-                      </div>
-                    )}
+                        </div>
+                      );
+                    })()}
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
                     {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (
@@ -3360,6 +3369,137 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                           </div>
                         )}
+
+                        {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
+                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block flex items-center justify-between">
+                            <span>🎨 Couleurs & Arrière-plan</span>
+                          </div>
+
+                          {/* 1. Arrière-plan principal (Conteneur / Bloc / Texte) */}
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 block">
+                              Arrière-plan du Conteneur / Bloc
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={elData.bgColor && elData.bgColor.startsWith('#') ? elData.bgColor : '#ffffff'}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
+                                className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
+                              />
+                              <input
+                                type="text"
+                                value={elData.bgColor || '#ffffff'}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
+                                placeholder="#FFFFFF ou bg-white"
+                                className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
+                              />
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {[
+                                { name: 'Blanc', val: '#ffffff' },
+                                { name: 'Crème Arizona', val: '#FEF5D7' },
+                                { name: 'Gris Soft', val: '#F8FAFC' },
+                                { name: 'Bleu Ciel', val: '#EFF6FF' },
+                                { name: 'Sombre Slate', val: '#0F172A' },
+                                { name: 'Néon Violet', val: '#FAF5FF' },
+                                { name: 'Transparent', val: 'transparent' },
+                              ].map((c) => (
+                                <button
+                                  key={c.val}
+                                  type="button"
+                                  onClick={() => handleUpdateElementData(selectedEl.id, { bgColor: c.val })}
+                                  className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
+                                >
+                                  {c.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 2. Arrière-plan des Cartes Interne (si Conteneur / Col2 / Col3 / Col4) */}
+                          {['ContentBox', 'Col2', 'Col3', 'Col4', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg'].includes(selectedEl.type) && (
+                            <div className="space-y-2 pt-2 border-t border-slate-800/80">
+                              <label className="text-[10px] font-bold text-slate-400 block">
+                                Arrière-plan des Cartes & Colonnes
+                              </label>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="color"
+                                  value={elData.cardBgColor && elData.cardBgColor.startsWith('#') ? elData.cardBgColor : '#f8fafc'}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
+                                  className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
+                                />
+                                <input
+                                  type="text"
+                                  value={elData.cardBgColor || '#f8fafc'}
+                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
+                                  placeholder="#F8FAFC ou bg-slate-50"
+                                  className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
+                                />
+                              </div>
+                              <div className="flex flex-wrap gap-1.5 pt-1">
+                                {[
+                                  { name: 'Blanc Pure', val: '#ffffff' },
+                                  { name: 'Gris Soft', val: '#f8fafc' },
+                                  { name: 'Crème', val: '#fffdf5' },
+                                  { name: 'Bleu Soft', val: '#f0f9ff' },
+                                  { name: 'Sombre', val: '#1e293b' },
+                                ].map((c) => (
+                                  <button
+                                    key={c.val}
+                                    type="button"
+                                    onClick={() => handleUpdateElementData(selectedEl.id, { cardBgColor: c.val })}
+                                    className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
+                                  >
+                                    {c.name}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 3. Couleur des Textes & Titres */}
+                          <div className="space-y-2 pt-2 border-t border-slate-800/80">
+                            <label className="text-[10px] font-bold text-slate-400 block">
+                              Couleur du Texte & Titre
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={elData.textColor && elData.textColor.startsWith('#') ? elData.textColor : '#1e293b'}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
+                                className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
+                              />
+                              <input
+                                type="text"
+                                value={elData.textColor || '#1e293b'}
+                                onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
+                                placeholder="#1E293B ou text-slate-800"
+                                className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
+                              />
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {[
+                                { name: 'Noir Slate', val: '#0f172a' },
+                                { name: 'Doré Arizona', val: '#D69A3A' },
+                                { name: 'Bleu Néon', val: '#00A0FF' },
+                                { name: 'Vert Émeraude', val: '#10B981' },
+                                { name: 'Blanc', val: '#ffffff' },
+                              ].map((c) => (
+                                <button
+                                  key={c.val}
+                                  type="button"
+                                  onClick={() => handleUpdateElementData(selectedEl.id, { textColor: c.val })}
+                                  className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
+                                >
+                                  {c.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
 
                         {/* IMAGE EXCLUSIVE CONTROLS (ONLY SHOW WHEN ELEMENT IS AN IMAGE) */}
                         {selectedEl.type === 'Image' && (
