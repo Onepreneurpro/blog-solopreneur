@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEditor } from '@craftjs/core';
 import {
   ArrowLeft,
@@ -41,6 +41,34 @@ export const Header = ({
 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // KEYBOARD SHORTCUTS FOR UNDO (Ctrl+Z) AND REDO (Ctrl+Y / Ctrl+Shift+Z)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept inside editable text if user is typing text, unless Ctrl key is pressed
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          if (canRedo) {
+            e.preventDefault();
+            actions.history.redo();
+          }
+        } else {
+          if (canUndo) {
+            e.preventDefault();
+            actions.history.undo();
+          }
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
+        if (canRedo) {
+          e.preventDefault();
+          actions.history.redo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, actions]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -99,7 +127,7 @@ export const Header = ({
         <div className="h-4 w-px bg-slate-800" />
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black text-white font-heading truncate max-w-[160px] sm:max-w-xs">
+          <span className="text-xs font-black text-white font-heading truncate max-w-[140px] sm:max-w-xs">
             {stepData?.name || 'Étape Tunnel Beta 2'}
           </span>
           <span className="text-[9px] font-mono font-bold bg-[#00A0FF]/20 text-[#00A0FF] border border-[#00A0FF]/40 px-2 py-0.5 rounded-full">
@@ -108,8 +136,40 @@ export const Header = ({
         </div>
       </div>
 
-      {/* PAGE LAYOUT MODE (CENTRED VS PLEINE PAGE) & DEVICE PREVIEW */}
-      <div className="flex items-center gap-2">
+      {/* CENTER ACTIONS: UNDO/REDO, PAGE LAYOUT MODE, DEVICE PREVIEW */}
+      <div className="flex items-center gap-2.5">
+        {/* UNDO / REDO BUTTONS (ANNULER / AVANCER) */}
+        <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl gap-1">
+          <button
+            onClick={() => actions.history.undo()}
+            disabled={!canUndo}
+            title="Annuler la dernière action (Ctrl+Z)"
+            className={`px-2.5 py-1 text-xs font-black rounded-lg flex items-center gap-1.5 transition-all ${
+              canUndo
+                ? 'bg-slate-800 text-white hover:bg-slate-700 active:scale-95 shadow-xs'
+                : 'text-slate-600 bg-slate-950/50 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-[#00A0FF]" />
+            <span>Annuler</span>
+          </button>
+
+          <button
+            onClick={() => actions.history.redo()}
+            disabled={!canRedo}
+            title="Avancer / Rétablir l action (Ctrl+Y)"
+            className={`px-2.5 py-1 text-xs font-black rounded-lg flex items-center gap-1.5 transition-all ${
+              canRedo
+                ? 'bg-slate-800 text-white hover:bg-slate-700 active:scale-95 shadow-xs'
+                : 'text-slate-600 bg-slate-950/50 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <RotateCw className="w-3.5 h-3.5 text-[#00A0FF]" />
+            <span>Avancer</span>
+          </button>
+        </div>
+
+        {/* PAGE LAYOUT MODE (CENTRED VS PLEINE PAGE) */}
         {setPageLayoutMode && (
           <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl">
             <button
@@ -139,31 +199,8 @@ export const Header = ({
           </div>
         )}
 
-        {/* DEVICE PREVIEW TOGGLE & UNDO/REDO */}
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-xl">
-          <button
-            onClick={() => actions.history.undo()}
-            disabled={!canUndo}
-            title="Annuler (Ctrl+Z)"
-            className={`p-1.5 rounded-lg transition-colors ${
-              canUndo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
-            }`}
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => actions.history.redo()}
-            disabled={!canRedo}
-            title="Rétablir (Ctrl+Y)"
-            className={`p-1.5 rounded-lg transition-colors ${
-              canRedo ? 'text-slate-200 hover:bg-slate-800' : 'text-slate-600 cursor-not-allowed'
-            }`}
-          >
-            <RotateCw className="w-4 h-4" />
-          </button>
-
-          <div className="h-4 w-px bg-slate-800 my-auto" />
-
+        {/* DEVICE PREVIEW TOGGLE */}
+        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
           <button
             onClick={() => setDeviceMode('desktop')}
             className={`p-1.5 rounded-lg transition-colors ${
