@@ -3,23 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Zap,
   Plus,
-  Edit,
   Trash2,
-  Globe,
-  Eye,
   Layers,
-  ArrowRight,
-  ExternalLink,
   Sparkles,
   Layout,
+  X,
+  FilePlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function TunnelsBeta2Page() {
   const [funnels, setFunnels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ADD PAGE MODAL STATE
+  const [selectedFunnelId, setSelectedFunnelId] = useState<string | null>(null);
+  const [newPageName, setNewPageName] = useState('');
+  const [newPageType, setNewPageType] = useState('OPTIN_PAGE');
+  const [creatingPage, setCreatingPage] = useState(false);
+  const [deletingStepId, setDeletingStepId] = useState<string | null>(null);
 
   const fetchFunnels = async () => {
     setLoading(true);
@@ -38,6 +41,56 @@ export default function TunnelsBeta2Page() {
     fetchFunnels();
   }, []);
 
+  // DELETE A STEP / PAGE
+  const handleDeleteStep = async (stepId: string, stepName: string) => {
+    if (!confirm(`Voulez-vous vraiment supprimer la page "${stepName}" ? cette action est irréversible.`)) {
+      return;
+    }
+
+    setDeletingStepId(stepId);
+    try {
+      const res = await fetch(`/api/admin/funnel-steps/${stepId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        await fetchFunnels();
+      }
+    } catch (err) {
+      console.error('Error deleting step:', err);
+    } finally {
+      setDeletingStepId(null);
+    }
+  };
+
+  // CREATE A NEW STEP / PAGE
+  const handleCreateStep = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFunnelId || !newPageName.trim()) return;
+
+    setCreatingPage(true);
+    try {
+      const res = await fetch('/api/admin/funnel-steps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          funnelId: selectedFunnelId,
+          name: newPageName.trim(),
+          type: newPageType,
+        }),
+      });
+
+      if (res.ok) {
+        setNewPageName('');
+        setSelectedFunnelId(null);
+        await fetchFunnels();
+      }
+    } catch (err) {
+      console.error('Error creating page:', err);
+    } finally {
+      setCreatingPage(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* HEADER BANNER */}
@@ -52,7 +105,7 @@ export default function TunnelsBeta2Page() {
             Créateur de Tunnels de Vente Beta 2
           </h1>
           <p className="text-sm text-slate-300 font-medium leading-relaxed">
-            Créez et éditez vos pages de tunnels de vente avec <strong>Craft.js</strong>. Contrôle total du DOM, glisser-déposer fluide, modification directe des textes et téléversement d images en 1 clic.
+            Créez, supprimez et ajoutez plusieurs pages à vos tunnels de vente avec <strong>Craft.js</strong>.
           </p>
         </div>
       </div>
@@ -86,7 +139,7 @@ export default function TunnelsBeta2Page() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold bg-blue-50 text-[#00A0FF] border border-blue-200 px-2.5 py-1 rounded-full uppercase">
-                    {funnel.steps?.length || 0} Étape(s)
+                    {funnel.steps?.length || 0} Page(s) / Étape(s)
                   </span>
                   <span className="text-xs font-bold text-slate-400 font-mono">
                     /{funnel.slug}
@@ -103,16 +156,26 @@ export default function TunnelsBeta2Page() {
               </div>
 
               {/* STEPS LIST */}
-              <div className="space-y-2 pt-3 border-t border-slate-100">
-                <span className="text-[10px] font-black uppercase text-slate-400 font-heading tracking-wider">
-                  Étapes à éditer dans Craft.js :
-                </span>
+              <div className="space-y-2.5 pt-3 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-slate-400 font-heading tracking-wider">
+                    Pages du Tunnel :
+                  </span>
+                  <button
+                    onClick={() => setSelectedFunnelId(funnel.id)}
+                    className="flex items-center gap-1 text-xs font-bold text-[#00A0FF] hover:text-[#0080FF] hover:underline transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Ajouter une page</span>
+                  </button>
+                </div>
+
                 {funnel.steps && funnel.steps.length > 0 ? (
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {funnel.steps.map((step: any) => (
                       <div
                         key={step.id}
-                        className="flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 transition-colors"
+                        className="flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-200 transition-colors"
                       >
                         <div className="min-w-0 pr-2">
                           <p className="text-xs font-black text-slate-800 truncate">
@@ -122,22 +185,104 @@ export default function TunnelsBeta2Page() {
                             Type: {step.type}
                           </p>
                         </div>
-                        <Link
-                          href={`/admin/tunnels-beta2/${step.id}/builder`}
-                          className="px-3 py-1.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white text-[11px] font-black rounded-xl shadow-sm flex items-center gap-1 shrink-0 transition-transform active:scale-95"
-                        >
-                          <Layout className="w-3.5 h-3.5" />
-                          <span>Craft.js</span>
-                        </Link>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Link
+                            href={`/admin/tunnels-beta2/${step.id}/builder`}
+                            className="px-3 py-1.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white text-[11px] font-black rounded-xl shadow-xs flex items-center gap-1 transition-transform active:scale-95"
+                          >
+                            <Layout className="w-3.5 h-3.5" />
+                            <span>Craft.js</span>
+                          </Link>
+
+                          <button
+                            onClick={() => handleDeleteStep(step.id, step.name)}
+                            disabled={deletingStepId === step.id}
+                            title="Supprimer cette page"
+                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors border border-rose-200"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400 italic">Aucune étape créée.</p>
+                  <p className="text-xs text-slate-400 italic">Aucune page créée dans ce tunnel.</p>
                 )}
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* MODAL FOR ADDING A NEW PAGE */}
+      {selectedFunnelId && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <FilePlus className="w-5 h-5 text-[#00A0FF]" />
+                <h3 className="font-heading font-black text-base text-slate-900">
+                  Ajouter une nouvelle page
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedFunnelId(null)}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateStep} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700">Nom de la Page *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="ex: Page de Vente Offre Spéciale"
+                  value={newPageName}
+                  onChange={(e) => setNewPageName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700">Type de Page</label>
+                <select
+                  value={newPageType}
+                  onChange={(e) => setNewPageType(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF]"
+                >
+                  <option value="OPTIN_PAGE">Page de Capture (Optin)</option>
+                  <option value="SALES_PAGE">Page de Vente (Sales Page)</option>
+                  <option value="CHECKOUT_PAGE">Bon de Commande (Checkout)</option>
+                  <option value="THANK_YOU_PAGE">Page de Remerciement (Thank You)</option>
+                  <option value="UPSELL_PAGE">Page d Offre Supérieure (Upsell)</option>
+                  <option value="CUSTOM_PAGE">Page Personnalisée</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <Button
+                  type="button"
+                  onClick={() => setSelectedFunnelId(null)}
+                  variant="outline"
+                  className="text-xs font-bold rounded-xl"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={creatingPage || !newPageName.trim()}
+                  className="bg-[#00A0FF] hover:bg-[#0080FF] text-white text-xs font-black rounded-xl shadow-md"
+                >
+                  {creatingPage ? 'Création...' : 'Créer la page 🚀'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

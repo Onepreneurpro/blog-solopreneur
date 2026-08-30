@@ -40,3 +40,15 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  try {
+    await prisma.funnelStep.delete({
+      where: { id: params.id },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Error deleting funnel step:', error);
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  }
+}
