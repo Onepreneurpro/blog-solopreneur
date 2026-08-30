@@ -36,7 +36,7 @@ export const Text = ({
 
   const Tag = tagName;
 
-  const handleWidthResizeMouseDown = (e: React.MouseEvent) => {
+  const handleRightWidthResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -52,7 +52,39 @@ export const Text = ({
     const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaPercent = Math.round((deltaX / parentWidth) * 100);
-      const newWidth = Math.min(100, Math.max(20, startWidth + deltaPercent));
+      const newWidth = Math.min(100, Math.max(15, startWidth + deltaPercent * 2));
+
+      setProp((props: TextProps) => {
+        props.width = Math.round(newWidth);
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const handleLeftWidthResizeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const resizerEl = e.currentTarget as HTMLElement;
+    const parentEl = resizerEl.parentElement?.parentElement as HTMLElement;
+    if (!parentEl) return;
+
+    const parentRect = parentEl.getBoundingClientRect();
+    const parentWidth = parentRect.width;
+    const startX = e.clientX;
+    const startWidth = width || 100;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startX - moveEvent.clientX;
+      const deltaPercent = Math.round((deltaX / parentWidth) * 100);
+      const newWidth = Math.min(100, Math.max(15, startWidth + deltaPercent * 2));
 
       setProp((props: TextProps) => {
         props.width = Math.round(newWidth);
@@ -119,10 +151,19 @@ export const Text = ({
         {text}
       </Tag>
 
+      {/* LEFT BORDER WIDTH RESIZER HANDLE */}
+      <div
+        onMouseDown={handleLeftWidthResizeMouseDown}
+        title="Tirez la bordure gauche pour agrandir"
+        className="absolute top-0 bottom-0 left-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/left-resizer z-40 rounded-l-lg select-none"
+      >
+        <div className="w-1 h-6 bg-[#00A0FF] group-hover/left-resizer:bg-white rounded-full transition-colors" />
+      </div>
+
       {/* RIGHT BORDER WIDTH RESIZER HANDLE */}
       <div
-        onMouseDown={handleWidthResizeMouseDown}
-        title="Tirez la bordure droite pour ajuster la largeur du texte"
+        onMouseDown={handleRightWidthResizeMouseDown}
+        title="Tirez la bordure droite pour agrandir"
         className="absolute top-0 bottom-0 right-0 w-3 bg-[#00A0FF]/20 hover:bg-[#00A0FF] active:bg-[#0080FF] cursor-col-resize flex items-center justify-center transition-colors group/right-resizer z-40 rounded-r-lg select-none"
       >
         <div className="w-1 h-6 bg-[#00A0FF] group-hover/right-resizer:bg-white rounded-full transition-colors" />
