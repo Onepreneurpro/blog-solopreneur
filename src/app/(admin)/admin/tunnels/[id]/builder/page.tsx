@@ -2344,9 +2344,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             : 'bg-white'
                         }`}
                       >
-                        {el.data?.title && (
-                          <h2 className="text-center font-heading font-black text-xl text-slate-900">{el.data.title}</h2>
-                        )}
+                        <div className="text-center">
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || 'BASES ET NUTRITION'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="w-full text-center text-xl font-heading font-black text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
+                            placeholder="Titre de la section..."
+                          />
+                        </div>
 
 
 
@@ -2516,8 +2526,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         }`}
                       >
                         <div className="text-center space-y-1">
-                          <h4 className="text-[10px] font-black text-[#00A0FF] uppercase tracking-widest">CE QUE VOUS OBTENEZ</h4>
-                          <h2 className="text-xl font-heading font-black text-slate-900">Le Savoir-Faire des Experts à Votre Portée</h2>
+                          <input
+                            type="text"
+                            value={el.data?.subtitle || 'CE QUE VOUS OBTENEZ'}
+                            onChange={(e) => handleUpdateElementData(el.id, { subtitle: e.target.value })}
+                            className="w-full text-center text-[10px] font-black text-[#00A0FF] uppercase tracking-widest bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                            placeholder="Sous-titre..."
+                          />
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || 'Le Savoir-Faire des Experts à Votre Portée'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="w-full text-center text-xl font-heading font-black text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
+                            placeholder="Titre de la section..."
+                          />
                         </div>
 
 
@@ -2677,22 +2703,51 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {el.type === 'BlockFeat2ColIconsLeft' && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-6">
                         <div className="text-center">
-                          <h2 className="text-xl font-heading font-black text-slate-900">Nos Services & Garanties</h2>
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="w-full text-center text-xl font-heading font-black text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
+                            placeholder="Titre de la section..."
+                          />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {[
-                            { title: 'Succès du projet', desc: 'Accompagnement pas à pas pour garantir l atteinte de vos objectifs.' },
-                            { title: 'Stratégie de Marque', desc: 'Positionnement fort pour vous démarquer sur votre marché.' },
-                            { title: 'Un Support Excellent', desc: 'Une équipe réactive disponible pour répondre à toutes vos questions.' },
-                            { title: 'Template Responsive', desc: 'Des interfaces optimisées pour tous les écrans mobiles et ordinateurs.' },
-                          ].map((item, i) => (
-                            <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                          {(el.data?.items || getDefaultBlockData(el.type, el.content).items).map((item: any, i: number) => (
+                            <div key={item.id || i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                               <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">
                                 ✓
                               </div>
-                              <div>
-                                <h4 className="font-heading font-extrabold text-sm text-slate-900">{item.title}</h4>
-                                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
+                              <div className="flex-1 space-y-1">
+                                <input
+                                  type="text"
+                                  value={item.title || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const items = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, title: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items });
+                                  }}
+                                  className="w-full font-heading font-extrabold text-sm text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                  placeholder="Titre..."
+                                />
+                                <textarea
+                                  value={item.desc || ''}
+                                  rows={2}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const items = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                      idx === i ? { ...it, desc: val } : it
+                                    );
+                                    handleUpdateElementData(el.id, { items });
+                                  }}
+                                  className="w-full text-xs text-slate-500 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                                  placeholder="Description..."
+                                />
                               </div>
                             </div>
                           ))}
@@ -2703,49 +2758,123 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {el.type === 'BlockFeat4ColDark' && (
                       <div className="p-8 bg-slate-950 text-white rounded-3xl border border-slate-800 space-y-6 shadow-2xl">
                         <div className="text-center space-y-2">
-                          <h2 className="text-2xl font-heading font-black text-white">Votre titre accrocheur ici pour attirer l attention</h2>
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="w-full text-center text-2xl font-heading font-black text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1"
+                            placeholder="Titre..."
+                          />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          {[
-                            { title: 'Rapidité', desc: 'Déploiement en 1 clic.' },
-                            { title: 'Sécurité', desc: 'Données protégées.' },
-                            { title: 'Performance', desc: 'Vitesse maximale.' },
-                            { title: 'Support', desc: '24/7 disponible.' },
-                          ].map((item, i) => (
-                            <div key={i} className="p-5 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2">
+                          {(el.data?.items || getDefaultBlockData(el.type, el.content).items).map((item: any, i: number) => (
+                            <div key={item.id || i} className="p-5 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2">
                               <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center mx-auto font-black text-sm">
                                 {i + 1}
                               </div>
-                              <h4 className="font-heading font-black text-sm text-white">{item.title}</h4>
-                              <p className="text-xs text-slate-400">{item.desc}</p>
+                              <input
+                                type="text"
+                                value={item.title || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const items = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                    idx === i ? { ...it, title: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items });
+                                }}
+                                className="w-full text-center font-heading font-black text-sm text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                placeholder="Titre..."
+                              />
+                              <textarea
+                                value={item.desc || ''}
+                                rows={2}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const items = (el.data?.items || getDefaultBlockData(el.type, el.content).items).map((it: any, idx: number) =>
+                                    idx === i ? { ...it, desc: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items });
+                                }}
+                                className="w-full text-center text-xs text-slate-400 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                                placeholder="Description..."
+                              />
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* DEFAULT FALLBACK RENDERER */}
+                    {/* DEFAULT FALLBACK RENDERER FOR ANY OTHER BLOCK TYPES */}
                     {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark'].includes(el.type) && (
                       <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
                             👍
                           </div>
-                          <h3 className="font-heading font-black text-base text-slate-900">{el.content}</h3>
+                          <input
+                            type="text"
+                            value={el.data?.title || el.content || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleUpdateElementData(el.id, { title: val });
+                              handleUpdateElementContent(el.id, val);
+                            }}
+                            className="w-full font-heading font-black text-base text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                            placeholder="Nom du bloc..."
+                          />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <h4 className="font-bold text-xs text-slate-900">Élément #1</h4>
-                            <p className="text-[11px] text-slate-500 mt-1">Description pré-remplie prêt à personnaliser.</p>
-                          </div>
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <h4 className="font-bold text-xs text-slate-900">Élément #2</h4>
-                            <p className="text-[11px] text-slate-500 mt-1">Description pré-remplie prêt à personnaliser.</p>
-                          </div>
-                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <h4 className="font-bold text-xs text-slate-900">Élément #3</h4>
-                            <p className="text-[11px] text-slate-500 mt-1">Description pré-remplie prêt à personnaliser.</p>
-                          </div>
+                          {(el.data?.items && el.data.items.length > 0
+                            ? el.data.items
+                            : [
+                                { id: '1', title: 'Élément #1', desc: 'Description pré-remplie prêt à personnaliser.' },
+                                { id: '2', title: 'Élément #2', desc: 'Description pré-remplie prêt à personnaliser.' },
+                                { id: '3', title: 'Élément #3', desc: 'Description pré-remplie prêt à personnaliser.' },
+                              ]
+                          ).map((item: any, i: number) => (
+                            <div key={item.id || i} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                              <input
+                                type="text"
+                                value={item.title || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const currentItems = el.data?.items || [
+                                    { id: '1', title: 'Élément #1', desc: 'Description pré-remplie' },
+                                    { id: '2', title: 'Élément #2', desc: 'Description pré-remplie' },
+                                    { id: '3', title: 'Élément #3', desc: 'Description pré-remplie' },
+                                  ];
+                                  const items = currentItems.map((it: any, idx: number) =>
+                                    idx === i ? { ...it, title: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items });
+                                }}
+                                className="w-full font-bold text-xs text-slate-900 bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                placeholder="Titre..."
+                              />
+                              <textarea
+                                value={item.desc || ''}
+                                rows={2}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const currentItems = el.data?.items || [
+                                    { id: '1', title: 'Élément #1', desc: 'Description pré-remplie' },
+                                    { id: '2', title: 'Élément #2', desc: 'Description pré-remplie' },
+                                    { id: '3', title: 'Élément #3', desc: 'Description pré-remplie' },
+                                  ];
+                                  const items = currentItems.map((it: any, idx: number) =>
+                                    idx === i ? { ...it, desc: val } : it
+                                  );
+                                  handleUpdateElementData(el.id, { items });
+                                }}
+                                className="w-full text-[11px] text-slate-500 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                                placeholder="Description..."
+                              />
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
