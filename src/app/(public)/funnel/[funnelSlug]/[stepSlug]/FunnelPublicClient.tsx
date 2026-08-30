@@ -177,6 +177,221 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
   // RENDER MAISON BUILDER PAGE IF CUSTOM ELEMENTS ARRAY
   if (customElements) {
+    // SPECIAL PIXEL-PERFECT TEMPLATE: THE ARIZONA (TECHNICOLOR BRAND VOICE)
+    const isArizona =
+      step?.templateId === 'the-arizona-technicolor' ||
+      funnel?.templateId === 'the-arizona-technicolor' ||
+      customElements.some((e: any) => e.id?.includes('arizona') || e.content?.includes('Technicolor') || e.content?.includes('Claire'));
+
+    if (isArizona) {
+      const getEl = (type: string, idx = 0) => {
+        const matches = customElements.filter((e: any) => e.type === type || e.id?.includes(type.toLowerCase()));
+        return matches[idx] || matches[0];
+      };
+
+      const heroHeading = customElements.find((e: any) => e.id === 'el-arizona-1') || getEl('Heading', 0);
+      const heroText = customElements.find((e: any) => e.id === 'el-arizona-2') || getEl('Text', 0);
+      const heroBtn = customElements.find((e: any) => e.id === 'el-arizona-3') || getEl('ButtonCTA', 0);
+      const heroImg = customElements.find((e: any) => e.id === 'el-arizona-4') || getEl('Image', 0);
+
+      const claireHeading = customElements.find((e: any) => e.id === 'el-arizona-5') || getEl('Heading', 1);
+      const claireText = customElements.find((e: any) => e.id === 'el-arizona-6') || getEl('Text', 1);
+      const claireBtn = customElements.find((e: any) => e.id === 'el-arizona-7') || getEl('ButtonCTA', 1);
+      const claireImg = customElements.find((e: any) => e.id === 'el-arizona-8') || getEl('Image', 1);
+
+      const sistersBlock = customElements.find((e: any) => e.id === 'el-arizona-9') || getEl('BlockFeat2ColIconsLeft', 0);
+      const cardsBlock = customElements.find((e: any) => e.id === 'el-arizona-10') || getEl('BlockFeat3ColImg', 0);
+
+      return (
+        <div className="min-h-screen bg-[#FFF9EE] text-slate-800 font-sans">
+          {/* 1. TOP TEAL BANNER NAVBAR */}
+          <nav className="bg-[#40B5A6] text-white py-3.5 px-6 shadow-sm">
+            <div className="max-w-5xl mx-auto flex items-center justify-center gap-6 sm:gap-10 text-[11px] font-extrabold tracking-widest uppercase">
+              <span className="hover:opacity-80 cursor-pointer">HOME</span>
+              <span className="hover:opacity-80 cursor-pointer">ABOUT</span>
+              <span className="hover:opacity-80 cursor-pointer">SERVICES</span>
+              <span className="hover:opacity-80 cursor-pointer">BLOG</span>
+              <span className="hover:opacity-80 cursor-pointer">CONTACT</span>
+              <span className="hover:opacity-80 cursor-pointer">EXTRA</span>
+            </div>
+          </nav>
+
+          {/* 2. HERO BANNER SECTION (WARM PASTEL YELLOW #FEF5D7) */}
+          <section className="bg-[#FEF5D7] py-12 px-4 sm:px-8 border-b border-amber-100/60">
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+              {/* DESK PHOTO CONTAINER */}
+              <div className="md:col-span-6 relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] border-4 border-white">
+                <img
+                  src={heroImg?.data?.img || heroImg?.content || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80'}
+                  alt="Technicolor Desk Setup"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* FLOATING WHITE CARD OVERLAY */}
+              <div className="md:col-span-6 bg-white p-8 sm:p-10 rounded-3xl shadow-xl space-y-4 border border-amber-100 text-left">
+                <div className="text-[10px] font-extrabold text-[#D69A3A] uppercase tracking-widest">
+                  {heroHeading?.data?.subtitle || 'MARKETING SELLS WHEN'}
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-serif font-black text-[#D69A3A] leading-tight">
+                  {heroHeading?.content || 'Your Brand Voice, Dressed in Technicolor'}
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                  {heroText?.content || 'Bold copy that demands attention, sparks connection, and converts — without ever toning it down.'}
+                </p>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    className="bg-[#70A327] hover:bg-[#5e8b20] text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all hover:scale-105"
+                  >
+                    {heroBtn?.data?.buttonText || heroBtn?.content || 'GET STARTED NOW'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. "HEY, I'M CLAIRE" SECTION */}
+          <section className="bg-white py-16 px-4 sm:px-8">
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-5 text-left">
+                <h2 className="text-4xl sm:text-5xl font-serif font-black text-[#D69A3A]">
+                  {claireHeading?.content || "Hey, I'm Claire"}
+                </h2>
+                <div className="text-base sm:text-lg font-serif font-bold text-[#40B5A6]">
+                  Welcome to the land of highlighter-worthy copy!
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line">
+                  {claireText?.content ||
+                    'The Painted Paragraph exists to help women take up more space—with words that radiate power, personality, and purpose. Because when your copy clicks, everything changes.\n\nPudding jujubes gingerbread jujubes bamboo sweet powder. Candy canes icing danish shortbread chupa chups topping.'}
+                </p>
+                <div className="pt-3">
+                  <button
+                    type="button"
+                    className="bg-[#70A327] hover:bg-[#5e8b20] text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all hover:scale-105"
+                  >
+                    {claireBtn?.data?.buttonText || claireBtn?.content || 'GET STARTED NOW'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-50 max-w-sm">
+                  <img
+                    src={claireImg?.data?.img || claireImg?.content || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'}
+                    alt="Claire"
+                    className="w-full h-[420px] object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 4. "WE MAY BE SOUL SISTERS IF..." SECTION */}
+          <section className="bg-white py-12 px-4 sm:px-8">
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-100">
+                <img
+                  src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80"
+                  alt="Workspace Flatlay"
+                  className="w-full h-[360px] object-cover"
+                />
+              </div>
+
+              <div className="bg-[#E6F7F5] border border-[#BCEEE6] p-8 rounded-3xl space-y-4 shadow-sm text-left">
+                <h3 className="text-2xl font-serif font-black text-[#40B5A6]">
+                  {sistersBlock?.data?.title || sistersBlock?.content || 'We May Be Soul Sisters If...'}
+                </h3>
+                <div className="space-y-3">
+                  {(sistersBlock?.data?.items || [
+                    { id: '1', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                    { id: '2', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                    { id: '3', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                    { id: '4', desc: 'Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.' },
+                  ]).map((it: any, idx: number) => (
+                    <div key={idx} className="flex items-start gap-3 text-xs text-slate-700 font-medium leading-relaxed">
+                      <span className="text-[#E85D75] text-sm shrink-0 font-bold">♥</span>
+                      <span>{it.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 5. 3-COLUMN FEATURE CARDS ("COPY THAT POPS. STRATEGY THAT SELLS.") */}
+          <section className="bg-white py-16 px-4 sm:px-8 space-y-12">
+            <div className="max-w-5xl mx-auto text-center">
+              <h2 className="text-3xl sm:text-4xl font-serif font-black text-[#D69A3A]">
+                {cardsBlock?.data?.title || cardsBlock?.content || 'Copy that Pops. Strategy that Sells.'}
+              </h2>
+            </div>
+
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* CARD 1: TEAL */}
+              <div className="flex flex-col items-center group">
+                <div className="w-full h-64 rounded-t-[100px] overflow-hidden shadow-md bg-slate-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&q=80"
+                    alt="The Masterpiece"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="text-[11px] font-serif font-extrabold text-[#40B5A6] italic my-2">The Masterpiece</div>
+                <div className="w-full bg-[#40B5A6] text-white p-6 rounded-b-2xl space-y-2 text-center shadow-lg">
+                  <div className="font-extrabold text-xs tracking-wider uppercase">EXCLUSIVE VIP DAYS</div>
+                  <p className="text-[11px] opacity-90 leading-relaxed font-medium">
+                    Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.
+                  </p>
+                </div>
+              </div>
+
+              {/* CARD 2: MINT GREEN */}
+              <div className="flex flex-col items-center group">
+                <div className="w-full h-64 rounded-t-[100px] overflow-hidden shadow-md bg-slate-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=500&q=80"
+                    alt="The Gallery"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="text-[11px] font-serif font-extrabold text-[#52C2A5] italic my-2">The Gallery</div>
+                <div className="w-full bg-[#52C2A5] text-white p-6 rounded-b-2xl space-y-2 text-center shadow-lg">
+                  <div className="font-extrabold text-xs tracking-wider uppercase">LAUNCH & COPY STRATEGY</div>
+                  <p className="text-[11px] opacity-90 leading-relaxed font-medium">
+                    Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.
+                  </p>
+                </div>
+              </div>
+
+              {/* CARD 3: MUSTARD YELLOW */}
+              <div className="flex flex-col items-center group">
+                <div className="w-full h-64 rounded-t-[100px] overflow-hidden shadow-md bg-slate-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=500&q=80"
+                    alt="The Sketch"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="text-[11px] font-serif font-extrabold text-[#F3C035] italic my-2">The Sketch</div>
+                <div className="w-full bg-[#F3C035] text-white p-6 rounded-b-2xl space-y-2 text-center shadow-lg">
+                  <div className="font-extrabold text-xs tracking-wider uppercase">BRAND VOICE INTENSIVE</div>
+                  <p className="text-[11px] opacity-90 leading-relaxed font-medium">
+                    Toffee bonbon gummy bears jujubes pudding cheesecake. Pudding jujubes gingerbread jujubes bonbon sweet powder.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="bg-white border-t border-amber-100 py-6 text-center text-xs text-slate-400">
+            © {new Date().getFullYear()} The Arizona — Technicolor Copy & Brand Voice. All rights reserved.
+          </footer>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-12">
         <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
