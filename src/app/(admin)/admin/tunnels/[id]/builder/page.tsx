@@ -331,13 +331,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       rawW = Math.max(50, Math.min(800, Math.round(rawW)));
       rawH = Math.max(50, Math.min(800, Math.round(rawH)));
 
-      // GENTLE CONTROLLED MAGNETIC SNAP ALIGNMENT LOGIC (NATURAL 10px THRESHOLD)
+      // HARD MAGNETIC FRICTION WALL SNAP LOGIC (STOPS AT TARGET HEIGHT LIKE HITTING A SOLID WALL)
       let finalH = rawH;
       let finalW = rawW;
       let snappedH = false;
       for (const targetH of targetHeights) {
-        if (Math.abs(rawH - targetH) <= 10) {
-          finalH = targetH;
+        if (Math.abs(rawH - targetH) <= 24) {
+          finalH = targetH; // STOPS THE IMAGE HEIGHT HARD AT TARGET HEIGHT LIKE A PHYSICAL WALL
           if (dir.startsWith('corner')) {
             finalW = Math.round(finalH * aspectRatio);
           }
@@ -349,7 +349,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       let snappedW = false;
       if (!snappedH) {
         for (const targetW of targetWidths) {
-          if (Math.abs(rawW - targetW) <= 10) {
+          if (Math.abs(rawW - targetW) <= 24) {
             finalW = targetW;
             if (dir.startsWith('corner')) {
               finalH = Math.round(finalW / aspectRatio);
@@ -2124,31 +2124,53 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     )}
                                   </div>
 
-                                  {/* 📌 PERMANENT BLUE REFERENCE LINE (OUTSIDE OVERFLOW-HIDDEN, 100% PERFECTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
-                                  {col.isFixedReference && (
-                                    <div
-                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center"
-                                      style={{ top: `${col.imgSize || 280}px` }}
-                                    >
-                                      <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                        <span>📌</span>
-                                        <span>Ligne de Référence Fixée ({col.imgSize || 280}px)</span>
-                                      </span>
-                                    </div>
-                                  )}
+                                  {/* 📌 PERMANENT REFERENCE & MAGNETIC SNAP LINE ON FIXED IMAGE */}
+                                  {col.isFixedReference && (() => {
+                                    const refH = col.imgSize || 280;
+                                    const isSnappedToThisRef = selectedSubItem?.blockId === el.id && snapGuide?.active && snapGuide?.val !== undefined && Math.abs(snapGuide.val - refH) <= 2;
 
-                                  {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
-                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (
-                                    <div
-                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
-                                      style={{ top: `${snapGuide.val}px` }}
-                                    >
-                                      <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                        <span>🧲</span>
-                                        <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
-                                      </span>
-                                    </div>
-                                  )}
+                                    return (
+                                      <div
+                                        className={`absolute -left-[2000px] -right-[2000px] h-[3.5px] transition-all pointer-events-none flex items-center justify-center ${
+                                          isSnappedToThisRef
+                                            ? 'bg-[#FF007F] shadow-[0_0_20px_#FF007F] animate-pulse z-50'
+                                            : 'bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40'
+                                        }`}
+                                        style={{ top: `${refH}px` }}
+                                      >
+                                        <span
+                                          className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5 ${
+                                            isSnappedToThisRef ? 'bg-[#FF007F]' : 'bg-[#00A0FF]'
+                                          }`}
+                                        >
+                                          <span>{isSnappedToThisRef ? '🧲' : '📌'}</span>
+                                          <span>
+                                            {isSnappedToThisRef
+                                              ? `Aimanté sur la ligne de référence (${refH}px)`
+                                              : `Ligne de Référence Fixée (${refH}px)`}
+                                          </span>
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
+
+                                  {/* 🧲 DYNAMIC SNAP LINE ON RESIZING IMAGE WHEN ALIGNING TO SIBLINGS (WITHOUT FIXED REF) */}
+                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (() => {
+                                    const hasFixedRefItem = (el.data?.items || getDefaultBlockData(el.type, el.content).items).some((it: any) => it.isFixedReference);
+                                    if (hasFixedRefItem) return null; // Badge is handled on fixed reference line
+
+                                    return (
+                                      <div
+                                        className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
+                                        style={{ top: `${snapGuide.val}px` }}
+                                      >
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>🧲</span>
+                                          <span>Aimanté sur la ligne voisine ({snapGuide.val}px)</span>
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
 
                                 {/* CLICKABLE TITLE WITH HIGHLIGHT */}
@@ -2300,31 +2322,53 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     )}
                                   </div>
 
-                                  {/* 📌 PERMANENT BLUE REFERENCE LINE (OUTSIDE OVERFLOW-HIDDEN, 100% PERFECTLY AT THE BOTTOM EDGE OF THE FIXED IMAGE) */}
-                                  {col.isFixedReference && (
-                                    <div
-                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center"
-                                      style={{ top: `${col.imgSize || 220}px` }}
-                                    >
-                                      <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                        <span>📌</span>
-                                        <span>Ligne de Référence Fixée ({col.imgSize || 220}px)</span>
-                                      </span>
-                                    </div>
-                                  )}
+                                  {/* 📌 PERMANENT REFERENCE & MAGNETIC SNAP LINE ON FIXED IMAGE */}
+                                  {col.isFixedReference && (() => {
+                                    const refH = col.imgSize || 220;
+                                    const isSnappedToThisRef = selectedSubItem?.blockId === el.id && snapGuide?.active && snapGuide?.val !== undefined && Math.abs(snapGuide.val - refH) <= 2;
 
-                                  {/* 🧲 HIGHLIGHTED SNAP LINE WHEN DRAGGING ANOTHER IMAGE ONTO THE REFERENCE */}
-                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (
-                                    <div
-                                      className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
-                                      style={{ top: `${snapGuide.val}px` }}
-                                    >
-                                      <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
-                                        <span>🧲</span>
-                                        <span>Aimanté sur la ligne de référence ({snapGuide.val}px)</span>
-                                      </span>
-                                    </div>
-                                  )}
+                                    return (
+                                      <div
+                                        className={`absolute -left-[2000px] -right-[2000px] h-[3.5px] transition-all pointer-events-none flex items-center justify-center ${
+                                          isSnappedToThisRef
+                                            ? 'bg-[#FF007F] shadow-[0_0_20px_#FF007F] animate-pulse z-50'
+                                            : 'bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40'
+                                        }`}
+                                        style={{ top: `${refH}px` }}
+                                      >
+                                        <span
+                                          className={`text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5 ${
+                                            isSnappedToThisRef ? 'bg-[#FF007F]' : 'bg-[#00A0FF]'
+                                          }`}
+                                        >
+                                          <span>{isSnappedToThisRef ? '🧲' : '📌'}</span>
+                                          <span>
+                                            {isSnappedToThisRef
+                                              ? `Aimanté sur la ligne de référence (${refH}px)`
+                                              : `Ligne de Référence Fixée (${refH}px)`}
+                                          </span>
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
+
+                                  {/* 🧲 DYNAMIC SNAP LINE ON RESIZING IMAGE WHEN ALIGNING TO SIBLINGS (WITHOUT FIXED REF) */}
+                                  {isImgSel && snapGuide?.active && !col.isFixedReference && (() => {
+                                    const hasFixedRefItem = (el.data?.items || getDefaultBlockData(el.type, el.content).items).some((it: any) => it.isFixedReference);
+                                    if (hasFixedRefItem) return null;
+
+                                    return (
+                                      <div
+                                        className="absolute -left-[2000px] -right-[2000px] h-[3.5px] bg-[#FF007F] shadow-[0_0_18px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center"
+                                        style={{ top: `${snapGuide.val}px` }}
+                                      >
+                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>🧲</span>
+                                          <span>Aimanté sur la ligne voisine ({snapGuide.val}px)</span>
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                                 <h4
                                   onClick={(e) => {
