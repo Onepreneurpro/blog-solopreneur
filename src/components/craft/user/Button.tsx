@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, getUnderlineAndHighlightStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay } from './Text';
 
 export interface ButtonProps {
   text?: string;
@@ -83,15 +83,18 @@ export const Button = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
-  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
-    underlineEnabled,
-    underlineColor,
-    underlineThickness,
-    underlineStyle,
-    underlineOffset,
-    highlightColor,
-    highlightPadding
-  );
+
+  const highlightStyles: React.CSSProperties =
+    highlightColor && highlightColor !== 'transparent'
+      ? {
+          backgroundColor: highlightColor,
+          paddingLeft: `${highlightPadding}px`,
+          paddingRight: `${highlightPadding}px`,
+          borderRadius: '4px',
+          boxDecorationBreak: 'clone',
+          WebkitBoxDecorationBreak: 'clone',
+        }
+      : {};
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -109,11 +112,19 @@ export const Button = ({
             padding: `${paddingY}px ${paddingX}px`,
             minHeight: height ? `${height}px` : undefined,
             boxShadow,
-            ...underlineHighlightStyles,
           }}
           className="w-full font-black text-sm hover:opacity-90 transition-all flex items-center justify-center text-center overflow-hidden"
         >
-          {text}
+          <span className="relative inline-block" style={{ ...highlightStyles }}>
+            <span>{text}</span>
+            <CreativeUnderlineOverlay
+              enabled={underlineEnabled}
+              color={underlineColor}
+              thickness={underlineThickness}
+              style={underlineStyle}
+              offset={underlineOffset}
+            />
+          </span>
         </a>
       </div>
     );
@@ -132,13 +143,6 @@ export const Button = ({
     >
       <button
         type="button"
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: ButtonProps) => {
-            props.text = e.currentTarget.innerText;
-          });
-        }}
         style={{
           ...bgStyles,
           color: textColor,
@@ -150,11 +154,30 @@ export const Button = ({
           minHeight: height ? `${height}px` : undefined,
           boxShadow,
           outline: 'none',
-          ...underlineHighlightStyles,
         }}
         className="w-full font-black text-sm hover:opacity-90 transition-all cursor-text flex items-center justify-center text-center overflow-hidden"
       >
-        {text}
+        <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              setProp((props: ButtonProps) => {
+                props.text = e.currentTarget.innerText;
+              });
+            }}
+            style={{ outline: 'none' }}
+          >
+            {text}
+          </span>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
+        </span>
       </button>
     </div>
   );

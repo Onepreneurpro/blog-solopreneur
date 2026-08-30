@@ -65,35 +65,62 @@ export const getBackgroundStyles = (bgColor?: string, bgImage?: string) => {
   return styles;
 };
 
-export const getUnderlineAndHighlightStyles = (
-  underlineEnabled?: boolean,
-  underlineColor = '#00A0FF',
-  underlineThickness = 4,
-  underlineStyle = 'solid',
-  underlineOffset = 2,
-  highlightColor?: string,
-  highlightPadding = 6
-): React.CSSProperties => {
-  const styles: React.CSSProperties = {};
+export const CreativeUnderlineOverlay = ({
+  enabled,
+  color = '#00A0FF',
+  thickness = 4,
+  style = 'solid',
+  offset = 2,
+}: {
+  enabled?: boolean;
+  color?: string;
+  thickness?: number;
+  style?: string;
+  offset?: number;
+}) => {
+  if (!enabled) return null;
 
-  if (underlineEnabled) {
-    styles.textDecorationLine = 'underline';
-    styles.textDecorationColor = underlineColor;
-    styles.textDecorationThickness = `${underlineThickness}px`;
-    styles.textDecorationStyle = underlineStyle as any;
-    styles.textUnderlineOffset = `${underlineOffset}px`;
+  if (style === 'wavy') {
+    return (
+      <svg
+        className="absolute left-0 w-full overflow-visible pointer-events-none"
+        style={{
+          bottom: `${-offset}px`,
+          height: `${Math.max(thickness * 2.5, 10)}px`,
+        }}
+        viewBox="0 0 100 20"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M 0 10 Q 6.25 0, 12.5 10 T 25 10 T 37.5 10 T 50 10 T 62.5 10 T 75 10 T 87.5 10 T 100 10"
+          fill="none"
+          stroke={color}
+          strokeWidth={thickness * 1.5}
+          strokeLinecap="round"
+        />
+      </svg>
+    );
   }
 
-  if (highlightColor && highlightColor !== 'transparent') {
-    styles.backgroundColor = highlightColor;
-    styles.paddingLeft = `${highlightPadding}px`;
-    styles.paddingRight = `${highlightPadding}px`;
-    styles.borderRadius = '4px';
-    styles.boxDecorationBreak = 'clone';
-    styles.WebkitBoxDecorationBreak = 'clone';
-  }
-
-  return styles;
+  return (
+    <span
+      className="absolute left-0 w-full pointer-events-none"
+      style={{
+        bottom: `${-offset}px`,
+        borderBottomWidth: `${thickness}px`,
+        borderBottomColor: color,
+        borderBottomStyle:
+          style === 'double'
+            ? 'double'
+            : style === 'dotted'
+            ? 'dotted'
+            : style === 'dashed'
+            ? 'dashed'
+            : 'solid',
+        height: style === 'double' ? `${thickness * 2}px` : '0px',
+      }}
+    />
+  );
 };
 
 export const Text = ({
@@ -138,15 +165,18 @@ export const Text = ({
   const Tag = tagName;
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
-  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
-    underlineEnabled,
-    underlineColor,
-    underlineThickness,
-    underlineStyle,
-    underlineOffset,
-    highlightColor,
-    highlightPadding
-  );
+
+  const highlightStyles: React.CSSProperties =
+    highlightColor && highlightColor !== 'transparent'
+      ? {
+          backgroundColor: highlightColor,
+          paddingLeft: `${highlightPadding}px`,
+          paddingRight: `${highlightPadding}px`,
+          borderRadius: '4px',
+          boxDecorationBreak: 'clone',
+          WebkitBoxDecorationBreak: 'clone',
+        }
+      : {};
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -169,11 +199,19 @@ export const Text = ({
             fontWeight,
             fontStyle,
             fontFamily,
-            ...underlineHighlightStyles,
           }}
           className="tracking-tight leading-tight w-full inline-block"
         >
-          {text}
+          <span className="relative inline-block" style={{ ...highlightStyles }}>
+            <span>{text}</span>
+            <CreativeUnderlineOverlay
+              enabled={underlineEnabled}
+              color={underlineColor}
+              thickness={underlineThickness}
+              style={underlineStyle}
+              offset={underlineOffset}
+            />
+          </span>
         </Tag>
       </div>
     );
@@ -197,13 +235,6 @@ export const Text = ({
       }}
     >
       <Tag
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: TextProps) => {
-            props.text = e.currentTarget.innerText;
-          });
-        }}
         style={{
           fontSize: `${fontSize}px`,
           textAlign,
@@ -211,13 +242,30 @@ export const Text = ({
           fontWeight,
           fontStyle,
           fontFamily,
-          outline: 'none',
-          cursor: 'text',
-          ...underlineHighlightStyles,
         }}
         className="tracking-tight leading-tight w-full min-w-[50px] inline-block"
       >
-        {text}
+        <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              setProp((props: TextProps) => {
+                props.text = e.currentTarget.innerText;
+              });
+            }}
+            style={{ outline: 'none', cursor: 'text' }}
+          >
+            {text}
+          </span>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
+        </span>
       </Tag>
     </div>
   );

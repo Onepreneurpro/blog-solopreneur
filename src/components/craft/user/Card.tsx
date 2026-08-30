@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
-import { getBoxShadow, getBackgroundStyles, getUnderlineAndHighlightStyles } from './Text';
+import { getBoxShadow, getBackgroundStyles, CreativeUnderlineOverlay } from './Text';
 
 export interface CardProps {
   title?: string;
@@ -67,15 +67,18 @@ export const Card = ({
 
   const boxShadow = getBoxShadow(shadowPreset, shadowBlur, shadowOffsetY, shadowColor, shadowOpacity);
   const bgStyles = getBackgroundStyles(bgColor, bgImage);
-  const underlineHighlightStyles = getUnderlineAndHighlightStyles(
-    underlineEnabled,
-    underlineColor,
-    underlineThickness,
-    underlineStyle,
-    underlineOffset,
-    highlightColor,
-    highlightPadding
-  );
+
+  const highlightStyles: React.CSSProperties =
+    highlightColor && highlightColor !== 'transparent'
+      ? {
+          backgroundColor: highlightColor,
+          paddingLeft: `${highlightPadding}px`,
+          paddingRight: `${highlightPadding}px`,
+          borderRadius: '4px',
+          boxDecorationBreak: 'clone',
+          WebkitBoxDecorationBreak: 'clone',
+        }
+      : {};
 
   // PUBLIC READ-ONLY VIEW
   if (!enabled) {
@@ -92,12 +95,19 @@ export const Card = ({
           boxShadow,
         }}
       >
-        <h3
-          style={{ ...underlineHighlightStyles }}
-          className="font-heading font-black text-lg text-slate-900 px-1 inline-block"
-        >
-          {title}
+        <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
+          <span className="relative inline-block" style={{ ...highlightStyles }}>
+            <span>{title}</span>
+            <CreativeUnderlineOverlay
+              enabled={underlineEnabled}
+              color={underlineColor}
+              thickness={underlineThickness}
+              style={underlineStyle}
+              offset={underlineOffset}
+            />
+          </span>
         </h3>
+
         <p className="text-sm font-medium text-[#475569] leading-relaxed p-1">
           {content}
         </p>
@@ -124,18 +134,28 @@ export const Card = ({
         boxShadow,
       }}
     >
-      <h3
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          setProp((props: CardProps) => {
-            props.title = e.currentTarget.innerText;
-          });
-        }}
-        style={{ ...underlineHighlightStyles }}
-        className="font-heading font-black text-lg text-slate-900 outline-none focus:ring-2 focus:ring-[#00A0FF] rounded-md px-1 cursor-text inline-block"
-      >
-        {title}
+      <h3 className="font-heading font-black text-lg text-slate-900 px-1 inline-block">
+        <span className="relative inline-block" style={{ ...highlightStyles }}>
+          <span
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              setProp((props: CardProps) => {
+                props.title = e.currentTarget.innerText;
+              });
+            }}
+            style={{ outline: 'none', cursor: 'text' }}
+          >
+            {title}
+          </span>
+          <CreativeUnderlineOverlay
+            enabled={underlineEnabled}
+            color={underlineColor}
+            thickness={underlineThickness}
+            style={underlineStyle}
+            offset={underlineOffset}
+          />
+        </span>
       </h3>
 
       <p
