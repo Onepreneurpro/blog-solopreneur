@@ -29,25 +29,22 @@ export const Viewport = ({ deviceMode, jsonContent }: ViewportProps) => {
         className={`bg-white rounded-3xl shadow-2xl min-h-[800px] transition-all my-auto ${widthClasses[deviceMode]}`}
       >
         <Frame data={jsonContent ? JSON.parse(jsonContent) : undefined}>
-          <Element is={Container} padding={40} bgGradient="bg-gradient-to-r from-blue-600 to-indigo-900" canvas>
+          <Element is={Container} padding={40} bgColor="#ffffff" canvas>
             <Text
               text="Bienvenue sur votre Tunnel Beta 2 (Craft.js)"
               fontSize={36}
-              textColor="#ffffff"
+              textColor="#0f172a"
               textAlign="center"
             />
             <Text
               text="Glissez-déposez n importe quel composant depuis le panneau de gauche et personnalisez-le directement sur la page."
               fontSize={16}
-              textColor="#f1f5f9"
+              textColor="#475569"
               textAlign="center"
               fontWeight="normal"
             />
             <Button text="Commencer mon essai gratuit 🚀" align="center" />
             <Image height={320} borderRadius={24} />
-          </Element>
-
-          <Element is={Container} padding={24} bgColor="#ffffff" canvas>
             <Text text="Nos Modules & Fonctionnalités" fontSize={28} textAlign="center" textColor="#0f172a" />
             <FeatureGrid columns={4} />
           </Element>
