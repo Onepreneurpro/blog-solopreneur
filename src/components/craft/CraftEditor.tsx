@@ -15,6 +15,7 @@ import { Toolbox } from './Toolbox';
 import { SettingsPanel } from './SettingsPanel';
 import { Header } from './Header';
 import { Viewport } from './Viewport';
+import { FloatingTextToolbar } from './FloatingTextToolbar';
 
 interface CraftEditorProps {
   stepData?: any;
@@ -71,6 +72,7 @@ export const CraftEditor = ({ stepData, stepId }: CraftEditorProps) => {
             jsonContent={jsonContent}
           />
           <SettingsPanel />
+          <FloatingTextToolbar />
         </div>
       </div>
     </Editor>
