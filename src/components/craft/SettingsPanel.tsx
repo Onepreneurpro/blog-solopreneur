@@ -404,7 +404,7 @@ export const SettingsPanel = () => {
           </div>
         )}
 
-        {/* UNDERLINE (SOULIGNAGE CRÉATIF AVEC DÉCALAGE / CHEVAUCHEMENT TEXTE) */}
+        {/* UNDERLINE (SOULIGNAGE CRÉATIF AVEC DÉCALAGE / CHEVAUCHEMENT TEXTE) - ALWAYS VISIBLE */}
         {(props.title !== undefined || props.text !== undefined) && (
           <div className="space-y-3 bg-sky-50/60 p-3.5 rounded-2xl border border-sky-200">
             <div className="flex items-center justify-between font-black text-slate-900 text-xs">
@@ -414,11 +414,12 @@ export const SettingsPanel = () => {
               </span>
               <button
                 onClick={() => {
-                  const formatted = applySelectionFormat('underline', props.underlineColor || '#00A0FF');
-                  if (!formatted) {
-                    actions.setProp(id, (nodeProps: any) => {
-                      nodeProps.underlineEnabled = !nodeProps.underlineEnabled;
-                    });
+                  const nextState = !props.underlineEnabled;
+                  actions.setProp(id, (nodeProps: any) => {
+                    nodeProps.underlineEnabled = nextState;
+                  });
+                  if (nextState) {
+                    applySelectionFormat('underline', props.underlineColor || '#00A0FF');
                   }
                 }}
                 className={`px-2.5 py-1 rounded-lg font-bold text-[10px] transition-colors ${
@@ -431,114 +432,118 @@ export const SettingsPanel = () => {
               </button>
             </div>
 
-            {props.underlineEnabled && (
-              <div className="space-y-3 pt-2 border-t border-sky-200/80 animate-in fade-in">
-                {/* UNDERLINE COLOR */}
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Couleur du Trait de Soulignement</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={props.underlineColor || '#00A0FF'}
-                      onChange={(e) =>
-                        actions.setProp(id, (nodeProps: any) => {
-                          nodeProps.underlineColor = e.target.value;
-                        })
-                      }
-                      className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
-                    />
-                    <input
-                      type="text"
-                      value={props.underlineColor || '#00A0FF'}
-                      onChange={(e) =>
-                        actions.setProp(id, (nodeProps: any) => {
-                          nodeProps.underlineColor = e.target.value;
-                        })
-                      }
-                      className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
-                    />
-                  </div>
-                </div>
-
-                {/* UNDERLINE STYLE (SOLIDE, ONDULÉ WAVY, POINTILLÉ, TIRET, DOUBLE) */}
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Style de Trait</label>
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { key: 'solid', label: 'Solide' },
-                      { key: 'wavy', label: 'Ondulé 🌊' },
-                      { key: 'dotted', label: 'Points •' },
-                      { key: 'dashed', label: 'Tirets -' },
-                      { key: 'double', label: 'Double =' },
-                    ].map((st) => (
-                      <button
-                        key={st.key}
-                        onClick={() =>
-                          actions.setProp(id, (nodeProps: any) => {
-                            nodeProps.underlineStyle = st.key;
-                          })
-                        }
-                        className={`py-1 px-1.5 rounded-lg border font-extrabold text-[10px] transition-colors ${
-                          (props.underlineStyle || 'solid') === st.key
-                            ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-100/50'
-                        }`}
-                      >
-                        {st.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* UNDERLINE THICKNESS (ÉPAISSEUR DU TRAIT) */}
-                <div className="space-y-1">
-                  <div className="flex justify-between font-bold text-slate-700 text-[11px]">
-                    <span>Épaisseur du Trait</span>
-                    <span>{props.underlineThickness !== undefined ? props.underlineThickness : 4}px</span>
-                  </div>
+            {/* SLIDERS & CONTROLS ALWAYS VISIBLE FOR 1-CLICK ACCESS */}
+            <div className="space-y-3 pt-2 border-t border-sky-200/80">
+              {/* UNDERLINE COLOR */}
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 text-[11px]">Couleur du Trait de Soulignement</label>
+                <div className="flex items-center gap-2">
                   <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    step={1}
-                    value={props.underlineThickness !== undefined ? props.underlineThickness : 4}
+                    type="color"
+                    value={props.underlineColor || '#00A0FF'}
                     onChange={(e) =>
                       actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.underlineThickness = parseInt(e.target.value, 10);
+                        nodeProps.underlineColor = e.target.value;
+                        nodeProps.underlineEnabled = true;
                       })
                     }
-                    className="w-full accent-sky-600"
+                    className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                   />
-                </div>
-
-                {/* UNDERLINE VERTICAL OFFSET / OVERLAP INTERFERENCE WITH TEXT */}
-                <div className="space-y-1 bg-white p-2.5 rounded-xl border border-sky-200">
-                  <div className="flex justify-between font-black text-slate-900 text-[11px]">
-                    <span>↕️ Position / Chevauchement avec le Texte</span>
-                    <span className="text-sky-600 font-mono">
-                      {props.underlineOffset !== undefined ? props.underlineOffset : 2}px
-                    </span>
-                  </div>
                   <input
-                    type="range"
-                    min={-12}
-                    max={14}
-                    step={1}
-                    value={props.underlineOffset !== undefined ? props.underlineOffset : 2}
+                    type="text"
+                    value={props.underlineColor || '#00A0FF'}
                     onChange={(e) =>
                       actions.setProp(id, (nodeProps: any) => {
-                        nodeProps.underlineOffset = parseInt(e.target.value, 10);
+                        nodeProps.underlineColor = e.target.value;
+                        nodeProps.underlineEnabled = true;
                       })
                     }
-                    className="w-full accent-sky-600"
+                    className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-xs"
                   />
-                  <div className="flex justify-between text-[9px] text-slate-500 font-semibold px-0.5">
-                    <span>⬆️ Interfère / Remonte sur les lettres (-12px)</span>
-                    <span>Sous le texte (14px) ⬇️</span>
-                  </div>
                 </div>
               </div>
-            )}
+
+              {/* UNDERLINE STYLE (SOLIDE, ONDULÉ WAVY, POINTILLÉ, TIRET, DOUBLE) */}
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 text-[11px]">Style de Trait</label>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { key: 'solid', label: 'Solide' },
+                    { key: 'wavy', label: 'Ondulé 🌊' },
+                    { key: 'dotted', label: 'Points •' },
+                    { key: 'dashed', label: 'Tirets -' },
+                    { key: 'double', label: 'Double =' },
+                  ].map((st) => (
+                    <button
+                      key={st.key}
+                      onClick={() =>
+                        actions.setProp(id, (nodeProps: any) => {
+                          nodeProps.underlineStyle = st.key;
+                          nodeProps.underlineEnabled = true;
+                        })
+                      }
+                      className={`py-1 px-1.5 rounded-lg border font-extrabold text-[10px] transition-colors ${
+                        (props.underlineStyle || 'solid') === st.key
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-sky-100/50'
+                      }`}
+                    >
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* UNDERLINE THICKNESS (ÉPAISSEUR DU TRAIT) */}
+              <div className="space-y-1">
+                <div className="flex justify-between font-bold text-slate-700 text-[11px]">
+                  <span>Épaisseur du Trait</span>
+                  <span>{props.underlineThickness !== undefined ? props.underlineThickness : 4}px</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={12}
+                  step={1}
+                  value={props.underlineThickness !== undefined ? props.underlineThickness : 4}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.underlineThickness = parseInt(e.target.value, 10);
+                      nodeProps.underlineEnabled = true;
+                    })
+                  }
+                  className="w-full accent-sky-600"
+                />
+              </div>
+
+              {/* UNDERLINE VERTICAL OFFSET / OVERLAP INTERFERENCE WITH TEXT */}
+              <div className="space-y-1 bg-white p-2.5 rounded-xl border border-sky-200">
+                <div className="flex justify-between font-black text-slate-900 text-[11px]">
+                  <span>↕️ Position / Chevauchement avec le Texte</span>
+                  <span className="text-sky-600 font-mono">
+                    {props.underlineOffset !== undefined ? props.underlineOffset : 2}px
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={-12}
+                  max={14}
+                  step={1}
+                  value={props.underlineOffset !== undefined ? props.underlineOffset : 2}
+                  onChange={(e) =>
+                    actions.setProp(id, (nodeProps: any) => {
+                      nodeProps.underlineOffset = parseInt(e.target.value, 10);
+                      nodeProps.underlineEnabled = true;
+                    })
+                  }
+                  className="w-full accent-sky-600"
+                />
+                <div className="flex justify-between text-[9px] text-slate-500 font-semibold px-0.5">
+                  <span>⬆️ Interfère / Remonte sur les lettres (-12px)</span>
+                  <span>Sous le texte (14px) ⬇️</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
