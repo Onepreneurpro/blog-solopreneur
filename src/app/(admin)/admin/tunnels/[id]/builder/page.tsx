@@ -69,6 +69,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     subType: 'image' | 'title' | 'desc';
   } | null>(null);
 
+  // MAGNETIC SNAP GUIDE LINE STATE FOR AUTOMATIC ALIGNMENT
+  const [snapGuide, setSnapGuide] = useState<{
+    active: boolean;
+    type?: 'height' | 'width' | 'both';
+    val?: number;
+  } | null>(null);
+
   // Canvas elements state
   const [elements, setElements] = useState<CanvasElement[]>([
     {
@@ -242,12 +249,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return { title: name, items: [] };
   };
 
-  // MOUSE INTERACTIVE DRAG RESIZING HANDLER FOR CANVAS SELECTION BOXES
+  // MOUSE INTERACTIVE DRAG RESIZING & MAGNETIC ALIGNMENT SNAP HANDLER
   const handleStartSubItemResize = (
     e: React.MouseEvent,
     blockId: string,
     itemIndex: number,
-    mode: 'both' | 'width' | 'height'
+    dir: 'corner-br' | 'corner-bl' | 'corner-tr' | 'corner-tl' | 'edge-t' | 'edge-b' | 'edge-l' | 'edge-r'
   ) => {
     e.stopPropagation();
     e.preventDefault();
@@ -269,12 +276,77 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     const startW = currentItem.imgWidth || 280;
     const startH = currentItem.imgSize || 240;
 
+    // Collect sibling heights & widths for magnetic alignment snap
+    const siblingHeights = elItems
+      .map((it: any, idx: number) => (idx !== itemIndex ? it.imgSize || 280 : null))
+      .filter(Boolean);
+    const siblingWidths = elItems
+      .map((it: any, idx: number) => (idx !== itemIndex ? it.imgWidth || 280 : null))
+      .filter(Boolean);
+
     const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
 
-      const newW = mode !== 'height' ? Math.max(50, Math.min(800, Math.round(startW + deltaX))) : startW;
-      const newH = mode !== 'width' ? Math.max(50, Math.min(800, Math.round(startH + deltaY))) : startH;
+      let rawW = startW;
+      let rawH = startH;
+
+      if (dir === 'corner-br') {
+        rawW = startW + deltaX;
+        rawH = startH + deltaY;
+      } else if (dir === 'corner-bl') {
+        rawW = startW - deltaX;
+        rawH = startH + deltaY;
+      } else if (dir === 'corner-tr') {
+        rawW = startW + deltaX;
+        rawH = startH - deltaY;
+      } else if (dir === 'corner-tl') {
+        rawW = startW - deltaX;
+        rawH = startH - deltaY;
+      } else if (dir === 'edge-r') {
+        rawW = startW + deltaX;
+      } else if (dir === 'edge-l') {
+        rawW = startW - deltaX;
+      } else if (dir === 'edge-b') {
+        rawH = startH + deltaY;
+      } else if (dir === 'edge-t') {
+        rawH = startH - deltaY;
+      }
+
+      rawW = Math.max(50, Math.min(800, Math.round(rawW)));
+      rawH = Math.max(50, Math.min(800, Math.round(rawH)));
+
+      // MAGNETIC SNAP ALIGNMENT LOGIC (THRESHOLD = 14px)
+      let finalH = rawH;
+      let snappedH = false;
+      for (const siblingH of siblingHeights) {
+        if (Math.abs(rawH - siblingH) <= 14) {
+          finalH = siblingH;
+          snappedH = true;
+          break;
+        }
+      }
+
+      let finalW = rawW;
+      let snappedW = false;
+      for (const siblingW of siblingWidths) {
+        if (Math.abs(rawW - siblingW) <= 14) {
+          finalW = siblingW;
+          snappedW = true;
+          break;
+        }
+      }
+
+      // SHOW MAGNETIC SNAP GUIDE VISUAL BADGE & LINE
+      if (snappedH || snappedW) {
+        setSnapGuide({
+          active: true,
+          type: snappedH && snappedW ? 'both' : snappedH ? 'height' : 'width',
+          val: snappedH ? finalH : finalW,
+        });
+      } else {
+        setSnapGuide(null);
+      }
 
       setElements((prev) =>
         prev.map((item) => {
@@ -285,7 +357,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               : getDefaultBlockData(item.type, item.content).items;
 
           const updatedItems = itemsList.map((it: any, idx: number) =>
-            idx === itemIndex ? { ...it, imgWidth: newW, imgSize: newH } : it
+            idx === itemIndex ? { ...it, imgWidth: finalW, imgSize: finalH } : it
           );
 
           return {
@@ -300,6 +372,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     };
 
     const onMouseUp = () => {
+      setSnapGuide(null);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
@@ -1909,26 +1982,63 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* INTERACTIVE DRAG RESIZE HANDLES (POIGNÉES DE REDIMENSIONNEMENT SUR LE CADRE) */}
+                                    {/* INTERACTIVE DRAG RESIZE HANDLES (LES 8 POINTS D ACCROCHE & BORDS DU CADRE) */}
                                     {isImgSel && (
                                       <>
-                                        {/* BOTTOM-RIGHT CORNER HANDLE (BOTH WIDTH & HEIGHT) */}
+                                        {/* MAGNETIC ALIGNMENT SNAP BADGE & GUIDE LINE */}
+                                        {snapGuide?.active && (
+                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#FF007F] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-xl flex items-center gap-1 z-50 animate-pulse pointer-events-none whitespace-nowrap">
+                                            <span>🧲 Aimanté aux éléments de la section ({snapGuide.val}px)</span>
+                                          </div>
+                                        )}
+
+                                        {/* 1. TOP-LEFT CORNER */}
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'both')}
-                                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-se-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Cliquer et glisser pour agrandir/réduire le cadre"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tl')}
+                                          className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Haut-Gauche)"
                                         />
-                                        {/* RIGHT CENTER HANDLE (WIDTH) */}
+                                        {/* 2. TOP-RIGHT CORNER */}
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'width')}
-                                          className="absolute top-1/2 -right-1 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-e-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Glisser pour modifier la largeur"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tr')}
+                                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Haut-Droit)"
                                         />
-                                        {/* BOTTOM CENTER HANDLE (HEIGHT) */}
+                                        {/* 3. BOTTOM-LEFT CORNER */}
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'height')}
-                                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-s-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Glisser pour modifier la hauteur"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-bl')}
+                                          className="absolute -bottom-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Bas-Gauche)"
+                                        />
+                                        {/* 4. BOTTOM-RIGHT CORNER */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-br')}
+                                          className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Bas-Droit)"
+                                        />
+                                        {/* 5. TOP EDGE */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-t')}
+                                          className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord supérieur (Hauteur)"
+                                        />
+                                        {/* 6. BOTTOM EDGE */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-b')}
+                                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord inférieur (Hauteur)"
+                                        />
+                                        {/* 7. LEFT EDGE */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-l')}
+                                          className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord gauche (Largeur)"
+                                        />
+                                        {/* 8. RIGHT EDGE */}
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-r')}
+                                          className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord droit (Largeur)"
                                         />
                                       </>
                                     )}
@@ -2021,23 +2131,55 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* INTERACTIVE DRAG RESIZE HANDLES */}
+                                    {/* INTERACTIVE DRAG RESIZE HANDLES (LES 8 POINTS D ACCROCHE) */}
                                     {isImgSel && (
                                       <>
+                                        {/* MAGNETIC ALIGNMENT SNAP BADGE */}
+                                        {snapGuide?.active && (
+                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#FF007F] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-xl flex items-center gap-1 z-50 animate-pulse pointer-events-none whitespace-nowrap">
+                                            <span>🧲 Aimanté aux éléments de la section ({snapGuide.val}px)</span>
+                                          </div>
+                                        )}
+
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'both')}
-                                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-se-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Cliquer et glisser pour agrandir/réduire le cadre"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tl')}
+                                          className="absolute -top-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Haut-Gauche)"
                                         />
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'width')}
-                                          className="absolute top-1/2 -right-1 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-e-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Glisser pour modifier la largeur"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-tr')}
+                                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Haut-Droit)"
                                         />
                                         <div
-                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'height')}
-                                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-s-resize shadow-2xl z-30 hover:scale-125 transition-transform"
-                                          title="Glisser pour modifier la hauteur"
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-bl')}
+                                          className="absolute -bottom-1.5 -left-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nesw-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Bas-Gauche)"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'corner-br')}
+                                          className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-nwse-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer pour redimensionner (Bas-Droit)"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-t')}
+                                          className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord supérieur (Hauteur)"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-b')}
+                                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ns-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord inférieur (Hauteur)"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-l')}
+                                          className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord gauche (Largeur)"
+                                        />
+                                        <div
+                                          onMouseDown={(e) => handleStartSubItemResize(e, el.id, i, 'edge-r')}
+                                          className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-4 h-4 bg-[#00A0FF] border-2 border-white rounded-full cursor-ew-resize shadow-2xl z-30 hover:scale-125 transition-transform"
+                                          title="Tirer le bord droit (Largeur)"
                                         />
                                       </>
                                     )}
