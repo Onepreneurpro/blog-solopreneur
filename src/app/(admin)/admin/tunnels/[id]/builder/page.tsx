@@ -277,6 +277,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     const startH = currentItem.imgSize || 240;
     const aspectRatio = startW / startH;
 
+    // Check if an item is marked as fixed reference in the section
+    const fixedRefItem = elItems.find((it: any) => it.isFixedReference);
+    const fixedRefHeight = fixedRefItem ? (fixedRefItem.imgSize || 280) : null;
+    const fixedRefWidth = fixedRefItem ? (fixedRefItem.imgWidth || 280) : null;
+
     // Collect sibling heights & widths for magnetic alignment snap
     const siblingHeights = elItems
       .map((it: any, idx: number) => (idx !== itemIndex ? it.imgSize || 280 : null))
@@ -284,6 +289,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     const siblingWidths = elItems
       .map((it: any, idx: number) => (idx !== itemIndex ? it.imgWidth || 280 : null))
       .filter(Boolean);
+
+    // Prioritize fixed reference item dimensions over general siblings
+    const targetHeights = fixedRefHeight
+      ? [fixedRefHeight, ...siblingHeights.filter((h: any) => h !== fixedRefHeight)]
+      : siblingHeights;
+    const targetWidths = fixedRefWidth
+      ? [fixedRefWidth, ...siblingWidths.filter((w: any) => w !== fixedRefWidth)]
+      : siblingWidths;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
@@ -320,9 +333,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       let finalH = rawH;
       let finalW = rawW;
       let snappedH = false;
-      for (const siblingH of siblingHeights) {
-        if (Math.abs(rawH - siblingH) <= 24) {
-          finalH = siblingH;
+      for (const targetH of targetHeights) {
+        if (Math.abs(rawH - targetH) <= 24) {
+          finalH = targetH;
           if (dir.startsWith('corner')) {
             finalW = Math.round(finalH * aspectRatio);
           }
@@ -333,9 +346,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
       let snappedW = false;
       if (!snappedH) {
-        for (const siblingW of siblingWidths) {
-          if (Math.abs(rawW - siblingW) <= 24) {
-            finalW = siblingW;
+        for (const targetW of targetWidths) {
+          if (Math.abs(rawW - targetW) <= 24) {
+            finalW = targetW;
             if (dir.startsWith('corner')) {
               finalH = Math.round(finalW / aspectRatio);
             }
@@ -707,6 +720,43 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   Téléchargez une image depuis votre PC ou collez une URL.
                                 </p>
                               </div>
+                            </div>
+
+                            {/* FIXER COMME RÉFÉRENCE D ALIGNEMENT (LIGNE BLEUE MAGNETIQUE) */}
+                            <div
+                              className={`p-3 rounded-2xl border transition-all ${
+                                currentSubItem.isFixedReference
+                                  ? 'bg-[#00A0FF]/20 border-[#00A0FF] shadow-lg ring-1 ring-[#00A0FF]'
+                                  : 'bg-slate-950 border-slate-800'
+                              }`}
+                            >
+                              <label className="flex items-center justify-between text-xs font-bold text-white cursor-pointer select-none">
+                                <span className="flex items-center gap-2">
+                                  <span className="text-base">📌</span>
+                                  <span className={currentSubItem.isFixedReference ? 'text-[#00A0FF]' : 'text-slate-200'}>
+                                    Fixer comme référence (Ligne Bleue)
+                                  </span>
+                                </span>
+                                <input
+                                  type="checkbox"
+                                  checked={!!currentSubItem.isFixedReference}
+                                  onChange={(e) => {
+                                    const val = e.target.checked;
+                                    const updatedItems = elItems.map((it: any, idx: number) =>
+                                      idx === selectedSubItem.itemIndex
+                                        ? { ...it, isFixedReference: val }
+                                        : { ...it, isFixedReference: false }
+                                    );
+                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                  }}
+                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-700 cursor-pointer accent-[#00A0FF]"
+                                />
+                              </label>
+                              <p className="text-[10px] text-slate-400 leading-relaxed mt-1.5">
+                                {currentSubItem.isFixedReference
+                                  ? '✅ Ligne bleue d alignement activée. Les autres images s aimeront dessus.'
+                                  : 'Cochez pour fixer une ligne bleue d alignement magnétique sous cette image.'}
+                              </p>
                             </div>
 
                             {/* LARGEUR DE L IMAGE */}
@@ -1991,11 +2041,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* FULL-WIDTH THIN BOTTOM MAGNETIC ALIGNMENT LINE SUPPORTING ALL CARDS */}
-                                    {isImgSel && snapGuide?.active && (
-                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3px] bg-[#FF007F] shadow-[0_0_14px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-2xl border border-white translate-y-3">
-                                          🧲 Alignement magnétique bas ({snapGuide.val}px)
+                                    {/* PERMANENT BLUE MAGNETIC REFERENCE LINE ON FIXED IMAGE */}
+                                    {col.isFixedReference && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>📌</span>
+                                          <span>Image Référence Fixée ({col.imgSize || 280}px)</span>
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* DYNAMIC SNAP LINE WHEN ALIGNING ANOTHER IMAGE */}
+                                    {isImgSel && !col.isFixedReference && snapGuide?.active && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>🧲</span>
+                                          <span>Aimanté à la ligne de référence bleue ({snapGuide.val}px)</span>
                                         </span>
                                       </div>
                                     )}
@@ -2142,11 +2203,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       }}
                                     />
 
-                                    {/* FULL-WIDTH THIN BOTTOM MAGNETIC ALIGNMENT LINE SUPPORTING ALL CARDS */}
-                                    {isImgSel && snapGuide?.active && (
-                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3px] bg-[#FF007F] shadow-[0_0_14px_#FF007F] z-50 animate-pulse pointer-events-none flex items-center justify-center">
-                                        <span className="bg-[#FF007F] text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-2xl border border-white translate-y-3">
-                                          🧲 Alignement magnétique bas ({snapGuide.val}px)
+                                    {/* PERMANENT BLUE MAGNETIC REFERENCE LINE ON FIXED IMAGE */}
+                                    {col.isFixedReference && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_16px_#00A0FF] z-40 pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>📌</span>
+                                          <span>Image Référence Fixée ({col.imgSize || 220}px)</span>
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* DYNAMIC SNAP LINE WHEN ALIGNING ANOTHER IMAGE */}
+                                    {isImgSel && !col.isFixedReference && snapGuide?.active && (
+                                      <div className="absolute -bottom-1 -left-[1000px] -right-[1000px] h-[3.5px] bg-[#00A0FF] shadow-[0_0_18px_#00A0FF] z-50 animate-pulse pointer-events-none flex items-center justify-center">
+                                        <span className="bg-[#00A0FF] text-white text-[10px] font-black px-3.5 py-0.5 rounded-full shadow-2xl border border-white translate-y-3 flex items-center gap-1.5">
+                                          <span>🧲</span>
+                                          <span>Aimanté à la ligne de référence bleue ({snapGuide.val}px)</span>
                                         </span>
                                       </div>
                                     )}
