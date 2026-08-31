@@ -323,14 +323,21 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                   const imgPos = it.imgObjectPosition || child.data?.imgObjectPosition || 'center';
 
                                   return (
-                                    <div key={idx} className="bg-white text-slate-800 p-4 rounded-3xl shadow-lg space-y-3 flex flex-col items-center text-center">
+                                    <div
+                                      key={idx}
+                                      style={{
+                                        backgroundColor: it.bgColor || child.data?.cardBgColor || '#ffffff',
+                                        color: it.textColor || child.data?.textColor || '#1e293b',
+                                      }}
+                                      className="p-4 sm:p-5 rounded-3xl shadow-lg space-y-3 flex flex-col items-center text-center transition-all border border-slate-100"
+                                    >
                                       {it.img && (
                                         <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm flex items-center justify-center`}>
                                           <img src={it.img} alt={it.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
                                         </div>
                                       )}
-                                      <h4 className="font-heading font-extrabold text-sm uppercase text-slate-900">{it.title}</h4>
-                                      <p className="text-xs text-slate-500 font-medium leading-relaxed">{it.desc}</p>
+                                      <h4 className="font-heading font-extrabold text-sm uppercase">{it.title}</h4>
+                                      <p className="text-xs font-medium leading-relaxed opacity-85">{it.desc}</p>
                                     </div>
                                   );
                                 })}

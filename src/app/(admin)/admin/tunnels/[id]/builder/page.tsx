@@ -70,6 +70,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     blockId: string;
     itemIndex: number;
     subType: 'image' | 'title' | 'desc';
+    parentBlockId?: string;
+    childIndex?: number;
   } | null>(null);
 
   // MAGNETIC SNAP GUIDE LINE STATE FOR AUTOMATIC ALIGNMENT
@@ -2252,43 +2254,152 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       </div>
                                     )}
 
-                                    {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg') && (
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
-                                        {(child.data?.items || getDefaultBlockData('Col4', '4 Colonnes').items).map((it: any, idx: number) => (
-                                          <div key={idx} className="space-y-2 text-center bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                                            {it.img && <img src={it.img} alt={it.title} className="w-full h-32 object-cover rounded-lg" />}
-                                            <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
-                                            <div className="text-[10px] text-slate-400">{it.desc}</div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                                    {/* INTERACTIVE NESTED COLUMN CARDS IN SECTION */}
+                                    {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg' || child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (() => {
+                                      const is4 = child.type.includes('4') || child.type === 'Col4';
+                                      const is3 = child.type.includes('3') || child.type === 'Col3';
+                                      const colsClass = is4 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : is3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2';
 
-                                    {(child.type === 'Col3' || child.type === 'BlockFeat3ColImg') && (
-                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
-                                        {(child.data?.items || getDefaultBlockData('Col3', '3 Colonnes').items).map((it: any, idx: number) => (
-                                          <div key={idx} className="space-y-2 text-center bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                                            {it.img && <img src={it.img} alt={it.title} className="w-full h-36 object-cover rounded-lg" />}
-                                            <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
-                                            <div className="text-[10px] text-slate-400">{it.desc}</div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                                      const updateNestedColumnItem = (itemIdx: number, itemChanges: any) => {
+                                        const currentChildren = [...(el.data?.children || [])];
+                                        const targetChild = currentChildren[cIdx];
+                                        const currentItems = targetChild.data?.items || getDefaultBlockData(child.type, child.content).items;
+                                        const updatedItems = currentItems.map((item: any, i: number) =>
+                                          i === itemIdx ? { ...item, ...itemChanges } : item
+                                        );
+                                        currentChildren[cIdx] = {
+                                          ...targetChild,
+                                          data: {
+                                            ...(targetChild.data || {}),
+                                            items: updatedItems,
+                                          },
+                                        };
+                                        handleUpdateElementData(el.id, { children: currentChildren });
+                                      };
 
-                                    {(child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
-                                        {(child.data?.items || getDefaultBlockData('Col2', '2 Colonnes').items).map((it: any, idx: number) => (
-                                          <div key={idx} className="flex items-start gap-3 p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                                            <div className="w-8 h-8 rounded-lg bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
-                                            <div>
-                                              <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
-                                              <div className="text-[10px] text-slate-400">{it.desc}</div>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                                      const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content).items;
+
+                                      return (
+                                        <div className={`grid ${colsClass} gap-4 p-4 bg-slate-950/60 rounded-3xl border border-white/10`}>
+                                          {itemsList.map((it: any, idx: number) => {
+                                            const isSelected = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === idx;
+
+                                            return (
+                                              <div
+                                                key={idx}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setSelectedElementId(el.id);
+                                                  setSelectedSubItem({
+                                                    blockId: `${el.id}-c${cIdx}`,
+                                                    itemIndex: idx,
+                                                    subType: 'image',
+                                                    childIndex: cIdx,
+                                                    parentBlockId: el.id,
+                                                  });
+                                                }}
+                                                style={{
+                                                  backgroundColor: it.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
+                                                  color: it.textColor || child.data?.textColor || '#ffffff',
+                                                }}
+                                                className={`p-4 rounded-2xl border-2 transition-all space-y-3 flex flex-col items-center relative group/card cursor-pointer ${
+                                                  isSelected
+                                                    ? 'border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
+                                                    : 'border-white/10 hover:border-white/30'
+                                                }`}
+                                              >
+                                                {/* IMAGE FRAME WITH DROP TARGET */}
+                                                <div
+                                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                  onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    const dataStr = e.dataTransfer.getData('application/json');
+                                                    if (dataStr) {
+                                                      try {
+                                                        const d = JSON.parse(dataStr);
+                                                        const imgUrl = d.defaultContent || d.content || d.url || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80';
+                                                        updateNestedColumnItem(idx, { img: imgUrl });
+                                                      } catch (err) {}
+                                                    }
+                                                  }}
+                                                  className={`w-full ${it.imgHeight || child.data?.imgHeight || 'h-36'} ${
+                                                    (it.imgShape || child.data?.imgShape || 'arcade') === 'arcade'
+                                                      ? 'rounded-t-[80px]'
+                                                      : (it.imgShape || child.data?.imgShape) === 'circle'
+                                                      ? 'rounded-full'
+                                                      : (it.imgShape || child.data?.imgShape) === 'square'
+                                                      ? 'rounded-none'
+                                                      : 'rounded-2xl'
+                                                  } overflow-hidden bg-slate-950/80 border border-white/20 relative group/img`}
+                                                >
+                                                  {it.img ? (
+                                                    <img
+                                                      src={it.img}
+                                                      alt={it.title}
+                                                      className={`w-full h-full ${it.imgObjectFit || child.data?.imgObjectFit || 'object-cover'}`}
+                                                      style={{ objectPosition: it.imgObjectPosition || child.data?.imgObjectPosition || 'center' }}
+                                                    />
+                                                  ) : (
+                                                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs font-bold gap-1">
+                                                      <span>🖼️</span>
+                                                      <span>Déposer image</span>
+                                                    </div>
+                                                  )}
+                                                  <div className="absolute inset-0 bg-[#00A0FF]/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white font-bold text-[10px] pointer-events-none transition-opacity">
+                                                    🎯 Sélectionner la carte
+                                                  </div>
+                                                </div>
+
+                                                {/* INLINE EDITABLE TITRE */}
+                                                <input
+                                                  type="text"
+                                                  value={it.title || ''}
+                                                  onChange={(e) => updateNestedColumnItem(idx, { title: e.target.value })}
+                                                  className="w-full text-center text-xs font-heading font-black uppercase bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                                  style={{ color: it.textColor || '#ffffff' }}
+                                                  placeholder="Titre de la carte..."
+                                                />
+
+                                                {/* INLINE EDITABLE DESCRIPTION */}
+                                                <textarea
+                                                  rows={2}
+                                                  value={it.desc || ''}
+                                                  onChange={(e) => updateNestedColumnItem(idx, { desc: e.target.value })}
+                                                  className="w-full text-center text-[10px] bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none leading-relaxed"
+                                                  style={{ color: it.textColor ? `${it.textColor}cc` : '#94a3b8' }}
+                                                  placeholder="Description..."
+                                                />
+
+                                                {/* QUICK COLOR PICKERS ON CARD */}
+                                                <div className="w-full pt-2 border-t border-white/10 flex items-center justify-between text-[9px] gap-1">
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-slate-400 font-bold">Fond:</span>
+                                                    <input
+                                                      type="color"
+                                                      value={it.bgColor || '#0f172a'}
+                                                      onChange={(e) => updateNestedColumnItem(idx, { bgColor: e.target.value })}
+                                                      className="w-4 h-4 rounded cursor-pointer border-none bg-transparent"
+                                                      title="Couleur de fond"
+                                                    />
+                                                  </div>
+                                                  <div className="flex items-center gap-1">
+                                                    <span className="text-slate-400 font-bold">Texte:</span>
+                                                    <input
+                                                      type="color"
+                                                      value={it.textColor || '#ffffff'}
+                                                      onChange={(e) => updateNestedColumnItem(idx, { textColor: e.target.value })}
+                                                      className="w-4 h-4 rounded cursor-pointer border-none bg-transparent"
+                                                      title="Couleur de texte"
+                                                    />
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    })()}
 
                                     {child.type === 'ContentBox' && (
                                       <div className="p-4 bg-slate-950/60 rounded-2xl border border-dashed border-[#00A0FF] space-y-3">
@@ -2946,10 +3057,46 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   : defaultData.items || [];
               const elData = { ...defaultData, ...rawData, items: elItems };
 
-              const currentSubItem =
-                selectedSubItem && selectedSubItem.blockId === selectedEl.id && elItems[selectedSubItem.itemIndex]
-                  ? elItems[selectedSubItem.itemIndex]
-                  : null;
+              const currentSubItem = (() => {
+                if (!selectedSubItem) return null;
+                if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+                  const childEl = selectedEl.data?.children?.[selectedSubItem.childIndex];
+                  if (childEl) {
+                    const childItems = childEl.data?.items || getDefaultBlockData(childEl.type, childEl.content).items || [];
+                    return childItems[selectedSubItem.itemIndex] || null;
+                  }
+                }
+                if (selectedSubItem.blockId === selectedEl.id || selectedSubItem.blockId.startsWith(selectedEl.id)) {
+                  return elItems[selectedSubItem.itemIndex] || null;
+                }
+                return null;
+              })();
+
+              const updateSubItemProperty = (changes: any) => {
+                if (!selectedSubItem) return;
+                if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+                  const cIdx = selectedSubItem.childIndex;
+                  const currentChildren = [...(selectedEl.data?.children || [])];
+                  const targetChild = currentChildren[cIdx];
+                  const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                  const updatedItems = currentItems.map((item: any, i: number) =>
+                    i === selectedSubItem.itemIndex ? { ...item, ...changes } : item
+                  );
+                  currentChildren[cIdx] = {
+                    ...targetChild,
+                    data: {
+                      ...(targetChild.data || {}),
+                      items: updatedItems,
+                    },
+                  };
+                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                } else {
+                  const updatedItems = elItems.map((it: any, idx: number) =>
+                    idx === selectedSubItem.itemIndex ? { ...it, ...changes } : it
+                  );
+                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                }
+              };
 
               return (
                 <div className="flex flex-col h-full text-slate-200 overflow-hidden">
@@ -3052,10 +3199,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                              const reader = new FileReader();
                                              reader.onload = (uploadEv) => {
                                                const url = uploadEv.target?.result as string;
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, img: url } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
+                                               updateSubItemProperty({ img: url });
                                              };
                                              reader.readAsDataURL(file);
                                            }
