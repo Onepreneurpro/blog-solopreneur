@@ -11,14 +11,32 @@ function makeAbsoluteUrl(relativeUrl: string | undefined, baseUrl: string): stri
   }
 }
 
-function extractColorFromStyle(styleStr: string | undefined): string | null {
-  if (!styleStr) return null;
-  const match = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
-  if (match) {
-    const val = match[1].trim();
-    if (val.startsWith('#') || val.startsWith('rgb')) return val;
+function extractStyleProps(styleStr: string | undefined): { bgColor?: string; textColor?: string; bgImage?: string } {
+  const result: { bgColor?: string; textColor?: string; bgImage?: string } = {};
+  if (!styleStr) return result;
+
+  const bgMatch = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
+  if (bgMatch) {
+    const val = bgMatch[1].trim();
+    if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
+      result.bgColor = val;
+    }
   }
-  return null;
+
+  const textMatch = styleStr.match(/(?:^|;)\s*color:\s*([^;]+)/i);
+  if (textMatch) {
+    const val = textMatch[1].trim();
+    if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
+      result.textColor = val;
+    }
+  }
+
+  const imgMatch = styleStr.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/i);
+  if (imgMatch) {
+    result.bgImage = imgMatch[1];
+  }
+
+  return result;
 }
 
 export async function POST(req: Request) {
@@ -35,13 +53,14 @@ export async function POST(req: Request) {
       targetUrl = `https://${targetUrl}`;
     }
 
-    // 1. Fetch HTML content with realistic User-Agent
+    // 1. Fetch HTML content with realistic User-Agent (Chrome/Windows)
     const response = await fetch(targetUrl, {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
         'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Cache-Control': 'no-cache',
       },
       redirect: 'follow',
     });
@@ -57,66 +76,79 @@ export async function POST(req: Request) {
     const $ = cheerio.load(html);
     const pageTitle = $('title').text().trim() || 'Page Clonée';
 
-    // Remove noise elements (scripts, styles, noscript, iframe, meta, link)
-    $('script, style, noscript, iframe, svg, meta, link').remove();
+    // Clean noise elements
+    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
 
     const clonedElements: any[] = [];
     const now = Date.now();
 
-    // Helper to extract content from an HTML element
+    // Helper: Parse elements inside a container div / col
     const parseContainerChildren = ($container: any): any[] => {
       const children: any[] = [];
+      const visitedTexts = new Set<string>();
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a.btn, a.button, button, input, form').each((i: any, el: any) => {
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, span.heading, div.heading').each((i: number, el: any) => {
         const $el = $(el);
-        const tagName = el.tagName.toLowerCase();
+        const tagName = el.tagName ? el.tagName.toLowerCase() : '';
+        const styleProps = extractStyleProps($el.attr('style'));
+        const text = $el.text().trim();
 
-        if (tagName.startsWith('h')) {
-          const text = $el.text().trim();
-          if (text && text.length > 1) {
+        // 1. HEADINGS (h1 - h6 or heading class)
+        if (tagName.startsWith('h') || $el.hasClass('heading') || $el.hasClass('title')) {
+          if (text && text.length > 1 && !visitedTexts.has(text)) {
+            visitedTexts.add(text);
             children.push({
               id: `cloned-heading-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Heading',
               category: 'Texte',
               content: text,
-              data: { fontSize: tagName === 'h1' ? 'text-4xl' : 'text-2xl', fontWeight: 'font-black' },
+              data: {
+                fontSize: tagName === 'h1' ? 'text-4xl' : tagName === 'h2' ? 'text-3xl' : 'text-xl',
+                fontWeight: 'font-black',
+                textColor: styleProps.textColor || '#ffffff',
+              },
             });
           }
-        } else if (tagName === 'p') {
-          const text = $el.text().trim();
-          if (text && text.length > 2) {
-            children.push({
-              id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'Text',
-              category: 'Texte',
-              content: text,
-              data: { fontSize: 'text-base', textColor: '#e2e8f0' },
-            });
-          }
-        } else if (tagName === 'img') {
-          const src = $el.attr('src') || $el.attr('data-src') || $el.attr('srcset');
+        }
+        // 2. IMAGES (img tags or inline background-images)
+        else if (tagName === 'img') {
+          const src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('srcset');
           const absSrc = makeAbsoluteUrl(src, targetUrl);
-          if (absSrc && !absSrc.includes('tracking') && !absSrc.includes('pixel')) {
+          if (absSrc && !absSrc.includes('tracking') && !absSrc.includes('pixel') && !absSrc.endsWith('.svg')) {
             children.push({
               id: `cloned-img-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Image',
               category: 'Média',
               content: absSrc,
-              data: { img: absSrc, imgObjectFit: 'cover' },
+              data: {
+                img: absSrc,
+                imgObjectFit: 'cover',
+              },
             });
           }
-        } else if (tagName === 'a' || tagName === 'button') {
-          const text = $el.text().trim();
-          if (text && text.length > 1 && text.length < 100) {
-            children.push({
-              id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'ButtonCTA',
-              category: 'Bouton',
-              content: text,
-              data: { btnColor: '#00A0FF', textColor: '#ffffff' },
-            });
+        }
+        // 3. BUTTONS / LINKS (a, button)
+        else if (tagName === 'a' || tagName === 'button') {
+          const isButtonLike = $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || tagName === 'button' || $el.attr('role') === 'button';
+          if (text && text.length > 1 && text.length < 120 && isButtonLike) {
+            if (!visitedTexts.has(text)) {
+              visitedTexts.add(text);
+              children.push({
+                id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
+                type: 'ButtonCTA',
+                category: 'Bouton',
+                content: text,
+                data: {
+                  btnColor: styleProps.bgColor || '#00A0FF',
+                  textColor: styleProps.textColor || '#ffffff',
+                  linkUrl: makeAbsoluteUrl($el.attr('href'), targetUrl),
+                },
+              });
+            }
           }
-        } else if (tagName === 'input') {
+        }
+        // 4. FORM INPUTS (input, textarea, select)
+        else if (tagName === 'input' || tagName === 'textarea') {
           const placeholder = $el.attr('placeholder') || $el.attr('name') || 'Votre e-mail...';
           const type = $el.attr('type') || 'text';
           if (type !== 'hidden' && type !== 'submit') {
@@ -125,7 +157,27 @@ export async function POST(req: Request) {
               type: 'FormInput',
               category: 'Formulaire',
               content: placeholder,
-              data: { placeholder, inputType: type },
+              data: {
+                placeholder,
+                inputType: type,
+                title: $el.prev('label').text().trim() || 'Champ de formulaire',
+              },
+            });
+          }
+        }
+        // 5. PARAGRAPHS & TEXT (p or text spans)
+        else if (tagName === 'p') {
+          if (text && text.length > 2 && !visitedTexts.has(text)) {
+            visitedTexts.add(text);
+            children.push({
+              id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
+              type: 'Text',
+              category: 'Texte',
+              content: text,
+              data: {
+                fontSize: 'text-base',
+                textColor: styleProps.textColor || '#e2e8f0',
+              },
             });
           }
         }
@@ -134,60 +186,61 @@ export async function POST(req: Request) {
       return children;
     };
 
-    // 2. Identify Section Elements (<section>, or top-level containers)
-    let $sections = $('section, header, footer, main');
+    // 2. Detect Sections (<section>, <header>, <footer>, <main>, or div.section, div.container, top-level divs)
+    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], div[class*="container"]');
     if ($sections.length === 0) {
       $sections = $('body > div, body > main > div');
     }
 
-    if ($sections.length > 0) {
-      $sections.each((sIdx: number, secEl: any) => {
-        const $sec = $(secEl);
-        const style = $sec.attr('style');
-        const bgColor = extractColorFromStyle(style) || (sIdx % 2 === 0 ? '#0b1329' : '#0f172a');
+    let sectionIndex = 0;
 
-        // Check columns inside section
-        const $cols = $sec.find('> div, > .container > div, > .row > div, > .grid > div');
-        const subChildren = parseContainerChildren($sec);
+    $sections.each((sIdx: number, secEl: any) => {
+      const $sec = $(secEl);
+      const styleProps = extractStyleProps($sec.attr('style'));
+      const bgColor = styleProps.bgColor || (sectionIndex % 2 === 0 ? '#0b1329' : '#0f172a');
 
-        if (subChildren.length === 0) return; // Skip empty sections
+      // Detect Columns / Grids inside this section
+      const $cols = $sec.find('> div, > .container > div, > .row > div, > .grid > div, > [class*="col"]');
+      const subChildren = parseContainerChildren($sec);
 
-        const isMultiCol = $cols.length >= 2;
-        const layoutMode = isMultiCol ? ($cols.length >= 3 ? 'grid-3' : 'grid-2') : 'grid-1';
-        const numCols = isMultiCol ? Math.min($cols.length, 3) : 1;
+      if (subChildren.length === 0) return; // Skip empty containers
 
-        const childCols: any[] = [];
-        for (let c = 0; c < numCols; c++) {
-          const colItems = isMultiCol ? parseContainerChildren($($cols[c])) : (c === 0 ? subChildren : []);
-          childCols.push({
-            id: `cloned-col-${sIdx}-${c}-${now}`,
-            type: 'ContentBox',
-            data: {
-              cardBgColor: 'transparent',
-              cardTextColor: '#ffffff',
-              children: colItems.length > 0 ? colItems : (c === 0 ? subChildren : []),
-            },
-          });
-        }
+      sectionIndex++;
+      const isMultiCol = $cols.length >= 2;
+      const numCols = isMultiCol ? Math.min($cols.length, 3) : 1;
+      const layoutMode = numCols === 3 ? 'grid-3' : numCols === 2 ? 'grid-2' : 'grid-1';
 
-        clonedElements.push({
-          id: `cloned-sec-${now}-${sIdx}`,
-          type: 'Section',
-          category: 'Structure',
-          content: `Section Clonée #${sIdx + 1}`,
+      const childCols: any[] = [];
+      for (let c = 0; c < numCols; c++) {
+        const colItems = isMultiCol ? parseContainerChildren($($cols[c])) : (c === 0 ? subChildren : []);
+        childCols.push({
+          id: `cloned-col-${now}-${sectionIndex}-${c}`,
+          type: 'ContentBox',
           data: {
-            bgColor,
-            textColor: '#ffffff',
-            layoutMode,
-            children: childCols,
-            paddingY: 48,
-            paddingX: 24,
+            cardBgColor: 'transparent',
+            cardTextColor: '#ffffff',
+            children: colItems.length > 0 ? colItems : (c === 0 ? subChildren : []),
           },
         });
-      });
-    }
+      }
 
-    // Fallback if no sections were extracted: create 1 master section
+      clonedElements.push({
+        id: `cloned-sec-${now}-${sectionIndex}`,
+        type: 'Section',
+        category: 'Structure',
+        content: `Section Clonée #${sectionIndex}`,
+        data: {
+          bgColor,
+          textColor: styleProps.textColor || '#ffffff',
+          layoutMode,
+          children: childCols,
+          paddingY: 48,
+          paddingX: 24,
+        },
+      });
+    });
+
+    // Fallback if no specific section tags were matched: extract directly from body
     if (clonedElements.length === 0) {
       const allChildren = parseContainerChildren($('body'));
       clonedElements.push({
