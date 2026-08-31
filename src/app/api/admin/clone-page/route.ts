@@ -1,77 +1,8 @@
 import { NextResponse } from 'next/server';
-import * as cheerio from 'cheerio';
-
-function makeAbsoluteUrl(relativeUrl: string | undefined, baseUrl: string): string {
-  if (!relativeUrl) return '';
-  if (relativeUrl.startsWith('data:')) return relativeUrl;
-  try {
-    return new URL(relativeUrl, baseUrl).href;
-  } catch (e) {
-    return relativeUrl;
-  }
-}
-
-function extractStyleProps(styleStr: string | undefined, classNameStr: string | undefined): { bgColor?: string; textColor?: string; bgImage?: string } {
-  const result: { bgColor?: string; textColor?: string; bgImage?: string } = {};
-
-  if (styleStr) {
-    const bgMatch = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
-    if (bgMatch) {
-      const val = bgMatch[1].trim();
-      if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
-        result.bgColor = val;
-      }
-    }
-
-    const textMatch = styleStr.match(/(?:^|;)\s*color:\s*([^;]+)/i);
-    if (textMatch) {
-      const val = textMatch[1].trim();
-      if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
-        result.textColor = val;
-      }
-    }
-
-    const imgMatch = styleStr.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/i);
-    if (imgMatch) {
-      result.bgImage = imgMatch[1];
-    }
-  }
-
-  if (classNameStr) {
-    const cls = classNameStr.toLowerCase();
-    if (!result.bgColor) {
-      if (cls.includes('red') || cls.includes('danger') || cls.includes('rouge')) result.bgColor = '#dc2626';
-      else if (cls.includes('green') || cls.includes('success') || cls.includes('vert')) result.bgColor = '#16a34a';
-      else if (cls.includes('blue') || cls.includes('primary') || cls.includes('bleu')) result.bgColor = '#00A0FF';
-      else if (cls.includes('dark') || cls.includes('black') || cls.includes('noir')) result.bgColor = '#0f172a';
-    }
-    if (!result.textColor) {
-      if (cls.includes('yellow') || cls.includes('amber') || cls.includes('jaune')) result.textColor = '#facc15';
-      else if (cls.includes('white') || cls.includes('blanc')) result.textColor = '#ffffff';
-    }
-  }
-
-  return result;
-}
-
-function cleanText(str: string): string {
-  return str.replace(/\s+/g, ' ').trim();
-}
-
-function isDuplicateText(newText: string, existingTexts: string[]): boolean {
-  const normNew = cleanText(newText).toLowerCase();
-  if (normNew.length < 2) return true;
-
-  for (const existing of existingTexts) {
-    const normExisting = cleanText(existing).toLowerCase();
-    if (normExisting === normNew || (normExisting.includes(normNew) && normNew.length < 15)) {
-      return true;
-    }
-  }
-  return false;
-}
+import puppeteer from 'puppeteer';
 
 export async function POST(req: Request) {
+  let browser = null;
   try {
     const body = await req.json();
     const { url } = body;
@@ -85,260 +16,210 @@ export async function POST(req: Request) {
       targetUrl = `https://${targetUrl}`;
     }
 
-    // 1. Fetch HTML content with Chrome User-Agent
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Cache-Control': 'no-cache',
-      },
-      redirect: 'follow',
+    // Launch headless Chrome browser
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
     });
 
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: `Impossible d'accéder à la page (${response.status} ${response.statusText})` },
-        { status: 400 }
-      );
-    }
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 900 });
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+    );
 
-    const html = await response.text();
-    const $ = cheerio.load(html);
-    const pageTitle = $('title').text().trim() || 'Page Clonée';
+    // Navigate and wait for DOM and network idle
+    await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    const clonedElements: any[] = [];
+    const pageTitle = await page.title();
     const now = Date.now();
 
-    // Strategy A: Check for JSON page data embedded in script tags (Systeme.io / ClickFunnels / Next.js)
-    let jsonParsedSections: any[] | null = null;
-    $('script').each((_, scriptEl) => {
-      const content = $(scriptEl).html() || '';
-      if (content.includes('window.__INITIAL_STATE__') || content.includes('pageData') || content.includes('"sections":[')) {
-        try {
-          const jsonMatch = content.match(/(\{[\s\S]*"sections":\s*\[[\s\S]*\}\})/) || content.match(/(\{[\s\S]*"elements":\s*\[[\s\S]*\}\})/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[1]);
-            if (parsed && (parsed.sections || parsed.elements)) {
-              jsonParsedSections = parsed.sections || parsed.elements;
+    // Execute in-browser DOM parsing with computed styles
+    const extractedData = await page.evaluate((nowVal: any) => {
+      const results: any[] = [];
+
+      // Helper to check if element is visible
+      const isVisible = (el: Element) => {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      };
+
+      // Helper to convert rgb(r, g, b) to hex
+      const rgbToHex = (rgb: string) => {
+        if (!rgb || rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)') return 'transparent';
+        const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (!match) return rgb;
+        return '#' + [match[1], match[2], match[3]].map((x) => parseInt(x).toString(16).padStart(2, '0')).join('');
+      };
+
+      const cleanTextStr = (str: string) => str.replace(/\s+/g, ' ').trim();
+
+      // Find all sections or main layout blocks
+      const sections = Array.from(
+        document.querySelectorAll('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], body > div')
+      ).filter((sec) => isVisible(sec) && sec.clientHeight > 40);
+
+      const targetSections = sections.length > 0 ? sections : [document.body];
+
+      targetSections.forEach((sec, sIdx) => {
+        const secStyle = window.getComputedStyle(sec);
+        const secBg = rgbToHex(secStyle.backgroundColor);
+        const secTextCol = rgbToHex(secStyle.color);
+
+        // Find columns / rows inside this section
+        const cols = Array.from(sec.querySelectorAll(':scope > div, :scope > .container > div, :scope > .row > div, :scope > .grid > div, [class*="col"]')).filter(
+          (c) => isVisible(c) && c.clientWidth > 40
+        );
+
+        const isMultiCol = cols.length >= 2 && cols.length <= 4;
+        const numCols = isMultiCol ? Math.min(cols.length, 3) : 1;
+        const layoutMode = numCols === 3 ? 'grid-3' : numCols === 2 ? 'grid-2' : 'grid-1';
+
+        const parseBlockElements = (rootEl: Element) => {
+          const items: any[] = [];
+          const textSet = new Set<string>();
+
+          // Find all buttons, headings, text, images, inputs
+          const els = Array.from(rootEl.querySelectorAll('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, [class*="btn"], [class*="button"]')).filter(
+            (e) => isVisible(e)
+          );
+
+          els.forEach((e) => {
+            const tag = e.tagName.toLowerCase();
+            const style = window.getComputedStyle(e);
+            const text = cleanTextStr(e.textContent || '');
+            const bg = rgbToHex(style.backgroundColor);
+            const fg = rgbToHex(style.color);
+
+            // BUTTONS / CTAs
+            const isBtn = tag === 'button' || tag === 'a' || e.classList.contains('btn') || e.classList.contains('button') || e.getAttribute('role') === 'button';
+            if (isBtn && text.length > 1 && text.length < 120 && !textSet.has(text)) {
+              textSet.add(text);
+              const linkUrl = e.getAttribute('href') || '#';
+              const btnColor = bg !== 'transparent' ? bg : text.toLowerCase().includes('oui') || text.includes('✅') ? '#16a34a' : '#dc2626';
+              items.push({
+                id: `cloned-btn-${nowVal}-${Math.random().toString(36).substring(2, 6)}`,
+                type: 'ButtonCTA',
+                category: 'Bouton',
+                content: text,
+                data: {
+                  btnColor,
+                  textColor: fg !== 'transparent' ? fg : '#ffffff',
+                  linkUrl,
+                },
+              });
+              return;
             }
-          }
-        } catch (e) {
-          // Fallthrough to DOM parsing
-        }
-      }
-    });
 
-    // Strategy B: Deep DOM Tree Walking
-    // Remove noise scripts & styles after checking hydration scripts
-    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
+            // HEADINGS
+            if (tag.startsWith('h') || e.classList.contains('title') || e.classList.contains('heading')) {
+              if (text && text.length > 1 && !textSet.has(text)) {
+                textSet.add(text);
+                items.push({
+                  id: `cloned-heading-${nowVal}-${Math.random().toString(36).substring(2, 6)}`,
+                  type: 'Heading',
+                  category: 'Texte',
+                  content: text,
+                  data: {
+                    fontSize: tag === 'h1' ? 'text-4xl' : tag === 'h2' ? 'text-3xl' : 'text-xl',
+                    fontWeight: 'font-black',
+                    textColor: fg !== 'transparent' ? fg : '#ffffff',
+                  },
+                });
+                return;
+              }
+            }
 
-    const parseContainerChildren = ($container: any): any[] => {
-      const children: any[] = [];
-      const extractedTextList: string[] = [];
+            // IMAGES
+            if (tag === 'img') {
+              const imgEl = e as HTMLImageElement;
+              const src = imgEl.src || imgEl.getAttribute('data-src') || '';
+              if (src && !src.includes('pixel') && !src.includes('tracking') && imgEl.naturalWidth > 20) {
+                items.push({
+                  id: `cloned-img-${nowVal}-${Math.random().toString(36).substring(2, 6)}`,
+                  type: 'Image',
+                  category: 'Média',
+                  content: src,
+                  data: {
+                    img: src,
+                    imgObjectFit: 'cover',
+                  },
+                });
+                return;
+              }
+            }
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, li, [class*="btn"], [class*="button"], [class*="title"], [class*="headline"]').each((i: number, el: any) => {
-        const $el = $(el);
-        const tagName = el.tagName ? el.tagName.toLowerCase() : '';
-        const styleProps = extractStyleProps($el.attr('style'), $el.attr('class'));
-        const rawText = cleanText($el.text());
+            // PARAGRAPHS & TEXT
+            if (tag === 'p' || tag === 'li') {
+              if (text && text.length > 2 && !textSet.has(text)) {
+                textSet.add(text);
+                items.push({
+                  id: `cloned-text-${nowVal}-${Math.random().toString(36).substring(2, 6)}`,
+                  type: 'Text',
+                  category: 'Texte',
+                  content: text,
+                  data: {
+                    fontSize: 'text-base',
+                    textColor: fg !== 'transparent' ? fg : '#ffffff',
+                  },
+                });
+                return;
+              }
+            }
+          });
 
-        // 1. BUTTONS / CTAs
-        const isButton = tagName === 'button' || tagName === 'a' || $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || $el.attr('role') === 'button';
-        if (isButton && rawText && rawText.length > 1 && rawText.length < 120) {
-          if (!isDuplicateText(rawText, extractedTextList)) {
-            extractedTextList.push(rawText);
-            const btnBg = styleProps.bgColor || (rawText.toLowerCase().includes('oui') || rawText.includes('✅') ? '#16a34a' : '#dc2626');
-            children.push({
-              id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'ButtonCTA',
-              category: 'Bouton',
-              content: rawText,
-              data: {
-                btnColor: btnBg,
-                textColor: styleProps.textColor || '#ffffff',
-                linkUrl: makeAbsoluteUrl($el.attr('href'), targetUrl),
-              },
-            });
-            return;
-          }
-        }
+          return items;
+        };
 
-        // 2. HEADINGS
-        if (tagName.startsWith('h') || $el.hasClass('title') || $el.hasClass('heading') || $el.hasClass('headline')) {
-          if (rawText && !isDuplicateText(rawText, extractedTextList)) {
-            extractedTextList.push(rawText);
-            children.push({
-              id: `cloned-heading-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'Heading',
-              category: 'Texte',
-              content: rawText,
-              data: {
-                fontSize: tagName === 'h1' ? 'text-4xl' : tagName === 'h2' ? 'text-3xl' : 'text-xl',
-                fontWeight: 'font-black',
-                textColor: styleProps.textColor || '#ffffff',
-              },
-            });
-            return;
-          }
-        }
+        const childCols: any[] = [];
+        for (let c = 0; c < numCols; c++) {
+          const colEl = isMultiCol ? cols[c] : sec;
+          const colStyle = colEl ? window.getComputedStyle(colEl) : null;
+          const colBg = colStyle ? rgbToHex(colStyle.backgroundColor) : 'transparent';
+          const colItems = parseBlockElements(colEl);
 
-        // 3. IMAGES
-        if (tagName === 'img') {
-          const src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('srcset');
-          const absSrc = makeAbsoluteUrl(src, targetUrl);
-          if (absSrc && !absSrc.includes('tracking') && !absSrc.includes('pixel') && !absSrc.endsWith('.svg')) {
-            children.push({
-              id: `cloned-img-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'Image',
-              category: 'Média',
-              content: absSrc,
-              data: {
-                img: absSrc,
-                imgObjectFit: 'cover',
-              },
-            });
-            return;
-          }
-        }
-
-        // 4. FORM INPUTS
-        if (tagName === 'input' || tagName === 'textarea') {
-          const placeholder = $el.attr('placeholder') || $el.attr('name') || 'Votre e-mail...';
-          const type = $el.attr('type') || 'text';
-          if (type !== 'hidden' && type !== 'submit') {
-            children.push({
-              id: `cloned-input-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'FormInput',
-              category: 'Formulaire',
-              content: placeholder,
-              data: {
-                placeholder,
-                inputType: type,
-                title: $el.prev('label').text().trim() || 'Champ de formulaire',
-              },
-            });
-            return;
-          }
+          childCols.push({
+            id: `cloned-col-${nowVal}-${sIdx}-${c}`,
+            type: 'ContentBox',
+            data: {
+              cardBgColor: colBg !== 'transparent' ? colBg : 'transparent',
+              cardTextColor: '#ffffff',
+              children: colItems,
+            },
+          });
         }
 
-        // 5. PARAGRAPHS & LIST ITEMS
-        if (tagName === 'p' || tagName === 'li') {
-          if (rawText && rawText.length > 1 && !isDuplicateText(rawText, extractedTextList)) {
-            extractedTextList.push(rawText);
-            children.push({
-              id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
-              type: 'Text',
-              category: 'Texte',
-              content: rawText,
-              data: {
-                fontSize: 'text-base',
-                textColor: styleProps.textColor || '#ffffff',
-              },
-            });
-          }
-        }
-      });
-
-      return children;
-    };
-
-    // Detect section elements
-    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], div[class*="container"]');
-    if ($sections.length === 0) {
-      $sections = $('body > div, body > main > div');
-    }
-
-    let sectionIndex = 0;
-
-    $sections.each((sIdx: number, secEl: any) => {
-      const $sec = $(secEl);
-      const styleProps = extractStyleProps($sec.attr('style'), $sec.attr('class'));
-      const bgColor = styleProps.bgColor || (sectionIndex % 2 === 0 ? '#0b1329' : '#0f172a');
-
-      // Deep column discovery
-      let $cols = $sec.find('[class*="col"], [class*="grid"] > div, .row > div, .container > div');
-      if ($cols.length < 2) {
-        $cols = $sec.children('div');
-      }
-
-      const subChildren = parseContainerChildren($sec);
-      if (subChildren.length === 0) return;
-
-      sectionIndex++;
-      const isMultiCol = $cols.length >= 2 && $cols.length <= 4;
-      const numCols = isMultiCol ? Math.min($cols.length, 3) : 1;
-      const layoutMode = numCols === 3 ? 'grid-3' : numCols === 2 ? 'grid-2' : 'grid-1';
-
-      const childCols: any[] = [];
-      for (let c = 0; c < numCols; c++) {
-        const $col = isMultiCol ? $($cols[c]) : null;
-        const colStyle = $col ? extractStyleProps($col.attr('style'), $col.attr('class')) : {};
-        const colItems = $col ? parseContainerChildren($col) : subChildren;
-
-        childCols.push({
-          id: `cloned-col-${now}-${sectionIndex}-${c}`,
-          type: 'ContentBox',
+        results.push({
+          id: `cloned-sec-${nowVal}-${sIdx}`,
+          type: 'Section',
+          category: 'Structure',
+          content: `Section Clonée #${sIdx + 1}`,
           data: {
-            cardBgColor: colStyle.bgColor || 'transparent',
-            cardTextColor: colStyle.textColor || '#ffffff',
-            children: colItems.length > 0 ? colItems : (c === 0 ? subChildren : []),
+            bgColor: secBg !== 'transparent' ? secBg : (sIdx % 2 === 0 ? '#0b1329' : '#0f172a'),
+            textColor: secTextCol !== 'transparent' ? secTextCol : '#ffffff',
+            layoutMode,
+            children: childCols,
+            paddingY: 48,
+            paddingX: 24,
           },
         });
-      }
-
-      clonedElements.push({
-        id: `cloned-sec-${now}-${sectionIndex}`,
-        type: 'Section',
-        category: 'Structure',
-        content: `Section Clonée #${sectionIndex}`,
-        data: {
-          bgColor,
-          textColor: styleProps.textColor || '#ffffff',
-          layoutMode,
-          children: childCols,
-          paddingY: 48,
-          paddingX: 24,
-        },
       });
-    });
 
-    // Fallback if no specific section tags were matched
-    if (clonedElements.length === 0) {
-      const allChildren = parseContainerChildren($('body'));
-      clonedElements.push({
-        id: `cloned-sec-master-${now}`,
-        type: 'Section',
-        category: 'Structure',
-        content: `Page Clonée: ${pageTitle}`,
-        data: {
-          bgColor: '#0b1329',
-          textColor: '#ffffff',
-          layoutMode: 'grid-1',
-          children: [
-            {
-              id: `cloned-col-master-${now}`,
-              type: 'ContentBox',
-              data: {
-                cardBgColor: 'transparent',
-                children: allChildren,
-              },
-            },
-          ],
-        },
-      });
-    }
+      return results;
+    }, now);
+
+    await browser.close();
 
     return NextResponse.json({
       success: true,
-      elements: clonedElements,
+      elements: extractedData,
       sourceUrl: targetUrl,
       title: pageTitle,
-      totalSections: clonedElements.length,
+      totalSections: extractedData.length,
     });
   } catch (error: any) {
-    console.error('Error cloning URL:', error);
+    if (browser) await browser.close();
+    console.error('Puppeteer Clone Error:', error);
     return NextResponse.json({ error: error.message || 'Erreur lors du clonage de la page' }, { status: 500 });
   }
 }
