@@ -121,7 +121,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-x-hidden">
         <div className={`${publicWidthClass} flex-1`}>
-          {customElements.map((el: any) => {
+          {customElements.map((el: any, index: number) => {
             if (el.type === 'BlockNavArizona') {
               return (
                 <nav key={el.id} className="bg-[#40B5A6] text-white py-3.5 px-6 rounded-2xl shadow-sm my-4">
@@ -250,7 +250,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     backgroundPosition: bgPos,
                     color: textColor,
                   }}
-                  className="relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all my-8 overflow-hidden"
+                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden`}
                 >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
