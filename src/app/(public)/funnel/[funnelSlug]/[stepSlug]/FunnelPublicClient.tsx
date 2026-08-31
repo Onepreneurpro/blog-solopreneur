@@ -267,8 +267,29 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                         {el.data.title}
                       </h2>
                     )}
-                    <div className="space-y-6">
-                      {(el.data?.children || []).map((child: any, cIdx: number) => {
+                    {(() => {
+                      const sectionLayoutMode = el.data?.layoutMode || (
+                        el.data?.children?.length === 2 ? 'grid-2' :
+                        el.data?.children?.length === 3 ? 'grid-3' :
+                        el.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
+                      );
+
+                      const childrenGridClass =
+                        sectionLayoutMode === 'grid-2'
+                          ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'
+                          : sectionLayoutMode === 'grid-3'
+                          ? 'grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'
+                          : sectionLayoutMode === 'grid-4'
+                          ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-stretch'
+                          : sectionLayoutMode === 'grid-1'
+                          ? 'grid grid-cols-1 gap-6 items-stretch'
+                          : sectionLayoutMode === 'flex-row'
+                          ? 'flex flex-wrap gap-6 items-stretch'
+                          : 'space-y-6 flex flex-col';
+
+                      return (
+                        <div className={childrenGridClass}>
+                          {(el.data?.children || []).map((child: any, cIdx: number) => {
                         if (child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg') {
                           const is4 = child.type.includes('4') || child.type === 'Col4';
                           const defaultData = is4
@@ -453,6 +474,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                         return <div key={child.id || cIdx} className="text-sm font-medium text-center">{child.content}</div>;
                       })}
                     </div>
+                  );
+                })()}
                   </div>
                 </section>
               );

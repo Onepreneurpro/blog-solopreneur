@@ -2277,304 +2277,331 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   Glissez vos colonnes (4, 3, 2 colonnes), votre conteneur d éléments, vos formulaires, images ou textes. Cette section s étendra à 100% sur toute la largeur de l écran de vos visiteurs !
                                 </div>
                               </div>
-                            ) : (
-                                 <div className="space-y-6">
-                                {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
-                                   <div
-                                     key={child.id || cIdx}
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       setSelectedElementId(el.id);
-                                       setSelectedChildIndex(cIdx);
-                                       setSelectedSubItem(null);
-                                     }}
-                                     className={`relative group/child p-3 rounded-none border transition-all ${
-                                       selectedChildIndex === cIdx
-                                         ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
-                                         : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
-                                     }`}
-                                   >
-                                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
-                                     <div
-                                       className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
-                                         selectedChildIndex === cIdx ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100'
-                                       }`}
-                                     >
-                                       {/* TYPE NAME BADGE */}
-                                       <div
-                                         className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
-                                           child.type === 'ContentBox' ? 'bg-sky-500' : 'bg-[#FF7700]'
-                                         }`}
-                                       >
-                                         <span>{child.type === 'ContentBox' ? 'Conteneur DIV' : child.type}</span>
-                                         <span className="text-[10px]">⬇️</span>
-                                       </div>
+                            ) : (() => {
+                              const sectionLayoutMode = el.data?.layoutMode || (
+                                el.data?.children?.length === 2 ? 'grid-2' :
+                                el.data?.children?.length === 3 ? 'grid-3' :
+                                el.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
+                              );
 
-                                       {/* ACTIONS BADGE */}
-                                       <div
-                                         className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
-                                           child.type === 'ContentBox' ? 'bg-sky-500 border-sky-600' : 'bg-[#FF7700] border-amber-600'
-                                         }`}
-                                       >
-                                         {/* ⚙️ CONTROLLER / INSPECTER */}
-                                         <button
-                                           type="button"
-                                           onClick={(e) => {
-                                             e.stopPropagation();
-                                             setSelectedElementId(el.id);
-                                             setSelectedChildIndex(cIdx);
-                                             setSelectedSubItem(null);
-                                           }}
-                                           className="p-1 hover:bg-black/20 rounded transition-colors"
-                                           title="⚙️ Contrôler le bloc / Paramètres"
-                                         >
-                                           <Settings className="w-3.5 h-3.5 text-white" />
-                                         </button>
+                              const childrenGridClass =
+                                sectionLayoutMode === 'grid-2'
+                                  ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'
+                                  : sectionLayoutMode === 'grid-3'
+                                  ? 'grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'
+                                  : sectionLayoutMode === 'grid-4'
+                                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-stretch'
+                                  : sectionLayoutMode === 'grid-1'
+                                  ? 'grid grid-cols-1 gap-6 items-stretch'
+                                  : sectionLayoutMode === 'flex-row'
+                                  ? 'flex flex-wrap gap-6 items-stretch'
+                                  : 'space-y-6 flex flex-col';
 
-                                         {/* 📋 DUPLIQUER */}
-                                         <button
-                                           type="button"
-                                           onClick={(e) => {
-                                             e.stopPropagation();
-                                             const copy = JSON.parse(JSON.stringify(child));
-                                             copy.id = `child-${Date.now()}`;
-                                             const updated = [...(el.data?.children || [])];
-                                             updated.splice(cIdx + 1, 0, copy);
-                                             handleUpdateElementData(el.id, { children: updated });
-                                           }}
-                                           className="p-1 hover:bg-black/20 rounded transition-colors"
-                                           title="📋 Dupliquer le bloc"
-                                         >
-                                           <Copy className="w-3.5 h-3.5 text-white" />
-                                         </button>
-
-                                         {/* ▲ MONTER */}
-                                         <button
-                                           type="button"
-                                           disabled={cIdx === 0}
-                                           onClick={(e) => {
-                                             e.stopPropagation();
-                                             if (cIdx > 0) {
-                                               const updated = [...el.data.children];
-                                               const temp = updated[cIdx - 1];
-                                               updated[cIdx - 1] = updated[cIdx];
-                                               updated[cIdx] = temp;
-                                               handleUpdateElementData(el.id, { children: updated });
-                                             }
-                                           }}
-                                           className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
-                                           title="▲ Monter"
-                                         >
-                                           <ChevronUp className="w-3.5 h-3.5 text-white" />
-                                         </button>
-
-                                         {/* ▼ DESCENDRE */}
-                                         <button
-                                           type="button"
-                                           disabled={cIdx === (el.data?.children || []).length - 1}
-                                           onClick={(e) => {
-                                             e.stopPropagation();
-                                             if (cIdx < el.data.children.length - 1) {
-                                               const updated = [...el.data.children];
-                                               const temp = updated[cIdx + 1];
-                                               updated[cIdx + 1] = updated[cIdx];
-                                               updated[cIdx] = temp;
-                                               handleUpdateElementData(el.id, { children: updated });
-                                             }
-                                           }}
-                                           className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
-                                           title="▼ Descendre"
-                                         >
-                                           <ChevronDown className="w-3.5 h-3.5 text-white" />
-                                         </button>
-
-                                         {/* 🗑️ SUPPRIMER */}
-                                         <button
-                                           type="button"
-                                           onClick={(e) => {
-                                             e.stopPropagation();
-                                             const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
-                                             handleUpdateElementData(el.id, { children: updated });
-                                             if (selectedChildIndex === cIdx) setSelectedChildIndex(null);
-                                           }}
-                                           className="p-1 hover:bg-red-700 rounded transition-colors"
-                                           title="🗑️ Supprimer le bloc"
-                                         >
-                                           <Trash2 className="w-3.5 h-3.5 text-white" />
-                                         </button>
-                                       </div>
-                                     </div>
-
-                                    {child.type === 'Heading' && (
-                                      <input
-                                        type="text"
-                                        value={child.content}
-                                        onChange={(e) => {
-                                          const updated = el.data.children.map((ch: any, i: number) =>
-                                            i === cIdx ? { ...ch, content: e.target.value } : ch
-                                          );
-                                          handleUpdateElementData(el.id, { children: updated });
-                                        }}
-                                        className="w-full text-xl sm:text-2xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
-                                      />
-                                    )}
-
-                                    {child.type === 'Text' && (
-                                      <textarea
-                                        rows={3}
-                                        value={child.content}
-                                        onChange={(e) => {
-                                          const updated = el.data.children.map((ch: any, i: number) =>
-                                            i === cIdx ? { ...ch, content: e.target.value } : ch
-                                          );
-                                          handleUpdateElementData(el.id, { children: updated });
-                                        }}
-                                        className="w-full text-sm leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-y"
-                                      />
-                                    )}
-
-                                    {child.type === 'Image' && (
-                                      <div className="space-y-2">
-                                        <div className="max-w-sm rounded-xl overflow-hidden shadow-md border border-white/10 max-h-56">
-                                          <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
+                              return (
+                                <div className={childrenGridClass}>
+                                  {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
+                                    <div
+                                      key={child.id || cIdx}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedElementId(el.id);
+                                        setSelectedChildIndex(cIdx);
+                                        setSelectedSubItem(null);
+                                      }}
+                                      className={`relative group/child p-3 rounded-none border transition-all h-full ${
+                                        selectedChildIndex === cIdx
+                                          ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                          : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
+                                      }`}
+                                    >
+                                      {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
+                                      <div
+                                        className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                          selectedChildIndex === cIdx ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100'
+                                        }`}
+                                      >
+                                        {/* TYPE NAME BADGE */}
+                                        <div
+                                          className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
+                                            child.type === 'ContentBox' ? 'bg-sky-500' : 'bg-[#FF7700]'
+                                          }`}
+                                        >
+                                          <span>{child.type === 'ContentBox' ? 'Rangée / DIV' : child.type}</span>
+                                          <span className="text-[10px]">⬇️</span>
                                         </div>
+
+                                        {/* ACTIONS BADGE */}
+                                        <div
+                                          className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                                            child.type === 'ContentBox' ? 'bg-sky-500 border-sky-600' : 'bg-[#FF7700] border-amber-600'
+                                          }`}
+                                        >
+                                          {/* ⚙️ CONTROLLER / INSPECTER */}
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setSelectedElementId(el.id);
+                                              setSelectedChildIndex(cIdx);
+                                              setSelectedSubItem(null);
+                                            }}
+                                            className="p-1 hover:bg-black/20 rounded transition-colors"
+                                            title="⚙️ Contrôler le bloc / Paramètres"
+                                          >
+                                            <Settings className="w-3.5 h-3.5 text-white" />
+                                          </button>
+
+                                          {/* 📋 DUPLIQUER */}
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const copy = JSON.parse(JSON.stringify(child));
+                                              copy.id = `child-${Date.now()}`;
+                                              const updated = [...(el.data?.children || [])];
+                                              updated.splice(cIdx + 1, 0, copy);
+                                              handleUpdateElementData(el.id, { children: updated });
+                                            }}
+                                            className="p-1 hover:bg-black/20 rounded transition-colors"
+                                            title="📋 Dupliquer le bloc"
+                                          >
+                                            <Copy className="w-3.5 h-3.5 text-white" />
+                                          </button>
+
+                                          {/* ▲ MONTER */}
+                                          <button
+                                            type="button"
+                                            disabled={cIdx === 0}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (cIdx > 0) {
+                                                const updated = [...el.data.children];
+                                                const temp = updated[cIdx - 1];
+                                                updated[cIdx - 1] = updated[cIdx];
+                                                updated[cIdx] = temp;
+                                                handleUpdateElementData(el.id, { children: updated });
+                                              }
+                                            }}
+                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                            title="▲ Monter"
+                                          >
+                                            <ChevronUp className="w-3.5 h-3.5 text-white" />
+                                          </button>
+
+                                          {/* ▼ DESCENDRE */}
+                                          <button
+                                            type="button"
+                                            disabled={cIdx === (el.data?.children || []).length - 1}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (cIdx < el.data.children.length - 1) {
+                                                const updated = [...el.data.children];
+                                                const temp = updated[cIdx + 1];
+                                                updated[cIdx + 1] = updated[cIdx];
+                                                updated[cIdx] = temp;
+                                                handleUpdateElementData(el.id, { children: updated });
+                                              }
+                                            }}
+                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                            title="▼ Descendre"
+                                          >
+                                            <ChevronDown className="w-3.5 h-3.5 text-white" />
+                                          </button>
+
+                                          {/* 🗑️ SUPPRIMER */}
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
+                                              handleUpdateElementData(el.id, { children: updated });
+                                              if (selectedChildIndex === cIdx) setSelectedChildIndex(null);
+                                            }}
+                                            className="p-1 hover:bg-red-700 rounded transition-colors"
+                                            title="🗑️ Supprimer le bloc"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5 text-white" />
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      {child.type === 'Heading' && (
                                         <input
                                           type="text"
-                                          value={child.data?.img || child.content}
+                                          value={child.content}
                                           onChange={(e) => {
-                                            const val = e.target.value;
                                             const updated = el.data.children.map((ch: any, i: number) =>
-                                              i === cIdx ? { ...ch, content: val, data: { ...ch.data, img: val } } : ch
+                                              i === cIdx ? { ...ch, content: e.target.value } : ch
                                             );
                                             handleUpdateElementData(el.id, { children: updated });
                                           }}
-                                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono"
-                                          placeholder="URL de l image..."
+                                          className="w-full text-xl sm:text-2xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
                                         />
-                                      </div>
-                                    )}
+                                      )}
 
-                                    {/* INTERACTIVE NESTED COLUMN CARDS IN SECTION */}
-                                    {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg' || child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (() => {
-                                      const is4 = child.type.includes('4') || child.type === 'Col4';
-                                      const is3 = child.type.includes('3') || child.type === 'Col3';
-                                      const colsClass = is4 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : is3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2';
+                                      {child.type === 'Text' && (
+                                        <textarea
+                                          rows={3}
+                                          value={child.content}
+                                          onChange={(e) => {
+                                            const updated = el.data.children.map((ch: any, i: number) =>
+                                              i === cIdx ? { ...ch, content: e.target.value } : ch
+                                            );
+                                            handleUpdateElementData(el.id, { children: updated });
+                                          }}
+                                          className="w-full text-sm leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-y"
+                                        />
+                                      )}
 
-                                      const updateNestedColumnItem = (itemIdx: number, itemChanges: any) => {
-                                        const currentChildren = [...(el.data?.children || [])];
-                                        const targetChild = currentChildren[cIdx];
-                                        const currentItems = targetChild.data?.items || getDefaultBlockData(child.type, child.content).items;
-                                        const updatedItems = currentItems.map((item: any, i: number) =>
-                                          i === itemIdx ? { ...item, ...itemChanges } : item
-                                        );
-                                        currentChildren[cIdx] = {
-                                          ...targetChild,
-                                          data: {
-                                            ...(targetChild.data || {}),
-                                            items: updatedItems,
-                                          },
+                                      {child.type === 'Image' && (
+                                        <div className="space-y-2">
+                                          <div className="max-w-sm rounded-xl overflow-hidden shadow-md border border-white/10 max-h-56">
+                                            <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
+                                          </div>
+                                          <input
+                                            type="text"
+                                            value={child.data?.img || child.content}
+                                            onChange={(e) => {
+                                              const updated = el.data.children.map((ch: any, i: number) =>
+                                                i === cIdx ? { ...ch, content: e.target.value, data: { ...ch.data, img: e.target.value } } : ch
+                                              );
+                                              handleUpdateElementData(el.id, { children: updated });
+                                            }}
+                                            className="w-full text-xs bg-slate-950 p-2 rounded border border-slate-700 text-slate-300"
+                                            placeholder="URL de l image..."
+                                          />
+                                        </div>
+                                      )}
+
+                                      {child.type === 'OptinForm' && (
+                                        <div className="max-w-md mx-auto p-6 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
+                                          <input
+                                            type="email"
+                                            disabled
+                                            placeholder={child.data?.emailPlaceholder || 'Entrez votre e-mail...'}
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-400"
+                                          />
+                                          <button type="button" className="w-full py-3 bg-[#00A0FF] text-white font-bold text-xs rounded-xl shadow-md">
+                                            {child.data?.buttonText || 'ACCÈS IMMÉDIAT'}
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg' || child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (() => {
+                                        const colsClass =
+                                          child.type.includes('4') || child.type === 'Col4'
+                                            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
+                                            : child.type.includes('2') || child.type === 'Col2'
+                                            ? 'grid-cols-1 md:grid-cols-2'
+                                            : 'grid-cols-1 md:grid-cols-3';
+
+                                        const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content).items;
+
+                                        const updateNestedColumnItem = (itemIdx: number, itemChanges: any) => {
+                                           const currentChildren = [...(el.data?.children || [])];
+                                           const targetChild = currentChildren[cIdx];
+                                           const currentItems = targetChild.data?.items || getDefaultBlockData(child.type, child.content).items;
+                                           const updatedItems = currentItems.map((item: any, i: number) =>
+                                             i === itemIdx ? { ...item, ...itemChanges } : item
+                                           );
+                                           currentChildren[cIdx] = {
+                                             ...targetChild,
+                                             data: {
+                                               ...(targetChild.data || {}),
+                                               items: updatedItems,
+                                             },
+                                           };
+                                           handleUpdateElementData(el.id, { children: currentChildren });
                                         };
-                                        handleUpdateElementData(el.id, { children: currentChildren });
-                                      };
 
-                                      const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content).items;
+                                        return (
+                                          <div className={`grid ${colsClass} gap-4 p-4 bg-slate-950/60 rounded-none border border-white/10`}>
+                                            {itemsList.map((it: any, idx: number) => {
+                                              const isSelected = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === idx;
 
-                                      return (
-                                        <div className={`grid ${colsClass} gap-4 p-4 bg-slate-950/60 rounded-none border border-white/10`}>
-                                          {itemsList.map((it: any, idx: number) => {
-                                            const isSelected = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === idx;
-
-                                            return (
-                                              <div
-                                                key={idx}
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  setSelectedElementId(el.id);
-                                                  setSelectedSubItem({
-                                                    blockId: `${el.id}-c${cIdx}`,
-                                                    itemIndex: idx,
-                                                    subType: 'image',
-                                                    childIndex: cIdx,
-                                                    parentBlockId: el.id,
-                                                  });
-                                                }}
-                                                style={{
-                                                  backgroundColor: it.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
-                                                  color: it.textColor || child.data?.textColor || '#ffffff',
-                                                }}
-                                                className={`p-4 rounded-none border-2 transition-all space-y-3 flex flex-col items-center relative group/card cursor-pointer ${
-                                                  isSelected
-                                                    ? 'border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
-                                                    : 'border-white/10 hover:border-white/30'
-                                                }`}
-                                              >
-                                                {/* IMAGE FRAME WITH DROP TARGET */}
+                                              return (
                                                 <div
-                                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                  onDrop={(e) => {
-                                                    e.preventDefault();
+                                                  key={idx}
+                                                  onClick={(e) => {
                                                     e.stopPropagation();
-                                                    const dataStr = e.dataTransfer.getData('application/json');
-                                                    if (dataStr) {
-                                                      try {
-                                                        const d = JSON.parse(dataStr);
-                                                        const imgUrl = d.defaultContent || d.content || d.url || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80';
-                                                        updateNestedColumnItem(idx, { img: imgUrl });
-                                                      } catch (err) {}
-                                                    }
+                                                    setSelectedElementId(el.id);
+                                                    setSelectedSubItem({
+                                                      blockId: `${el.id}-c${cIdx}`,
+                                                      itemIndex: idx,
+                                                      subType: 'image',
+                                                      childIndex: cIdx,
+                                                      parentBlockId: el.id,
+                                                    });
                                                   }}
-                                                  className={`w-full ${it.imgHeight || child.data?.imgHeight || 'h-36'} ${
-                                                    (it.imgShape || child.data?.imgShape || 'square') === 'arcade'
-                                                      ? 'rounded-t-[80px]'
-                                                      : (it.imgShape || child.data?.imgShape) === 'circle'
-                                                      ? 'rounded-full'
-                                                      : (it.imgShape || child.data?.imgShape) === 'square'
-                                                      ? 'rounded-none'
-                                                      : 'rounded-2xl'
-                                                  } overflow-hidden bg-slate-950/80 border border-white/20 relative group/img`}
+                                                  style={{
+                                                    backgroundColor: it.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
+                                                    color: it.textColor || child.data?.textColor || '#ffffff',
+                                                  }}
+                                                  className={`p-4 rounded-none border-2 transition-all space-y-3 flex flex-col items-center relative group/card cursor-pointer ${
+                                                    isSelected
+                                                      ? 'border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
+                                                      : 'border-white/10 hover:border-white/30'
+                                                  }`}
                                                 >
-                                                  {it.img ? (
-                                                    <img
-                                                      src={it.img}
-                                                      alt={it.title}
-                                                      className={`w-full h-full ${it.imgObjectFit || child.data?.imgObjectFit || 'object-cover'}`}
-                                                      style={{ objectPosition: it.imgObjectPosition || child.data?.imgObjectPosition || 'center' }}
-                                                    />
-                                                  ) : (
-                                                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs font-bold gap-1">
-                                                      <span>🖼️</span>
-                                                      <span>Déposer image</span>
+                                                  {/* IMAGE FRAME WITH DROP TARGET */}
+                                                  <div
+                                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                    onDrop={(e) => {
+                                                      e.preventDefault();
+                                                      e.stopPropagation();
+                                                      const dataStr = e.dataTransfer.getData('application/json');
+                                                      if (dataStr) {
+                                                        try {
+                                                          const d = JSON.parse(dataStr);
+                                                          const imgUrl = d.defaultContent || d.content || d.url || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80';
+                                                          updateNestedColumnItem(idx, { img: imgUrl });
+                                                        } catch (err) {}
+                                                      }
+                                                    }}
+                                                    className={`w-full ${it.imgHeight || child.data?.imgHeight || 'h-36'} ${
+                                                      (it.imgShape || child.data?.imgShape || 'square') === 'arcade'
+                                                        ? 'rounded-t-[80px]'
+                                                        : (it.imgShape || child.data?.imgShape) === 'circle'
+                                                        ? 'rounded-full'
+                                                        : 'rounded-none'
+                                                    } overflow-hidden bg-slate-950/80 border border-white/20 relative group/img`}
+                                                  >
+                                                    {it.img ? (
+                                                      <img
+                                                        src={it.img}
+                                                        alt={it.title}
+                                                        className={`w-full h-full ${it.imgObjectFit || child.data?.imgObjectFit || 'object-cover'}`}
+                                                        style={{ objectPosition: it.imgObjectPosition || child.data?.imgObjectPosition || 'center' }}
+                                                      />
+                                                    ) : (
+                                                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs font-bold gap-1">
+                                                        <span>🖼️</span>
+                                                        <span>Déposer image</span>
+                                                      </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-[#00A0FF]/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white font-bold text-[10px] pointer-events-none transition-opacity">
+                                                      Glisser une image ici
                                                     </div>
-                                                  )}
-                                                  <div className="absolute inset-0 bg-[#00A0FF]/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white font-bold text-[10px] pointer-events-none transition-opacity">
-                                                    🎯 Sélectionner la carte
                                                   </div>
-                                                </div>
 
-                                                {/* INLINE EDITABLE TITRE */}
-                                                <input
-                                                  type="text"
-                                                  value={it.title || ''}
-                                                  onChange={(e) => updateNestedColumnItem(idx, { title: e.target.value })}
-                                                  className="w-full text-center text-xs font-heading font-black uppercase bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
-                                                  style={{ color: it.textColor || '#ffffff' }}
-                                                  placeholder="Titre de la carte..."
-                                                />
+                                                  <input
+                                                    type="text"
+                                                    value={it.title || ''}
+                                                    onChange={(e) => updateNestedColumnItem(idx, { title: e.target.value })}
+                                                    className="w-full text-center font-heading font-extrabold text-sm uppercase bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                                    placeholder="Titre de la carte..."
+                                                  />
 
-                                                {/* INLINE EDITABLE DESCRIPTION */}
-                                                <textarea
-                                                  rows={2}
-                                                  value={it.desc || ''}
-                                                  onChange={(e) => updateNestedColumnItem(idx, { desc: e.target.value })}
-                                                  className="w-full text-center text-[10px] bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none leading-relaxed"
-                                                  style={{ color: it.textColor ? `${it.textColor}cc` : '#94a3b8' }}
-                                                  placeholder="Description..."
-                                                />
+                                                  <textarea
+                                                    rows={2}
+                                                    value={it.desc || ''}
+                                                    onChange={(e) => updateNestedColumnItem(idx, { desc: e.target.value })}
+                                                    className="w-full text-center text-xs font-medium opacity-80 bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none"
+                                                    placeholder="Description..."
+                                                  />
 
-                                                {/* QUICK COLOR PICKERS ON CARD */}
-                                                <div className="w-full pt-2 border-t border-white/10 flex items-center justify-between text-[9px] gap-1">
-                                                  <div className="flex items-center gap-1">
-                                                    <span className="text-slate-400 font-bold">Fond:</span>
+                                                  {/* QUICK COLOR PICKERS ON CARD */}
+                                                  <div className="flex items-center gap-2 pt-2 opacity-0 group-hover/card:opacity-100 transition-opacity">
                                                     <input
                                                       type="color"
                                                       value={it.bgColor || '#0f172a'}
@@ -2582,9 +2609,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                       className="w-4 h-4 rounded cursor-pointer border-none bg-transparent"
                                                       title="Couleur de fond"
                                                     />
-                                                  </div>
-                                                  <div className="flex items-center gap-1">
-                                                    <span className="text-slate-400 font-bold">Texte:</span>
                                                     <input
                                                       type="color"
                                                       value={it.textColor || '#ffffff'}
@@ -2594,44 +2618,65 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     />
                                                   </div>
                                                 </div>
-                                              </div>
-                                            );
-                                          })}
+                                              );
+                                            })}
+                                          </div>
+                                        );
+                                      })()}
+
+                                      {child.type === 'ContentBox' && (
+                                        <div
+                                          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                          onDrop={(e) => {
+                                            e.stopPropagation();
+                                            handleBlockDrop(e, child.id);
+                                          }}
+                                          style={{
+                                            backgroundColor: child.data?.bgColor || 'transparent',
+                                          }}
+                                          className="min-h-[100px] w-full p-4 rounded-none border-2 border-dashed border-sky-400/40 hover:border-sky-400 bg-sky-950/20 text-sky-300 transition-all flex items-center justify-center text-xs font-bold"
+                                        >
+                                          {(!child.data?.children || child.data.children.length === 0) ? (
+                                            <div className="text-center py-4 space-y-1">
+                                              <span className="text-sm font-bold text-sky-300">📦 Rangée / Conteneur DIV (Vierge)</span>
+                                              <div className="text-[10px] text-sky-400/70 font-normal">Déposez vos cartes ou éléments dans ce bloc</div>
+                                            </div>
+                                          ) : (
+                                            <div className="w-full space-y-4">
+                                              {(child.data.children || []).map((subChild: any, sIdx: number) => (
+                                                <div key={subChild.id || sIdx} className="text-sm font-medium">
+                                                  {subChild.content || subChild.type}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
                                         </div>
-                                      );
-                                    })()}
+                                      )}
 
-                                    {child.type === 'ContentBox' && (
-                                      <div className="p-4 bg-slate-950/60 rounded-2xl border border-dashed border-[#00A0FF] space-y-3">
-                                        <div className="text-xs font-bold text-[#00A0FF]">📦 Conteneur d éléments imbriqué</div>
-                                        <div className="text-xs text-slate-400">Insérez d autres cartes et éléments ici...</div>
-                                      </div>
-                                    )}
+                                      {child.type === 'ButtonCTA' && (
+                                        <div className="text-center pt-2">
+                                          <button type="button" className="px-8 py-3 bg-[#00A0FF] text-white font-bold text-xs rounded-xl shadow-lg">
+                                            {child.content || child.data?.buttonText || 'Bouton d action'}
+                                          </button>
+                                        </div>
+                                      )}
 
-                                    {child.type === 'ButtonCTA' && (
-                                      <div className="text-center pt-2">
-                                        <button type="button" className="px-8 py-3 bg-[#00A0FF] text-white font-bold text-xs rounded-xl shadow-lg">
-                                          {child.content || child.data?.buttonText || 'Bouton d action'}
-                                        </button>
-                                      </div>
-                                    )}
-
-                                    {child.type === 'FormInput' && (
-                                      <div className="max-w-md mx-auto space-y-1 text-left">
-                                        <label className="text-[10px] font-bold text-slate-300 block">{child.data?.title || 'Champ de formulaire'}</label>
-                                        <input
-                                          type="text"
-                                          disabled
-                                          placeholder={child.data?.placeholder || child.content || 'votre.email@exemple.com'}
-                                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-400"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                                      {child.type === 'FormInput' && (
+                                        <div className="max-w-md mx-auto space-y-1 text-left">
+                                          <label className="text-[10px] font-bold text-slate-300 block">{child.data?.title || 'Champ de formulaire'}</label>
+                                          <input
+                                            type="text"
+                                            disabled
+                                            placeholder={child.data?.placeholder || child.content || 'votre.email@exemple.com'}
+                                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-400"
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            })()}
 
                           {/* INTERACTIVE BOTTOM RESIZE DRAG HANDLE BAR */}
                           <div
@@ -2645,6 +2690,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                           </div>
                         </div>
+                      </div>
                       );
                     })()}
 
@@ -4402,6 +4448,46 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   }`}
                                 >
                                   {p.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 📐 DISPOSITION DES RANGÉES & BLOCS DIV DANS LA SECTION */}
+                        {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
+                          <div className="p-4 bg-slate-950 rounded-2xl border border-purple-500/60 space-y-3 shadow-lg">
+                            <div className="text-[10px] font-black text-purple-300 uppercase tracking-wider flex items-center justify-between">
+                              <span>📐 Disposition des Rangées / Blocs DIV</span>
+                              <span className="text-[9px] font-mono text-purple-400">
+                                {selectedEl.data?.layoutMode || 'Automatique'}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { key: 'grid-1', label: '1 Rangée (100%)' },
+                                { key: 'grid-2', label: '2 Rangées (50% / 50%)' },
+                                { key: 'grid-3', label: '3 Rangées (33% chacun)' },
+                                { key: 'grid-4', label: '4 Rangées (25% chacun)' },
+                                { key: 'vertical', label: 'Empilés (Vertical)' },
+                                { key: 'flex-row', label: 'Côte à côte (Flex)' },
+                              ].map((mode) => (
+                                <button
+                                  key={mode.key}
+                                  type="button"
+                                  onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: mode.key })}
+                                  className={`py-2 px-2 text-[11px] font-bold rounded-xl border transition-all text-center flex items-center justify-center gap-1 ${
+                                    (selectedEl.data?.layoutMode || (
+                                      selectedEl.data?.children?.length === 2 ? 'grid-2' :
+                                      selectedEl.data?.children?.length === 3 ? 'grid-3' :
+                                      selectedEl.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
+                                    )) === mode.key
+                                      ? 'bg-purple-600 text-white border-purple-500 shadow-md ring-2 ring-purple-400/40'
+                                      : 'bg-slate-900 text-purple-200 border-slate-800 hover:text-white hover:border-purple-500/50'
+                                  }`}
+                                >
+                                  {mode.label}
                                 </button>
                               ))}
                             </div>
