@@ -1381,10 +1381,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                   <div className="flex items-center gap-2">
                     {/* TOP CONTROL */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold">Top (Haut)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate">Top (Haut)</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={padTop}
@@ -1396,7 +1396,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ paddingTop: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1414,7 +1414,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ paddingTop: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
 
@@ -1433,10 +1433,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </button>
 
                     {/* BOTTOM CONTROL */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold">Bottom (Bas)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate">Bottom (Bas)</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={padBottom}
@@ -1448,7 +1448,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ paddingBottom: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1466,7 +1466,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ paddingBottom: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
                   </div>
@@ -1479,10 +1479,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                   <div className="flex items-center gap-2">
                     {/* LEFT CONTROL */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold">Left (Gauche)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate">Left (Gauche)</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={padLeft}
@@ -1494,7 +1494,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ paddingLeft: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1512,7 +1512,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ paddingLeft: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
 
@@ -1531,10 +1531,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </button>
 
                     {/* RIGHT CONTROL */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold">Right (Droite)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate">Right (Droite)</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={padRight}
@@ -1546,7 +1546,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ paddingRight: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1564,7 +1564,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ paddingRight: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
                   </div>
@@ -1577,10 +1577,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                   <div className="flex items-center gap-2">
                     {/* MARGIN HAUT */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold font-mono">Margin Haut</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate font-mono">Margin Haut</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={marginTop}
@@ -1592,7 +1592,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ marginTop: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1610,7 +1610,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ marginTop: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
 
@@ -1629,10 +1629,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </button>
 
                     {/* MARGIN BAS */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold font-mono">Margin Bas</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <span className="text-slate-400 font-bold truncate font-mono">Margin Bas</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
                           <input
                             type="number"
                             value={marginBottom}
@@ -1644,7 +1644,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 updateMarginData({ marginBottom: val });
                               }
                             }}
-                            className="w-10 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
                           />
                           <span className="text-[9px] text-slate-400 font-mono">px</span>
                         </div>
@@ -1662,7 +1662,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ marginBottom: val });
                           }
                         }}
-                        className="w-full accent-[#00A0FF] h-1.5 cursor-pointer"
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
                       />
                     </div>
                   </div>
@@ -1873,7 +1873,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT PALETTE / INSPECTOR PANEL (SINGLE SIDEBAR ARCHITECTURE) */}
-        <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden">
+        <div className="w-80 sm:w-96 md:w-[410px] max-w-[90vw] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden transition-all">
           {!selectedElementId ? (
             <React.Fragment>
               {/* TABS: ÉLÉMENTS / BLOCS */}
