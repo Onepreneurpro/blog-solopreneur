@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     const $ = cheerio.load(html);
     const pageTitle = $('title').text().trim() || 'Page Clonée';
 
-    // Clean noise elements
+    // Clean noise elements (scripts, styles, noscript, iframe, meta, link)
     $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
 
     const clonedElements: any[] = [];
@@ -87,21 +87,22 @@ export async function POST(req: Request) {
       const children: any[] = [];
       const visitedTexts = new Set<string>();
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, span.heading, div.heading').each((i: number, el: any) => {
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, span, div, li').each((i: number, el: any) => {
         const $el = $(el);
         const tagName = el.tagName ? el.tagName.toLowerCase() : '';
         const styleProps = extractStyleProps($el.attr('style'));
-        const text = $el.text().trim();
+        const directText = $el.clone().children().remove().end().text().trim();
+        const fullText = $el.text().trim();
 
-        // 1. HEADINGS (h1 - h6 or heading class)
-        if (tagName.startsWith('h') || $el.hasClass('heading') || $el.hasClass('title')) {
-          if (text && text.length > 1 && !visitedTexts.has(text)) {
-            visitedTexts.add(text);
+        // 1. HEADINGS (h1 - h6 or elements with heading class/large text)
+        if (tagName.startsWith('h') || $el.hasClass('heading') || $el.hasClass('title') || $el.hasClass('headline')) {
+          if (fullText && fullText.length > 1 && !visitedTexts.has(fullText)) {
+            visitedTexts.add(fullText);
             children.push({
               id: `cloned-heading-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Heading',
               category: 'Texte',
-              content: text,
+              content: fullText,
               data: {
                 fontSize: tagName === 'h1' ? 'text-4xl' : tagName === 'h2' ? 'text-3xl' : 'text-xl',
                 fontWeight: 'font-black',
@@ -130,14 +131,14 @@ export async function POST(req: Request) {
         // 3. BUTTONS / LINKS (a, button)
         else if (tagName === 'a' || tagName === 'button') {
           const isButtonLike = $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || tagName === 'button' || $el.attr('role') === 'button';
-          if (text && text.length > 1 && text.length < 120 && isButtonLike) {
-            if (!visitedTexts.has(text)) {
-              visitedTexts.add(text);
+          if (fullText && fullText.length > 1 && fullText.length < 120 && isButtonLike) {
+            if (!visitedTexts.has(fullText)) {
+              visitedTexts.add(fullText);
               children.push({
                 id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
                 type: 'ButtonCTA',
                 category: 'Bouton',
-                content: text,
+                content: fullText,
                 data: {
                   btnColor: styleProps.bgColor || '#00A0FF',
                   textColor: styleProps.textColor || '#ffffff',
@@ -165,15 +166,16 @@ export async function POST(req: Request) {
             });
           }
         }
-        // 5. PARAGRAPHS & TEXT (p or text spans)
-        else if (tagName === 'p') {
-          if (text && text.length > 2 && !visitedTexts.has(text)) {
-            visitedTexts.add(text);
+        // 5. PARAGRAPHS & TEXT (p, li, span, or text-only div)
+        else if (tagName === 'p' || tagName === 'li' || (tagName === 'span' && directText.length > 3) || (tagName === 'div' && directText.length > 10 && $el.children().length === 0)) {
+          const textToUse = directText.length > 3 ? directText : fullText;
+          if (textToUse && textToUse.length > 2 && !visitedTexts.has(textToUse)) {
+            visitedTexts.add(textToUse);
             children.push({
               id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Text',
               category: 'Texte',
-              content: text,
+              content: textToUse,
               data: {
                 fontSize: 'text-base',
                 textColor: styleProps.textColor || '#e2e8f0',
