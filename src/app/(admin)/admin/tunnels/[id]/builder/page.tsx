@@ -1084,63 +1084,52 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             );
           })()}
 
-          {/* SOUS-ÉLÉMENT INTÉRIEUR SELECTIONNÉ */}
+          {/* SOUS-ÉLÉMENT INTÉRIEUR SELECTIONNÉ (IMAGE / CARTE) */}
           {selectedSubItem && currentSubItem && (
-            <div className="p-4 bg-slate-950 rounded-2xl border border-emerald-500/60 space-y-4 shadow-xl mb-4">
+            <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/60 space-y-4 shadow-xl mb-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-xs font-black text-emerald-400 uppercase flex items-center gap-1.5">
-                  <span>✨</span>
-                  <span>Élément Intérieur #{selectedSubItem.itemIndex + 1}</span>
+                <span className="text-xs font-black text-amber-400 uppercase flex items-center gap-1.5">
+                  <span>🖼️</span>
+                  <span>Paramètres de l Image / Élément</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setSelectedSubItem(null)}
                   className="text-[10px] font-bold text-slate-400 hover:text-white underline"
                 >
-                  Retour Bloc
+                  Fermer
                 </button>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">
-                  Titre de la Carte
-                </label>
-                <input
-                  type="text"
-                  value={currentSubItem.title || ''}
-                  onChange={(e) => updateSubItemProperty({ title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-emerald-400 outline-none"
-                />
+                {/* IMAGE URL INPUT */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider block">
+                    URL de l Image
+                  </label>
+                  <input
+                    type="text"
+                    value={currentSubItem.img || currentSubItem.content || ''}
+                    onChange={(e) => updateSubItemProperty({ img: e.target.value, content: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-400 outline-none"
+                    placeholder="https://..."
+                  />
+                </div>
 
-                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">
-                  Description / Texte
-                </label>
-                <textarea
-                  rows={3}
-                  value={currentSubItem.desc || ''}
-                  onChange={(e) => updateSubItemProperty({ desc: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-emerald-400 outline-none resize-none"
-                />
-
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Fond Carte</label>
-                    <input
-                      type="color"
-                      value={currentSubItem.bgColor || '#0f172a'}
-                      onChange={(e) => updateSubItemProperty({ bgColor: e.target.value })}
-                      className="w-full h-8 rounded-lg cursor-pointer border-none bg-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Texte Carte</label>
-                    <input
-                      type="color"
-                      value={currentSubItem.textColor || '#ffffff'}
-                      onChange={(e) => updateSubItemProperty({ textColor: e.target.value })}
-                      className="w-full h-8 rounded-lg cursor-pointer border-none bg-transparent"
-                    />
-                  </div>
+                {/* OBJECT FIT & DIMENSIONS */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block">
+                    Ajustement d Image (Object Fit)
+                  </label>
+                  <select
+                    value={currentSubItem.imgObjectFit || 'cover'}
+                    onChange={(e) => updateSubItemProperty({ imgObjectFit: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-400 outline-none"
+                  >
+                    <option value="cover">Remplir / Découpe propre (Cover)</option>
+                    <option value="contain">Ajuster sans couper (Contain)</option>
+                    <option value="fill">Étirer (Fill)</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -3593,7 +3582,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                   currentSubList[sIdx] = {
                                                     ...currentSubList[sIdx],
                                                     data: { ...(currentSubList[sIdx].data || {}), ...changes },
-                                                    content: changes.content !== undefined ? changes.content : currentSubList[sIdx].content,
+                                            content: changes.content !== undefined ? changes.content : currentSubList[sIdx].content,
                                                   };
                                                   currentChildren[cIdx] = {
                                                     ...targetChild,
@@ -3613,39 +3602,87 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                   handleUpdateElementData(el.id, { children: currentChildren });
                                                 };
 
+                                                const isSubSel = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === sIdx;
+
+                                                if (subChild.type === 'Image') {
+                                                  return (
+                                                    <div
+                                                      key={subChild.id || sIdx}
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedElementId(el.id);
+                                                        setSelectedChildIndex(cIdx);
+                                                        setSelectedSubItem({
+                                                          blockId: `${el.id}-c${cIdx}`,
+                                                          itemIndex: sIdx,
+                                                          subType: 'image',
+                                                          childIndex: cIdx,
+                                                          parentBlockId: el.id,
+                                                        });
+                                                      }}
+                                                      className={`relative group/subimg w-full cursor-pointer transition-all ${
+                                                        isSubSel ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900' : 'hover:ring-1 hover:ring-amber-400/60'
+                                                      }`}
+                                                    >
+                                                      {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
+                                                      <div
+                                                        className={`absolute -top-3.5 left-2 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                          isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
+                                                        }`}
+                                                      >
+                                                        <div className="bg-amber-500 text-white px-2 py-0.5 rounded-l font-extrabold text-[10px] uppercase flex items-center gap-1">
+                                                          <span>Image</span>
+                                                          <span>⬇️</span>
+                                                        </div>
+                                                        <div className="bg-amber-600 text-white px-1 py-0.5 rounded-r flex items-center gap-1 border-l border-amber-700">
+                                                          <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              removeSubChild();
+                                                            }}
+                                                            className="p-0.5 hover:bg-black/20 rounded transition-colors"
+                                                            title="Supprimer l image"
+                                                          >
+                                                            <Trash2 className="w-3.5 h-3.5 text-white" />
+                                                          </button>
+                                                        </div>
+                                                      </div>
+
+                                                      {/* RAW IMAGE - ZERO WHITE FRAME, ZERO PADDING, ZERO INPUT BOX */}
+                                                      <img
+                                                        src={subChild.data?.img || subChild.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80'}
+                                                        alt="SubImage"
+                                                        style={{
+                                                          objectFit: subChild.data?.imgObjectFit || 'cover',
+                                                          borderRadius: subChild.data?.borderRadius ? `${subChild.data.borderRadius}px` : 0,
+                                                        }}
+                                                        className="w-full h-full min-h-[140px] block rounded-none"
+                                                      />
+                                                    </div>
+                                                  );
+                                                }
+
                                                 return (
-                                                  <div key={subChild.id || sIdx} className="relative group/subchild p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2 text-left">
-                                                    <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 text-[10px] text-slate-400 font-bold">
-                                                      <span className="uppercase tracking-wider text-[#00A0FF]">{subChild.type}</span>
+                                                  <div key={subChild.id || sIdx} className="relative group/subchild text-left py-1">
+                                                    <div className="flex items-center justify-between opacity-0 group-hover/subchild:opacity-100 transition-opacity mb-1">
+                                                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-[#00A0FF]">{subChild.type}</span>
                                                       <button
                                                         type="button"
                                                         onClick={removeSubChild}
-                                                        className="p-0.5 text-slate-500 hover:text-red-400 rounded transition-colors"
+                                                        className="p-0.5 text-slate-400 hover:text-red-400 rounded transition-colors"
                                                         title="Supprimer l élément"
                                                       >
-                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                        <Trash2 className="w-3 h-3" />
                                                       </button>
                                                     </div>
 
-                                                    {subChild.type === 'Image' ? (
-                                                      <div className="space-y-2">
-                                                        <div className="aspect-video w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
-                                                          <img src={subChild.data?.img || subChild.content} alt="Image" className="w-full h-full object-cover" />
-                                                        </div>
-                                                        <input
-                                                          type="text"
-                                                          value={subChild.data?.img || subChild.content}
-                                                          onChange={(e) => updateSubChildData({ img: e.target.value, content: e.target.value })}
-                                                          className="w-full text-xs bg-slate-950 p-2 rounded border border-slate-700 text-slate-200 outline-none"
-                                                          placeholder="URL de l image..."
-                                                        />
-                                                      </div>
-                                                    ) : subChild.type === 'Heading' ? (
+                                                    {subChild.type === 'Heading' ? (
                                                       <input
                                                         type="text"
                                                         value={subChild.content}
                                                         onChange={(e) => updateSubChildData({ content: e.target.value })}
-                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-slate-700 focus:border-[#00A0FF] outline-none text-white"
+                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none text-white"
                                                       />
                                                     ) : subChild.type === 'ButtonCTA' ? (
                                                       <div className="text-center py-1">
@@ -3668,7 +3705,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         rows={2}
                                                         value={subChild.content}
                                                         onChange={(e) => updateSubChildData({ content: e.target.value })}
-                                                        className="w-full text-xs leading-relaxed bg-transparent border border-slate-700 focus:border-[#00A0FF] outline-none text-slate-200 resize-y"
+                                                        className="w-full text-xs leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none text-slate-200 resize-y"
                                                       />
                                                     )}
                                                   </div>
