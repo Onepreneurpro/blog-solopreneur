@@ -370,7 +370,86 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           );
                         }
 
-                        return <div key={child.id || cIdx} className="text-sm font-medium">{child.content}</div>;
+                        if (child.type === 'Image') {
+                          const imgSrc = child.data?.img || child.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
+                          const imgHeight = child.data?.imgHeight || child.imgHeight || 'h-64';
+                          const imgShape = child.data?.imgShape || child.imgShape || 'arcade';
+                          const shapeClass =
+                            imgShape === 'arcade'
+                              ? 'rounded-t-[80px]'
+                              : imgShape === 'circle'
+                              ? 'rounded-full'
+                              : imgShape === 'square'
+                              ? 'rounded-none'
+                              : 'rounded-3xl';
+                          const imgFit = child.data?.imgObjectFit || child.imgObjectFit || 'object-cover';
+
+                          return (
+                            <div key={child.id || cIdx} className={`w-full max-w-2xl mx-auto ${imgHeight} ${shapeClass} overflow-hidden shadow-lg my-4`}>
+                              <img
+                                src={imgSrc}
+                                alt="Content"
+                                className={`w-full h-full ${imgFit}`}
+                              />
+                            </div>
+                          );
+                        }
+
+                        if (child.type === 'Heading') {
+                          return (
+                            <h2 key={child.id || cIdx} className="text-2xl sm:text-4xl font-heading font-black text-center my-4">
+                              {child.content}
+                            </h2>
+                          );
+                        }
+
+                        if (child.type === 'Text') {
+                          return (
+                            <p key={child.id || cIdx} className="text-sm sm:text-base font-medium leading-relaxed text-center opacity-90 max-w-3xl mx-auto my-4">
+                              {child.content}
+                            </p>
+                          );
+                        }
+
+                        if (child.type === 'ButtonCTA') {
+                          return (
+                            <div key={child.id || cIdx} className="text-center my-6">
+                              <button type="button" className="px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02]">
+                                {child.content || 'BOUTON D ACTION'}
+                              </button>
+                            </div>
+                          );
+                        }
+
+                        if (child.type === 'OptinForm') {
+                          return (
+                            <div key={child.id || cIdx} className="max-w-md mx-auto p-6 sm:p-8 bg-slate-900/90 text-white rounded-3xl border border-slate-800 shadow-2xl space-y-4 my-6">
+                              <h3 className="text-lg font-heading font-bold text-center">{child.content || 'Formulaire de Capture Email'}</h3>
+                              <form onSubmit={handleSubmit} className="space-y-3">
+                                <input
+                                  type="text"
+                                  placeholder="Votre Prénom..."
+                                  value={name}
+                                  onChange={(e) => setName(e.target.value)}
+                                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none"
+                                />
+                                <input
+                                  type="email"
+                                  required
+                                  placeholder="Votre Adresse Email *"
+                                  value={email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none"
+                                />
+                                <button type="submit" disabled={submitting} className="w-full py-3.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg uppercase">
+                                  {submitting ? 'Envoi...' : 'Recevoir mon accès gratuit'}
+                                </button>
+                              </form>
+                            </div>
+                          );
+                        }
+
+                        return <div key={child.id || cIdx} className="text-sm font-medium text-center">{child.content}</div>;
                       })}
                     </div>
                   </div>
