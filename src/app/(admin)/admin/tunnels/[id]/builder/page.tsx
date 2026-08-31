@@ -3611,16 +3611,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                                     </div>
 
-                                    {/* NATURAL CLICK-AND-DRAG VERTICAL SEAM RESIZER BETWEEN ADJACENT DIVS */}
-                                    {cIdx < numCols - 1 && (
-                                      <div
-                                        onMouseDown={(e) => handleStartColWidthResize(e, el.id, cIdx, sectionContainerRefs.current[el.id])}
-                                        className="w-3 -mx-1.5 cursor-col-resize z-40 flex items-center justify-center group/colseam self-stretch transition-all select-none relative"
-                                        title="Cliquer-glisser la bordure pour ajuster la largeur des colonnes"
-                                      >
-                                        <div className="w-1 group-hover/colseam:w-1.5 h-full bg-transparent group-hover/colseam:bg-[#00A0FF] transition-all shadow-md" />
-                                      </div>
-                                    )}
+                                    {/* VERTICAL SEAM RESIZER BETWEEN ADJACENT DIVS MATCHING SCREEN 2 */}
+                                     {cIdx < numCols - 1 && (
+                                       <div
+                                         onMouseDown={(e) => handleStartColWidthResize(e, el.id, cIdx, sectionContainerRefs.current[el.id])}
+                                         className="w-4 -mx-2 cursor-col-resize z-40 flex flex-col items-center justify-center group/colseam self-stretch transition-all select-none relative"
+                                         title="Cliquer-glisser la bordure pour ajuster la largeur des colonnes"
+                                       >
+                                         {/* Subtle seam line */}
+                                         <div className="w-px h-full bg-slate-700/40 group-hover/colseam:bg-[#00A0FF]/60 transition-colors" />
+                                         
+                                         {/* Small blue grip handle notch in the center (Screen 2) */}
+                                         <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#00A0FF] group-hover/colseam:w-2 group-hover/colseam:h-7 rounded-sm shadow-md transition-all border border-white/30" />
+                                       </div>
+                                     )}
                                   </React.Fragment>
                                 ))}
                               </div>
