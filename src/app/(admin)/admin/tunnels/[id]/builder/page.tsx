@@ -780,6 +780,442 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
+  const renderInspectorPanel = () => {
+    if (!selectedElementId) return null;
+    const selectedEl = elements.find((el) => el.id === selectedElementId);
+    if (!selectedEl) return null;
+    const rawData = selectedEl.data || {};
+    const defaultData = getDefaultBlockData(selectedEl.type, selectedEl.content);
+    const elItems =
+      rawData.items && rawData.items.length > 0
+        ? rawData.items
+        : defaultData.items || [];
+    const elData = { ...defaultData, ...rawData, items: elItems };
+
+    const currentSubItem = (() => {
+      if (!selectedSubItem) return null;
+      if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+        const childEl = selectedEl.data?.children?.[selectedSubItem.childIndex];
+        if (childEl) {
+          const childItems = childEl.data?.items || getDefaultBlockData(childEl.type, childEl.content).items || [];
+          return childItems[selectedSubItem.itemIndex] || null;
+        }
+      }
+      if (selectedSubItem.blockId === selectedEl.id || selectedSubItem.blockId.startsWith(selectedEl.id)) {
+        return elItems[selectedSubItem.itemIndex] || null;
+      }
+      return null;
+    })();
+
+    const updateSubItemProperty = (changes: any) => {
+      if (!selectedSubItem) return;
+      if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+        const cIdx = selectedSubItem.childIndex;
+        const currentChildren = [...(selectedEl.data?.children || [])];
+        const targetChild = currentChildren[cIdx];
+        const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+        const updatedItems = currentItems.map((item: any, i: number) =>
+          i === selectedSubItem.itemIndex ? { ...item, ...changes } : item
+        );
+        currentChildren[cIdx] = {
+          ...targetChild,
+          data: {
+            ...(targetChild.data || {}),
+            items: updatedItems,
+          },
+        };
+        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+        return;
+      }
+      const updatedItems = elItems.map((item: any, i: number) =>
+        i === selectedSubItem.itemIndex ? { ...item, ...changes } : item
+      );
+      handleUpdateElementData(selectedEl.id, { items: updatedItems });
+    };
+
+    return (
+      <div className="flex flex-col h-full text-slate-200 overflow-hidden">
+        {/* TOP HEADER MATCHING SCREENSHOT 3: < Retour | Section > Rangée > Image | ✕ */}
+        <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedElementId(null);
+              setSelectedChildIndex(null);
+              setSelectedSubItem(null);
+            }}
+            className="px-3 py-1.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-extrabold rounded-xl text-xs flex items-center gap-1 shadow-md transition-all cursor-pointer shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>&lt; Retour</span>
+          </button>
+          <div className="text-[11px] font-bold text-slate-400 truncate flex-1 text-center">
+            <span className="text-slate-400">Section</span> &gt;{' '}
+            <span className="text-white font-extrabold">
+              {selectedSubItem
+                ? selectedSubItem.subType === 'image'
+                  ? `Image (#${selectedSubItem.itemIndex + 1})`
+                  : selectedSubItem.subType === 'title'
+                  ? `Titre (#${selectedSubItem.itemIndex + 1})`
+                  : `Paragraphe (#${selectedSubItem.itemIndex + 1})`
+                : selectedEl.type}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedElementId(null);
+              setSelectedChildIndex(null);
+              setSelectedSubItem(null);
+            }}
+            className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+            title="Fermer l inspecteur"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
+        <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
+          {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
+          {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
+            const activeChild = selectedEl.data.children[selectedChildIndex];
+            const activeShape = activeChild.data?.imgShape || 'square';
+
+            return (
+              <div className="p-4 bg-slate-950 rounded-2xl border border-[#00A0FF]/60 space-y-4 shadow-xl mb-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="text-xs font-black text-[#00A0FF] uppercase flex items-center gap-1.5">
+                    <span>⚙️</span>
+                    <span>Bloc #{selectedChildIndex + 1} : {activeChild.type}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedChildIndex(null)}
+                    className="text-[10px] font-bold text-slate-400 hover:text-white underline"
+                  >
+                    Retour Section
+                  </button>
+                </div>
+
+                {/* FORME & DÉCOUPE DE TOUTES LES IMAGES DU BLOC */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    🏛️ Forme & Découpe de TOUTES les Images du Bloc
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { key: 'arcade', label: '🏛️ Arche Arizona' },
+                      { key: 'circle', label: '⚪ Cercle' },
+                      { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
+                      { key: 'square', label: '⬛ Droit' },
+                    ].map((s) => (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => {
+                          const currentChildren = [...(selectedEl.data?.children || [])];
+                          const targetChild = currentChildren[selectedChildIndex];
+                          const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                          const updatedItems = currentItems.map((it: any) => ({ ...it, imgShape: s.key }));
+
+                          currentChildren[selectedChildIndex] = {
+                            ...targetChild,
+                            data: {
+                              ...(targetChild.data || {}),
+                              imgShape: s.key,
+                              items: updatedItems,
+                            },
+                          };
+                          handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                        }}
+                        className={`py-2.5 px-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
+                          activeShape === s.key
+                            ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
+                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* COULEURS DE TOUTES LES CARTES DE LA COLONNE */}
+                <div className="space-y-2 pt-2 border-t border-slate-800">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    🎨 Arrière-plan de TOUTES les cartes du bloc
+                  </label>
+                  <div className="flex items-center gap-3 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                    <input
+                      type="color"
+                      value={activeChild.data?.cardBgColor || '#2759ce'}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const currentChildren = [...(selectedEl.data?.children || [])];
+                        const targetChild = currentChildren[selectedChildIndex];
+                        const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                        const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
+
+                        currentChildren[selectedChildIndex] = {
+                          ...targetChild,
+                          data: {
+                            ...(targetChild.data || {}),
+                            cardBgColor: val,
+                            items: updatedItems,
+                          },
+                        };
+                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                      }}
+                      className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                    />
+                    <span className="font-mono text-xs text-slate-300 uppercase font-bold">
+                      {activeChild.data?.cardBgColor || '#2759ce'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* SOUS-ÉLÉMENT INTÉRIEUR SELECTIONNÉ */}
+          {selectedSubItem && currentSubItem && (
+            <div className="p-4 bg-slate-950 rounded-2xl border border-emerald-500/60 space-y-4 shadow-xl mb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="text-xs font-black text-emerald-400 uppercase flex items-center gap-1.5">
+                  <span>✨</span>
+                  <span>Élément Intérieur #{selectedSubItem.itemIndex + 1}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSubItem(null)}
+                  className="text-[10px] font-bold text-slate-400 hover:text-white underline"
+                >
+                  Retour Bloc
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">
+                  Titre de la Carte
+                </label>
+                <input
+                  type="text"
+                  value={currentSubItem.title || ''}
+                  onChange={(e) => updateSubItemProperty({ title: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-emerald-400 outline-none"
+                />
+
+                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">
+                  Description / Texte
+                </label>
+                <textarea
+                  rows={3}
+                  value={currentSubItem.desc || ''}
+                  onChange={(e) => updateSubItemProperty({ desc: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-emerald-400 outline-none resize-none"
+                />
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Fond Carte</label>
+                    <input
+                      type="color"
+                      value={currentSubItem.bgColor || '#0f172a'}
+                      onChange={(e) => updateSubItemProperty({ bgColor: e.target.value })}
+                      className="w-full h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-400 block mb-1">Texte Carte</label>
+                    <input
+                      type="color"
+                      value={currentSubItem.textColor || '#ffffff'}
+                      onChange={(e) => updateSubItemProperty({ textColor: e.target.value })}
+                      className="w-full h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 1. TITRE / CONTENU DU COMPOSANT */}
+          {(selectedEl.type === 'Heading' || selectedEl.type === 'Text' || selectedEl.type === 'ButtonCTA' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                Contenu principal / Titre
+              </label>
+              <input
+                type="text"
+                value={elData.title !== undefined ? elData.title : selectedEl.content}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleUpdateElementData(selectedEl.id, { title: val });
+                  handleUpdateElementContent(selectedEl.id, val);
+                }}
+                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-medium focus:border-[#00A0FF] outline-none"
+              />
+            </div>
+          )}
+
+          {/* 📐 DISPOSITION DES RANGÉES & BLOCS DIV DANS LA SECTION */}
+          {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
+            <div className="p-4 bg-slate-950 rounded-2xl border border-purple-500/60 space-y-3 shadow-lg">
+              <div className="text-[10px] font-black text-purple-300 uppercase tracking-wider flex items-center justify-between">
+                <span>📐 Disposition des Rangées / Blocs DIV</span>
+                <span className="text-[9px] font-mono text-purple-400">
+                  {selectedEl.data?.layoutMode || 'Automatique'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'grid-1', label: '1 Rangée (100%)' },
+                  { key: 'grid-2', label: '2 Rangées (50% / 50%)' },
+                  { key: 'grid-3', label: '3 Rangées (33% chacun)' },
+                  { key: 'grid-4', label: '4 Rangées (25% chacun)' },
+                  { key: 'vertical', label: 'Empilés (Vertical)' },
+                  { key: 'flex-row', label: 'Côte à côte (Flex)' },
+                ].map((mode) => (
+                  <button
+                    key={mode.key}
+                    type="button"
+                    onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: mode.key })}
+                    className={`py-2 px-2 text-[11px] font-bold rounded-xl border transition-all text-center flex items-center justify-center gap-1 ${
+                      (selectedEl.data?.layoutMode || (
+                        selectedEl.data?.children?.length === 2 ? 'grid-2' :
+                        selectedEl.data?.children?.length === 3 ? 'grid-3' :
+                        selectedEl.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
+                      )) === mode.key
+                        ? 'bg-purple-600 text-white border-purple-500 shadow-md ring-2 ring-purple-400/40'
+                        : 'bg-slate-900 text-purple-200 border-slate-800 hover:text-white hover:border-purple-500/50'
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
+          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block flex items-center justify-between">
+              <span>🎨 Couleurs & Arrière-plan</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Fond de Section / Bloc</label>
+                <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                  <input
+                    type="color"
+                    value={elData.bgColor || '#0F172A'}
+                    onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
+                    className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                  />
+                  <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
+                    {elData.bgColor || '#0F172A'}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Couleur du Texte</label>
+                <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                  <input
+                    type="color"
+                    value={elData.textColor || '#FFFFFF'}
+                    onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
+                    className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                  />
+                  <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
+                    {elData.textColor || '#FFFFFF'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Fond des Cartes / Sub-Items</label>
+              <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                <input
+                  type="color"
+                  value={elData.cardBgColor || '#2759ce'}
+                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
+                  className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                />
+                <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
+                  {elData.cardBgColor || '#2759ce'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 📍 MARGES EXTERNES ET INTERNES (PADDING & MARGIN) */}
+          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+              📐 Marges & Espacements (px)
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 block mb-1">Marge Interne HAUT / BAS (Padding Y)</span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={120}
+                    value={elData.paddingY !== undefined ? elData.paddingY : 48}
+                    onChange={(e) => handleUpdateElementData(selectedEl.id, { paddingY: Number(e.target.value) })}
+                    className="flex-1 accent-[#00A0FF]"
+                  />
+                  <span className="font-mono text-xs font-bold text-slate-300 w-10 text-right">
+                    {elData.paddingY !== undefined ? elData.paddingY : 48}px
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 block mb-1">Marge Interne GAUCHE / DROITE (Padding X)</span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={80}
+                    value={elData.paddingX !== undefined ? elData.paddingX : 24}
+                    onChange={(e) => handleUpdateElementData(selectedEl.id, { paddingX: Number(e.target.value) })}
+                    className="flex-1 accent-[#00A0FF]"
+                  />
+                  <span className="font-mono text-xs font-bold text-slate-300 w-10 text-right">
+                    {elData.paddingX !== undefined ? elData.paddingX : 24}px
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 7. BORDURE & ARRONDI */}
+          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between text-xs font-bold">
+              <span className="text-slate-400">Arrondissement des coins</span>
+              <span className="text-xs font-mono text-slate-300">{elData.borderRadius || 0}px</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={60}
+              value={elData.borderRadius || 0}
+              onChange={(e) => handleUpdateElementData(selectedEl.id, { borderRadius: Number(e.target.value) })}
+              className="w-full accent-[#00A0FF]"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden">
       
@@ -961,11 +1397,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       {/* 2. MAIN BUILDER BODY */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* LEFT PALETTE / INSPECTOR PANEL (SCREENS 1, 2, 3, 4, 5) */}
+        {/* LEFT PALETTE / INSPECTOR PANEL (SINGLE SIDEBAR ARCHITECTURE) */}
         <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden">
-          
-          {/* PERMANENT LEFT PALETTE (ÉLÉMENTS & BLOCS) */}
-            <>
+          {!selectedElementId ? (
+            <React.Fragment>
               {/* TABS: ÉLÉMENTS / BLOCS */}
               <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950 shrink-0">
                 <button
@@ -1461,19 +1896,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <Plus className="w-3.5 h-3.5 text-[#00A0FF]" />
                       </button>
                     </div>
-
                   </div>
                 )}
               </div>
             )}
           </div>
-        </>
+        </React.Fragment>
+      ) : (
+        renderInspectorPanel()
+      )}
         </div>
 
         {/* RIGHT LIVE CANVAS WORKSPACE */}
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleCanvasDrop(e)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedElementId(null);
+              setSelectedChildIndex(null);
+              setSelectedSubItem(null);
+            }
+          }}
           className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto flex justify-center"
         >
           <div
@@ -3317,1763 +3761,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                 </React.Fragment>
               );
-              })}
-            </div>
-
+            })}
           </div>
         </div>
-
-        {/* RIGHT SIDEBAR INSPECTOR PANEL (Appears on right when an element is clicked) */}
-        {selectedElementId && (
-          <div className="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 h-full overflow-hidden shadow-2xl animate-in slide-in-from-right duration-200">
-            {(() => {
-              const selectedEl = elements.find((el) => el.id === selectedElementId);
-              if (!selectedEl) return null;
-              const rawData = selectedEl.data || {};
-              const defaultData = getDefaultBlockData(selectedEl.type, selectedEl.content);
-              const elItems =
-                rawData.items && rawData.items.length > 0
-                  ? rawData.items
-                  : defaultData.items || [];
-              const elData = { ...defaultData, ...rawData, items: elItems };
-
-              const currentSubItem = (() => {
-                if (!selectedSubItem) return null;
-                if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
-                  const childEl = selectedEl.data?.children?.[selectedSubItem.childIndex];
-                  if (childEl) {
-                    const childItems = childEl.data?.items || getDefaultBlockData(childEl.type, childEl.content).items || [];
-                    return childItems[selectedSubItem.itemIndex] || null;
-                  }
-                }
-                if (selectedSubItem.blockId === selectedEl.id || selectedSubItem.blockId.startsWith(selectedEl.id)) {
-                  return elItems[selectedSubItem.itemIndex] || null;
-                }
-                return null;
-              })();
-
-              const updateSubItemProperty = (changes: any) => {
-                if (!selectedSubItem) return;
-                if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
-                  const cIdx = selectedSubItem.childIndex;
-                  const currentChildren = [...(selectedEl.data?.children || [])];
-                  const targetChild = currentChildren[cIdx];
-                  const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                  const updatedItems = currentItems.map((item: any, i: number) =>
-                    i === selectedSubItem.itemIndex ? { ...item, ...changes } : item
-                  );
-                  currentChildren[cIdx] = {
-                    ...targetChild,
-                    data: {
-                      ...(targetChild.data || {}),
-                      items: updatedItems,
-                    },
-                  };
-                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                } else {
-                  const updatedItems = elItems.map((it: any, idx: number) =>
-                    idx === selectedSubItem.itemIndex ? { ...it, ...changes } : it
-                  );
-                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                }
-              };
-
-              return (
-                <div className="flex flex-col h-full text-slate-200 overflow-hidden">
-                  {/* TOP HEADER MATCHING SCREENSHOT 3: < Retour | Section > Rangée > Image */}
-                  <div className="p-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-2 shrink-0">
-                    <button
-                      onClick={() => {
-                        setSelectedElementId(null);
-                        setSelectedSubItem(null);
-                      }}
-                      className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors shrink-0"
-                      title="Fermer l'inspecteur"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (selectedSubItem) {
-                          setSelectedSubItem(null);
-                        } else {
-                          setSelectedElementId(null);
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-700 transition-colors"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>&lt; Retour</span>
-                    </button>
-                    <div className="text-[11px] font-bold text-slate-400 truncate">
-                      Section &gt; Rangée &gt;{' '}
-                      <span className="text-white font-extrabold">
-                        {selectedSubItem
-                          ? selectedSubItem.subType === 'image'
-                            ? `Image (#${selectedSubItem.itemIndex + 1})`
-                            : selectedSubItem.subType === 'title'
-                            ? `Titre (#${selectedSubItem.itemIndex + 1})`
-                            : `Paragraphe (#${selectedSubItem.itemIndex + 1})`
-                          : selectedEl.type}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
-                  <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
-                    
-                    {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
-                    {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
-                      const activeChild = selectedEl.data.children[selectedChildIndex];
-                      const activeShape = activeChild.data?.imgShape || 'square';
-
-                      return (
-                        <div className="p-4 bg-slate-950 rounded-2xl border border-[#00A0FF]/60 space-y-4 shadow-xl mb-4">
-                          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <span className="text-xs font-black text-[#00A0FF] uppercase flex items-center gap-1.5">
-                              <span>⚙️</span>
-                              <span>Bloc #{selectedChildIndex + 1} : {activeChild.type}</span>
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setSelectedChildIndex(null)}
-                              className="text-[10px] font-bold text-slate-400 hover:text-white underline"
-                            >
-                              Retour Section
-                            </button>
-                          </div>
-
-                          {/* FORME & DÉCOUPE DE TOUTES LES IMAGES DU BLOC */}
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              🏛️ Forme & Découpe de TOUTES les Images du Bloc
-                            </label>
-                            <div className="grid grid-cols-2 gap-2">
-                              {[
-                                { key: 'arcade', label: '🏛️ Arche Arizona' },
-                                { key: 'circle', label: '⚪ Cercle' },
-                                { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
-                                { key: 'square', label: '⬛ Droit' },
-                              ].map((s) => (
-                                <button
-                                  key={s.key}
-                                  type="button"
-                                  onClick={() => {
-                                    const currentChildren = [...(selectedEl.data?.children || [])];
-                                    const targetChild = currentChildren[selectedChildIndex];
-                                    const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                                    const updatedItems = currentItems.map((it: any) => ({ ...it, imgShape: s.key }));
-
-                                    currentChildren[selectedChildIndex] = {
-                                      ...targetChild,
-                                      data: {
-                                        ...(targetChild.data || {}),
-                                        imgShape: s.key,
-                                        items: updatedItems,
-                                      },
-                                    };
-                                    handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                                  }}
-                                  className={`py-2.5 px-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
-                                    activeShape === s.key
-                                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
-                                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
-                                  }`}
-                                >
-                                  {s.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* COULEURS DE TOUTES LES CARTES DE LA COLONNE */}
-                          <div className="space-y-2 pt-2 border-t border-slate-800">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              🎨 Arrière-plan de TOUTES les cartes du bloc
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="color"
-                                value={activeChild.data?.cardBgColor || '#0f172a'}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  const currentChildren = [...(selectedEl.data?.children || [])];
-                                  const targetChild = currentChildren[selectedChildIndex];
-                                  const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                                  const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
-
-                                  currentChildren[selectedChildIndex] = {
-                                    ...targetChild,
-                                    data: {
-                                      ...(targetChild.data || {}),
-                                      cardBgColor: val,
-                                      items: updatedItems,
-                                    },
-                                  };
-                                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                                }}
-                                className="w-8 h-8 rounded-lg cursor-pointer bg-slate-900 border border-slate-800"
-                              />
-                              <span className="text-xs font-mono text-slate-300">
-                                {activeChild.data?.cardBgColor || '#0f172a'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* IF A SPECIFIC SUB-ITEM (IMAGE, TITLE, DESC) WAS CLICKED DIRECTLY */}
-                    {selectedSubItem && currentSubItem ? (
-                      <div className="space-y-4">
-                        {/* 1. IF CLICKED SUB-ITEM IS AN IMAGE */}
-                        {selectedSubItem.subType === 'image' && (
-                          <>
-                             {/* 1. SECTION FICHIER DE L IMAGE */}
-                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
-                               <button
-                                 type="button"
-                                 onClick={() => toggleAccordion('imageFile')}
-                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
-                               >
-                                 <span className="font-bold text-xs text-white flex items-center gap-2">
-                                   <span className="text-[#00A0FF]">🖼️</span>
-                                   <span>Fichier de l Image</span>
-                                 </span>
-                                 {openAccordion.imageFile ? (
-                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
-                                 ) : (
-                                   <ChevronRight className="w-4 h-4 text-slate-500" />
-                                 )}
-                               </button>
-
-                               {openAccordion.imageFile && (
-                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
-                                   <div className="flex items-center justify-between">
-                                     <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                                       Élément #{selectedSubItem.itemIndex + 1}
-                                     </label>
-                                     {currentSubItem.img && (
-                                       <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded-full">
-                                         ✓ Active
-                                       </span>
-                                     )}
-                                   </div>
-
-                                   <div className="flex items-center gap-2 pt-1">
-                                     {currentSubItem.img && (
-                                       <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-800 shrink-0 bg-slate-900 shadow-inner flex items-center justify-center">
-                                         <img src={currentSubItem.img} alt="Aperçu" className="w-full h-full object-cover" />
-                                       </div>
-                                     )}
-
-                                     <label className="flex-1 py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white rounded-xl cursor-pointer font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
-                                       <span>📤</span>
-                                       <span>{currentSubItem.img ? "Changer l'image (PC)" : "Choisir une image (PC)"}</span>
-                                       <input
-                                         type="file"
-                                         accept="image/*"
-                                         className="hidden"
-                                         onChange={(e) => {
-                                           const file = e.target.files?.[0];
-                                           if (file) {
-                                             const reader = new FileReader();
-                                             reader.onload = (uploadEv) => {
-                                               const url = uploadEv.target?.result as string;
-                                               updateSubItemProperty({ img: url });
-                                             };
-                                             reader.readAsDataURL(file);
-                                           }
-                                         }}
-                                       />
-                                     </label>
-                                   </div>
-                                 </div>
-                               )}
-                             </div>
-
-                             {/* 2. SECTION ALIGNEMENT ET RÉFÉRENCE */}
-                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
-                               <button
-                                 type="button"
-                                 onClick={() => toggleAccordion('align')}
-                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
-                               >
-                                 <span className="font-bold text-xs text-white flex items-center gap-2">
-                                   <span className="text-base">📌</span>
-                                   <span>Alignement & Référence</span>
-                                 </span>
-                                 {openAccordion.align ? (
-                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
-                                 ) : (
-                                   <ChevronRight className="w-4 h-4 text-slate-500" />
-                                 )}
-                               </button>
-
-                               {openAccordion.align && (
-                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
-                                   <label className="flex items-center justify-between text-xs font-bold text-white cursor-pointer select-none">
-                                     <span className="flex items-center gap-2">
-                                       <span className="text-base">📌</span>
-                                       <span className={currentSubItem.isFixedReference ? 'text-[#00A0FF]' : 'text-slate-200'}>
-                                         Fixer comme référence
-                                       </span>
-                                     </span>
-                                     <input
-                                       type="checkbox"
-                                       checked={!!currentSubItem.isFixedReference}
-                                       onChange={(e) => {
-                                         const val = e.target.checked;
-                                         const updatedItems = elItems.map((it: any, idx: number) =>
-                                           idx === selectedSubItem.itemIndex
-                                             ? { ...it, isFixedReference: val }
-                                             : { ...it, isFixedReference: false }
-                                         );
-                                         handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                       }}
-                                       className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-700 cursor-pointer accent-[#00A0FF]"
-                                     />
-                                   </label>
-
-                                   <p className="text-[10px] text-slate-400 leading-relaxed">
-                                     {currentSubItem.isFixedReference
-                                       ? `Modèle fixé (${currentSubItem.imgWidth || 280}px × ${currentSubItem.imgSize || 280}px). Cliquez ci-dessous pour tout aligner.`
-                                       : 'Cochez pour définir cette image comme modèle de taille.'}
-                                   </p>
-
-                                   <button
-                                     type="button"
-                                     onClick={() => {
-                                       const refItem = elItems.find((it: any) => it.isFixedReference) || currentSubItem;
-                                       const targetW = refItem.imgWidth || 280;
-                                       const targetH = refItem.imgSize || 280;
-
-                                       const updatedItems = elItems.map((it: any) => ({
-                                         ...it,
-                                         imgWidth: targetW,
-                                         imgSize: targetH,
-                                       }));
-
-                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                     }}
-                                     className="w-full py-2.5 px-3 bg-[#00A0FF] hover:bg-[#0080FF] active:scale-[0.98] text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-                                   >
-                                     <span>📐</span>
-                                     <span>Aligner toutes les images du bloc</span>
-                                   </button>
-                                 </div>
-                               )}
-                             </div>
-
-                             {/* 3. SECTION PRINCIPALE : STYLES, DIMENSIONS & ESPACEMENTS */}
-                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
-                               {/* HEADER DE LA SECTION PRINCIPALE */}
-                               <button
-                                 type="button"
-                                 onClick={() => toggleAccordion('stylesGroup')}
-                                 className="w-full px-4 py-3 bg-slate-900/90 hover:bg-slate-900 flex items-center justify-between transition-colors text-left border-b border-slate-800/60"
-                               >
-                                 <span className="font-black text-xs text-[#00A0FF] flex items-center gap-2 uppercase tracking-wider">
-                                   <span>🎨</span>
-                                   <span>Styles, Dimensions & Marges</span>
-                                 </span>
-                                 {openAccordion.stylesGroup ? (
-                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
-                                 ) : (
-                                   <ChevronRight className="w-4 h-4 text-slate-500" />
-                                 )}
-                               </button>
-
-                               {/* CONTENEUR DES 4 SOUS-SECTIONS RETRACTABLES */}
-                               {openAccordion.stylesGroup && (
-                                 <div className="p-3 space-y-3 bg-slate-950/80">
-                                   
-                                   {/* 3.1 SOUS-SECTION : DIMENSION & ÉCHELLE */}
-                                   <div className="bg-slate-900/90 rounded-xl border border-slate-800/80 overflow-hidden transition-all">
-                                     <button
-                                       type="button"
-                                       onClick={() => toggleAccordion('dimensions')}
-                                       className="w-full px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800/80 flex items-center justify-between transition-colors text-left"
-                                     >
-                                       <span className="font-bold text-[11px] text-white flex items-center gap-2">
-                                         <span className="text-[#00A0FF]">📐</span>
-                                         <span>Dimension & Échelle (Largeur / Hauteur / Zoom)</span>
-                                       </span>
-                                       {openAccordion.dimensions ? (
-                                         <ChevronDown className="w-3.5 h-3.5 text-[#00A0FF]" />
-                                       ) : (
-                                         <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                                       )}
-                                     </button>
-
-                                     {openAccordion.dimensions && (
-                                       <div className="p-3 border-t border-slate-800/60 space-y-3.5 bg-slate-950/40">
-                                         {/* LARGEUR DE L IMAGE */}
-                                         <div className="space-y-1.5">
-                                           <div className="flex items-center justify-between text-[11px] font-bold">
-                                             <span className="text-slate-300">Largeur de l image</span>
-                                             <div className="flex items-center gap-1">
-                                               <input
-                                                 type="number"
-                                                 value={currentSubItem.imgWidth || 280}
-                                                 onChange={(e) => {
-                                                   const val = Number(e.target.value);
-                                                   const updatedItems = elItems.map((it: any, idx: number) =>
-                                                     idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
-                                                   );
-                                                   handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                                 }}
-                                                 className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                                               />
-                                               <span className="text-slate-500 text-[10px]">px</span>
-                                             </div>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={50}
-                                             max={800}
-                                             value={currentSubItem.imgWidth || 280}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, imgWidth: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-
-                                         {/* HAUTEUR / TAILLE DE L IMAGE */}
-                                         <div className="space-y-1.5">
-                                           <div className="flex items-center justify-between text-[11px] font-bold">
-                                             <span className="text-slate-300">Hauteur / Taille de l image</span>
-                                             <div className="flex items-center gap-1">
-                                               <input
-                                                 type="number"
-                                                 value={currentSubItem.imgSize || 240}
-                                                 onChange={(e) => {
-                                                   const val = Number(e.target.value);
-                                                   const updatedItems = elItems.map((it: any, idx: number) =>
-                                                     idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
-                                                   );
-                                                   handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                                 }}
-                                                 className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                                               />
-                                               <span className="text-slate-500 text-[10px]">px</span>
-                                             </div>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={50}
-                                             max={800}
-                                             value={currentSubItem.imgSize || 240}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, imgSize: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-
-                                         {/* ZOOM & ÉCHELLE DE L IMAGE INTERNE */}
-                                         <div className="space-y-1.5">
-                                           <div className="flex items-center justify-between text-[11px] font-bold">
-                                             <span className="text-[#00A0FF]">🔍 Zoom / Échelle interne</span>
-                                             <span className="text-xs font-mono text-white">
-                                               {currentSubItem.imgZoom || 100}%
-                                             </span>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={100}
-                                             max={300}
-                                             value={currentSubItem.imgZoom || 100}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, imgZoom: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-                                       </div>
-                                     )}
-                                   </div>
-
-                                   {/* 3.2 SOUS-SECTION : RECADRAGE & POSITION INTERNE */}
-                                   <div className="bg-slate-900/90 rounded-xl border border-slate-800/80 overflow-hidden transition-all">
-                                     <button
-                                       type="button"
-                                       onClick={() => toggleAccordion('crop')}
-                                       className="w-full px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800/80 flex items-center justify-between transition-colors text-left"
-                                     >
-                                       <span className="font-bold text-[11px] text-white flex items-center gap-2">
-                                         <span className="text-[#00A0FF]">🎯</span>
-                                         <span>Recadrage & Position Interne</span>
-                                       </span>
-                                       {openAccordion.crop ? (
-                                         <ChevronDown className="w-3.5 h-3.5 text-[#00A0FF]" />
-                                       ) : (
-                                         <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                                       )}
-                                     </button>
-
-                                     {openAccordion.crop && (
-                                       <div className="p-3 border-t border-slate-800/60 space-y-3 bg-slate-950/40">
-                                         {/* POSITION X (HORIZONTALE) */}
-                                         <div className="space-y-1">
-                                           <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                             <span>Position Horizontale (X)</span>
-                                             <span className="font-mono text-slate-400">
-                                               {currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%
-                                             </span>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={0}
-                                             max={100}
-                                             value={currentSubItem.posX !== undefined ? currentSubItem.posX : 50}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, posX: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-
-                                         {/* POSITION Y (VERTICALE) */}
-                                         <div className="space-y-1">
-                                           <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                             <span>Position Verticale (Y)</span>
-                                             <span className="font-mono text-slate-400">
-                                               {currentSubItem.posY !== undefined ? currentSubItem.posY : 50}%
-                                             </span>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={0}
-                                             max={100}
-                                             value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, posY: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-                                         {/* MODE D AJUSTEMENT (OBJECT-FIT) */}
-                                         <div className="space-y-1 pt-1">
-                                           <label className="text-[10px] font-bold text-slate-400 block">Mode d ajustement</label>
-                                           <select
-                                             value={currentSubItem.objectFit || 'cover'}
-                                             onChange={(e) => updateSubItemProperty({ objectFit: e.target.value })}
-                                             className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                                           >
-                                             <option value="cover">Remplir le cadre (Cover)</option>
-                                             <option value="contain">Ajuster sans rogner (Contain)</option>
-                                             <option value="fill">Étirer (Fill)</option>
-                                           </select>
-                                         </div>
-                                       </div>
-                                     )}
-                                   </div>
-
-                                   {/* 3.3 SOUS-SECTION : ARRONDISSEMENT DES COINS */}
-                                   <div className="bg-slate-900/90 rounded-xl border border-slate-800/80 overflow-hidden transition-all">
-                                     <button
-                                       type="button"
-                                       onClick={() => toggleAccordion('border')}
-                                       className="w-full px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800/80 flex items-center justify-between transition-colors text-left"
-                                     >
-                                       <span className="font-bold text-[11px] text-white flex items-center gap-2">
-                                         <span className="text-[#00A0FF]">✨</span>
-                                         <span>Arrondissement des Coins</span>
-                                       </span>
-                                       {openAccordion.border ? (
-                                         <ChevronDown className="w-3.5 h-3.5 text-[#00A0FF]" />
-                                       ) : (
-                                         <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                                       )}
-                                     </button>
-
-                                     {openAccordion.border && (
-                                       <div className="p-3 border-t border-slate-800/60 space-y-2 bg-slate-950/40">
-                                         <div className="flex items-center justify-between text-[11px] font-bold">
-                                           <span className="text-slate-300">Arrondissement des coins</span>
-                                           <span className="text-xs font-mono text-slate-300">
-                                             {currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}px
-                                           </span>
-                                         </div>
-                                         <input
-                                           type="range"
-                                           min={0}
-                                           max={60}
-                                           value={currentSubItem.borderRadius !== undefined ? currentSubItem.borderRadius : 16}
-                                           onChange={(e) => {
-                                             const val = Number(e.target.value);
-                                             const updatedItems = elItems.map((it: any, idx: number) =>
-                                               idx === selectedSubItem.itemIndex ? { ...it, borderRadius: val } : it
-                                             );
-                                             handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                           }}
-                                           className="w-full accent-[#00A0FF]"
-                                         />
-                                       </div>
-                                     )}
-                                   </div>
-
-                                   {/* 3.4 SOUS-SECTION : ESPACEMENTS & MARGES */}
-                                   <div className="bg-slate-900/90 rounded-xl border border-slate-800/80 overflow-hidden transition-all">
-                                     <button
-                                       type="button"
-                                       onClick={() => toggleAccordion('spacing')}
-                                       className="w-full px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800/80 flex items-center justify-between transition-colors text-left"
-                                     >
-                                       <span className="font-bold text-[11px] text-white flex items-center gap-2">
-                                         <span className="text-[#00A0FF]">📏</span>
-                                         <span>Espacements & Marges (Padding / Margin)</span>
-                                       </span>
-                                       {openAccordion.spacing ? (
-                                         <ChevronDown className="w-3.5 h-3.5 text-[#00A0FF]" />
-                                       ) : (
-                                         <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                                       )}
-                                     </button>
-
-                                     {openAccordion.spacing && (
-                                       <div className="p-3 border-t border-slate-800/60 space-y-3 bg-slate-950/40">
-                                         <div className="space-y-1">
-                                           <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                             <span>Marge Externe Haut/Bas (Margin Y)</span>
-                                             <span className="font-mono text-slate-400">
-                                               {currentSubItem.marginY || 0}px
-                                             </span>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={0}
-                                             max={80}
-                                             value={currentSubItem.marginY || 0}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, marginY: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-
-                                         <div className="space-y-1">
-                                           <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                             <span>Remplissage Interne (Padding)</span>
-                                             <span className="font-mono text-slate-400">
-                                               {currentSubItem.padding || 0}px
-                                             </span>
-                                           </div>
-                                           <input
-                                             type="range"
-                                             min={0}
-                                             max={60}
-                                             value={currentSubItem.padding || 0}
-                                             onChange={(e) => {
-                                               const val = Number(e.target.value);
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, padding: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
-                                             className="w-full accent-[#00A0FF]"
-                                           />
-                                         </div>
-                                       </div>
-                                     )}
-                                   </div>
-
-                                 </div>
-                               )}
-                             </div>
-
-                             {/* 7. SECTION ACTION SUR CLIC ET REDIRECTION */}
-                             <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden transition-all">
-                               <button
-                                 type="button"
-                                 onClick={() => toggleAccordion('action')}
-                                 className="w-full px-4 py-3 bg-slate-950 hover:bg-slate-900 flex items-center justify-between transition-colors text-left"
-                               >
-                                 <span className="font-bold text-xs text-white flex items-center gap-2">
-                                   <span className="text-[#00A0FF]">🔗</span>
-                                   <span>Action sur Clic & Redirection</span>
-                                 </span>
-                                 {openAccordion.action ? (
-                                   <ChevronDown className="w-4 h-4 text-[#00A0FF]" />
-                                 ) : (
-                                   <ChevronRight className="w-4 h-4 text-slate-500" />
-                                 )}
-                               </button>
-
-                               {openAccordion.action && (
-                                 <div className="p-3.5 border-t border-slate-900 space-y-3 bg-slate-950/60">
-                                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                     Action sur une image cliquée
-                                   </label>
-                                   <select
-                                     value={currentSubItem.clickAction || 'OpenURL'}
-                                     onChange={(e) => {
-                                       const val = e.target.value;
-                                       const updatedItems = elItems.map((it: any, idx: number) =>
-                                         idx === selectedSubItem.itemIndex ? { ...it, clickAction: val } : it
-                                       );
-                                       handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                     }}
-                                     className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                                   >
-                                     <option value="None">Aucune (None)</option>
-                                     <option value="OpenURL">Ouvrir l URL de redirection</option>
-                                     <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
-                                   </select>
-
-                                   {(currentSubItem.clickAction || 'OpenURL') === 'OpenURL' && (
-                                     <div className="space-y-1 pt-1">
-                                       <label className="text-[10px] font-bold text-slate-400">
-                                         URL de redirection (ex: https://...)
-                                       </label>
-                                       <input
-                                         type="text"
-                                         value={currentSubItem.redirectUrl || ''}
-                                         placeholder="https://votre-site.com/offre"
-                                         onChange={(e) => {
-                                           const val = e.target.value;
-                                           const updatedItems = elItems.map((it: any, idx: number) =>
-                                             idx === selectedSubItem.itemIndex ? { ...it, redirectUrl: val } : it
-                                           );
-                                           handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                         }}
-                                         className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono"
-                                       />
-                                     </div>
-                                   )}
-                                 </div>
-                               )}
-                             </div>
-
-                            {/* ATTRIBUT ALT & REMPLIR À 100% */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                  Attribut Alt
-                                </label>
-                                <input
-                                  type="text"
-                                  value={currentSubItem.alt || ''}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, alt: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  placeholder="Texte alternatif..."
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
-                                />
-                              </div>
-
-                              <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
-                                <input
-                                  type="checkbox"
-                                  checked={currentSubItem.fullWidth || false}
-                                  onChange={(e) => {
-                                    const val = e.target.checked;
-                                    const updatedItems = elItems.map((it: any, idx: number) =>
-                                      idx === selectedSubItem.itemIndex ? { ...it, fullWidth: val } : it
-                                    );
-                                    handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                  }}
-                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
-                                />
-                                <span>Remplir à 100% en largeur</span>
-                              </label>
-                            </div>
-                          </>
-                        )}
-
-                        {/* 2. IF CLICKED SUB-ITEM IS A TITLE */}
-                        {selectedSubItem.subType === 'title' && (
-                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              Titre de l élément #{selectedSubItem.itemIndex + 1}
-                            </label>
-                            <input
-                              type="text"
-                              value={currentSubItem.title || ''}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                const updatedItems = elData.items.map((it: any, idx: number) =>
-                                  idx === selectedSubItem.itemIndex ? { ...it, title: val } : it
-                                );
-                                handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                              }}
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
-                            />
-                          </div>
-                        )}
-
-                        {/* 3. IF CLICKED SUB-ITEM IS A DESCRIPTION */}
-                        {selectedSubItem.subType === 'desc' && (
-                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              Description de l élément #{selectedSubItem.itemIndex + 1}
-                            </label>
-                            <textarea
-                              rows={4}
-                              value={currentSubItem.desc || ''}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                const updatedItems = elData.items.map((it: any, idx: number) =>
-                                  idx === selectedSubItem.itemIndex ? { ...it, desc: val } : it
-                                );
-                                handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                              }}
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-medium outline-none focus:border-[#00A0FF]"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      /* OVERALL BLOCK SETTINGS (WHEN NO SUB-ITEM CLICKED SPECIFICALLY) */
-                      <>
-                        {/* SECTION TITLE / MAIN CONTENT EDITING */}
-                        <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                          <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                            Contenu Principal / Titre
-                          </label>
-                          <input
-                            type="text"
-                            value={elData.title || selectedEl.content || ''}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              handleUpdateElementData(selectedEl.id, { title: val });
-                              handleUpdateElementContent(selectedEl.id, val);
-                            }}
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
-                          />
-                        </div>
-
-                        {/* FORM INPUT SPECIFIC CONTROLS */}
-                        {(selectedEl.type === 'OptinForm' || selectedEl.type === 'FormInput') && (
-                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              ⚙️ Configuration du Champ de Formulaire
-                            </label>
-                            <div className="space-y-2">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400">Texte indicatif (Placeholder)</label>
-                                <input
-                                  type="text"
-                                  value={elData.placeholder || selectedEl.content || 'Entrez votre adresse email...'}
-                                  onChange={(e) => {
-                                    handleUpdateElementData(selectedEl.id, { placeholder: e.target.value });
-                                    handleUpdateElementContent(selectedEl.id, e.target.value);
-                                  }}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400">Type de saisie</label>
-                                <select
-                                  value={elData.inputType || 'email'}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { inputType: e.target.value })}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                                >
-                                  <option value="email">Adresse Email</option>
-                                  <option value="text">Nom complet / Texte</option>
-                                  <option value="tel">Numéro de téléphone</option>
-                                </select>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* BUTTON CTA SPECIFIC CONTROLS */}
-                        {selectedEl.type === 'ButtonCTA' && (
-                          <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              🎯 Action & Style du Bouton
-                            </label>
-                            <div className="space-y-2">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400">Texte du Bouton (CTA)</label>
-                                <input
-                                  type="text"
-                                  value={elData.buttonText || selectedEl.content || 'Recevoir mon accès gratuit →'}
-                                  onChange={(e) => {
-                                    handleUpdateElementData(selectedEl.id, { buttonText: e.target.value });
-                                    handleUpdateElementContent(selectedEl.id, e.target.value);
-                                  }}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF]"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400">Action au clic</label>
-                                <select
-                                  value={elData.clickAction || 'Submit'}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                                >
-                                  <option value="Submit">Soumettre le formulaire</option>
-                                  <option value="OpenURL">Ouvrir l URL de redirection</option>
-                                  <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
-                                </select>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* DISPOSITION INTERNE CÔTE À CÔTE POUR CONTENTBOX */}
-                        {selectedEl.type === 'ContentBox' && (
-                          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                              📐 Disposition Interne (Côte à côte)
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              {[
-                                { key: 'masonry', label: '🧱 Mosaïque (Combler les vides)' },
-                                { key: 'grid-3', label: '3 Colonnes (33%)' },
-                                { key: 'grid-2', label: '2 Colonnes (50%)' },
-                                { key: 'grid-4', label: '4 Colonnes (25%)' },
-                                { key: 'vertical', label: '1 Colonne (Vertical)' },
-                                { key: 'flex-row', label: 'Ligne Flexible (Wrap)' },
-                              ].map((l) => (
-                                <button
-                                  key={l.key}
-                                  type="button"
-                                  onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: l.key })}
-                                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all ${
-                                    (elData.layoutMode || 'grid-3') === l.key
-                                      ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                  }`}
-                                >
-                                  {l.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 📍 POSITION & ORDRE DANS LA PAGE */}
-                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                            <span>📍 Position & Ordre dans la Page</span>
-                            <span className="text-[9px] font-mono text-emerald-400 font-bold">
-                              Rang #{elements.findIndex(e => e.id === selectedEl.id) + 1} / {elements.length}
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
-                                if (curIdx > 0) moveElementToPosition(curIdx, 'top', e);
-                              }}
-                              disabled={elements.findIndex(e => e.id === selectedEl.id) === 0}
-                              className="py-2.5 px-2 bg-gradient-to-r from-emerald-900/80 to-teal-900/80 hover:from-emerald-800 hover:to-teal-800 border border-emerald-500/60 text-white font-black text-xs rounded-xl shadow-md disabled:opacity-30 flex items-center justify-center gap-1.5 transition-all"
-                            >
-                              <span>🔝</span>
-                              <span>Placer Tout en Haut</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
-                                if (curIdx < elements.length - 1) moveElementToPosition(curIdx, 'bottom', e);
-                              }}
-                              disabled={elements.findIndex(e => e.id === selectedEl.id) === elements.length - 1}
-                              className="py-2.5 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-30 flex items-center justify-center gap-1.5 transition-all"
-                            >
-                              <span>🔚</span>
-                              <span>Placer Tout en Bas</span>
-                            </button>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2 pt-1">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
-                                if (curIdx > 0) moveElementToPosition(curIdx, 'up', e);
-                              }}
-                              disabled={elements.findIndex(e => e.id === selectedEl.id) === 0}
-                              className="py-2 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl disabled:opacity-30 flex items-center justify-center gap-1 transition-all"
-                            >
-                              <span>▲ Monter 1 rang</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
-                                if (curIdx < elements.length - 1) moveElementToPosition(curIdx, 'down', e);
-                              }}
-                              disabled={elements.findIndex(e => e.id === selectedEl.id) === elements.length - 1}
-                              className="py-2 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl disabled:opacity-30 flex items-center justify-center gap-1 transition-all"
-                            >
-                              <span>▼ Descendre 1 rang</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* 📐 LARGEUR DE L'AFFICHAGE DU BUILDER ET DU TUNNEL */}
-                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                            <span>📐 Largeur de l Affichage</span>
-                            <span className="text-[9px] font-mono text-slate-400">
-                              {pageWidthMode === 'standard' ? '896px' : pageWidthMode === 'wide' ? '1152px' : '100% Full'}
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {[
-                              { key: 'standard', label: '📱 Standard (896px)' },
-                              { key: 'wide', label: '💻 Large (1152px)' },
-                              { key: 'full', label: '🖥️ Plein Écran' },
-                            ].map((w) => (
-                              <button
-                                key={w.key}
-                                type="button"
-                                onClick={() => handleSetPageWidthMode(w.key as any)}
-                                className={`py-2 px-1 text-[10px] font-bold rounded-xl border transition-all text-center ${
-                                  pageWidthMode === w.key
-                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                }`}
-                              >
-                                {w.label}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* CONVERT NON-SECTION ELEMENT TO FULL-WIDTH SECTION */}
-                          {selectedEl.type !== 'Section' && selectedEl.type !== 'BlockSectionFull' && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setElements((prev) =>
-                                  prev.map((item) => {
-                                    if (item.id !== selectedEl.id) return item;
-                                    return {
-                                      id: item.id,
-                                      type: 'Section',
-                                      category: 'DISPOSITION & SECTIONS FULL-WIDTH',
-                                      content: item.content || 'Section Principale',
-                                      data: {
-                                        bgColor: item.data?.bgColor || '#0F172A',
-                                        bgImage: item.data?.bgImage || '',
-                                        bgOverlay: 0,
-                                        textColor: item.data?.textColor || '#ffffff',
-                                        innerContentWidth: 'standard',
-                                        children: [
-                                          {
-                                            id: `sub-${Date.now()}`,
-                                            type: item.type,
-                                            category: item.category,
-                                            content: item.content,
-                                            data: item.data,
-                                          },
-                                        ],
-                                      },
-                                    };
-                                  })
-                                );
-                              }}
-                              className="w-full py-2.5 px-3 bg-gradient-to-r from-purple-900 to-indigo-900 hover:from-purple-800 hover:to-indigo-800 border border-purple-500/60 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
-                            >
-                              <span>🏛️</span>
-                              <span>Placer dans une Section Plein Écran (100%)</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {/* 📐 HAUTEUR DE LA SECTION */}
-                        {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
-                          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                              <span>📐 Hauteur de la Section (Pixels)</span>
-                              <span className="text-xs font-mono text-purple-300 font-bold">
-                                {selectedEl.data?.minHeight ? `${selectedEl.data.minHeight}px` : 'Auto'}
-                              </span>
-                            </div>
-
-                            <input
-                              type="range"
-                              min="100"
-                              max="1200"
-                              step="10"
-                              value={selectedEl.data?.minHeight || 300}
-                              onChange={(e) => handleUpdateElementData(selectedEl.id, { minHeight: parseInt(e.target.value) })}
-                              className="w-full accent-[#00A0FF] cursor-pointer"
-                            />
-
-                            <div className="grid grid-cols-4 gap-1.5 pt-1">
-                              {[
-                                { label: '200px', val: 200 },
-                                { label: '400px', val: 400 },
-                                { label: '600px', val: 600 },
-                                { label: '800px', val: 800 },
-                              ].map((p) => (
-                                <button
-                                  key={p.val}
-                                  type="button"
-                                  onClick={() => handleUpdateElementData(selectedEl.id, { minHeight: p.val })}
-                                  className={`py-1.5 px-1 text-[9px] font-bold rounded-lg border transition-all text-center ${
-                                    selectedEl.data?.minHeight === p.val
-                                      ? 'bg-purple-600 text-white border-purple-400'
-                                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                  }`}
-                                >
-                                  {p.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 📐 DISPOSITION DES RANGÉES & BLOCS DIV DANS LA SECTION */}
-                        {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
-                          <div className="p-4 bg-slate-950 rounded-2xl border border-purple-500/60 space-y-3 shadow-lg">
-                            <div className="text-[10px] font-black text-purple-300 uppercase tracking-wider flex items-center justify-between">
-                              <span>📐 Disposition des Rangées / Blocs DIV</span>
-                              <span className="text-[9px] font-mono text-purple-400">
-                                {selectedEl.data?.layoutMode || 'Automatique'}
-                              </span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2">
-                              {[
-                                { key: 'grid-1', label: '1 Rangée (100%)' },
-                                { key: 'grid-2', label: '2 Rangées (50% / 50%)' },
-                                { key: 'grid-3', label: '3 Rangées (33% chacun)' },
-                                { key: 'grid-4', label: '4 Rangées (25% chacun)' },
-                                { key: 'vertical', label: 'Empilés (Vertical)' },
-                                { key: 'flex-row', label: 'Côte à côte (Flex)' },
-                              ].map((mode) => (
-                                <button
-                                  key={mode.key}
-                                  type="button"
-                                  onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: mode.key })}
-                                  className={`py-2 px-2 text-[11px] font-bold rounded-xl border transition-all text-center flex items-center justify-center gap-1 ${
-                                    (selectedEl.data?.layoutMode || (
-                                      selectedEl.data?.children?.length === 2 ? 'grid-2' :
-                                      selectedEl.data?.children?.length === 3 ? 'grid-3' :
-                                      selectedEl.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
-                                    )) === mode.key
-                                      ? 'bg-purple-600 text-white border-purple-500 shadow-md ring-2 ring-purple-400/40'
-                                      : 'bg-slate-900 text-purple-200 border-slate-800 hover:text-white hover:border-purple-500/50'
-                                  }`}
-                                >
-                                  {mode.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
-                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block flex items-center justify-between">
-                            <span>🎨 Couleurs & Arrière-plan</span>
-                          </div>
-
-                          {/* 1. Arrière-plan principal (Conteneur / Bloc / Texte) */}
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-slate-400 block">
-                              Arrière-plan du Conteneur / Bloc
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="color"
-                                value={elData.bgColor && elData.bgColor.startsWith('#') ? elData.bgColor : '#ffffff'}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
-                                className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
-                              />
-                              <input
-                                type="text"
-                                value={elData.bgColor || '#ffffff'}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
-                                placeholder="#FFFFFF ou bg-white"
-                                className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
-                              />
-                            </div>
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                              {[
-                                { name: 'Blanc', val: '#ffffff' },
-                                { name: 'Crème Arizona', val: '#FEF5D7' },
-                                { name: 'Gris Soft', val: '#F8FAFC' },
-                                { name: 'Bleu Ciel', val: '#EFF6FF' },
-                                { name: 'Sombre Slate', val: '#0F172A' },
-                                { name: 'Néon Violet', val: '#FAF5FF' },
-                                { name: 'Transparent', val: 'transparent' },
-                              ].map((c) => (
-                                <button
-                                  key={c.val}
-                                  type="button"
-                                  onClick={() => handleUpdateElementData(selectedEl.id, { bgColor: c.val })}
-                                  className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
-                                >
-                                  {c.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* 2. Arrière-plan des Cartes Interne (si Conteneur / Col2 / Col3 / Col4) */}
-                          {['ContentBox', 'Col2', 'Col3', 'Col4', 'Block3ColArcadeArizona', 'BlockFeat4ColImg', 'BlockFeat3ColImg'].includes(selectedEl.type) && (
-                            <div className="space-y-2 pt-2 border-t border-slate-800/80">
-                              <label className="text-[10px] font-bold text-slate-400 block">
-                                Arrière-plan des Cartes & Colonnes
-                              </label>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="color"
-                                  value={elData.cardBgColor && elData.cardBgColor.startsWith('#') ? elData.cardBgColor : '#f8fafc'}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
-                                  className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
-                                />
-                                <input
-                                  type="text"
-                                  value={elData.cardBgColor || '#f8fafc'}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
-                                  placeholder="#F8FAFC ou bg-slate-50"
-                                  className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
-                                />
-                              </div>
-                              <div className="flex flex-wrap gap-1.5 pt-1">
-                                {[
-                                  { name: 'Blanc Pure', val: '#ffffff' },
-                                  { name: 'Gris Soft', val: '#f8fafc' },
-                                  { name: 'Crème', val: '#fffdf5' },
-                                  { name: 'Bleu Soft', val: '#f0f9ff' },
-                                  { name: 'Sombre', val: '#1e293b' },
-                                ].map((c) => (
-                                  <button
-                                    key={c.val}
-                                    type="button"
-                                    onClick={() => handleUpdateElementData(selectedEl.id, { cardBgColor: c.val })}
-                                    className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
-                                  >
-                                    {c.name}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* 3. Couleur des Textes & Titres */}
-                          <div className="space-y-2 pt-2 border-t border-slate-800/80">
-                            <label className="text-[10px] font-bold text-slate-400 block">
-                              Couleur du Texte & Titre
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="color"
-                                value={elData.textColor && elData.textColor.startsWith('#') ? elData.textColor : '#1e293b'}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
-                                className="w-8 h-8 rounded-lg cursor-pointer border border-slate-700 bg-transparent p-0"
-                              />
-                              <input
-                                type="text"
-                                value={elData.textColor || '#1e293b'}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
-                                placeholder="#1E293B ou text-slate-800"
-                                className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-mono outline-none focus:border-[#00A0FF]"
-                              />
-                            </div>
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                              {[
-                                { name: 'Noir Slate', val: '#0f172a' },
-                                { name: 'Doré Arizona', val: '#D69A3A' },
-                                { name: 'Bleu Néon', val: '#00A0FF' },
-                                { name: 'Vert Émeraude', val: '#10B981' },
-                                { name: 'Blanc', val: '#ffffff' },
-                              ].map((c) => (
-                                <button
-                                  key={c.val}
-                                  type="button"
-                                  onClick={() => handleUpdateElementData(selectedEl.id, { textColor: c.val })}
-                                  className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-bold hover:border-[#00A0FF] hover:text-white"
-                                >
-                                  {c.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* IMAGE EXCLUSIVE CONTROLS (ONLY SHOW WHEN ELEMENT IS AN IMAGE) */}
-                        {selectedEl.type === 'Image' && (
-                          <>
-                            {/* 1. FICHIER DE L IMAGE */}
-                            <div className="space-y-3 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
-                                Fichier de l image
-                              </label>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    value={elData.img || selectedEl.content || ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      handleUpdateElementData(selectedEl.id, { img: val });
-                                      handleUpdateElementContent(selectedEl.id, val);
-                                    }}
-                                    placeholder="https://..."
-                                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] text-slate-300 font-mono"
-                                  />
-                                  <label className="p-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-xl cursor-pointer shrink-0 font-bold text-xs shadow-md">
-                                    <span>📤</span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = (uploadEv) => {
-                                            const url = uploadEv.target?.result as string;
-                                            handleUpdateElementData(selectedEl.id, { img: url });
-                                            handleUpdateElementContent(selectedEl.id, url);
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* 2. ACTION SUR UNE IMAGE CLIQUÉE */}
-                            <div className="space-y-1.5 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                Action sur une image cliquée
-                              </label>
-                              <select
-                                value={elData.clickAction || 'None'}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { clickAction: e.target.value })}
-                                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
-                              >
-                                <option value="None">Aucune (None)</option>
-                                <option value="OpenURL">Ouvrir l URL de redirection</option>
-                                <option value="OpenPopup">Ouvrir la fenêtre Popup</option>
-                              </select>
-                            </div>
-
-                            {/* 3. ATTRIBUT ALT */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                              <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                  Attribut Alt
-                                </label>
-                                <input
-                                  type="text"
-                                  value={elData.alt || ''}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { alt: e.target.value })}
-                                  placeholder="Texte alternatif..."
-                                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300"
-                                />
-                              </div>
-
-                              <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer pt-1">
-                                <input
-                                  type="checkbox"
-                                  checked={elData.fullWidth || false}
-                                  onChange={(e) => handleUpdateElementData(selectedEl.id, { fullWidth: e.target.checked })}
-                                  className="w-4 h-4 rounded text-[#00A0FF] bg-slate-900 border-slate-800"
-                                />
-                                <span>Remplir à 100% en largeur</span>
-                              </label>
-                            </div>
-
-                            {/* 4. TAILLE DE L IMAGE */}
-                            <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-slate-400">Taille de l image</span>
-                                <div className="flex items-center gap-1">
-                                  <input
-                                    type="number"
-                                    value={elData.imgSize || 240}
-                                    onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
-                                    className="w-14 px-2 py-0.5 bg-slate-900 border border-slate-800 rounded-lg text-center font-mono text-xs text-white"
-                                  />
-                                  <span className="text-slate-500 text-[10px]">px</span>
-                                </div>
-                              </div>
-                              <input
-                                type="range"
-                                min={50}
-                                max={800}
-                                value={elData.imgSize || 240}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { imgSize: Number(e.target.value) })}
-                                className="w-full accent-[#00A0FF]"
-                              />
-                            </div>
-                          </>
-                        )}
-
-                    {/* 4.5 CONTRÔLE AVANCÉ DES IMAGES DU BLOC */}
-                    {(elData.img !== undefined || elData.items || ['BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona', 'Image', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'Col4', 'Col3', 'Col2', 'BlockFeat2ColIconsLeft', 'ContentBox'].includes(selectedEl.type)) && (
-                      <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-                        <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                          <span>🖼️ Contrôle des Images du Bloc</span>
-                        </div>
-
-                        {/* 1. HAUTEUR DE L'IMAGE */}
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Hauteur des Images du Bloc
-                          </label>
-                          <div className="grid grid-cols-4 gap-1.5">
-                            {[
-                              { key: 'h-36', label: '144px' },
-                              { key: 'h-48', label: '192px' },
-                              { key: 'h-64', label: '256px' },
-                              { key: 'h-80', label: '320px' },
-                            ].map((h) => (
-                              <button
-                                key={h.key}
-                                onClick={() => handleUpdateElementData(selectedEl.id, { imgHeight: h.key })}
-                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
-                                  (elData.imgHeight || 'h-48') === h.key
-                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                }`}
-                              >
-                                {h.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* 2. FORME & DÉCOUPE */}
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Forme & Découpe de l Image
-                          </label>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {[
-                              { key: 'arcade', label: '🏛️ Arche Arizona' },
-                              { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
-                              { key: 'circle', label: '⚪ Cercle' },
-                              { key: 'square', label: '⬛ Droit' },
-                            ].map((s) => (
-                              <button
-                                key={s.key}
-                                onClick={() => handleUpdateElementData(selectedEl.id, { imgShape: s.key })}
-                                className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all flex items-center justify-center gap-1 ${
-                                  (elData.imgShape || 'square') === s.key
-                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                }`}
-                              >
-                                {s.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* 3. AJUSTEMENT (OBJECT FIT) */}
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Ajustement Image (Object Fit)
-                          </label>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {[
-                              { key: 'object-cover', label: 'Couvrir' },
-                              { key: 'object-contain', label: 'Contenir' },
-                              { key: 'object-fill', label: 'Étirer' },
-                            ].map((fit) => (
-                              <button
-                                key={fit.key}
-                                onClick={() => handleUpdateElementData(selectedEl.id, { imgObjectFit: fit.key })}
-                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
-                                  (elData.imgObjectFit || 'object-cover') === fit.key
-                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                }`}
-                              >
-                                {fit.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* 4. CADRAGE VERTICAL */}
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Cadrage Vertical (Position)
-                          </label>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {[
-                              { key: 'top', label: 'Haut' },
-                              { key: 'center', label: 'Centre' },
-                              { key: 'bottom', label: 'Bas' },
-                            ].map((pos) => (
-                              <button
-                                key={pos.key}
-                                onClick={() => handleUpdateElementData(selectedEl.id, { imgObjectPosition: pos.key })}
-                                className={`py-1.5 text-[10px] font-bold rounded-lg border transition-all ${
-                                  (elData.imgObjectPosition || 'center') === pos.key
-                                    ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                                }`}
-                              >
-                                {pos.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 5. ALIGNER (LEFT, CENTER, RIGHT - SCREENSHOT 3) */}
-                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Aligner
-                      </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {['Left', 'Center', 'Right'].map((align) => (
-                          <button
-                            key={align}
-                            onClick={() => handleUpdateElementData(selectedEl.id, { align })}
-                            className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                              (elData.align || 'Center') === align
-                                ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
-                                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                            }`}
-                          >
-                            {align === 'Left' ? '← Gauche' : align === 'Center' ? '↔ Centre' : 'Droite →'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 6. MARGES EXTERNES & REMPLISSAGE INTERNE (PADDING / MARGIN) */}
-                    <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-                      <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                        📏 Marges Externes (Margin) & Remplissage (Padding)
-                      </div>
-
-                      {/* MARGES EXTERNES (MARGIN) */}
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Marges Externes (Margin px)
-                        </label>
-                        <div className="grid grid-cols-4 gap-2 text-center">
-                          {[
-                            { key: 'marginTop', label: 'Haut' },
-                            { key: 'marginRight', label: 'Droite' },
-                            { key: 'marginBottom', label: 'Bas' },
-                            { key: 'marginLeft', label: 'Gauche' },
-                          ].map((m) => (
-                            <div key={m.key} className="space-y-1">
-                              <input
-                                type="number"
-                                value={elData[m.key] || 0}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { [m.key]: Number(e.target.value) })}
-                                className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono focus:border-[#00A0FF] outline-none"
-                              />
-                              <span className="text-[9px] font-bold text-slate-500">{m.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* REMPLISSAGE INTERNE (PADDING) */}
-                      <div className="space-y-1.5 border-t border-slate-900 pt-3">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Remplissage Interne (Padding px)
-                        </label>
-                        <div className="grid grid-cols-4 gap-2 text-center">
-                          {[
-                            { key: 'paddingTop', label: 'Haut', def: 16 },
-                            { key: 'paddingRight', label: 'Droite', def: 16 },
-                            { key: 'paddingBottom', label: 'Bas', def: 16 },
-                            { key: 'paddingLeft', label: 'Gauche', def: 16 },
-                          ].map((p) => (
-                            <div key={p.key} className="space-y-1">
-                              <input
-                                type="number"
-                                value={elData[p.key] !== undefined ? elData[p.key] : p.def}
-                                onChange={(e) => handleUpdateElementData(selectedEl.id, { [p.key]: Number(e.target.value) })}
-                                className="w-full px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-center text-xs text-white font-mono focus:border-[#00A0FF] outline-none"
-                              />
-                              <span className="text-[9px] font-bold text-slate-500">{p.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 7. BORDURE & ARRONDI (SCREENSHOT 4 & 5) */}
-                    <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold">
-                        <span className="text-slate-400">Arrondissement des coins</span>
-                        <span className="text-xs font-mono text-slate-300">{elData.borderRadius || 16}px</span>
-                      </div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={60}
-                        value={elData.borderRadius || 16}
-                        onChange={(e) => handleUpdateElementData(selectedEl.id, { borderRadius: Number(e.target.value) })}
-                        className="w-full accent-[#00A0FF]"
-                      />
-                    </div>
-
-                    {/* 8. SOUS-ÉLÉMENTS ET COLONNES DU BLOC (IF MULTI-COLUMN BLOCK) */}
-                    {elData.items && (
-                      <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                            Cartes & Colonnes ({elData.items.length})
-                          </label>
-                          <button
-                            onClick={() => handleAddItemToBlock(selectedEl.id)}
-                            className="px-2 py-1 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-lg text-[10px] font-bold flex items-center gap-1"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Ajouter</span>
-                          </button>
-                        </div>
-
-                        <div className="space-y-3">
-                          {elData.items.map((item: any, idx: number) => (
-                            <div key={item.id || idx} className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-[11px] font-bold text-slate-300">
-                                <span>Élément #{idx + 1}</span>
-                                <button
-                                  onClick={() => handleRemoveItemFromBlock(selectedEl.id, item.id)}
-                                  className="text-rose-400 hover:text-rose-300 text-[10px]"
-                                >
-                                  Supprimer
-                                </button>
-                              </div>
-
-                              <input
-                                type="text"
-                                value={item.title || ''}
-                                placeholder="Titre..."
-                                onChange={(e) => {
-                                  const updatedItems = elData.items.map((it: any) =>
-                                    it.id === item.id ? { ...it, title: e.target.value } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold"
-                              />
-
-                              {/* IMAGE FILE / URL UPLOAD FOR EACH COLUMN */}
-                              <div className="space-y-1 pt-1">
-                                <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold">
-                                  <span>🖼️ Image de la carte</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedSubItem({ blockId: selectedEl.id, itemIndex: idx, subType: 'image' })}
-                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                                      selectedSubItem?.blockId === selectedEl.id && selectedSubItem?.itemIndex === idx
-                                        ? 'bg-[#00A0FF] text-white'
-                                        : 'bg-slate-800 text-slate-400 hover:text-white'
-                                    }`}
-                                  >
-                                    {selectedSubItem?.blockId === selectedEl.id && selectedSubItem?.itemIndex === idx
-                                      ? '✅ Prêt pour le menu à gauche'
-                                      : 'Cliquer pour l assigner'}
-                                  </button>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <input
-                                    type="text"
-                                    value={item.img || ''}
-                                    placeholder="URL Image..."
-                                    onChange={(e) => {
-                                      const updatedItems = elData.items.map((it: any) =>
-                                        it.id === item.id ? { ...it, img: e.target.value } : it
-                                      );
-                                      handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                    }}
-                                    className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-slate-300 font-mono"
-                                  />
-                                  <label className="px-2 py-1 bg-[#00A0FF] hover:bg-[#0082D6] text-white rounded-lg cursor-pointer shrink-0 text-xs font-bold flex items-center gap-1 shadow-xs">
-                                    <span>📁 Fichier</span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = (uploadEv) => {
-                                            const url = uploadEv.target?.result as string;
-                                            const updatedItems = elData.items.map((it: any) =>
-                                              it.id === item.id ? { ...it, img: url } : it
-                                            );
-                                            handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-
-                              <textarea
-                                rows={2}
-                                value={item.desc || ''}
-                                placeholder="Description..."
-                                onChange={(e) => {
-                                  const updatedItems = elData.items.map((it: any) =>
-                                    it.id === item.id ? { ...it, desc: e.target.value } : it
-                                  );
-                                  handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                }}
-                                className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
       </div>
-
     </div>
-  );
+  </div>
+);
 }
