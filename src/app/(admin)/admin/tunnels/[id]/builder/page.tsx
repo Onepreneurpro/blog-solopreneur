@@ -2524,7 +2524,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     }
                                                   }}
                                                   className={`w-full ${it.imgHeight || child.data?.imgHeight || 'h-36'} ${
-                                                    (it.imgShape || child.data?.imgShape || 'arcade') === 'arcade'
+                                                    (it.imgShape || child.data?.imgShape || 'square') === 'arcade'
                                                       ? 'rounded-t-[80px]'
                                                       : (it.imgShape || child.data?.imgShape) === 'circle'
                                                       ? 'rounded-full'
@@ -3379,7 +3379,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
                     {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
                       const activeChild = selectedEl.data.children[selectedChildIndex];
-                      const activeShape = activeChild.data?.imgShape || 'arcade';
+                      const activeShape = activeChild.data?.imgShape || 'square';
 
                       return (
                         <div className="p-4 bg-slate-950 rounded-2xl border border-[#00A0FF]/60 space-y-4 shadow-xl mb-4">
@@ -4702,7 +4702,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 key={s.key}
                                 onClick={() => handleUpdateElementData(selectedEl.id, { imgShape: s.key })}
                                 className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all flex items-center justify-center gap-1 ${
-                                  (elData.imgShape || 'arcade') === s.key
+                                  (elData.imgShape || 'square') === s.key
                                     ? 'bg-[#00A0FF] text-white border-[#00A0FF]'
                                     : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
                                 }`}
