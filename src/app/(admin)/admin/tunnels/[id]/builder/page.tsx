@@ -1423,10 +1423,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleCanvasDrop(e)}
-          className="flex-1 bg-slate-950 p-6 overflow-y-auto flex justify-center"
+          className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto flex justify-center"
         >
           <div
-            className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl transition-all space-y-6 ${
+            className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-0 overflow-hidden shadow-2xl transition-all ${
               previewMode === 'MOBILE'
                 ? 'max-w-sm'
                 : pageWidthMode === 'full'
@@ -1440,15 +1440,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 : ''
             }`}
           >
-            <div className="text-center text-xs text-slate-500 border-b border-slate-800 pb-3 flex items-center justify-between">
-              <span className="flex items-center gap-1.5 font-bold">
-                <GripVertical className="w-4 h-4 text-purple-400" />
-                <span>Zone de travail (Glisser-déposer d éléments actif)</span>
-              </span>
-              <span className="text-[11px] text-emerald-400 font-mono">Modèle : {step?.templateName || step?.name}</span>
-            </div>
-
-            {/* TOP DROP ZONE FOR INDEX 0 (PLACEMENT EN TÊTE DE PAGE) */}
+            {/* DYNAMIC TOP DROP INDICATOR (ONLY SHOWN WHILE DRAGGING OVER TOP) */}
             <div
               onDragOver={(e) => {
                 e.preventDefault();
@@ -1460,22 +1452,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 e.stopPropagation();
                 handleCanvasDrop(e, 0);
               }}
-              className={`transition-all rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black text-xs shadow-md my-2 ${
+              className={`transition-all rounded-t-3xl flex items-center justify-center gap-2 font-black text-xs cursor-pointer ${
                 dragOverIndex === 0
-                  ? 'h-14 bg-[#00A0FF]/20 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] ring-4 ring-[#00A0FF]/30 scale-[1.01]'
-                  : 'h-10 bg-emerald-950/30 border-2 border-dashed border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-400'
+                  ? 'h-14 bg-[#00A0FF]/30 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/40'
+                  : 'h-2 bg-transparent hover:h-8 hover:bg-emerald-950/40 hover:border-b hover:border-emerald-500/40 text-emerald-400'
               }`}
             >
-              <span className="text-base">🔝</span>
-              <span>
-                {dragOverIndex === 0
-                  ? '✨ Relâcher pour placer TOUT EN HAUT DE PAGE (En-tête)'
-                  : 'Déposer ici pour placer TOUT EN HAUT DE PAGE (En-tête)'}
-              </span>
+              {dragOverIndex === 0 && (
+                <>
+                  <span className="text-base">🔝</span>
+                  <span>✨ Relâcher pour placer TOUT EN HAUT DE PAGE (En-tête)</span>
+                </>
+              )}
             </div>
 
             {/* CANVAS RENDERED ELEMENTS */}
-            <div className="space-y-4 min-h-[400px]">
+            <div className="space-y-0 min-h-[400px]">
               {elements.map((el, idx) => {
                 const isSelected = el.id === selectedElementId;
 
