@@ -119,20 +119,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         : 'max-w-4xl mx-auto w-full';
 
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-12">
-        <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-900 pb-4">
-          <div className="flex items-center gap-2 font-heading font-black text-lg">
-            <span className="w-8 h-8 rounded-xl bg-[#00A0FF] text-white flex items-center justify-center text-sm font-extrabold shadow-md">
-              O
-            </span>
-            <span>Onepreneur&Co</span>
-          </div>
-          <span className="px-3 py-1 rounded-full bg-slate-900 text-amber-300 border border-slate-800 text-xs font-bold">
-            🎁 ACCÈS RÉSULTATS
-          </span>
-        </div>
-
-        <div className={`${publicWidthClass} my-8 space-y-8`}>
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-x-hidden">
+        <div className={`${publicWidthClass} flex-1`}>
           {customElements.map((el: any) => {
             if (el.type === 'BlockNavArizona') {
               return (
