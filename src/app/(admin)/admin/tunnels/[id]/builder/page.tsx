@@ -328,18 +328,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  const moveElement = (index: number, direction: -1 | 1, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= elements.length) return;
-
+  const moveElementToPosition = (index: number, targetPosition: 'top' | 'up' | 'down' | 'bottom', e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setElements((prev) => {
+      if (index < 0 || index >= prev.length) return prev;
       const updated = [...prev];
-      const temp = updated[index];
-      updated[index] = updated[targetIndex];
-      updated[targetIndex] = temp;
+      const [moved] = updated.splice(index, 1);
+      if (targetPosition === 'top') {
+        updated.unshift(moved);
+      } else if (targetPosition === 'bottom') {
+        updated.push(moved);
+      } else if (targetPosition === 'up') {
+        const newIdx = Math.max(0, index - 1);
+        updated.splice(newIdx, 0, moved);
+      } else if (targetPosition === 'down') {
+        const newIdx = Math.min(updated.length, index + 1);
+        updated.splice(newIdx, 0, moved);
+      }
       return updated;
     });
+  };
+
+  const moveElement = (index: number, direction: -1 | 1, e: React.MouseEvent) => {
+    moveElementToPosition(index, direction === -1 ? 'up' : 'down', e);
   };
 
   const [editingBlock, setEditingBlock] = useState<CanvasElement | null>(null);
@@ -1437,6 +1448,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <span className="text-[11px] text-emerald-400 font-mono">Modèle : {step?.templateName || step?.name}</span>
             </div>
 
+            {/* TOP DROP ZONE FOR INDEX 0 (PLACEMENT EN TÊTE DE PAGE) */}
+            <div
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={(e) => {
+                e.stopPropagation();
+                handleCanvasDrop(e, 0);
+              }}
+              className="p-2.5 border-2 border-dashed border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-950/40 hover:border-emerald-400 text-emerald-300 rounded-2xl text-center text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm my-2"
+            >
+              <span>🔝</span>
+              <span>Déposer ici pour placer TOUT EN HAUT DE PAGE (En-tête)</span>
+            </div>
+
             {/* CANVAS RENDERED ELEMENTS */}
             <div className="space-y-4 min-h-[400px]">
               {elements.map((el, idx) => {
@@ -1492,20 +1516,38 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         </button>
                         <div className="h-3 w-px bg-white/40" />
                         <button
-                          onClick={(e) => moveElement(idx, -1, e)}
+                          onClick={(e) => moveElementToPosition(idx, 'top', e)}
                           disabled={idx === 0}
-                          title="Déplacer vers le haut (▲)"
+                          title="Placer tout en haut de page (En-tête)"
+                          className="disabled:opacity-40 hover:text-amber-300 flex items-center gap-0.5 px-1 py-0.5 bg-white/10 rounded-lg text-[9px] font-extrabold"
+                        >
+                          <span>🔝</span>
+                          <span>Haut</span>
+                        </button>
+                        <button
+                          onClick={(e) => moveElementToPosition(idx, 'up', e)}
+                          disabled={idx === 0}
+                          title="Monter d un rang (▲)"
                           className="disabled:opacity-40"
                         >
                           <ChevronUp className="w-3.5 h-3.5 hover:text-amber-300" />
                         </button>
                         <button
-                          onClick={(e) => moveElement(idx, 1, e)}
+                          onClick={(e) => moveElementToPosition(idx, 'down', e)}
                           disabled={idx === elements.length - 1}
-                          title="Déplacer vers le bas (▼)"
+                          title="Descendre d un rang (▼)"
                           className="disabled:opacity-40"
                         >
                           <ChevronDown className="w-3.5 h-3.5 hover:text-amber-300" />
+                        </button>
+                        <button
+                          onClick={(e) => moveElementToPosition(idx, 'bottom', e)}
+                          disabled={idx === elements.length - 1}
+                          title="Placer tout en bas de page (Pied de page)"
+                          className="disabled:opacity-40 hover:text-amber-300 flex items-center gap-0.5 px-1 py-0.5 bg-white/10 rounded-lg text-[9px] font-extrabold"
+                        >
+                          <span>🔚</span>
+                          <span>Bas</span>
                         </button>
                         <div className="h-3 w-px bg-white/40" />
                         <button onClick={(e) => handleDuplicateElement(el.id, e)} title="Dupliquer">
@@ -4016,6 +4058,68 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </div>
                           </div>
                         )}
+
+                        {/* 📍 POSITION & ORDRE DANS LA PAGE */}
+                        <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                          <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                            <span>📍 Position & Ordre dans la Page</span>
+                            <span className="text-[9px] font-mono text-emerald-400 font-bold">
+                              Rang #{elements.findIndex(e => e.id === selectedEl.id) + 1} / {elements.length}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
+                                if (curIdx > 0) moveElementToPosition(curIdx, 'top', e);
+                              }}
+                              disabled={elements.findIndex(e => e.id === selectedEl.id) === 0}
+                              className="py-2.5 px-2 bg-gradient-to-r from-emerald-900/80 to-teal-900/80 hover:from-emerald-800 hover:to-teal-800 border border-emerald-500/60 text-white font-black text-xs rounded-xl shadow-md disabled:opacity-30 flex items-center justify-center gap-1.5 transition-all"
+                            >
+                              <span>🔝</span>
+                              <span>Placer Tout en Haut</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
+                                if (curIdx < elements.length - 1) moveElementToPosition(curIdx, 'bottom', e);
+                              }}
+                              disabled={elements.findIndex(e => e.id === selectedEl.id) === elements.length - 1}
+                              className="py-2.5 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-30 flex items-center justify-center gap-1.5 transition-all"
+                            >
+                              <span>🔚</span>
+                              <span>Placer Tout en Bas</span>
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
+                                if (curIdx > 0) moveElementToPosition(curIdx, 'up', e);
+                              }}
+                              disabled={elements.findIndex(e => e.id === selectedEl.id) === 0}
+                              className="py-2 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl disabled:opacity-30 flex items-center justify-center gap-1 transition-all"
+                            >
+                              <span>▲ Monter 1 rang</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const curIdx = elements.findIndex(e => e.id === selectedEl.id);
+                                if (curIdx < elements.length - 1) moveElementToPosition(curIdx, 'down', e);
+                              }}
+                              disabled={elements.findIndex(e => e.id === selectedEl.id) === elements.length - 1}
+                              className="py-2 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl disabled:opacity-30 flex items-center justify-center gap-1 transition-all"
+                            >
+                              <span>▼ Descendre 1 rang</span>
+                            </button>
+                          </div>
+                        </div>
 
                         {/* 📐 LARGEUR DE L'AFFICHAGE DU BUILDER ET DU TUNNEL */}
                         <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
