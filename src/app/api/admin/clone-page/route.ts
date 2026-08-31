@@ -14,7 +14,6 @@ function makeAbsoluteUrl(relativeUrl: string | undefined, baseUrl: string): stri
 function extractStyleProps(styleStr: string | undefined, classNameStr: string | undefined): { bgColor?: string; textColor?: string; bgImage?: string } {
   const result: { bgColor?: string; textColor?: string; bgImage?: string } = {};
 
-  // Extract from inline style
   if (styleStr) {
     const bgMatch = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
     if (bgMatch) {
@@ -38,20 +37,17 @@ function extractStyleProps(styleStr: string | undefined, classNameStr: string | 
     }
   }
 
-  // Extract common color hints from class names if no inline style
   if (classNameStr) {
     const cls = classNameStr.toLowerCase();
     if (!result.bgColor) {
-      if (cls.includes('bg-red') || cls.includes('red-bg') || cls.includes('btn-danger')) result.bgColor = '#dc2626';
-      else if (cls.includes('bg-green') || cls.includes('green-bg') || cls.includes('btn-success')) result.bgColor = '#16a34a';
-      else if (cls.includes('bg-blue') || cls.includes('blue-bg') || cls.includes('btn-primary')) result.bgColor = '#00A0FF';
-      else if (cls.includes('bg-[#') || cls.includes('bg-dark')) result.bgColor = '#181825';
+      if (cls.includes('red') || cls.includes('danger') || cls.includes('rouge')) result.bgColor = '#dc2626';
+      else if (cls.includes('green') || cls.includes('success') || cls.includes('vert')) result.bgColor = '#16a34a';
+      else if (cls.includes('blue') || cls.includes('primary') || cls.includes('bleu')) result.bgColor = '#00A0FF';
+      else if (cls.includes('dark') || cls.includes('black') || cls.includes('noir')) result.bgColor = '#0f172a';
     }
     if (!result.textColor) {
-      if (cls.includes('text-yellow') || cls.includes('text-amber')) result.textColor = '#facc15';
-      else if (cls.includes('text-green')) result.textColor = '#4ade80';
-      else if (cls.includes('text-red')) result.textColor = '#f87171';
-      else if (cls.includes('text-white')) result.textColor = '#ffffff';
+      if (cls.includes('yellow') || cls.includes('amber') || cls.includes('jaune')) result.textColor = '#facc15';
+      else if (cls.includes('white') || cls.includes('blanc')) result.textColor = '#ffffff';
     }
   }
 
@@ -89,7 +85,7 @@ export async function POST(req: Request) {
       targetUrl = `https://${targetUrl}`;
     }
 
-    // 1. Fetch HTML content
+    // 1. Fetch HTML content with Chrome User-Agent
     const response = await fetch(targetUrl, {
       headers: {
         'User-Agent':
@@ -112,24 +108,43 @@ export async function POST(req: Request) {
     const $ = cheerio.load(html);
     const pageTitle = $('title').text().trim() || 'Page Clonée';
 
-    // Remove noise elements
-    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
-
     const clonedElements: any[] = [];
     const now = Date.now();
 
-    // Helper: Parse elements inside a container div / col
+    // Strategy A: Check for JSON page data embedded in script tags (Systeme.io / ClickFunnels / Next.js)
+    let jsonParsedSections: any[] | null = null;
+    $('script').each((_, scriptEl) => {
+      const content = $(scriptEl).html() || '';
+      if (content.includes('window.__INITIAL_STATE__') || content.includes('pageData') || content.includes('"sections":[')) {
+        try {
+          const jsonMatch = content.match(/(\{[\s\S]*"sections":\s*\[[\s\S]*\}\})/) || content.match(/(\{[\s\S]*"elements":\s*\[[\s\S]*\}\})/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[1]);
+            if (parsed && (parsed.sections || parsed.elements)) {
+              jsonParsedSections = parsed.sections || parsed.elements;
+            }
+          }
+        } catch (e) {
+          // Fallthrough to DOM parsing
+        }
+      }
+    });
+
+    // Strategy B: Deep DOM Tree Walking
+    // Remove noise scripts & styles after checking hydration scripts
+    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
+
     const parseContainerChildren = ($container: any): any[] => {
       const children: any[] = [];
       const extractedTextList: string[] = [];
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, li, [class*="btn"], [class*="button"]').each((i: number, el: any) => {
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, li, [class*="btn"], [class*="button"], [class*="title"], [class*="headline"]').each((i: number, el: any) => {
         const $el = $(el);
         const tagName = el.tagName ? el.tagName.toLowerCase() : '';
         const styleProps = extractStyleProps($el.attr('style'), $el.attr('class'));
         const rawText = cleanText($el.text());
 
-        // 1. BUTTONS / CTAs (a, button, or elements with btn/button class)
+        // 1. BUTTONS / CTAs
         const isButton = tagName === 'button' || tagName === 'a' || $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || $el.attr('role') === 'button';
         if (isButton && rawText && rawText.length > 1 && rawText.length < 120) {
           if (!isDuplicateText(rawText, extractedTextList)) {
@@ -150,7 +165,7 @@ export async function POST(req: Request) {
           }
         }
 
-        // 2. HEADINGS (h1 - h6 or title class)
+        // 2. HEADINGS
         if (tagName.startsWith('h') || $el.hasClass('title') || $el.hasClass('heading') || $el.hasClass('headline')) {
           if (rawText && !isDuplicateText(rawText, extractedTextList)) {
             extractedTextList.push(rawText);
@@ -169,7 +184,7 @@ export async function POST(req: Request) {
           }
         }
 
-        // 3. IMAGES (img tags)
+        // 3. IMAGES
         if (tagName === 'img') {
           const src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('srcset');
           const absSrc = makeAbsoluteUrl(src, targetUrl);
@@ -188,7 +203,7 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4. FORM INPUTS (input, textarea)
+        // 4. FORM INPUTS
         if (tagName === 'input' || tagName === 'textarea') {
           const placeholder = $el.attr('placeholder') || $el.attr('name') || 'Votre e-mail...';
           const type = $el.attr('type') || 'text';
@@ -208,7 +223,7 @@ export async function POST(req: Request) {
           }
         }
 
-        // 5. PARAGRAPHS & LIST ITEMS (p, li)
+        // 5. PARAGRAPHS & LIST ITEMS
         if (tagName === 'p' || tagName === 'li') {
           if (rawText && rawText.length > 1 && !isDuplicateText(rawText, extractedTextList)) {
             extractedTextList.push(rawText);
@@ -229,8 +244,8 @@ export async function POST(req: Request) {
       return children;
     };
 
-    // 2. Identify Section Elements (<section>, or top-level containers)
-    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"]');
+    // Detect section elements
+    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], div[class*="container"]');
     if ($sections.length === 0) {
       $sections = $('body > div, body > main > div');
     }
@@ -242,14 +257,14 @@ export async function POST(req: Request) {
       const styleProps = extractStyleProps($sec.attr('style'), $sec.attr('class'));
       const bgColor = styleProps.bgColor || (sectionIndex % 2 === 0 ? '#0b1329' : '#0f172a');
 
-      // Deep search for columns / grids inside section
+      // Deep column discovery
       let $cols = $sec.find('[class*="col"], [class*="grid"] > div, .row > div, .container > div');
       if ($cols.length < 2) {
         $cols = $sec.children('div');
       }
 
       const subChildren = parseContainerChildren($sec);
-      if (subChildren.length === 0) return; // Skip empty containers
+      if (subChildren.length === 0) return;
 
       sectionIndex++;
       const isMultiCol = $cols.length >= 2 && $cols.length <= 4;
