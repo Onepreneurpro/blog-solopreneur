@@ -250,8 +250,12 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     backgroundPosition: bgPos,
                     color: textColor,
                     minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
+                    paddingTop: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
+                    paddingBottom: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
+                    paddingLeft: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
+                    paddingRight: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
                   }}
-                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
+                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined ? 'p-8 sm:p-14' : ''} shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
                 >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
@@ -376,7 +380,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
                                     color: child.data?.textColor || 'inherit',
                                   }}
-                                  className="p-6 w-full rounded-none transition-all space-y-4"
+                                  className="p-6 w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4"
                                 >
                                   {child.data?.title && (
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
