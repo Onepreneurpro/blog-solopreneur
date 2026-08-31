@@ -2396,7 +2396,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto flex justify-center"
         >
           <div
-            className={`w-full bg-slate-900 rounded-none border border-slate-800 p-0 overflow-hidden shadow-2xl transition-all ${
+            className={`w-full bg-transparent rounded-none border-0 p-0 overflow-hidden shadow-none transition-all ${
               previewMode === 'MOBILE'
                 ? 'max-w-sm'
                 : pageWidthMode === 'full'
@@ -2440,6 +2440,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <div className="space-y-0 min-h-[400px]">
               {elements.map((el, idx) => {
                 const isSelected = el.id === selectedElementId;
+                const isSection = el.type === 'Section' || el.type === 'BlockSectionFull';
 
                 return (
                   <React.Fragment key={el.id}>
@@ -2453,21 +2454,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       handleCanvasDrop(e, idx);
                     }}
                     onClick={() => setSelectedElementId(el.id)}
-                    className={`relative rounded-none border-2 transition-all cursor-move group ${
-                      isSelected
-                        ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30'
-                        : 'border-slate-800/80 hover:border-slate-700 bg-slate-950/40'
+                    className={`relative rounded-none transition-all group ${
+                      isSection
+                        ? 'border-0 p-0 m-0 bg-transparent'
+                        : isSelected
+                        ? 'border-2 border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30 p-4'
+                        : 'border-2 border-slate-800/80 hover:border-slate-700 bg-slate-950/40 p-4'
                     }`}
-                    style={{
-                      marginTop: `${el.data?.marginTop || 0}px`,
-                      marginRight: `${el.data?.marginRight || 0}px`,
-                      marginBottom: `${el.data?.marginBottom || 0}px`,
-                      marginLeft: `${el.data?.marginLeft || 0}px`,
-                      paddingTop: `${el.data?.paddingTop !== undefined ? el.data.paddingTop : 16}px`,
-                      paddingRight: `${el.data?.paddingRight !== undefined ? el.data.paddingRight : 16}px`,
-                      paddingBottom: `${el.data?.paddingBottom !== undefined ? el.data.paddingBottom : 16}px`,
-                      paddingLeft: `${el.data?.paddingLeft !== undefined ? el.data.paddingLeft : 16}px`,
-                    }}
+                    style={
+                      isSection
+                        ? {}
+                        : {
+                            marginTop: `${el.data?.marginTop || 0}px`,
+                            marginRight: `${el.data?.marginRight || 0}px`,
+                            marginBottom: `${el.data?.marginBottom || 0}px`,
+                            marginLeft: `${el.data?.marginLeft || 0}px`,
+                            paddingTop: `${el.data?.paddingTop !== undefined ? el.data.paddingTop : 16}px`,
+                            paddingRight: `${el.data?.paddingRight !== undefined ? el.data.paddingRight : 16}px`,
+                            paddingBottom: `${el.data?.paddingBottom !== undefined ? el.data.paddingBottom : 16}px`,
+                            paddingLeft: `${el.data?.paddingLeft !== undefined ? el.data.paddingLeft : 16}px`,
+                          }
+                    }
                   >
                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
                     <div
