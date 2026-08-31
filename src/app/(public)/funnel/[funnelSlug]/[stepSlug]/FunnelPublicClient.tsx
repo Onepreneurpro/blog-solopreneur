@@ -249,6 +249,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     backgroundSize: bgSize,
                     backgroundPosition: bgPos,
                     color: textColor,
+                    minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                   }}
                   className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden`}
                 >

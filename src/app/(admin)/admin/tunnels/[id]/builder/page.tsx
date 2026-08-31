@@ -570,6 +570,43 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     window.addEventListener('mouseup', onMouseUp);
   };
 
+  const handleStartSectionResize = (e: React.MouseEvent, sectionId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const startY = e.clientY;
+    const el = elements.find((item) => item.id === sectionId);
+    if (!el) return;
+
+    const startMinHeight = el.data?.minHeight || 300;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - startY;
+      const newHeight = Math.max(100, Math.min(1600, Math.round(startMinHeight + deltaY)));
+
+      setElements((prev) =>
+        prev.map((item) => {
+          if (item.id !== sectionId) return item;
+          return {
+            ...item,
+            data: {
+              ...item.data,
+              minHeight: newHeight,
+            },
+          };
+        })
+      );
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
     // If a container block is selected on the canvas, insert element directly into the container!
     if (selectedElementId) {
@@ -2159,6 +2196,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             backgroundSize: bgSize,
                             backgroundPosition: bgPos,
                             color: textColor,
+                            minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                           }}
                           className="relative w-full p-6 sm:p-10 shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400"
                         >
@@ -2171,23 +2209,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           )}
 
                           <div className={`relative z-10 ${innerWidthClass} space-y-6`}>
-                            <div className="flex items-center justify-between border-b border-white/20 pb-3">
-                              <input
-                                type="text"
-                                value={el.data?.title || el.content || 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)'}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  handleUpdateElementData(el.id, { title: val });
-                                  handleUpdateElementContent(el.id, val);
-                                }}
-                                style={{ color: textColor }}
-                                className="text-xl sm:text-2xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF] w-full max-w-xl"
-                                placeholder="Titre de la Section..."
-                              />
-                              <span className="text-[10px] font-bold text-purple-300 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-700 shrink-0 flex items-center gap-1.5 shadow-sm">
-                                🏛️ Section Principale (100% Plein Écran)
-                              </span>
-                            </div>
+                            {/* TITLE HEADER (ONLY IF SPECIFIED BY USER) */}
+                            {el.data?.title && (
+                              <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                                <input
+                                  type="text"
+                                  value={el.data.title}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    handleUpdateElementData(el.id, { title: val });
+                                    handleUpdateElementContent(el.id, val);
+                                  }}
+                                  style={{ color: textColor }}
+                                  className="text-xl sm:text-2xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF] w-full max-w-xl"
+                                  placeholder="Titre de la Section..."
+                                />
+                                <span className="text-[10px] font-bold text-purple-300 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-700 shrink-0 flex items-center gap-1.5 shadow-sm">
+                                  🏛️ Section HTML5 (100% Plein Écran)
+                                </span>
+                              </div>
+                            )}
 
                             {/* RENDER NESTED CHILDREN INSIDE THE FULL SECTION */}
                             {(!el.data?.children || el.data.children.length === 0) ? (
@@ -2499,6 +2540,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 ))}
                               </div>
                             )}
+                          </div>
+
+                          {/* INTERACTIVE BOTTOM RESIZE DRAG HANDLE BAR */}
+                          <div
+                            onMouseDown={(e) => handleStartSectionResize(e, el.id)}
+                            title="Cliquer et glisser vers le haut/bas pour régler la hauteur"
+                            className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-purple-950/90 to-transparent hover:from-purple-600/90 hover:to-purple-900/70 cursor-ns-resize flex items-center justify-center group/resize transition-all z-20"
+                          >
+                            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-purple-900/90 text-white font-mono text-[10px] border border-purple-400 shadow-md group-hover/resize:scale-110 transition-transform">
+                              <span className="text-xs">↕️</span>
+                              <span>Tirer pour ajuster la hauteur {el.data?.minHeight ? `(${el.data.minHeight}px)` : ''}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -4226,6 +4279,50 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             </button>
                           )}
                         </div>
+
+                        {/* 📐 HAUTEUR DE LA SECTION */}
+                        {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
+                          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                              <span>📐 Hauteur de la Section (Pixels)</span>
+                              <span className="text-xs font-mono text-purple-300 font-bold">
+                                {selectedEl.data?.minHeight ? `${selectedEl.data.minHeight}px` : 'Auto'}
+                              </span>
+                            </div>
+
+                            <input
+                              type="range"
+                              min="100"
+                              max="1200"
+                              step="10"
+                              value={selectedEl.data?.minHeight || 300}
+                              onChange={(e) => handleUpdateElementData(selectedEl.id, { minHeight: parseInt(e.target.value) })}
+                              className="w-full accent-[#00A0FF] cursor-pointer"
+                            />
+
+                            <div className="grid grid-cols-4 gap-1.5 pt-1">
+                              {[
+                                { label: '200px', val: 200 },
+                                { label: '400px', val: 400 },
+                                { label: '600px', val: 600 },
+                                { label: '800px', val: 800 },
+                              ].map((p) => (
+                                <button
+                                  key={p.val}
+                                  type="button"
+                                  onClick={() => handleUpdateElementData(selectedEl.id, { minHeight: p.val })}
+                                  className={`py-1.5 px-1 text-[9px] font-bold rounded-lg border transition-all text-center ${
+                                    selectedEl.data?.minHeight === p.val
+                                      ? 'bg-purple-600 text-white border-purple-400'
+                                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                                  }`}
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
 
                         {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
                         <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
