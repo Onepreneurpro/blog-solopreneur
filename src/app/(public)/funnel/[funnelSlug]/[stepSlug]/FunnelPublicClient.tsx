@@ -280,27 +280,101 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     )}
                     <div className="space-y-6">
                       {(el.data?.children || []).map((child: any, cIdx: number) => {
-                        if (child.type === 'Heading') {
+                        if (child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg') {
+                          const is4 = child.type.includes('4') || child.type === 'Col4';
+                          const defaultData = is4
+                            ? {
+                                items: [
+                                  { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                  { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                  { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                  { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                ],
+                              }
+                            : {
+                                items: [
+                                  { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies.' },
+                                  { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer à l action.' },
+                                  { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif.' },
+                                ],
+                              };
+
+                          const items = child.data?.items && child.data.items.length > 0 ? child.data.items : defaultData.items;
+                          const colsClass = is4 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+
                           return (
-                            <h3 key={child.id || cIdx} className="text-xl sm:text-3xl font-heading font-black leading-tight text-center">
-                              {child.content}
-                            </h3>
-                          );
-                        }
-                        if (child.type === 'Text') {
-                          return (
-                            <div key={child.id || cIdx} className="text-base leading-relaxed font-medium text-center" dangerouslySetInnerHTML={{ __html: child.content }} />
-                          );
-                        }
-                        if (child.type === 'Image') {
-                          return (
-                            <div key={child.id || cIdx} className="flex justify-center my-4">
-                              <div className="max-w-xl rounded-2xl overflow-hidden shadow-xl">
-                                <img src={child.data?.img || child.content} alt="Content" className="w-full h-full object-cover" />
+                            <div key={child.id || cIdx} className="space-y-4 my-4">
+                              {child.data?.title && (
+                                <h3 className="text-xl font-heading font-black text-center">{child.data.title}</h3>
+                              )}
+                              <div className={`grid ${colsClass} gap-6`}>
+                                {items.map((it: any, idx: number) => {
+                                  const imgHeight = it.imgHeight || child.data?.imgHeight || 'h-64';
+                                  const imgShape = it.imgShape || child.data?.imgShape || 'arcade';
+                                  const shapeClass =
+                                    imgShape === 'arcade'
+                                      ? 'rounded-t-[80px]'
+                                      : imgShape === 'circle'
+                                      ? 'rounded-full'
+                                      : imgShape === 'square'
+                                      ? 'rounded-none'
+                                      : 'rounded-3xl';
+                                  const imgFit = it.imgObjectFit || child.data?.imgObjectFit || 'object-cover';
+                                  const imgPos = it.imgObjectPosition || child.data?.imgObjectPosition || 'center';
+
+                                  return (
+                                    <div key={idx} className="bg-white text-slate-800 p-4 rounded-3xl shadow-lg space-y-3 flex flex-col items-center text-center">
+                                      {it.img && (
+                                        <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm flex items-center justify-center`}>
+                                          <img src={it.img} alt={it.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
+                                        </div>
+                                      )}
+                                      <h4 className="font-heading font-extrabold text-sm uppercase text-slate-900">{it.title}</h4>
+                                      <p className="text-xs text-slate-500 font-medium leading-relaxed">{it.desc}</p>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           );
                         }
+
+                        if (child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') {
+                          const items = child.data?.items || [
+                            { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas.' },
+                            { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort.' },
+                          ];
+                          return (
+                            <div key={child.id || cIdx} className="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
+                              {items.map((it: any, idx: number) => (
+                                <div key={idx} className="flex items-start gap-4 p-5 bg-white text-slate-800 rounded-2xl shadow-md border border-slate-100">
+                                  <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
+                                  <div>
+                                    <h4 className="font-heading font-extrabold text-sm text-slate-900">{it.title}</h4>
+                                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{it.desc}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+
+                        if (child.type === 'ContentBox') {
+                          return (
+                            <div key={child.id || cIdx} className="p-6 bg-white text-slate-800 rounded-3xl shadow-xl space-y-4 my-4">
+                              <h3 className="text-lg font-heading font-black">{child.data?.title || 'Conteneur d éléments'}</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {(child.data?.children || []).map((sub: any, sIdx: number) => (
+                                  <div key={sIdx} className="p-4 bg-slate-50 rounded-2xl text-center space-y-2">
+                                    {sub.type === 'Image' && <img src={sub.data?.img || sub.content} alt="Sub" className="w-full h-36 object-cover rounded-xl" />}
+                                    <div className="font-bold text-xs text-slate-800">{sub.content}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+
                         return <div key={child.id || cIdx} className="text-sm font-medium">{child.content}</div>;
                       })}
                     </div>
