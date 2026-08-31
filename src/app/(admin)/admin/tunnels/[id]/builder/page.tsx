@@ -2774,7 +2774,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             color: textColor,
                             minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                           }}
-                          className="relative w-full p-6 sm:p-10 pb-12 shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between"
+                          className="relative w-full p-6 sm:p-10 shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between"
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
@@ -3227,22 +3227,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       </div>
                                     )}
                                   </React.Fragment>
-                                  ))}
-                                </div>
-                              );
-                            })()}
-
-                          {/* INTERACTIVE BOTTOM RESIZE DRAG HANDLE BAR */}
-                          <div
-                            onMouseDown={(e) => handleStartSectionResize(e, el.id)}
-                            title="Cliquer et glisser vers le haut/bas pour régler la hauteur"
-                            className="absolute -bottom-3 left-0 right-0 h-6 bg-gradient-to-t from-purple-950/90 to-transparent hover:from-purple-600/90 hover:to-purple-900/70 cursor-ns-resize flex items-center justify-center group/resize transition-all z-30 select-none"
-                          >
-                            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-purple-900/90 text-white font-mono text-[10px] border border-purple-400 shadow-md group-hover/resize:scale-110 transition-transform">
-                              <span className="text-xs">↕️</span>
-                              <span>Tirer pour ajuster la hauteur {el.data?.minHeight ? `(${el.data.minHeight}px)` : ''}</span>
-                            </div>
-                          </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                       );
