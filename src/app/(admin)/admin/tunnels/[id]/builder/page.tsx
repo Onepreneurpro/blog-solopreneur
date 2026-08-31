@@ -266,8 +266,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       const targetEl = elements.find((item) => item.id === blockId);
       if (!targetEl) return;
 
-      // Special handling for ContentBox container (stores children: CanvasElement[])
-      if (targetEl.type === 'ContentBox') {
+      // Special handling for ContentBox and Section containers (stores children: CanvasElement[])
+      if (targetEl.type === 'ContentBox' || targetEl.type === 'Section' || targetEl.type === 'BlockSectionFull') {
         const newChild: CanvasElement = {
           id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
           type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
@@ -557,10 +557,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   };
 
   const handleAddElement = (type: string, category: string, defaultContent: string) => {
-    // If a container block is selected on the canvas, insert element (Text, Heading, Image, Video, Button, etc.) directly into the container!
+    // If a container block is selected on the canvas, insert element directly into the container!
     if (selectedElementId) {
       const selectedEl = elements.find((e) => e.id === selectedElementId);
-      if (selectedEl && selectedEl.type === 'ContentBox') {
+      if (selectedEl && (selectedEl.type === 'ContentBox' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull')) {
         const newChild: CanvasElement = {
           id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
           type,
@@ -2248,6 +2248,71 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           }}
                                           className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono"
                                           placeholder="URL de l image..."
+                                        />
+                                      </div>
+                                    )}
+
+                                    {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg') && (
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
+                                        {(child.data?.items || getDefaultBlockData('Col4', '4 Colonnes').items).map((it: any, idx: number) => (
+                                          <div key={idx} className="space-y-2 text-center bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                            {it.img && <img src={it.img} alt={it.title} className="w-full h-32 object-cover rounded-lg" />}
+                                            <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
+                                            <div className="text-[10px] text-slate-400">{it.desc}</div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {(child.type === 'Col3' || child.type === 'BlockFeat3ColImg') && (
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
+                                        {(child.data?.items || getDefaultBlockData('Col3', '3 Colonnes').items).map((it: any, idx: number) => (
+                                          <div key={idx} className="space-y-2 text-center bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                            {it.img && <img src={it.img} alt={it.title} className="w-full h-36 object-cover rounded-lg" />}
+                                            <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
+                                            <div className="text-[10px] text-slate-400">{it.desc}</div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {(child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-950/60 rounded-2xl border border-white/10">
+                                        {(child.data?.items || getDefaultBlockData('Col2', '2 Colonnes').items).map((it: any, idx: number) => (
+                                          <div key={idx} className="flex items-start gap-3 p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                                            <div className="w-8 h-8 rounded-lg bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
+                                            <div>
+                                              <div className="font-heading font-extrabold text-xs text-white">{it.title}</div>
+                                              <div className="text-[10px] text-slate-400">{it.desc}</div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {child.type === 'ContentBox' && (
+                                      <div className="p-4 bg-slate-950/60 rounded-2xl border border-dashed border-[#00A0FF] space-y-3">
+                                        <div className="text-xs font-bold text-[#00A0FF]">📦 Conteneur d éléments imbriqué</div>
+                                        <div className="text-xs text-slate-400">Insérez d autres cartes et éléments ici...</div>
+                                      </div>
+                                    )}
+
+                                    {child.type === 'ButtonCTA' && (
+                                      <div className="text-center pt-2">
+                                        <button type="button" className="px-8 py-3 bg-[#00A0FF] text-white font-bold text-xs rounded-xl shadow-lg">
+                                          {child.content || child.data?.buttonText || 'Bouton d action'}
+                                        </button>
+                                      </div>
+                                    )}
+
+                                    {child.type === 'FormInput' && (
+                                      <div className="max-w-md mx-auto space-y-1 text-left">
+                                        <label className="text-[10px] font-bold text-slate-300 block">{child.data?.title || 'Champ de formulaire'}</label>
+                                        <input
+                                          type="text"
+                                          disabled
+                                          placeholder={child.data?.placeholder || child.content || 'votre.email@exemple.com'}
+                                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-400"
                                         />
                                       </div>
                                     )}
