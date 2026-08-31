@@ -250,12 +250,14 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     backgroundPosition: bgPos,
                     color: textColor,
                     minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
-                    paddingTop: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
-                    paddingBottom: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
-                    paddingLeft: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
-                    paddingRight: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
+                    paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                    paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                    paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                    paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                    marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
+                    marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                   }}
-                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined ? 'p-8 sm:p-14' : ''} shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
+                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
                 >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
@@ -379,12 +381,14 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
                                     borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
                                     color: child.data?.textColor || 'inherit',
-                                    paddingTop: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
-                                    paddingBottom: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
-                                    paddingLeft: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
-                                    paddingRight: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
+                                    paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                    paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                    paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                    paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                    marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
+                                    marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                   }}
-                                  className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined ? 'p-6' : ''}`}
+                                  className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-6' : ''}`}
                                 >
                                   {child.data?.title && (
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>

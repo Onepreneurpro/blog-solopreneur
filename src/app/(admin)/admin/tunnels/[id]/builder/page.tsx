@@ -43,6 +43,8 @@ import {
   X,
   Maximize2,
   Settings,
+  Link2,
+  Unlink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -1333,47 +1335,341 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
 
           {/* 📍 MARGES EXTERNES ET INTERNES (PADDING & MARGIN) */}
-          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-              📐 Marges & Espacements (px)
-            </div>
+          {(() => {
+            const targetData = selectedChildIndex !== null
+              ? (selectedEl.data?.children?.[selectedChildIndex]?.data || {})
+              : elData;
 
-            <div className="space-y-3">
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 block mb-1">Marge Interne HAUT / BAS (Padding Y)</span>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min={0}
-                    max={120}
-                    value={elData.paddingY !== undefined ? elData.paddingY : 48}
-                    onChange={(e) => handleUpdateElementData(selectedEl.id, { paddingY: Number(e.target.value) })}
-                    className="flex-1 accent-[#00A0FF]"
-                  />
-                  <span className="font-mono text-xs font-bold text-slate-300 w-10 text-right">
-                    {elData.paddingY !== undefined ? elData.paddingY : 48}px
-                  </span>
+            const updateMarginData = (changes: any) => {
+              if (selectedChildIndex !== null) {
+                const currentChildren = [...(selectedEl.data?.children || [])];
+                const targetChild = currentChildren[selectedChildIndex];
+                currentChildren[selectedChildIndex] = {
+                  ...targetChild,
+                  data: {
+                    ...(targetChild.data || {}),
+                    ...changes,
+                  },
+                };
+                handleUpdateElementData(selectedEl.id, { children: currentChildren });
+              } else {
+                handleUpdateElementData(selectedEl.id, changes);
+              }
+            };
+
+            const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : (targetData.paddingY !== undefined ? targetData.paddingY : 48);
+            const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : (targetData.paddingY !== undefined ? targetData.paddingY : 48);
+            const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : (targetData.paddingX !== undefined ? targetData.paddingX : 24);
+            const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : (targetData.paddingX !== undefined ? targetData.paddingX : 24);
+            const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : 0;
+            const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : 0;
+
+            const isSyncY = targetData.syncPaddingY !== false;
+            const isSyncX = targetData.syncPaddingX !== false;
+            const isSyncMargin = targetData.syncMarginY !== false;
+
+            return (
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                  <span>📐 Marges & Espacements (px) {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
+                </div>
+
+                {/* MARGE INTERNE HAUT / BAS (PADDING Y) */}
+                <div className="space-y-3 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Marge Interne Verticale (Padding Y)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ syncPaddingY: !isSyncY })}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 border transition-all ${
+                        isSyncY
+                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-sm'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                      }`}
+                      title={isSyncY ? 'Verrouillé: Haut & Bas synchronisés (Cliquer pour déverrouiller)' : 'Déverrouillé: Haut & Bas indépendants (Cliquer pour verrouiller)'}
+                    >
+                      {isSyncY ? <Link2 className="w-3.5 h-3.5 text-[#00A0FF]" /> : <Unlink className="w-3.5 h-3.5 text-slate-400" />}
+                      <span>{isSyncY ? 'Liés 🔗' : 'Séparés 🔓'}</span>
+                    </button>
+                  </div>
+
+                  {/* PADDING HAUT */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Haut (Top)</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={padTop}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncY) {
+                              updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
+                            } else {
+                              updateMarginData({ paddingTop: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={padTop}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncY) {
+                          updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
+                        } else {
+                          updateMarginData({ paddingTop: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
+
+                  {/* PADDING BAS */}
+                  <div className="space-y-1 pt-1 border-t border-slate-800/60">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Bas (Bottom)</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={padBottom}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncY) {
+                              updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
+                            } else {
+                              updateMarginData({ paddingBottom: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={padBottom}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncY) {
+                          updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
+                        } else {
+                          updateMarginData({ paddingBottom: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
+                </div>
+
+                {/* MARGE INTERNE GAUCHE / DROITE (PADDING X) */}
+                <div className="space-y-3 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Marge Interne Horizontale (Padding X)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ syncPaddingX: !isSyncX })}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 border transition-all ${
+                        isSyncX
+                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-sm'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                      }`}
+                      title={isSyncX ? 'Verrouillé: Gauche & Droite synchronisés' : 'Déverrouillé: Gauche & Droite indépendants'}
+                    >
+                      {isSyncX ? <Link2 className="w-3.5 h-3.5 text-[#00A0FF]" /> : <Unlink className="w-3.5 h-3.5 text-slate-400" />}
+                      <span>{isSyncX ? 'Liés 🔗' : 'Séparés 🔓'}</span>
+                    </button>
+                  </div>
+
+                  {/* PADDING GAUCHE */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Gauche (Left)</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={padLeft}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncX) {
+                              updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
+                            } else {
+                              updateMarginData({ paddingLeft: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={padLeft}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncX) {
+                          updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
+                        } else {
+                          updateMarginData({ paddingLeft: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
+
+                  {/* PADDING DROITE */}
+                  <div className="space-y-1 pt-1 border-t border-slate-800/60">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Droite (Right)</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={padRight}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncX) {
+                              updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
+                            } else {
+                              updateMarginData({ paddingRight: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={padRight}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncX) {
+                          updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
+                        } else {
+                          updateMarginData({ paddingRight: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
+                </div>
+
+                {/* MARGES EXTERNES (MARGIN TOP & MARGIN BOTTOM) */}
+                <div className="space-y-3 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Marge Externe Verticale (Margin Y)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ syncMarginY: !isSyncMargin })}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 border transition-all ${
+                        isSyncMargin
+                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-sm'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                      }`}
+                      title={isSyncMargin ? 'Verrouillé: Haut & Bas synchronisés' : 'Déverrouillé: Haut & Bas indépendants'}
+                    >
+                      {isSyncMargin ? <Link2 className="w-3.5 h-3.5 text-[#00A0FF]" /> : <Unlink className="w-3.5 h-3.5 text-slate-400" />}
+                      <span>{isSyncMargin ? 'Liés 🔗' : 'Séparés 🔓'}</span>
+                    </button>
+                  </div>
+
+                  {/* MARGIN HAUT */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Margin Haut</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={marginTop}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncMargin) {
+                              updateMarginData({ marginTop: val, marginBottom: val });
+                            } else {
+                              updateMarginData({ marginTop: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={marginTop}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncMargin) {
+                          updateMarginData({ marginTop: val, marginBottom: val });
+                        } else {
+                          updateMarginData({ marginTop: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
+
+                  {/* MARGIN BAS */}
+                  <div className="space-y-1 pt-1 border-t border-slate-800/60">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400 font-bold">Margin Bas</span>
+                      <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-700 shadow-inner">
+                        <input
+                          type="number"
+                          value={marginBottom}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (isSyncMargin) {
+                              updateMarginData({ marginTop: val, marginBottom: val });
+                            } else {
+                              updateMarginData({ marginBottom: val });
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right font-mono text-xs font-bold text-white outline-none"
+                        />
+                        <span className="text-[10px] text-slate-400 font-mono">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={-50}
+                      max={150}
+                      value={marginBottom}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (isSyncMargin) {
+                          updateMarginData({ marginTop: val, marginBottom: val });
+                        } else {
+                          updateMarginData({ marginBottom: val });
+                        }
+                      }}
+                      className="w-full accent-[#00A0FF]"
+                    />
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 block mb-1">Marge Interne GAUCHE / DROITE (Padding X)</span>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min={0}
-                    max={80}
-                    value={elData.paddingX !== undefined ? elData.paddingX : 24}
-                    onChange={(e) => handleUpdateElementData(selectedEl.id, { paddingX: Number(e.target.value) })}
-                    className="flex-1 accent-[#00A0FF]"
-                  />
-                  <span className="font-mono text-xs font-bold text-slate-300 w-10 text-right">
-                    {elData.paddingX !== undefined ? elData.paddingX : 24}px
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* 7. BORDURE & ARRONDI */}
           <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
@@ -2854,14 +3150,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             backgroundPosition: bgPos,
                             color: textColor,
                             minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
-                            paddingTop: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
-                            paddingBottom: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
-                            paddingLeft: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
-                            paddingRight: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
+                            paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                            paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                            paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                            paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
                             marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
                             marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                           }}
-                          className={`relative w-full shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between ${el.data?.paddingY === undefined ? 'p-6 sm:p-10' : ''}`}
+                          className={`relative w-full shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-6 sm:p-10' : ''}`}
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
@@ -2934,12 +3230,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                                           backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
                                           color: child.data?.textColor || 'inherit',
-                                          paddingTop: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
-                                          paddingBottom: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
-                                          paddingLeft: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
-                                          paddingRight: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
+                                          paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                          paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                          paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                          paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                          marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
+                                          marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
-                                        className={`relative group/child ${child.data?.paddingY === undefined ? 'p-3' : ''} rounded-none border transition-all flex flex-col flex-1 h-full ${
+                                        className={`relative group/child ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-3' : ''} rounded-none border transition-all flex flex-col flex-1 h-full ${
                                           selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
