@@ -1331,11 +1331,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
           {/* 📍 MARGES EXTERNES ET INTERNES (PADDING & MARGIN) */}
           {(() => {
-            const targetData = selectedChildIndex !== null
-              ? (selectedEl.data?.children?.[selectedChildIndex]?.data || {})
-              : elData;
+            const targetData = (() => {
+              if (selectedSubItem && selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+                const targetChild = selectedEl.data?.children?.[selectedSubItem.childIndex];
+                const subList = targetChild?.data?.children || targetChild?.data?.items || [];
+                const sub = subList[selectedSubItem.itemIndex];
+                return sub?.data || sub || {};
+              }
+              if (selectedChildIndex !== null) {
+                return selectedEl.data?.children?.[selectedChildIndex]?.data || {};
+              }
+              return elData;
+            })();
 
             const updateMarginData = (changes: any) => {
+              if (selectedSubItem && selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
+                const cIdx = selectedSubItem.childIndex;
+                const currentChildren = [...(selectedEl.data?.children || [])];
+                const targetChild = currentChildren[cIdx];
+                const currentSubList = [...(targetChild.data?.children || targetChild.data?.items || [])];
+                currentSubList[selectedSubItem.itemIndex] = {
+                  ...currentSubList[selectedSubItem.itemIndex],
+                  data: { ...(currentSubList[selectedSubItem.itemIndex]?.data || {}), ...changes },
+                  ...changes,
+                };
+                currentChildren[cIdx] = {
+                  ...targetChild,
+                  data: { ...(targetChild.data || {}), children: currentSubList, items: currentSubList },
+                };
+                handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                return;
+              }
               if (selectedChildIndex !== null) {
                 const currentChildren = [...(selectedEl.data?.children || [])];
                 const targetChild = currentChildren[selectedChildIndex];
@@ -1352,10 +1378,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               }
             };
 
-            const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : (targetData.paddingY !== undefined ? targetData.paddingY : 48);
-            const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : (targetData.paddingY !== undefined ? targetData.paddingY : 48);
-            const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : (targetData.paddingX !== undefined ? targetData.paddingX : 24);
-            const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : (targetData.paddingX !== undefined ? targetData.paddingX : 24);
+            const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 48;
+            const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : (targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal);
+            const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : (targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal);
+            const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
+            const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
             const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : 0;
             const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : 0;
 
@@ -1366,7 +1393,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             return (
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
                 <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                  <span>📐 Marges & Espacements (px) {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
+                  <span>📐 Marges & Espacements (px) {selectedSubItem ? '(Image)' : selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
                 </div>
 
                 {/* MARGE INTERNE HAUT / BAS (PADDING Y) - CÔTÉ À CÔTÉ AVEC ICÔNE LINK AU CENTRE */}
@@ -3605,6 +3632,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                 const isSubSel = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === sIdx;
 
                                                 if (subChild.type === 'Image') {
+                                                  const subData = subChild.data || subChild;
+                                                  const imgPadTop = subData.paddingTop !== undefined ? `${subData.paddingTop}px` : (subData.paddingY !== undefined ? `${subData.paddingY}px` : '0px');
+                                                  const imgPadBottom = subData.paddingBottom !== undefined ? `${subData.paddingBottom}px` : (subData.paddingY !== undefined ? `${subData.paddingY}px` : '0px');
+                                                  const imgPadLeft = subData.paddingLeft !== undefined ? `${subData.paddingLeft}px` : (subData.paddingX !== undefined ? `${subData.paddingX}px` : '0px');
+                                                  const imgPadRight = subData.paddingRight !== undefined ? `${subData.paddingRight}px` : (subData.paddingX !== undefined ? `${subData.paddingX}px` : '0px');
+                                                  const imgMarginTop = subData.marginTop !== undefined ? `${subData.marginTop}px` : '0px';
+                                                  const imgMarginBottom = subData.marginBottom !== undefined ? `${subData.marginBottom}px` : '0px';
+
                                                   return (
                                                     <div
                                                       key={subChild.id || sIdx}
@@ -3619,6 +3654,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           childIndex: cIdx,
                                                           parentBlockId: el.id,
                                                         });
+                                                      }}
+                                                      style={{
+                                                        paddingTop: imgPadTop,
+                                                        paddingBottom: imgPadBottom,
+                                                        paddingLeft: imgPadLeft,
+                                                        paddingRight: imgPadRight,
+                                                        marginTop: imgMarginTop,
+                                                        marginBottom: imgMarginBottom,
                                                       }}
                                                       className={`relative group/subimg w-full cursor-pointer transition-all ${
                                                         isSubSel ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900' : 'hover:ring-1 hover:ring-amber-400/60'
