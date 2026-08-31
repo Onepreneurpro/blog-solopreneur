@@ -43,6 +43,8 @@ import {
   X,
   Maximize2,
   Settings,
+  Globe,
+  Loader2,
   Link2,
   Unlink,
 } from 'lucide-react';
@@ -92,6 +94,51 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   // PAGE DISPLAY WIDTH MODE STATE (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%)
   const [pageWidthMode, setPageWidthMode] = useState<'standard' | 'wide' | 'full'>('standard');
+
+  // PAGE CLONER STATE (IMPORT FROM URL)
+  const [showCloneModal, setShowCloneModal] = useState<boolean>(false);
+  const [cloneUrlInput, setCloneUrlInput] = useState<string>('');
+  const [isCloning, setIsCloning] = useState<boolean>(false);
+  const [cloneError, setCloneError] = useState<string | null>(null);
+  const [cloneMode, setCloneMode] = useState<'replace' | 'append'>('replace');
+
+  const handleClonePage = async () => {
+    if (!cloneUrlInput.trim()) {
+      setCloneError('Veuillez saisir une URL valide (ex: https://...)');
+      return;
+    }
+    setIsCloning(true);
+    setCloneError(null);
+
+    try {
+      const res = await fetch('/api/admin/clone-page', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: cloneUrlInput.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.elements) {
+        throw new Error(data.error || 'Échec lors du clonage de la page');
+      }
+
+      if (cloneMode === 'replace') {
+        setElements(data.elements);
+      } else {
+        setElements((prev) => [...prev, ...data.elements]);
+      }
+
+      setShowCloneModal(false);
+      setCloneUrlInput('');
+      alert(`🎉 Page clonée avec succès ! ${data.totalSections} section(s) importée(s).`);
+    } catch (err: any) {
+      console.error('Clone Error:', err);
+      setCloneError(err.message || 'Erreur réseau lors du clonage');
+    } finally {
+      setIsCloning(false);
+    }
+  };
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -1814,6 +1861,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               title="Activer/Désactiver le grillage à carreaux pour l alignement"
             >
               <span>🏁 Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
+            </button>
+            <div className="h-4 w-px bg-slate-800 my-auto" />
+            <button
+              type="button"
+              onClick={() => setShowCloneModal(true)}
+              className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md transition-all border border-purple-400/30"
+              title="Cloner une page web ou un funnel à partir de son URL (ClickFunnels, Systeme.io, etc.)"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>Cloner Page (URL)</span>
             </button>
           </div>
 
@@ -4440,6 +4497,113 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
         </div>
       </div>
+      {/* MODAL CLONNEUR DE PAGE VIA URL */}
+      {showCloneModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative text-left">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold border border-purple-500/30">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Cloner une Page Web / Funnel</h3>
+                  <p className="text-[11px] text-slate-400">Importez Systeme.io, ClickFunnels, WordPress ou n importe quelle URL</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCloneModal(false)}
+                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 block">
+                  URL de la Page Cible
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={cloneUrlInput}
+                    onChange={(e) => setCloneUrlInput(e.target.value)}
+                    placeholder="https://votre-page-cible.com/tunnel"
+                    className="w-full pl-3.5 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:border-purple-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-bold text-slate-300 block">Mode d importation</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setCloneMode('replace')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      cloneMode === 'replace'
+                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🔄 Remplacer le Canvas</span>
+                    <span className="text-[9px] font-normal opacity-80">Remplace le contenu actuel</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCloneMode('append')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      cloneMode === 'append'
+                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>➕ Ajouter à la suite</span>
+                    <span className="text-[9px] font-normal opacity-80">Conserve les sections actuelles</span>
+                  </button>
+                </div>
+              </div>
+
+              {cloneError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 font-medium flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{cloneError}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowCloneModal(false)}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                disabled={isCloning}
+                onClick={handleClonePage}
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs rounded-xl flex items-center gap-2 shadow-lg disabled:opacity-50 transition-all"
+              >
+                {isCloning ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Analyse & Clonage...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>Lancer le Clonage</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   </div>
 );
