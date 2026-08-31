@@ -257,7 +257,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
                     marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                   }}
-                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
+                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-none transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
                 >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
