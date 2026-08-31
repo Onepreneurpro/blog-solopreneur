@@ -394,12 +394,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
     if (type === 'ContentBox') {
       return {
-        title: 'Conteneur d éléments...',
-        children: [
-          { id: 'c1', type: 'Heading', category: 'Texte', content: 'Votre Titre dans le Conteneur' },
-          { id: 'c2', type: 'Image', category: 'Média', content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' },
-          { id: 'c3', type: 'Text', category: 'Texte', content: 'Insérez vos paragraphes, images et boutons dans cette boîte flexible par simple glisser-déposer.' },
-        ],
+        title: '',
+        children: [],
       };
     }
     if (type === 'Section' || type === 'BlockSectionFull') {
@@ -1101,6 +1097,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     </div>
                     <Plus className="w-4 h-4 text-purple-300 shrink-0" />
+                  </button>
+
+                  {/* BLOC DIV CONTENEUR BUTTON */}
+                  <button
+                    draggable
+                    onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Conteneur DIV')}
+                    onClick={() => handleAddElement('ContentBox', 'Disposition', 'Conteneur DIV')}
+                    className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-blue-500/40 hover:border-blue-400 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-md mb-2"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Box className="w-5 h-5 text-[#00A0FF] group-hover:text-white shrink-0" />
+                      <div>
+                        <div className="text-xs font-black text-white">📦 Bloc DIV / Conteneur (Mise en Page)</div>
+                        <div className="text-[10px] text-slate-400 font-medium leading-tight">Balise &lt;div&gt; souple pour regrouper et centrer vos éléments dans la section</div>
+                      </div>
+                    </div>
+                    <Plus className="w-4 h-4 text-[#00A0FF] shrink-0" />
                   </button>
 
                   <div className="grid grid-cols-3 gap-2">
