@@ -2006,7 +2006,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                           onDrop={(e) => handleBlockDrop(e, el.id)}
                           style={{ backgroundColor: mainBg, color: textColor }}
-                          className="p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
+                          className="p-6 sm:p-8 rounded-none shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
                         >
                           <div className="flex items-center justify-between border-b border-slate-100/60 pb-3">
                             <input
@@ -2481,7 +2481,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content).items;
 
                                       return (
-                                        <div className={`grid ${colsClass} gap-4 p-4 bg-slate-950/60 rounded-3xl border border-white/10`}>
+                                        <div className={`grid ${colsClass} gap-4 p-4 bg-slate-950/60 rounded-none border border-white/10`}>
                                           {itemsList.map((it: any, idx: number) => {
                                             const isSelected = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === idx;
 
@@ -2503,7 +2503,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                   backgroundColor: it.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
                                                   color: it.textColor || child.data?.textColor || '#ffffff',
                                                 }}
-                                                className={`p-4 rounded-2xl border-2 transition-all space-y-3 flex flex-col items-center relative group/card cursor-pointer ${
+                                                className={`p-4 rounded-none border-2 transition-all space-y-3 flex flex-col items-center relative group/card cursor-pointer ${
                                                   isSelected
                                                     ? 'border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
                                                     : 'border-white/10 hover:border-white/30'

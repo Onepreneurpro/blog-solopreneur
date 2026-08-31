@@ -157,7 +157,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                 <div
                   key={el.id}
                   style={{ backgroundColor: mainBg, color: textColor }}
-                  className="p-6 sm:p-8 rounded-3xl shadow-xl space-y-6 border border-slate-100 my-6"
+                  className="p-6 sm:p-8 rounded-none shadow-xl space-y-6 border border-slate-100 my-6"
                 >
                   {el.data?.title && (
                     <h3 className="text-2xl font-heading font-black border-b border-slate-100/60 pb-3" style={{ color: textColor }}>
@@ -318,7 +318,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                         backgroundColor: it.bgColor || child.data?.cardBgColor || '#ffffff',
                                         color: it.textColor || child.data?.textColor || '#1e293b',
                                       }}
-                                      className="p-4 sm:p-5 rounded-3xl shadow-lg space-y-3 flex flex-col items-center text-center transition-all border border-slate-100"
+                                      className="p-4 sm:p-5 rounded-none shadow-lg space-y-3 flex flex-col items-center text-center transition-all border border-slate-100"
                                     >
                                       {it.img && (
                                         <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm flex items-center justify-center`}>
@@ -343,7 +343,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           return (
                             <div key={child.id || cIdx} className="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
                               {items.map((it: any, idx: number) => (
-                                <div key={idx} className="flex items-start gap-4 p-5 bg-white text-slate-800 rounded-2xl shadow-md border border-slate-100">
+                                <div key={idx} className="flex items-start gap-4 p-5 bg-white text-slate-800 rounded-none shadow-md border border-slate-100">
                                   <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
                                   <div>
                                     <h4 className="font-heading font-extrabold text-sm text-slate-900">{it.title}</h4>
@@ -357,7 +357,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
                         if (child.type === 'ContentBox') {
                           return (
-                            <div key={child.id || cIdx} className="p-6 bg-white text-slate-800 rounded-3xl shadow-xl space-y-4 my-4">
+                            <div key={child.id || cIdx} className="p-6 bg-white text-slate-800 rounded-none shadow-xl space-y-4 my-4">
                               <h3 className="text-lg font-heading font-black">{child.data?.title || 'Conteneur d éléments'}</h3>
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {(child.data?.children || []).map((sub: any, sIdx: number) => (
