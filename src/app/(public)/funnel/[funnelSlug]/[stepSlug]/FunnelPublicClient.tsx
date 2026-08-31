@@ -394,10 +394,32 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
                                   )}
                                   {(child.data?.children && child.data.children.length > 0) && (
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 w-full">
                                       {(child.data.children || []).map((sub: any, sIdx: number) => (
-                                        <div key={sub.id || sIdx} className="text-sm font-medium">
-                                          {sub.content || sub.type}
+                                        <div key={sub.id || sIdx} className="w-full">
+                                          {sub.type === 'Image' ? (
+                                            <div className="w-full rounded-xl overflow-hidden shadow-md my-2">
+                                              <img src={sub.data?.img || sub.content} alt="Child" className="w-full h-full object-cover" />
+                                            </div>
+                                          ) : sub.type === 'Heading' ? (
+                                            <h3 className="text-xl font-heading font-black my-2">{sub.content}</h3>
+                                          ) : sub.type === 'ButtonCTA' ? (
+                                            <div className="py-2 text-center">
+                                              <button type="button" className="px-8 py-3 bg-[#00A0FF] text-white font-bold text-sm rounded-xl shadow-lg">
+                                                {sub.content || 'Action'}
+                                              </button>
+                                            </div>
+                                          ) : sub.type === 'FormInput' ? (
+                                            <div className="space-y-1 my-2">
+                                              <input
+                                                type="text"
+                                                placeholder={sub.data?.placeholder || sub.content || 'Votre e-mail...'}
+                                                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm"
+                                              />
+                                            </div>
+                                          ) : (
+                                            <p className="text-sm leading-relaxed my-2">{sub.content}</p>
+                                          )}
                                         </div>
                                       ))}
                                     </div>

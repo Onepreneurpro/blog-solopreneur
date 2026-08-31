@@ -273,19 +273,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     try {
       const data = JSON.parse(dataStr);
-      const targetEl = elements.find((item) => item.id === blockId);
-      if (!targetEl) return;
+      const newChild: CanvasElement = {
+        id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
+        category: data.category || 'Texte',
+        content: data.defaultContent || data.content || (data.type === 'Image' ? 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' : 'Nouveau texte inséré...'),
+        data: getDefaultBlockData(data.type, data.defaultContent),
+      };
 
-      // Special handling for ContentBox and Section containers (stores children: CanvasElement[])
-      if (targetEl.type === 'ContentBox' || targetEl.type === 'Section' || targetEl.type === 'BlockSectionFull') {
-        const newChild: CanvasElement = {
-          id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-          type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
-          category: data.category || 'Texte',
-          content: data.defaultContent || data.content || (data.type === 'Image' ? 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' : 'Nouveau texte inséré...'),
-          data: getDefaultBlockData(data.type, data.defaultContent),
-        };
-
+      // 1. Root-level container drop (Section, ContentBox, etc.)
+      const isRootEl = elements.some((item) => item.id === blockId);
+      if (isRootEl) {
         setElements((prev) =>
           prev.map((el) => {
             if (el.id !== blockId) return el;
@@ -299,37 +297,45 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             };
           })
         );
-
         if (!data.isNew && data.draggedElementId) {
           setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
         }
-
         setSelectedElementId(blockId);
         return;
       }
 
-      // Default card-based block drop
-      const imageUrl = data.defaultContent || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
-
+      // 2. Child DIV container drop inside a Section element
       setElements((prev) =>
         prev.map((el) => {
-          if (el.id !== blockId) return el;
-          if (el.data?.items && el.data.items.length > 0) {
-            const currentItems = el.data.items;
-            const updatedItems = currentItems.map((it: any, i: number) =>
-              i === 0 ? { ...it, img: imageUrl } : it
-            );
-            return { ...el, data: { ...el.data, items: updatedItems, img: imageUrl } };
-          }
-          return { ...el, data: { ...el.data, img: imageUrl } };
+          if (!el.data?.children) return el;
+          const hasChild = el.data.children.some((ch: any) => ch.id === blockId);
+          if (!hasChild) return el;
+
+          const updatedChildren = el.data.children.map((ch: any) => {
+            if (ch.id !== blockId) return ch;
+            const currentSubChildren = ch.data?.children || [];
+            return {
+              ...ch,
+              data: {
+                ...(ch.data || {}),
+                children: [...currentSubChildren, newChild],
+              },
+            };
+          });
+
+          return {
+            ...el,
+            data: {
+              ...el.data,
+              children: updatedChildren,
+            },
+          };
         })
       );
 
       if (!data.isNew && data.draggedElementId) {
         setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
       }
-
-      setSelectedElementId(blockId);
     } catch (err) {
       console.error(err);
     }
@@ -3578,12 +3584,96 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               <div className="text-[10px] text-sky-400/70 font-normal">Déposez vos cartes ou éléments dans ce bloc</div>
                                             </div>
                                           ) : (
-                                            <div className="w-full space-y-4">
-                                              {(child.data.children || []).map((subChild: any, sIdx: number) => (
-                                                <div key={subChild.id || sIdx} className="text-sm font-medium">
-                                                  {subChild.content || subChild.type}
-                                                </div>
-                                              ))}
+                                            <div className="w-full space-y-3">
+                                              {(child.data.children || []).map((subChild: any, sIdx: number) => {
+                                                const updateSubChildData = (changes: any) => {
+                                                  const currentChildren = [...(el.data?.children || [])];
+                                                  const targetChild = currentChildren[cIdx];
+                                                  const currentSubList = [...(targetChild.data?.children || [])];
+                                                  currentSubList[sIdx] = {
+                                                    ...currentSubList[sIdx],
+                                                    data: { ...(currentSubList[sIdx].data || {}), ...changes },
+                                                    content: changes.content !== undefined ? changes.content : currentSubList[sIdx].content,
+                                                  };
+                                                  currentChildren[cIdx] = {
+                                                    ...targetChild,
+                                                    data: { ...(targetChild.data || {}), children: currentSubList },
+                                                  };
+                                                  handleUpdateElementData(el.id, { children: currentChildren });
+                                                };
+
+                                                const removeSubChild = () => {
+                                                  const currentChildren = [...(el.data?.children || [])];
+                                                  const targetChild = currentChildren[cIdx];
+                                                  const currentSubList = (targetChild.data?.children || []).filter((_: any, i: number) => i !== sIdx);
+                                                  currentChildren[cIdx] = {
+                                                    ...targetChild,
+                                                    data: { ...(targetChild.data || {}), children: currentSubList },
+                                                  };
+                                                  handleUpdateElementData(el.id, { children: currentChildren });
+                                                };
+
+                                                return (
+                                                  <div key={subChild.id || sIdx} className="relative group/subchild p-3 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2 text-left">
+                                                    <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 text-[10px] text-slate-400 font-bold">
+                                                      <span className="uppercase tracking-wider text-[#00A0FF]">{subChild.type}</span>
+                                                      <button
+                                                        type="button"
+                                                        onClick={removeSubChild}
+                                                        className="p-0.5 text-slate-500 hover:text-red-400 rounded transition-colors"
+                                                        title="Supprimer l élément"
+                                                      >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                      </button>
+                                                    </div>
+
+                                                    {subChild.type === 'Image' ? (
+                                                      <div className="space-y-2">
+                                                        <div className="aspect-video w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
+                                                          <img src={subChild.data?.img || subChild.content} alt="Image" className="w-full h-full object-cover" />
+                                                        </div>
+                                                        <input
+                                                          type="text"
+                                                          value={subChild.data?.img || subChild.content}
+                                                          onChange={(e) => updateSubChildData({ img: e.target.value, content: e.target.value })}
+                                                          className="w-full text-xs bg-slate-950 p-2 rounded border border-slate-700 text-slate-200 outline-none"
+                                                          placeholder="URL de l image..."
+                                                        />
+                                                      </div>
+                                                    ) : subChild.type === 'Heading' ? (
+                                                      <input
+                                                        type="text"
+                                                        value={subChild.content}
+                                                        onChange={(e) => updateSubChildData({ content: e.target.value })}
+                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-slate-700 focus:border-[#00A0FF] outline-none text-white"
+                                                      />
+                                                    ) : subChild.type === 'ButtonCTA' ? (
+                                                      <div className="text-center py-1">
+                                                        <button type="button" className="px-6 py-2 bg-[#00A0FF] text-white font-bold text-xs rounded-lg shadow-md">
+                                                          {subChild.content || 'Bouton CTA'}
+                                                        </button>
+                                                      </div>
+                                                    ) : subChild.type === 'FormInput' ? (
+                                                      <div className="space-y-1">
+                                                        <label className="text-[10px] font-bold text-slate-300 block">{subChild.data?.title || 'Champ de formulaire'}</label>
+                                                        <input
+                                                          type="text"
+                                                          disabled
+                                                          placeholder={subChild.data?.placeholder || subChild.content || 'votre.email@exemple.com'}
+                                                          className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-400"
+                                                        />
+                                                      </div>
+                                                    ) : (
+                                                      <textarea
+                                                        rows={2}
+                                                        value={subChild.content}
+                                                        onChange={(e) => updateSubChildData({ content: e.target.value })}
+                                                        className="w-full text-xs leading-relaxed bg-transparent border border-slate-700 focus:border-[#00A0FF] outline-none text-slate-200 resize-y"
+                                                      />
+                                                    )}
+                                                  </div>
+                                                );
+                                              })}
                                             </div>
                                           )}
                                         </div>
