@@ -268,214 +268,163 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       </h2>
                     )}
                     {(() => {
-                      const sectionLayoutMode = el.data?.layoutMode || (
-                        el.data?.children?.length === 2 ? 'grid-2' :
-                        el.data?.children?.length === 3 ? 'grid-3' :
-                        el.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
-                      );
-
-                      const childrenGridClass =
-                        sectionLayoutMode === 'grid-2'
-                          ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'
-                          : sectionLayoutMode === 'grid-3'
-                          ? 'grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'
-                          : sectionLayoutMode === 'grid-4'
-                          ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-stretch'
-                          : sectionLayoutMode === 'grid-1'
-                          ? 'grid grid-cols-1 gap-6 items-stretch'
-                          : sectionLayoutMode === 'flex-row'
-                          ? 'flex flex-wrap gap-6 items-stretch'
-                          : 'space-y-6 flex flex-col';
+                      const childrenList = el.data?.children || [];
+                      const numCols = childrenList.length;
+                      const colWidths =
+                        el.data?.colWidths && el.data.colWidths.length === numCols
+                          ? el.data.colWidths
+                          : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                       return (
-                        <div className={childrenGridClass}>
-                          {(el.data?.children || []).map((child: any, cIdx: number) => {
-                        if (child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg') {
-                          const is4 = child.type.includes('4') || child.type === 'Col4';
-                          const defaultData = is4
-                            ? {
-                                items: [
-                                  { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                                  { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                                  { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                                  { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
-                                ],
-                              }
-                            : {
-                                items: [
-                                  { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies.' },
-                                  { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer à l action.' },
-                                  { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif.' },
-                                ],
-                              };
+                        <div className="flex flex-wrap md:flex-nowrap gap-6 items-stretch w-full">
+                          {childrenList.map((child: any, cIdx: number) => {
+                            const colStyle = {
+                              flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (24 * (numCols - 1) / numCols) : 0}px)`,
+                              width: `${colWidths[cIdx]}%`,
+                              minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                            };
 
-                          const items = child.data?.items && child.data.items.length > 0 ? child.data.items : defaultData.items;
-                          const colsClass = is4 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+                            let renderedChild = null;
 
-                          return (
-                            <div key={child.id || cIdx} className="space-y-4 my-4">
-                              {child.data?.title && (
-                                <h3 className="text-xl font-heading font-black text-center">{child.data.title}</h3>
-                              )}
-                              <div className={`grid ${colsClass} gap-6`}>
-                                {items.map((it: any, idx: number) => {
-                                  const imgHeight = it.imgHeight || child.data?.imgHeight || 'h-64';
-                                  const imgShape = it.imgShape || child.data?.imgShape || 'arcade';
-                                  const shapeClass =
-                                    imgShape === 'arcade'
-                                      ? 'rounded-t-[80px]'
-                                      : imgShape === 'circle'
-                                      ? 'rounded-full'
-                                      : imgShape === 'square'
-                                      ? 'rounded-none'
-                                      : 'rounded-3xl';
-                                  const imgFit = it.imgObjectFit || child.data?.imgObjectFit || 'object-cover';
-                                  const imgPos = it.imgObjectPosition || child.data?.imgObjectPosition || 'center';
+                            if (child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg') {
+                              const is4 = child.type.includes('4') || child.type === 'Col4';
+                              const defaultData = is4
+                                ? {
+                                    items: [
+                                      { id: '1', title: 'BASES', img: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                      { id: '2', title: 'CUISINER', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                      { id: '3', title: 'EXTÉRIEUR', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                      { id: '4', title: 'DRESSAGE', img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit integer sed.' },
+                                    ],
+                                  }
+                                : {
+                                    items: [
+                                      { id: '1', title: 'Le savoir des experts', img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80', desc: 'Accédez à des connaissances approfondies.' },
+                                      { id: '2', title: 'Des leçons pratiques', img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80', desc: 'Des exercices concrets pour passer à l action.' },
+                                      { id: '3', title: 'Nouvelles relations', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80', desc: 'Rejoignez un réseau actif.' },
+                                    ],
+                                  };
 
-                                  return (
-                                    <div
-                                      key={idx}
-                                      style={{
-                                        backgroundColor: it.bgColor || child.data?.cardBgColor || '#ffffff',
-                                        color: it.textColor || child.data?.textColor || '#1e293b',
-                                      }}
-                                      className="p-4 sm:p-5 rounded-none shadow-lg space-y-3 flex flex-col items-center text-center transition-all border border-slate-100"
-                                    >
-                                      {it.img && (
-                                        <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm flex items-center justify-center`}>
-                                          <img src={it.img} alt={it.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
+                              const items = child.data?.items && child.data.items.length > 0 ? child.data.items : defaultData.items;
+                              const colsClass = is4 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3';
+
+                              renderedChild = (
+                                <div className="space-y-4 my-4 w-full">
+                                  {child.data?.title && (
+                                    <h3 className="text-xl font-heading font-black text-center">{child.data.title}</h3>
+                                  )}
+                                  <div className={`grid ${colsClass} gap-6`}>
+                                    {items.map((it: any, idx: number) => {
+                                      const imgHeight = it.imgHeight || child.data?.imgHeight || 'h-64';
+                                      const imgShape = it.imgShape || child.data?.imgShape || 'arcade';
+                                      const shapeClass =
+                                        imgShape === 'arcade'
+                                          ? 'rounded-t-[80px]'
+                                          : imgShape === 'circle'
+                                          ? 'rounded-full'
+                                          : imgShape === 'square'
+                                          ? 'rounded-none'
+                                          : 'rounded-3xl';
+                                      const imgFit = it.imgObjectFit || child.data?.imgObjectFit || 'object-cover';
+                                      const imgPos = it.imgObjectPosition || child.data?.imgObjectPosition || 'center';
+
+                                      return (
+                                        <div
+                                          key={idx}
+                                          style={{
+                                            backgroundColor: it.bgColor || child.data?.cardBgColor || '#ffffff',
+                                            color: it.textColor || child.data?.textColor || '#1e293b',
+                                          }}
+                                          className="p-4 sm:p-5 rounded-none shadow-lg space-y-3 flex flex-col items-center text-center transition-all border border-slate-100"
+                                        >
+                                          {it.img && (
+                                            <div className={`w-full ${imgHeight} ${shapeClass} overflow-hidden shadow-sm flex items-center justify-center`}>
+                                              <img src={it.img} alt={it.title} className={`w-full h-full ${imgFit}`} style={{ objectPosition: imgPos }} />
+                                            </div>
+                                          )}
+                                          <h4 className="font-heading font-extrabold text-sm uppercase">{it.title}</h4>
+                                          <p className="text-xs font-medium leading-relaxed opacity-85">{it.desc}</p>
                                         </div>
-                                      )}
-                                      <h4 className="font-heading font-extrabold text-sm uppercase">{it.title}</h4>
-                                      <p className="text-xs font-medium leading-relaxed opacity-85">{it.desc}</p>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') {
-                          const items = child.data?.items || [
-                            { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas.' },
-                            { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort.' },
-                          ];
-                          return (
-                            <div key={child.id || cIdx} className="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
-                              {items.map((it: any, idx: number) => (
-                                <div key={idx} className="flex items-start gap-4 p-5 bg-white text-slate-800 rounded-none shadow-md border border-slate-100">
-                                  <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
-                                  <div>
-                                    <h4 className="font-heading font-extrabold text-sm text-slate-900">{it.title}</h4>
-                                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{it.desc}</p>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          );
-                        }
+                              );
+                            } else if (child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') {
+                              const items = child.data?.items || [
+                                { id: '1', title: 'Succès du projet', desc: 'Accompagnement pas à pas.' },
+                                { id: '2', title: 'Stratégie de Marque', desc: 'Positionnement fort.' },
+                              ];
+                              renderedChild = (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-4 w-full">
+                                  {items.map((it: any, idx: number) => (
+                                    <div key={idx} className="flex items-start gap-4 p-5 bg-white text-slate-800 rounded-none shadow-md border border-slate-100">
+                                      <div className="w-10 h-10 rounded-xl bg-[#00A0FF]/10 text-[#00A0FF] flex items-center justify-center shrink-0 font-bold">✓</div>
+                                      <div>
+                                        <h4 className="font-heading font-extrabold text-sm text-slate-900">{it.title}</h4>
+                                        <p className="text-xs text-slate-500 font-medium leading-relaxed">{it.desc}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            } else if (child.type === 'ContentBox') {
+                              renderedChild = (
+                                <div
+                                  style={{
+                                    backgroundColor: child.data?.bgColor || el.data?.cardBgColor || 'transparent',
+                                    borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
+                                    color: child.data?.textColor || 'inherit',
+                                  }}
+                                  className="p-6 w-full rounded-none transition-all space-y-4"
+                                >
+                                  {child.data?.title && (
+                                    <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
+                                  )}
+                                  {(child.data?.children && child.data.children.length > 0) && (
+                                    <div className="space-y-4">
+                                      {(child.data.children || []).map((sub: any, sIdx: number) => (
+                                        <div key={sub.id || sIdx} className="text-sm font-medium">
+                                          {sub.content || sub.type}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            } else {
+                              renderedChild = (
+                                <div className="w-full">
+                                  {child.type === 'Image' ? (
+                                    <div className={`w-full max-w-2xl mx-auto ${child.data?.imgHeight || 'h-64'} rounded-none overflow-hidden shadow-lg my-4`}>
+                                      <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
+                                    </div>
+                                  ) : child.type === 'Heading' ? (
+                                    <h2 className="text-2xl sm:text-4xl font-heading font-black text-center my-4">{child.content}</h2>
+                                  ) : child.type === 'Text' ? (
+                                    <p className="text-sm sm:text-base font-medium leading-relaxed text-center opacity-90 max-w-3xl mx-auto my-4">{child.content}</p>
+                                  ) : child.type === 'ButtonCTA' ? (
+                                    <div className="text-center my-6">
+                                      <button type="button" className="px-8 py-4 bg-[#00A0FF] text-white font-black text-base rounded-2xl shadow-xl">
+                                        {child.content || 'BOUTON D ACTION'}
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm font-medium text-center">{child.content}</div>
+                                  )}
+                                </div>
+                              );
+                            }
 
-                        if (child.type === 'ContentBox') {
-                          return (
-                            <div key={child.id || cIdx} className="p-6 bg-white text-slate-800 rounded-none shadow-xl space-y-4 my-4">
-                              <h3 className="text-lg font-heading font-black">{child.data?.title || 'Conteneur d éléments'}</h3>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {(child.data?.children || []).map((sub: any, sIdx: number) => (
-                                  <div key={sIdx} className="p-4 bg-slate-50 rounded-2xl text-center space-y-2">
-                                    {sub.type === 'Image' && <img src={sub.data?.img || sub.content} alt="Sub" className="w-full h-36 object-cover rounded-xl" />}
-                                    <div className="font-bold text-xs text-slate-800">{sub.content}</div>
-                                  </div>
-                                ))}
+                            return (
+                              <div key={child.id || cIdx} style={colStyle} className="h-full flex flex-col">
+                                {renderedChild}
                               </div>
-                            </div>
-                          );
-                        }
-
-                        if (child.type === 'Image') {
-                          const imgSrc = child.data?.img || child.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80';
-                          const imgHeight = child.data?.imgHeight || child.imgHeight || 'h-64';
-                          const imgShape = child.data?.imgShape || child.imgShape || 'arcade';
-                          const shapeClass =
-                            imgShape === 'arcade'
-                              ? 'rounded-t-[80px]'
-                              : imgShape === 'circle'
-                              ? 'rounded-full'
-                              : imgShape === 'square'
-                              ? 'rounded-none'
-                              : 'rounded-3xl';
-                          const imgFit = child.data?.imgObjectFit || child.imgObjectFit || 'object-cover';
-
-                          return (
-                            <div key={child.id || cIdx} className={`w-full max-w-2xl mx-auto ${imgHeight} ${shapeClass} overflow-hidden shadow-lg my-4`}>
-                              <img
-                                src={imgSrc}
-                                alt="Content"
-                                className={`w-full h-full ${imgFit}`}
-                              />
-                            </div>
-                          );
-                        }
-
-                        if (child.type === 'Heading') {
-                          return (
-                            <h2 key={child.id || cIdx} className="text-2xl sm:text-4xl font-heading font-black text-center my-4">
-                              {child.content}
-                            </h2>
-                          );
-                        }
-
-                        if (child.type === 'Text') {
-                          return (
-                            <p key={child.id || cIdx} className="text-sm sm:text-base font-medium leading-relaxed text-center opacity-90 max-w-3xl mx-auto my-4">
-                              {child.content}
-                            </p>
-                          );
-                        }
-
-                        if (child.type === 'ButtonCTA') {
-                          return (
-                            <div key={child.id || cIdx} className="text-center my-6">
-                              <button type="button" className="px-8 py-4 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02]">
-                                {child.content || 'BOUTON D ACTION'}
-                              </button>
-                            </div>
-                          );
-                        }
-
-                        if (child.type === 'OptinForm') {
-                          return (
-                            <div key={child.id || cIdx} className="max-w-md mx-auto p-6 sm:p-8 bg-slate-900/90 text-white rounded-3xl border border-slate-800 shadow-2xl space-y-4 my-6">
-                              <h3 className="text-lg font-heading font-bold text-center">{child.content || 'Formulaire de Capture Email'}</h3>
-                              <form onSubmit={handleSubmit} className="space-y-3">
-                                <input
-                                  type="text"
-                                  placeholder="Votre Prénom..."
-                                  value={name}
-                                  onChange={(e) => setName(e.target.value)}
-                                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none"
-                                />
-                                <input
-                                  type="email"
-                                  required
-                                  placeholder="Votre Adresse Email *"
-                                  value={email}
-                                  onChange={(e) => setEmail(e.target.value)}
-                                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none"
-                                />
-                                <button type="submit" disabled={submitting} className="w-full py-3.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white font-black text-xs rounded-xl shadow-lg uppercase">
-                                  {submitting ? 'Envoi...' : 'Recevoir mon accès gratuit'}
-                                </button>
-                              </form>
-                            </div>
-                          );
-                        }
-
-                        return <div key={child.id || cIdx} className="text-sm font-medium text-center">{child.content}</div>;
-                      })}
-                    </div>
-                  );
-                })()}
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </section>
               );

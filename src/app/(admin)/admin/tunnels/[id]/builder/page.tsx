@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
@@ -86,6 +86,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   // CANVAS BACKGROUND ALIGNMENT GRID STATE (GRILLAGE À CARREAUX ON/OFF)
   const [showCanvasGrid, setShowCanvasGrid] = useState<boolean>(true);
+  const sectionContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // PAGE DISPLAY WIDTH MODE STATE (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%)
   const [pageWidthMode, setPageWidthMode] = useState<'standard' | 'wide' | 'full'>('standard');
@@ -593,6 +594,103 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           };
         })
       );
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  // 📐 MOUSE DRAG RESIZE FOR COLUMN WIDTHS IN A SECTION (SCREEN 3 FEATURE)
+  const handleStartColWidthResize = (
+    e: React.MouseEvent,
+    sectionId: string,
+    colIndex: number,
+    containerElem: HTMLDivElement | null
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const sectionEl = elements.find((item) => item.id === sectionId);
+    if (!sectionEl || !containerElem) return;
+
+    const children = sectionEl.data?.children || [];
+    const numCols = children.length;
+    if (numCols < 2 || colIndex >= numCols - 1) return;
+
+    const startX = e.clientX;
+    const containerWidth = containerElem.getBoundingClientRect().width;
+    if (containerWidth <= 0) return;
+
+    const currentWidths =
+      sectionEl.data?.colWidths && sectionEl.data.colWidths.length === numCols
+        ? [...sectionEl.data.colWidths]
+        : Array(numCols).fill(100 / numCols);
+
+    const startWidthLeft = currentWidths[colIndex];
+    const startWidthRight = currentWidths[colIndex + 1];
+    const combinedWidth = startWidthLeft + startWidthRight;
+
+    const onMouseMove = (moveEv: MouseEvent) => {
+      const deltaX = moveEv.clientX - startX;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+
+      let newLeft = startWidthLeft + deltaPercent;
+      newLeft = Math.max(10, Math.min(combinedWidth - 10, newLeft));
+      let newRight = combinedWidth - newLeft;
+
+      const newWidths = [...currentWidths];
+      newWidths[colIndex] = Math.round(newLeft * 10) / 10;
+      newWidths[colIndex + 1] = Math.round(newRight * 10) / 10;
+
+      handleUpdateElementData(sectionId, { colWidths: newWidths });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  // 📐 MOUSE DRAG RESIZE FOR CHILD DIV HEIGHT IN A SECTION (SCREEN 2 FEATURE)
+  const handleStartChildHeightResize = (
+    e: React.MouseEvent,
+    sectionId: string,
+    childIndex: number
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const sectionEl = elements.find((item) => item.id === sectionId);
+    if (!sectionEl) return;
+
+    const children = [...(sectionEl.data?.children || [])];
+    const targetChild = children[childIndex];
+    if (!targetChild) return;
+
+    const startY = e.clientY;
+    const startMinHeight = targetChild.data?.minHeight || 160;
+
+    const onMouseMove = (moveEv: MouseEvent) => {
+      const deltaY = moveEv.clientY - startY;
+      const newMinHeight = Math.max(60, Math.round(startMinHeight + deltaY));
+
+      children[childIndex] = {
+        ...targetChild,
+        data: {
+          ...(targetChild.data || {}),
+          minHeight: newMinHeight,
+        },
+      };
+
+      handleUpdateElementData(sectionId, { children });
     };
 
     const onMouseUp = () => {
@@ -2722,42 +2820,38 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 </div>
                               </div>
                             ) : (() => {
-                              const sectionLayoutMode = el.data?.layoutMode || (
-                                el.data?.children?.length === 2 ? 'grid-2' :
-                                el.data?.children?.length === 3 ? 'grid-3' :
-                                el.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
-                              );
-
-                              const childrenGridClass =
-                                sectionLayoutMode === 'grid-2'
-                                  ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'
-                                  : sectionLayoutMode === 'grid-3'
-                                  ? 'grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'
-                                  : sectionLayoutMode === 'grid-4'
-                                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-stretch'
-                                  : sectionLayoutMode === 'grid-1'
-                                  ? 'grid grid-cols-1 gap-6 items-stretch'
-                                  : sectionLayoutMode === 'flex-row'
-                                  ? 'flex flex-wrap gap-6 items-stretch'
-                                  : 'space-y-6 flex flex-col';
+                              const childrenList = el.data?.children || [];
+                              const numCols = childrenList.length;
+                              const colWidths =
+                                el.data?.colWidths && el.data.colWidths.length === numCols
+                                  ? el.data.colWidths
+                                  : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                               return (
-                                <div className={childrenGridClass}>
-                                  {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
-                                    <div
-                                      key={child.id || cIdx}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedElementId(el.id);
-                                        setSelectedChildIndex(cIdx);
-                                        setSelectedSubItem(null);
-                                      }}
-                                      className={`relative group/child p-3 rounded-none border transition-all h-full ${
-                                        selectedChildIndex === cIdx
-                                          ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
-                                          : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
-                                      }`}
-                                    >
+                                <div
+                                  ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
+                                  className="flex flex-wrap md:flex-nowrap gap-4 items-stretch w-full relative"
+                                >
+                                  {childrenList.map((child: CanvasElement, cIdx: number) => (
+                                    <React.Fragment key={child.id || cIdx}>
+                                      <div
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedElementId(el.id);
+                                          setSelectedChildIndex(cIdx);
+                                          setSelectedSubItem(null);
+                                        }}
+                                        style={{
+                                          flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (16 * (numCols - 1) / numCols) : 0}px)`,
+                                          minWidth: '120px',
+                                          minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                                        }}
+                                        className={`relative group/child p-3 rounded-none border transition-all h-full ${
+                                          selectedChildIndex === cIdx
+                                            ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                            : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
+                                        }`}
+                                      >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
                                         className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
@@ -3116,7 +3210,34 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           />
                                         </div>
                                       )}
+
+                                      {/* BOTTOM HEIGHT RESIZER HANDLE (SCREEN 2) */}
+                                      <div
+                                        onMouseDown={(e) => handleStartChildHeightResize(e, el.id, cIdx)}
+                                        className="absolute -bottom-2 left-0 right-0 h-4 cursor-row-resize flex items-center justify-center opacity-0 group-hover/child:opacity-100 transition-opacity z-30 select-none"
+                                        title="Cliquer-glisser pour ajuster la hauteur du bloc DIV"
+                                      >
+                                        <div className="px-2 py-0.5 bg-[#00A0FF] text-white rounded-full shadow-lg border border-white/30 font-mono text-[9px] flex items-center gap-1 cursor-row-resize">
+                                          <span>↕</span>
+                                          <span>Hauteur DIV {child.data?.minHeight ? `(${child.data.minHeight}px)` : ''}</span>
+                                        </div>
+                                      </div>
                                     </div>
+
+                                    {/* VERTICAL COLUMN RESIZER HANDLE BETWEEN ADJACENT DIVS (SCREEN 3) */}
+                                    {cIdx < numCols - 1 && (
+                                      <div
+                                        onMouseDown={(e) => handleStartColWidthResize(e, el.id, cIdx, sectionContainerRefs.current[el.id])}
+                                        className="w-4 -mx-2 cursor-col-resize z-40 flex items-center justify-center group/colresize self-stretch transition-all select-none"
+                                        title="Cliquer-glisser pour ajuster la largeur des colonnes"
+                                      >
+                                        <div className="w-1.5 group-hover/colresize:w-3.5 h-20 bg-[#00A0FF]/70 group-hover/colresize:bg-[#00A0FF] rounded-full shadow-xl border border-white/40 flex flex-col items-center justify-center gap-1 transition-all">
+                                          <span className="text-[10px] text-white font-black select-none">↔</span>
+                                          <span className="text-[8px] text-white font-mono font-bold select-none">{Math.round(colWidths[cIdx])}%</span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </React.Fragment>
                                   ))}
                                 </div>
                               );
