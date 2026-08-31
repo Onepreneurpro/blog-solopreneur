@@ -1199,22 +1199,49 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
           {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
           <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block flex items-center justify-between">
-              <span>🎨 Couleurs & Arrière-plan</span>
+            <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+              <span>🎨 Couleurs & Arrière-plan {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Fond de Section / Bloc</label>
+                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">
+                  {selectedChildIndex !== null ? `Fond du Bloc #${selectedChildIndex + 1}` : 'Fond de Section / Bloc'}
+                </label>
                 <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                   <input
                     type="color"
-                    value={elData.bgColor || '#0F172A'}
-                    onChange={(e) => handleUpdateElementData(selectedEl.id, { bgColor: e.target.value })}
+                    value={
+                      selectedChildIndex !== null
+                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#0F172A')
+                        : (elData.bgColor || '#0F172A')
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (selectedChildIndex !== null) {
+                        const currentChildren = [...(selectedEl.data?.children || [])];
+                        const targetChild = currentChildren[selectedChildIndex];
+                        currentChildren[selectedChildIndex] = {
+                          ...targetChild,
+                          data: {
+                            ...(targetChild.data || {}),
+                            bgColor: val,
+                            cardBgColor: val,
+                          },
+                        };
+                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                      } else {
+                        handleUpdateElementData(selectedEl.id, { bgColor: val });
+                      }
+                    }}
                     className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
                   />
                   <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                    {elData.bgColor || '#0F172A'}
+                    {
+                      selectedChildIndex !== null
+                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#0F172A')
+                        : (elData.bgColor || '#0F172A')
+                    }
                   </span>
                 </div>
               </div>
@@ -1224,28 +1251,82 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                   <input
                     type="color"
-                    value={elData.textColor || '#FFFFFF'}
-                    onChange={(e) => handleUpdateElementData(selectedEl.id, { textColor: e.target.value })}
+                    value={
+                      selectedChildIndex !== null
+                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
+                        : (elData.textColor || '#FFFFFF')
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (selectedChildIndex !== null) {
+                        const currentChildren = [...(selectedEl.data?.children || [])];
+                        const targetChild = currentChildren[selectedChildIndex];
+                        currentChildren[selectedChildIndex] = {
+                          ...targetChild,
+                          data: {
+                            ...(targetChild.data || {}),
+                            textColor: val,
+                          },
+                        };
+                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                      } else {
+                        handleUpdateElementData(selectedEl.id, { textColor: val });
+                      }
+                    }}
                     className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
                   />
                   <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                    {elData.textColor || '#FFFFFF'}
+                    {
+                      selectedChildIndex !== null
+                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
+                        : (elData.textColor || '#FFFFFF')
+                    }
                   </span>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Fond des Cartes / Sub-Items</label>
+              <label className="text-[10px] font-bold text-slate-400 block mb-1.5">
+                {selectedChildIndex !== null ? `Fond des Cartes (Bloc #${selectedChildIndex + 1})` : 'Fond des Cartes / Sub-Items'}
+              </label>
               <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                 <input
                   type="color"
-                  value={elData.cardBgColor || '#2759ce'}
-                  onChange={(e) => handleUpdateElementData(selectedEl.id, { cardBgColor: e.target.value })}
+                  value={
+                    selectedChildIndex !== null
+                      ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#2759ce')
+                      : (elData.cardBgColor || '#2759ce')
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (selectedChildIndex !== null) {
+                      const currentChildren = [...(selectedEl.data?.children || [])];
+                      const targetChild = currentChildren[selectedChildIndex];
+                      const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                      const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
+                      currentChildren[selectedChildIndex] = {
+                        ...targetChild,
+                        data: {
+                          ...(targetChild.data || {}),
+                          cardBgColor: val,
+                          bgColor: val,
+                          items: updatedItems,
+                        },
+                      };
+                      handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                    } else {
+                      handleUpdateElementData(selectedEl.id, { cardBgColor: val });
+                    }
+                  }}
                   className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
                 />
                 <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                  {elData.cardBgColor || '#2759ce'}
+                  {
+                    selectedChildIndex !== null
+                      ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#2759ce')
+                      : (elData.cardBgColor || '#2759ce')
+                  }
                 </span>
               </div>
             </div>
@@ -2845,11 +2926,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (16 * (numCols - 1) / numCols) : 0}px)`,
                                           minWidth: '120px',
                                           minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                                          backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
+                                          color: child.data?.textColor || 'inherit',
                                         }}
                                         className={`relative group/child p-3 rounded-none border transition-all flex flex-col flex-1 h-full ${
                                           selectedChildIndex === cIdx
-                                            ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
-                                            : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
+                                            ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                            : 'border-white/10 hover:border-amber-500/60'
                                         }`}
                                       >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}

@@ -372,7 +372,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               renderedChild = (
                                 <div
                                   style={{
-                                    backgroundColor: child.data?.bgColor || el.data?.cardBgColor || 'transparent',
+                                    backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
                                     borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
                                     color: child.data?.textColor || 'inherit',
                                   }}
