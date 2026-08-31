@@ -2160,7 +2160,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             backgroundPosition: bgPos,
                             color: textColor,
                           }}
-                          className="relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-12 shadow-2xl transition-all my-6 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400"
+                          className="relative w-full p-6 sm:p-10 shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400"
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
