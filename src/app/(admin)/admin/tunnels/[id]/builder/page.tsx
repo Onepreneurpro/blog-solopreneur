@@ -4196,6 +4196,46 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               </button>
                             ))}
                           </div>
+
+                          {/* CONVERT NON-SECTION ELEMENT TO FULL-WIDTH SECTION */}
+                          {selectedEl.type !== 'Section' && selectedEl.type !== 'BlockSectionFull' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setElements((prev) =>
+                                  prev.map((item) => {
+                                    if (item.id !== selectedEl.id) return item;
+                                    return {
+                                      id: item.id,
+                                      type: 'Section',
+                                      category: 'DISPOSITION & SECTIONS FULL-WIDTH',
+                                      content: item.content || 'Section Principale',
+                                      data: {
+                                        bgColor: item.data?.bgColor || '#0F172A',
+                                        bgImage: item.data?.bgImage || '',
+                                        bgOverlay: 0,
+                                        textColor: item.data?.textColor || '#ffffff',
+                                        innerContentWidth: 'standard',
+                                        children: [
+                                          {
+                                            id: `sub-${Date.now()}`,
+                                            type: item.type,
+                                            category: item.category,
+                                            content: item.content,
+                                            data: item.data,
+                                          },
+                                        ],
+                                      },
+                                    };
+                                  })
+                                );
+                              }}
+                              className="w-full py-2.5 px-3 bg-gradient-to-r from-purple-900 to-indigo-900 hover:from-purple-800 hover:to-indigo-800 border border-purple-500/60 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+                            >
+                              <span>🏛️</span>
+                              <span>Placer dans une Section Plein Écran (100%)</span>
+                            </button>
+                          )}
                         </div>
 
                         {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
