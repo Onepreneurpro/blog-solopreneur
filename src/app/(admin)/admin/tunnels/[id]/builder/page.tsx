@@ -74,6 +74,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     childIndex?: number;
   } | null>(null);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // MAGNETIC SNAP GUIDE LINE STATE FOR AUTOMATIC ALIGNMENT
   const [snapGuide, setSnapGuide] = useState<{
@@ -186,6 +187,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   const handleCanvasDrop = (e: React.DragEvent, targetIndex?: number) => {
     e.preventDefault();
+    e.stopPropagation();
+    setDragOverIndex(null);
     const dataStr = e.dataTransfer.getData('application/json');
     if (!dataStr) return;
 
@@ -200,24 +203,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           data: getDefaultBlockData(data.type, data.defaultContent),
         };
         setElements((prev) => {
-          if (targetIndex !== undefined) {
-            const updated = [...prev];
-            updated.splice(targetIndex, 0, newEl);
-            return updated;
-          }
-          return [...prev, newEl];
+          const insertIdx = targetIndex !== undefined ? targetIndex : prev.length;
+          const updated = [...prev];
+          updated.splice(insertIdx, 0, newEl);
+          return updated;
         });
         setSelectedElementId(newEl.id);
       } else if (data.draggedElementId !== undefined) {
         const fromIndex = data.draggedIndex;
-        const toIndex = targetIndex !== undefined ? targetIndex : elements.length - 1;
-        if (fromIndex !== undefined && fromIndex !== toIndex) {
+        let toIndex = targetIndex !== undefined ? targetIndex : elements.length;
+        if (fromIndex !== undefined) {
           setElements((prev) => {
             const updated = [...prev];
             const [moved] = updated.splice(fromIndex, 1);
+            if (fromIndex < toIndex) toIndex -= 1;
             updated.splice(toIndex, 0, moved);
             return updated;
           });
+          setSelectedElementId(data.draggedElementId);
         }
       }
     } catch (err) {
@@ -1450,15 +1453,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
             {/* TOP DROP ZONE FOR INDEX 0 (PLACEMENT EN TÊTE DE PAGE) */}
             <div
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setDragOverIndex(0);
+              }}
+              onDragLeave={() => setDragOverIndex(null)}
               onDrop={(e) => {
                 e.stopPropagation();
                 handleCanvasDrop(e, 0);
               }}
-              className="p-2.5 border-2 border-dashed border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-950/40 hover:border-emerald-400 text-emerald-300 rounded-2xl text-center text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm my-2"
+              className={`transition-all rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black text-xs shadow-md my-2 ${
+                dragOverIndex === 0
+                  ? 'h-14 bg-[#00A0FF]/20 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] ring-4 ring-[#00A0FF]/30 scale-[1.01]'
+                  : 'h-10 bg-emerald-950/30 border-2 border-dashed border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-400'
+              }`}
             >
-              <span>🔝</span>
-              <span>Déposer ici pour placer TOUT EN HAUT DE PAGE (En-tête)</span>
+              <span className="text-base">🔝</span>
+              <span>
+                {dragOverIndex === 0
+                  ? '✨ Relâcher pour placer TOUT EN HAUT DE PAGE (En-tête)'
+                  : 'Déposer ici pour placer TOUT EN HAUT DE PAGE (En-tête)'}
+              </span>
             </div>
 
             {/* CANVAS RENDERED ELEMENTS */}
@@ -1467,6 +1483,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 const isSelected = el.id === selectedElementId;
 
                 return (
+                  <React.Fragment key={el.id}>
                   <div
                     key={el.id}
                     draggable
@@ -3098,7 +3115,36 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                   </div>
-                );
+
+                  {/* INTER-ELEMENT DROP ZONE FOR FLUID REORDERING */}
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragOverIndex(idx + 1);
+                    }}
+                    onDragLeave={() => setDragOverIndex(null)}
+                    onDrop={(e) => {
+                      e.stopPropagation();
+                      handleCanvasDrop(e, idx + 1);
+                    }}
+                    className={`transition-all rounded-xl cursor-pointer flex items-center justify-center gap-2 font-bold text-xs my-2 ${
+                      dragOverIndex === idx + 1
+                        ? 'h-12 bg-[#00A0FF]/20 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/30 scale-[1.01]'
+                        : 'h-3 hover:h-8 bg-transparent hover:bg-slate-800/60 border border-dashed border-transparent hover:border-slate-700 text-slate-400 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    {dragOverIndex === idx + 1 ? (
+                      <>
+                        <span>📍</span>
+                        <span>✨ Relâcher pour insérer ici (Position #{idx + 2})</span>
+                      </>
+                    ) : (
+                      <span className="hidden hover:inline">➕ Déposer ici (Position #{idx + 2})</span>
+                    )}
+                  </div>
+                </React.Fragment>
+              );
               })}
             </div>
 
