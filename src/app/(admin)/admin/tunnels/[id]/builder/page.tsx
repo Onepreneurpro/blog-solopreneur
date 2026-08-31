@@ -3220,7 +3220,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className="flex flex-wrap md:flex-nowrap gap-4 items-stretch w-full relative flex-1 h-full"
+                                  className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full relative flex-1 h-full"
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
@@ -3232,7 +3232,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           setSelectedSubItem(null);
                                         }}
                                         style={{
-                                          flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (16 * (numCols - 1) / numCols) : 0}px)`,
+                                          flex: `0 0 ${colWidths[cIdx]}%`,
                                           minWidth: '120px',
                                           minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                                           backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
@@ -3611,17 +3611,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                                     </div>
 
-                                    {/* VERTICAL COLUMN RESIZER HANDLE BETWEEN ADJACENT DIVS (SCREEN 3) */}
+                                    {/* NATURAL CLICK-AND-DRAG VERTICAL SEAM RESIZER BETWEEN ADJACENT DIVS */}
                                     {cIdx < numCols - 1 && (
                                       <div
                                         onMouseDown={(e) => handleStartColWidthResize(e, el.id, cIdx, sectionContainerRefs.current[el.id])}
-                                        className="w-4 -mx-2 cursor-col-resize z-40 flex items-center justify-center group/colresize self-stretch transition-all select-none"
-                                        title="Cliquer-glisser pour ajuster la largeur des colonnes"
+                                        className="w-3 -mx-1.5 cursor-col-resize z-40 flex items-center justify-center group/colseam self-stretch transition-all select-none relative"
+                                        title="Cliquer-glisser la bordure pour ajuster la largeur des colonnes"
                                       >
-                                        <div className="w-1.5 group-hover/colresize:w-3.5 h-20 bg-[#00A0FF]/70 group-hover/colresize:bg-[#00A0FF] rounded-full shadow-xl border border-white/40 flex flex-col items-center justify-center gap-1 transition-all">
-                                          <span className="text-[10px] text-white font-black select-none">↔</span>
-                                          <span className="text-[8px] text-white font-mono font-bold select-none">{Math.round(colWidths[cIdx])}%</span>
-                                        </div>
+                                        <div className="w-1 group-hover/colseam:w-1.5 h-full bg-transparent group-hover/colseam:bg-[#00A0FF] transition-all shadow-md" />
                                       </div>
                                     )}
                                   </React.Fragment>

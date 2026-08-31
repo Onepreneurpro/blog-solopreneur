@@ -282,10 +282,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                       return (
-                        <div className="flex flex-wrap md:flex-nowrap gap-6 items-stretch w-full flex-1 h-full">
+                        <div className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
-                              flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (24 * (numCols - 1) / numCols) : 0}px)`,
+                              flex: `0 0 ${colWidths[cIdx]}%`,
                               width: `${colWidths[cIdx]}%`,
                               minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                             };
