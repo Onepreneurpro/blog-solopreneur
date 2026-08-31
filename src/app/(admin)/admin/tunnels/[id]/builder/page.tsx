@@ -404,7 +404,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
     if (type === 'Section' || type === 'BlockSectionFull') {
       return {
-        title: 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)',
+        title: '',
         isFullWidth: true,
         bgColor: '#0F172A',
         bgImage: '',
@@ -412,10 +412,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         bgSize: 'cover',
         bgPosition: 'center',
         textColor: '#ffffff',
-        children: [
-          { id: 's1', type: 'Heading', category: 'Texte', content: 'VOTRE TITRE DE SECTION PRINCIPALE' },
-          { id: 's2', type: 'Text', category: 'Texte', content: 'Cette section s étend sur toute la largeur de l écran. Vous pouvez y déposer vos colonnes, formulaires, conteneurs, images et textes.' },
-        ],
+        children: [],
       };
     }
     return { title: name, items: [] };
@@ -1062,8 +1059,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <div className="flex items-center gap-2.5">
                       <Maximize2 className="w-5 h-5 text-purple-300 group-hover:text-white shrink-0" />
                       <div>
-                        <div className="text-xs font-black text-white">Section Principale (100% Plein Écran)</div>
-                        <div className="text-[10px] text-purple-200 font-medium leading-tight">Fond & image bord à bord pour colonnes & éléments</div>
+                        <div className="text-xs font-black text-white">Section HTML5 (100% Plein Écran)</div>
+                        <div className="text-[10px] text-purple-200 font-medium leading-tight">Balise &lt;section&gt; bord à bord pour colonnes, conteneurs, formulaires, images &amp; textes</div>
                       </div>
                     </div>
                     <Plus className="w-4 h-4 text-purple-300 shrink-0" />

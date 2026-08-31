@@ -253,7 +253,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                   : 'max-w-4xl mx-auto';
 
               return (
-                <div
+                <section
                   key={el.id}
                   style={{
                     backgroundColor: mainBg,
@@ -386,7 +386,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       })}
                     </div>
                   </div>
-                </div>
+                </section>
               );
             }
 
