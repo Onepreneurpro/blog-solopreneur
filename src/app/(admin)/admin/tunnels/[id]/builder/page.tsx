@@ -2008,22 +2008,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ backgroundColor: mainBg, color: textColor }}
                           className="p-6 sm:p-8 rounded-none shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
                         >
-                          <div className="flex items-center justify-between border-b border-slate-100/60 pb-3">
-                            <input
-                              type="text"
-                              value={el.data?.title || el.content || 'Conteneur d éléments...'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                handleUpdateElementData(el.id, { title: val });
-                                handleUpdateElementContent(el.id, val);
-                              }}
-                              style={{ color: textColor }}
-                              className="text-xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
-                            />
-                            <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 flex items-center gap-1">
-                              <span>📦 Boîte Conteneur Réceptrice</span>
-                            </span>
-                          </div>
+                          {el.data?.title && (
+                            <div className="flex items-center justify-between border-b border-slate-100/60 pb-3">
+                              <input
+                                type="text"
+                                value={el.data.title}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  handleUpdateElementData(el.id, { title: val });
+                                  handleUpdateElementContent(el.id, val);
+                                }}
+                                style={{ color: textColor }}
+                                className="text-xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF]"
+                              />
+                            </div>
+                          )}
 
                         {/* RENDER NESTED CHILDREN IN THE CONTAINER */}
                         {(!el.data?.children || el.data.children.length === 0) ? (
@@ -3178,11 +3177,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {/* DEFAULT FALLBACK RENDERER FOR UNHANDLED CUSTOM BLOCKS */}
-                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark', 'Col4', 'Col3', 'Col2', 'BlockNavArizona', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona'].includes(el.type) && (
-                      <div className="p-6 bg-white text-slate-900 rounded-3xl shadow-xl space-y-4">
+                    {!['Heading', 'Text', 'BulletList', 'Image', 'OptinForm', 'FormInput', 'ButtonCTA', 'Checkbox', 'Video', 'Audio', 'Countdown', 'Divider', 'Section', 'BlockSectionFull', 'ContentBox', 'BlockFeat4ColImg', 'BlockFeat3ColImg', 'BlockFeat2ColIconsLeft', 'BlockFeat4ColDark', 'Col4', 'Col3', 'Col2', 'BlockNavArizona', 'BlockHeroArizona', 'BlockBioArizona', 'BlockSoulSistersArizona', 'Block3ColArcadeArizona'].includes(el.type) && (
+                      <div className="p-6 bg-white text-slate-900 rounded-none shadow-xl space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
-                            👍
+                          <div className="w-8 h-8 rounded-none bg-[#00A0FF]/20 text-[#00A0FF] flex items-center justify-center font-bold text-xs">
+                            📦
                           </div>
                           <input
                             type="text"
@@ -3197,15 +3196,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          {(el.data?.items && el.data.items.length > 0
-                            ? el.data.items
-                            : [
-                                { id: '1', title: 'Élément #1', desc: 'Description pré-remplie prêt à personnaliser.' },
-                                { id: '2', title: 'Élément #2', desc: 'Description pré-remplie prêt à personnaliser.' },
-                                { id: '3', title: 'Élément #3', desc: 'Description pré-remplie prêt à personnaliser.' },
-                              ]
-                          ).map((item: any, i: number) => (
-                            <div key={item.id || i} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                          {(el.data?.items && el.data.items.length > 0 ? el.data.items : []).map((item: any, i: number) => (
+                            <div key={item.id || i} className="p-4 bg-slate-50 rounded-none border border-slate-200 space-y-1">
                               <input
                                 type="text"
                                 value={item.title || ''}
