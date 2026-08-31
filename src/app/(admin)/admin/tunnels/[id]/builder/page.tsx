@@ -42,6 +42,7 @@ import {
   Eye,
   X,
   Maximize2,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -1549,71 +1550,92 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       paddingLeft: `${el.data?.paddingLeft !== undefined ? el.data.paddingLeft : 16}px`,
                     }}
                   >
-                    {/* ELEMENT CONTROLS TOOLBAR (UP, DOWN, SETTINGS, DUPLICATE, DELETE) */}
-                    {isSelected && (
-                      <div className="absolute -top-3 right-4 bg-[#00A0FF] text-white px-2.5 py-1 rounded-xl text-[10px] font-black flex items-center gap-2 shadow-lg z-20">
-                        <span className="uppercase">{el.type}</span>
-                        <div className="h-3 w-px bg-white/40" />
+                    {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
+                    <div
+                      className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                        isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}
+                    >
+                      {/* TYPE NAME BADGE */}
+                      <div
+                        className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
+                          el.type === 'Section' || el.type === 'BlockSectionFull'
+                            ? 'bg-purple-600'
+                            : el.type === 'ContentBox'
+                            ? 'bg-sky-500'
+                            : 'bg-[#FF7700]'
+                        }`}
+                      >
+                        <span>{el.type === 'Section' ? 'Section HTML5' : el.type === 'ContentBox' ? 'Conteneur DIV' : el.type}</span>
+                        <span className="text-[10px]">⬇️</span>
+                      </div>
+
+                      {/* ACTIONS BADGE */}
+                      <div
+                        className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                          el.type === 'Section' || el.type === 'BlockSectionFull'
+                            ? 'bg-purple-600 border-purple-700'
+                            : el.type === 'ContentBox'
+                            ? 'bg-sky-500 border-sky-600'
+                            : 'bg-[#FF7700] border-amber-600'
+                        }`}
+                      >
+                        {/* ⚙️ PARAMÈTRES / INSPECTEUR */}
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const targetData = el.data && el.data.items && el.data.items.length > 0
-                              ? el.data
-                              : getDefaultBlockData(el.type, el.content);
-                            const updatedEl = { ...el, data: targetData };
-                            handleUpdateElementData(el.id, targetData);
-                            setEditingBlock(updatedEl);
+                            setSelectedElementId(el.id);
                           }}
-                          title="Personnaliser le bloc (Texte, Images, Colonnes...)"
-                          className="flex items-center gap-1 hover:text-amber-300 bg-white/10 px-1.5 py-0.5 rounded-lg"
+                          className="p-1 hover:bg-black/20 rounded transition-colors"
+                          title="⚙️ Paramètres du bloc"
                         >
-                          <Sliders className="w-3 h-3" />
-                          <span>Personnaliser</span>
+                          <Settings className="w-3.5 h-3.5 text-white" />
                         </button>
-                        <div className="h-3 w-px bg-white/40" />
+
+                        {/* 📋 DUPLIQUER */}
                         <button
-                          onClick={(e) => moveElementToPosition(idx, 'top', e)}
+                          type="button"
+                          onClick={(e) => handleDuplicateElement(el.id, e)}
+                          className="p-1 hover:bg-black/20 rounded transition-colors"
+                          title="📋 Dupliquer le bloc"
+                        >
+                          <Copy className="w-3.5 h-3.5 text-white" />
+                        </button>
+
+                        {/* ▲ MONTER */}
+                        <button
+                          type="button"
                           disabled={idx === 0}
-                          title="Placer tout en haut de page (En-tête)"
-                          className="disabled:opacity-40 hover:text-amber-300 flex items-center gap-0.5 px-1 py-0.5 bg-white/10 rounded-lg text-[9px] font-extrabold"
-                        >
-                          <span>🔝</span>
-                          <span>Haut</span>
-                        </button>
-                        <button
                           onClick={(e) => moveElementToPosition(idx, 'up', e)}
-                          disabled={idx === 0}
-                          title="Monter d un rang (▲)"
-                          className="disabled:opacity-40"
+                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                          title="▲ Monter"
                         >
-                          <ChevronUp className="w-3.5 h-3.5 hover:text-amber-300" />
+                          <ChevronUp className="w-3.5 h-3.5 text-white" />
                         </button>
+
+                        {/* ▼ DESCENDRE */}
                         <button
+                          type="button"
+                          disabled={idx === elements.length - 1}
                           onClick={(e) => moveElementToPosition(idx, 'down', e)}
-                          disabled={idx === elements.length - 1}
-                          title="Descendre d un rang (▼)"
-                          className="disabled:opacity-40"
+                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                          title="▼ Descendre"
                         >
-                          <ChevronDown className="w-3.5 h-3.5 hover:text-amber-300" />
+                          <ChevronDown className="w-3.5 h-3.5 text-white" />
                         </button>
+
+                        {/* 🗑️ SUPPRIMER */}
                         <button
-                          onClick={(e) => moveElementToPosition(idx, 'bottom', e)}
-                          disabled={idx === elements.length - 1}
-                          title="Placer tout en bas de page (Pied de page)"
-                          className="disabled:opacity-40 hover:text-amber-300 flex items-center gap-0.5 px-1 py-0.5 bg-white/10 rounded-lg text-[9px] font-extrabold"
+                          type="button"
+                          onClick={(e) => handleDeleteElement(el.id, e)}
+                          className="p-1 hover:bg-red-700 rounded transition-colors"
+                          title="🗑️ Supprimer"
                         >
-                          <span>🔚</span>
-                          <span>Bas</span>
-                        </button>
-                        <div className="h-3 w-px bg-white/40" />
-                        <button onClick={(e) => handleDuplicateElement(el.id, e)} title="Dupliquer">
-                          <Copy className="w-3.5 h-3.5 hover:text-amber-300" />
-                        </button>
-                        <button onClick={(e) => handleDeleteElement(el.id, e)} title="Supprimer">
-                          <Trash2 className="w-3.5 h-3.5 hover:text-rose-300" />
+                          <Trash2 className="w-3.5 h-3.5 text-white" />
                         </button>
                       </div>
-                    )}
+                    </div>
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
@@ -2259,73 +2281,130 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             ) : (
                               <div className="space-y-6">
                                 {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
-                                  <div key={child.id || cIdx} className="relative group/child bg-slate-900/40 p-4 rounded-2xl border border-white/10 shadow-md">
-                                    <div
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedElementId(el.id);
-                                        setSelectedChildIndex(cIdx);
-                                        setSelectedSubItem(null);
-                                      }}
-                                      className={`flex items-center justify-between text-xs p-2.5 rounded-xl transition-all cursor-pointer border mb-3 ${
-                                        selectedChildIndex === cIdx
-                                          ? 'bg-[#00A0FF] text-white font-bold border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
-                                          : 'bg-slate-900/90 text-purple-200 border-purple-500/30 hover:border-purple-400 hover:text-white'
-                                      }`}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-extrabold uppercase text-[11px]">Élément #{cIdx + 1} : {child.type}</span>
-                                        <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1 text-white shadow-sm">
-                                          <span>⚙️</span>
-                                          <span>Contrôler le bloc entier</span>
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            if (cIdx > 0) {
-                                              const updated = [...el.data.children];
-                                              const temp = updated[cIdx - 1];
-                                              updated[cIdx - 1] = updated[cIdx];
-                                              updated[cIdx] = temp;
-                                              handleUpdateElementData(el.id, { children: updated });
-                                            }
-                                          }}
-                                          className="hover:text-white px-1"
-                                          title="Monter"
-                                        >
-                                          ▲
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            if (cIdx < el.data.children.length - 1) {
-                                              const updated = [...el.data.children];
-                                              const temp = updated[cIdx + 1];
-                                              updated[cIdx + 1] = updated[cIdx];
-                                              updated[cIdx] = temp;
-                                              handleUpdateElementData(el.id, { children: updated });
-                                            }
-                                          }}
-                                          className="hover:text-white px-1"
-                                          title="Descendre"
-                                        >
-                                          ▼
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
-                                            handleUpdateElementData(el.id, { children: updated });
-                                            if (selectedChildIndex === cIdx) setSelectedChildIndex(null);
-                                          }}
-                                          className="text-rose-400 hover:text-rose-300 font-bold px-1"
-                                        >
-                                          Supprimer
-                                        </button>
-                                      </div>
-                                    </div>
+                                   <div
+                                     key={child.id || cIdx}
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       setSelectedElementId(el.id);
+                                       setSelectedChildIndex(cIdx);
+                                       setSelectedSubItem(null);
+                                     }}
+                                     className={`relative group/child p-3 rounded-2xl border transition-all ${
+                                       selectedChildIndex === cIdx
+                                         ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                         : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
+                                     }`}
+                                   >
+                                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
+                                     <div
+                                       className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                         selectedChildIndex === cIdx ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100'
+                                       }`}
+                                     >
+                                       {/* TYPE NAME BADGE */}
+                                       <div
+                                         className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
+                                           child.type === 'ContentBox' ? 'bg-sky-500' : 'bg-[#FF7700]'
+                                         }`}
+                                       >
+                                         <span>{child.type === 'ContentBox' ? 'Conteneur DIV' : child.type}</span>
+                                         <span className="text-[10px]">⬇️</span>
+                                       </div>
+
+                                       {/* ACTIONS BADGE */}
+                                       <div
+                                         className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                                           child.type === 'ContentBox' ? 'bg-sky-500 border-sky-600' : 'bg-[#FF7700] border-amber-600'
+                                         }`}
+                                       >
+                                         {/* ⚙️ CONTROLLER / INSPECTER */}
+                                         <button
+                                           type="button"
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             setSelectedElementId(el.id);
+                                             setSelectedChildIndex(cIdx);
+                                             setSelectedSubItem(null);
+                                           }}
+                                           className="p-1 hover:bg-black/20 rounded transition-colors"
+                                           title="⚙️ Contrôler le bloc / Paramètres"
+                                         >
+                                           <Settings className="w-3.5 h-3.5 text-white" />
+                                         </button>
+
+                                         {/* 📋 DUPLIQUER */}
+                                         <button
+                                           type="button"
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             const copy = JSON.parse(JSON.stringify(child));
+                                             copy.id = `child-${Date.now()}`;
+                                             const updated = [...(el.data?.children || [])];
+                                             updated.splice(cIdx + 1, 0, copy);
+                                             handleUpdateElementData(el.id, { children: updated });
+                                           }}
+                                           className="p-1 hover:bg-black/20 rounded transition-colors"
+                                           title="📋 Dupliquer le bloc"
+                                         >
+                                           <Copy className="w-3.5 h-3.5 text-white" />
+                                         </button>
+
+                                         {/* ▲ MONTER */}
+                                         <button
+                                           type="button"
+                                           disabled={cIdx === 0}
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             if (cIdx > 0) {
+                                               const updated = [...el.data.children];
+                                               const temp = updated[cIdx - 1];
+                                               updated[cIdx - 1] = updated[cIdx];
+                                               updated[cIdx] = temp;
+                                               handleUpdateElementData(el.id, { children: updated });
+                                             }
+                                           }}
+                                           className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                           title="▲ Monter"
+                                         >
+                                           <ChevronUp className="w-3.5 h-3.5 text-white" />
+                                         </button>
+
+                                         {/* ▼ DESCENDRE */}
+                                         <button
+                                           type="button"
+                                           disabled={cIdx === (el.data?.children || []).length - 1}
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             if (cIdx < el.data.children.length - 1) {
+                                               const updated = [...el.data.children];
+                                               const temp = updated[cIdx + 1];
+                                               updated[cIdx + 1] = updated[cIdx];
+                                               updated[cIdx] = temp;
+                                               handleUpdateElementData(el.id, { children: updated });
+                                             }
+                                           }}
+                                           className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                           title="▼ Descendre"
+                                         >
+                                           <ChevronDown className="w-3.5 h-3.5 text-white" />
+                                         </button>
+
+                                         {/* 🗑️ SUPPRIMER */}
+                                         <button
+                                           type="button"
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
+                                             handleUpdateElementData(el.id, { children: updated });
+                                             if (selectedChildIndex === cIdx) setSelectedChildIndex(null);
+                                           }}
+                                           className="p-1 hover:bg-red-700 rounded transition-colors"
+                                           title="🗑️ Supprimer le bloc"
+                                         >
+                                           <Trash2 className="w-3.5 h-3.5 text-white" />
+                                         </button>
+                                       </div>
+                                     </div>
 
                                     {child.type === 'Heading' && (
                                       <input
