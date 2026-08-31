@@ -2854,8 +2854,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             backgroundPosition: bgPos,
                             color: textColor,
                             minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
+                            paddingTop: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
+                            paddingBottom: el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined,
+                            paddingLeft: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
+                            paddingRight: el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined,
+                            marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
+                            marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                           }}
-                          className="relative w-full p-6 sm:p-10 shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between"
+                          className={`relative w-full shadow-2xl transition-all my-0 group/section border-2 border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between ${el.data?.paddingY === undefined ? 'p-6 sm:p-10' : ''}`}
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
@@ -2928,8 +2934,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                                           backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'rgba(15, 23, 42, 0.95)',
                                           color: child.data?.textColor || 'inherit',
+                                          paddingTop: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
+                                          paddingBottom: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
+                                          paddingLeft: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
+                                          paddingRight: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
                                         }}
-                                        className={`relative group/child p-3 rounded-none border transition-all flex flex-col flex-1 h-full ${
+                                        className={`relative group/child ${child.data?.paddingY === undefined ? 'p-3' : ''} rounded-none border transition-all flex flex-col flex-1 h-full ${
                                           selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
@@ -3314,6 +3324,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               </div>
                             );
                           })()}
+                        </div>
+                        {/* NATURAL CLICK-AND-DRAG BOTTOM BORDER FOR SECTION HEIGHT RESIZING */}
+                        <div
+                          onMouseDown={(e) => handleStartSectionResize(e, el.id)}
+                          className="absolute -bottom-2 left-0 right-0 h-4 cursor-ns-resize z-40 group/secborder flex items-center justify-center select-none"
+                          title="Cliquer-glisser la bordure inférieure pour ajuster la hauteur"
+                        >
+                          <div className="w-full h-1 group-hover/secborder:h-1.5 bg-transparent group-hover/secborder:bg-[#00A0FF] transition-all shadow-md" />
                         </div>
                       </div>
                       );

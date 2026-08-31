@@ -379,8 +379,12 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
                                     borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
                                     color: child.data?.textColor || 'inherit',
+                                    paddingTop: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
+                                    paddingBottom: child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined,
+                                    paddingLeft: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
+                                    paddingRight: child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined,
                                   }}
-                                  className="p-6 w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4"
+                                  className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined ? 'p-6' : ''}`}
                                 >
                                   {child.data?.title && (
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
