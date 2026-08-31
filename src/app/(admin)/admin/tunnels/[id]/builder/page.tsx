@@ -3211,17 +3211,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         </div>
                                       )}
 
-                                      {/* BOTTOM HEIGHT RESIZER HANDLE (SCREEN 2) */}
-                                      <div
-                                        onMouseDown={(e) => handleStartChildHeightResize(e, el.id, cIdx)}
-                                        className="absolute -bottom-2 left-0 right-0 h-4 cursor-row-resize flex items-center justify-center opacity-0 group-hover/child:opacity-100 transition-opacity z-30 select-none"
-                                        title="Cliquer-glisser pour ajuster la hauteur du bloc DIV"
-                                      >
-                                        <div className="px-2 py-0.5 bg-[#00A0FF] text-white rounded-full shadow-lg border border-white/30 font-mono text-[9px] flex items-center gap-1 cursor-row-resize">
-                                          <span>↕</span>
-                                          <span>Hauteur DIV {child.data?.minHeight ? `(${child.data.minHeight}px)` : ''}</span>
-                                        </div>
-                                      </div>
                                     </div>
 
                                     {/* VERTICAL COLUMN RESIZER HANDLE BETWEEN ADJACENT DIVS (SCREEN 3) */}
