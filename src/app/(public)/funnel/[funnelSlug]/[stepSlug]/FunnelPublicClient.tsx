@@ -251,7 +251,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     color: textColor,
                     minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                   }}
-                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden`}
+                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] p-8 sm:p-14 shadow-2xl transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
                 >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
@@ -261,7 +261,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     />
                   )}
 
-                  <div className={`relative z-10 ${innerWidthClass} space-y-8`}>
+                  <div className={`relative z-10 ${innerWidthClass} space-y-8 flex-1 flex flex-col h-full w-full`}>
                     {el.data?.title && (
                       <h2 className="text-2xl sm:text-4xl font-heading font-black text-center" style={{ color: textColor }}>
                         {el.data.title}
@@ -276,7 +276,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                       return (
-                        <div className="flex flex-wrap md:flex-nowrap gap-6 items-stretch w-full">
+                        <div className="flex flex-wrap md:flex-nowrap gap-6 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
                               flex: `0 0 calc(${colWidths[cIdx]}% - ${numCols > 1 ? (24 * (numCols - 1) / numCols) : 0}px)`,
