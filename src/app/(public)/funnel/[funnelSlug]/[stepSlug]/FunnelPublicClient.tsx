@@ -429,7 +429,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 />
                                               </div>
                                             ) : sub.type === 'Heading' ? (
-                                              <h3 className="text-xl font-heading font-black my-2">{sub.content}</h3>
+                                              <h3 style={{ color: sub.data?.textColor || '#ffffff' }} className="text-xl font-heading font-black my-2">{sub.content}</h3>
                                             ) : sub.type === 'ButtonCTA' ? (
                                               <div className="py-2 text-center">
                                                 <button type="button" className="px-8 py-3 bg-[#00A0FF] text-[#ffffff] font-bold text-sm rounded-xl shadow-lg">
@@ -441,11 +441,11 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 <input
                                                   type="text"
                                                   placeholder={sub.data?.placeholder || sub.content || 'Votre e-mail...'}
-                                                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm"
+                                                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm text-slate-900"
                                                 />
                                               </div>
                                             ) : (
-                                              <p className="text-sm leading-relaxed my-2">{sub.content}</p>
+                                              <p style={{ color: sub.data?.textColor || '#ffffff' }} className="text-sm leading-relaxed my-2">{sub.content}</p>
                                             )}
                                           </div>
                                         );

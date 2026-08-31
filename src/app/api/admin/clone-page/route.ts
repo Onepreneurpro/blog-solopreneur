@@ -39,6 +39,24 @@ function extractStyleProps(styleStr: string | undefined): { bgColor?: string; te
   return result;
 }
 
+function cleanText(str: string): string {
+  return str.replace(/\s+/g, ' ').trim();
+}
+
+function isDuplicateText(newText: string, existingTexts: string[]): boolean {
+  const normNew = cleanText(newText).toLowerCase();
+  if (normNew.length < 2) return true;
+
+  for (const existing of existingTexts) {
+    const normExisting = cleanText(existing).toLowerCase();
+    // Strict substring or overlap deduplication
+    if (normExisting === normNew || normExisting.includes(normNew) || (normNew.length > 5 && normExisting.slice(0, 15) === normNew.slice(0, 15))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -76,42 +94,42 @@ export async function POST(req: Request) {
     const $ = cheerio.load(html);
     const pageTitle = $('title').text().trim() || 'Page Clonée';
 
-    // Clean noise elements (scripts, styles, noscript, iframe, meta, link)
-    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
+    // Clean noise elements (scripts, styles, noscript, iframe, meta, link, cookies)
+    $('script, style, noscript, iframe, svg, meta, link, nav, footer, header, div[class*="cookie"]').remove();
 
     const clonedElements: any[] = [];
     const now = Date.now();
 
-    // Helper: Parse elements inside a container div / col
+    // Helper: Parse elements inside a container div / col with strict deduplication
     const parseContainerChildren = ($container: any): any[] => {
       const children: any[] = [];
-      const visitedTexts = new Set<string>();
+      const extractedTextList: string[] = [];
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, span, div, li').each((i: number, el: any) => {
+      // Target semantic text tags first to avoid container duplication
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a.btn, a.button, button, input, textarea, select, li').each((i: number, el: any) => {
         const $el = $(el);
         const tagName = el.tagName ? el.tagName.toLowerCase() : '';
         const styleProps = extractStyleProps($el.attr('style'));
-        const directText = $el.clone().children().remove().end().text().trim();
-        const fullText = $el.text().trim();
+        const rawText = cleanText($el.text());
 
-        // 1. HEADINGS (h1 - h6 or elements with heading class/large text)
-        if (tagName.startsWith('h') || $el.hasClass('heading') || $el.hasClass('title') || $el.hasClass('headline')) {
-          if (fullText && fullText.length > 1 && !visitedTexts.has(fullText)) {
-            visitedTexts.add(fullText);
+        // 1. HEADINGS (h1 - h6)
+        if (tagName.startsWith('h')) {
+          if (rawText && !isDuplicateText(rawText, extractedTextList)) {
+            extractedTextList.push(rawText);
             children.push({
               id: `cloned-heading-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Heading',
               category: 'Texte',
-              content: fullText,
+              content: rawText,
               data: {
                 fontSize: tagName === 'h1' ? 'text-4xl' : tagName === 'h2' ? 'text-3xl' : 'text-xl',
                 fontWeight: 'font-black',
-                textColor: styleProps.textColor || '#ffffff',
+                textColor: '#ffffff', // Ensure high contrast white text
               },
             });
           }
         }
-        // 2. IMAGES (img tags or inline background-images)
+        // 2. IMAGES (img tags)
         else if (tagName === 'img') {
           const src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('srcset');
           const absSrc = makeAbsoluteUrl(src, targetUrl);
@@ -128,27 +146,26 @@ export async function POST(req: Request) {
             });
           }
         }
-        // 3. BUTTONS / LINKS (a, button)
+        // 3. BUTTONS / LINKS (a.btn, button)
         else if (tagName === 'a' || tagName === 'button') {
-          const isButtonLike = $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || tagName === 'button' || $el.attr('role') === 'button';
-          if (fullText && fullText.length > 1 && fullText.length < 120 && isButtonLike) {
-            if (!visitedTexts.has(fullText)) {
-              visitedTexts.add(fullText);
+          if (rawText && rawText.length > 1 && rawText.length < 100) {
+            if (!isDuplicateText(rawText, extractedTextList)) {
+              extractedTextList.push(rawText);
               children.push({
                 id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
                 type: 'ButtonCTA',
                 category: 'Bouton',
-                content: fullText,
+                content: rawText,
                 data: {
                   btnColor: styleProps.bgColor || '#00A0FF',
-                  textColor: styleProps.textColor || '#ffffff',
+                  textColor: '#ffffff',
                   linkUrl: makeAbsoluteUrl($el.attr('href'), targetUrl),
                 },
               });
             }
           }
         }
-        // 4. FORM INPUTS (input, textarea, select)
+        // 4. FORM INPUTS (input, textarea)
         else if (tagName === 'input' || tagName === 'textarea') {
           const placeholder = $el.attr('placeholder') || $el.attr('name') || 'Votre e-mail...';
           const type = $el.attr('type') || 'text';
@@ -166,19 +183,18 @@ export async function POST(req: Request) {
             });
           }
         }
-        // 5. PARAGRAPHS & TEXT (p, li, span, or text-only div)
-        else if (tagName === 'p' || tagName === 'li' || (tagName === 'span' && directText.length > 3) || (tagName === 'div' && directText.length > 10 && $el.children().length === 0)) {
-          const textToUse = directText.length > 3 ? directText : fullText;
-          if (textToUse && textToUse.length > 2 && !visitedTexts.has(textToUse)) {
-            visitedTexts.add(textToUse);
+        // 5. PARAGRAPHS & LIST ITEMS (p, li)
+        else if (tagName === 'p' || tagName === 'li') {
+          if (rawText && rawText.length > 2 && !isDuplicateText(rawText, extractedTextList)) {
+            extractedTextList.push(rawText);
             children.push({
               id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
               type: 'Text',
               category: 'Texte',
-              content: textToUse,
+              content: rawText,
               data: {
                 fontSize: 'text-base',
-                textColor: styleProps.textColor || '#e2e8f0',
+                textColor: '#ffffff', // High contrast white text by default
               },
             });
           }
@@ -188,8 +204,8 @@ export async function POST(req: Request) {
       return children;
     };
 
-    // 2. Detect Sections (<section>, <header>, <footer>, <main>, or div.section, div.container, top-level divs)
-    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], div[class*="container"]');
+    // 2. Detect Sections (<section>, or top-level containers)
+    let $sections = $('section, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"]');
     if ($sections.length === 0) {
       $sections = $('body > div, body > main > div');
     }
@@ -233,7 +249,7 @@ export async function POST(req: Request) {
         content: `Section Clonée #${sectionIndex}`,
         data: {
           bgColor,
-          textColor: styleProps.textColor || '#ffffff',
+          textColor: '#ffffff',
           layoutMode,
           children: childCols,
           paddingY: 48,
