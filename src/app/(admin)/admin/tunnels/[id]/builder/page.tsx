@@ -73,6 +73,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     parentBlockId?: string;
     childIndex?: number;
   } | null>(null);
+  const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
 
   // MAGNETIC SNAP GUIDE LINE STATE FOR AUTOMATIC ALIGNMENT
   const [snapGuide, setSnapGuide] = useState<{
@@ -2157,9 +2158,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               <div className="space-y-6">
                                 {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
                                   <div key={child.id || cIdx} className="relative group/child bg-slate-900/40 p-4 rounded-2xl border border-white/10 shadow-md">
-                                    <div className="flex items-center justify-between text-[10px] text-slate-400 border-b border-white/10 pb-2 mb-3">
-                                      <span className="font-bold text-purple-300 uppercase">Élément #{cIdx + 1} : {child.type}</span>
+                                    <div
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedElementId(el.id);
+                                        setSelectedChildIndex(cIdx);
+                                        setSelectedSubItem(null);
+                                      }}
+                                      className={`flex items-center justify-between text-xs p-2.5 rounded-xl transition-all cursor-pointer border mb-3 ${
+                                        selectedChildIndex === cIdx
+                                          ? 'bg-[#00A0FF] text-white font-bold border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
+                                          : 'bg-slate-900/90 text-purple-200 border-purple-500/30 hover:border-purple-400 hover:text-white'
+                                      }`}
+                                    >
                                       <div className="flex items-center gap-2">
+                                        <span className="font-extrabold uppercase text-[11px]">Élément #{cIdx + 1} : {child.type}</span>
+                                        <span className="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1 text-white shadow-sm">
+                                          <span>⚙️</span>
+                                          <span>Contrôler le bloc entier</span>
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                                         <button
                                           type="button"
                                           onClick={() => {
@@ -2171,7 +2190,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               handleUpdateElementData(el.id, { children: updated });
                                             }
                                           }}
-                                          className="hover:text-white"
+                                          className="hover:text-white px-1"
                                           title="Monter"
                                         >
                                           ▲
@@ -2187,7 +2206,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               handleUpdateElementData(el.id, { children: updated });
                                             }
                                           }}
-                                          className="hover:text-white"
+                                          className="hover:text-white px-1"
                                           title="Descendre"
                                         >
                                           ▼
@@ -2197,8 +2216,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           onClick={() => {
                                             const updated = el.data.children.filter((_: any, i: number) => i !== cIdx);
                                             handleUpdateElementData(el.id, { children: updated });
+                                            if (selectedChildIndex === cIdx) setSelectedChildIndex(null);
                                           }}
-                                          className="text-rose-400 hover:text-rose-300 font-bold"
+                                          className="text-rose-400 hover:text-rose-300 font-bold px-1"
                                         >
                                           Supprimer
                                         </button>
@@ -3142,6 +3162,107 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
                   <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
                     
+                    {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
+                    {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
+                      const activeChild = selectedEl.data.children[selectedChildIndex];
+                      const activeShape = activeChild.data?.imgShape || 'arcade';
+
+                      return (
+                        <div className="p-4 bg-slate-950 rounded-2xl border border-[#00A0FF]/60 space-y-4 shadow-xl mb-4">
+                          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span className="text-xs font-black text-[#00A0FF] uppercase flex items-center gap-1.5">
+                              <span>⚙️</span>
+                              <span>Bloc #{selectedChildIndex + 1} : {activeChild.type}</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedChildIndex(null)}
+                              className="text-[10px] font-bold text-slate-400 hover:text-white underline"
+                            >
+                              Retour Section
+                            </button>
+                          </div>
+
+                          {/* FORME & DÉCOUPE DE TOUTES LES IMAGES DU BLOC */}
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              🏛️ Forme & Découpe de TOUTES les Images du Bloc
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { key: 'arcade', label: '🏛️ Arche Arizona' },
+                                { key: 'circle', label: '⚪ Cercle' },
+                                { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
+                                { key: 'square', label: '⬛ Droit' },
+                              ].map((s) => (
+                                <button
+                                  key={s.key}
+                                  type="button"
+                                  onClick={() => {
+                                    const currentChildren = [...(selectedEl.data?.children || [])];
+                                    const targetChild = currentChildren[selectedChildIndex];
+                                    const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                                    const updatedItems = currentItems.map((it: any) => ({ ...it, imgShape: s.key }));
+
+                                    currentChildren[selectedChildIndex] = {
+                                      ...targetChild,
+                                      data: {
+                                        ...(targetChild.data || {}),
+                                        imgShape: s.key,
+                                        items: updatedItems,
+                                      },
+                                    };
+                                    handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                                  }}
+                                  className={`py-2.5 px-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
+                                    activeShape === s.key
+                                      ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
+                                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+                                  }`}
+                                >
+                                  {s.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* COULEURS DE TOUTES LES CARTES DE LA COLONNE */}
+                          <div className="space-y-2 pt-2 border-t border-slate-800">
+                            <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                              🎨 Arrière-plan de TOUTES les cartes du bloc
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={activeChild.data?.cardBgColor || '#0f172a'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const currentChildren = [...(selectedEl.data?.children || [])];
+                                  const targetChild = currentChildren[selectedChildIndex];
+                                  const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                                  const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
+
+                                  currentChildren[selectedChildIndex] = {
+                                    ...targetChild,
+                                    data: {
+                                      ...(targetChild.data || {}),
+                                      cardBgColor: val,
+                                      items: updatedItems,
+                                    },
+                                  };
+                                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                                }}
+                                className="w-8 h-8 rounded-lg cursor-pointer bg-slate-900 border border-slate-800"
+                              />
+                              <span className="text-xs font-mono text-slate-300">
+                                {activeChild.data?.cardBgColor || '#0f172a'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* IF A SPECIFIC SUB-ITEM (IMAGE, TITLE, DESC) WAS CLICKED DIRECTLY */}
                     {selectedSubItem && currentSubItem ? (
                       <div className="space-y-4">
