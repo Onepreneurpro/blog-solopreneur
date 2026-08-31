@@ -11,29 +11,48 @@ function makeAbsoluteUrl(relativeUrl: string | undefined, baseUrl: string): stri
   }
 }
 
-function extractStyleProps(styleStr: string | undefined): { bgColor?: string; textColor?: string; bgImage?: string } {
+function extractStyleProps(styleStr: string | undefined, classNameStr: string | undefined): { bgColor?: string; textColor?: string; bgImage?: string } {
   const result: { bgColor?: string; textColor?: string; bgImage?: string } = {};
-  if (!styleStr) return result;
 
-  const bgMatch = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
-  if (bgMatch) {
-    const val = bgMatch[1].trim();
-    if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
-      result.bgColor = val;
+  // Extract from inline style
+  if (styleStr) {
+    const bgMatch = styleStr.match(/background-color:\s*([^;]+)/i) || styleStr.match(/background:\s*([^;]+)/i);
+    if (bgMatch) {
+      const val = bgMatch[1].trim();
+      if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
+        result.bgColor = val;
+      }
+    }
+
+    const textMatch = styleStr.match(/(?:^|;)\s*color:\s*([^;]+)/i);
+    if (textMatch) {
+      const val = textMatch[1].trim();
+      if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
+        result.textColor = val;
+      }
+    }
+
+    const imgMatch = styleStr.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/i);
+    if (imgMatch) {
+      result.bgImage = imgMatch[1];
     }
   }
 
-  const textMatch = styleStr.match(/(?:^|;)\s*color:\s*([^;]+)/i);
-  if (textMatch) {
-    const val = textMatch[1].trim();
-    if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
-      result.textColor = val;
+  // Extract common color hints from class names if no inline style
+  if (classNameStr) {
+    const cls = classNameStr.toLowerCase();
+    if (!result.bgColor) {
+      if (cls.includes('bg-red') || cls.includes('red-bg') || cls.includes('btn-danger')) result.bgColor = '#dc2626';
+      else if (cls.includes('bg-green') || cls.includes('green-bg') || cls.includes('btn-success')) result.bgColor = '#16a34a';
+      else if (cls.includes('bg-blue') || cls.includes('blue-bg') || cls.includes('btn-primary')) result.bgColor = '#00A0FF';
+      else if (cls.includes('bg-[#') || cls.includes('bg-dark')) result.bgColor = '#181825';
     }
-  }
-
-  const imgMatch = styleStr.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/i);
-  if (imgMatch) {
-    result.bgImage = imgMatch[1];
+    if (!result.textColor) {
+      if (cls.includes('text-yellow') || cls.includes('text-amber')) result.textColor = '#facc15';
+      else if (cls.includes('text-green')) result.textColor = '#4ade80';
+      else if (cls.includes('text-red')) result.textColor = '#f87171';
+      else if (cls.includes('text-white')) result.textColor = '#ffffff';
+    }
   }
 
   return result;
@@ -49,8 +68,7 @@ function isDuplicateText(newText: string, existingTexts: string[]): boolean {
 
   for (const existing of existingTexts) {
     const normExisting = cleanText(existing).toLowerCase();
-    // Strict substring or overlap deduplication
-    if (normExisting === normNew || normExisting.includes(normNew) || (normNew.length > 5 && normExisting.slice(0, 15) === normNew.slice(0, 15))) {
+    if (normExisting === normNew || (normExisting.includes(normNew) && normNew.length < 15)) {
       return true;
     }
   }
@@ -71,7 +89,7 @@ export async function POST(req: Request) {
       targetUrl = `https://${targetUrl}`;
     }
 
-    // 1. Fetch HTML content with realistic User-Agent (Chrome/Windows)
+    // 1. Fetch HTML content
     const response = await fetch(targetUrl, {
       headers: {
         'User-Agent':
@@ -94,26 +112,46 @@ export async function POST(req: Request) {
     const $ = cheerio.load(html);
     const pageTitle = $('title').text().trim() || 'Page Clonée';
 
-    // Clean noise elements (scripts, styles, noscript, iframe, meta, link, cookies)
-    $('script, style, noscript, iframe, svg, meta, link, nav, footer, header, div[class*="cookie"]').remove();
+    // Remove noise elements
+    $('script, style, noscript, iframe, svg, meta, link, nav.cookie, div.cookie').remove();
 
     const clonedElements: any[] = [];
     const now = Date.now();
 
-    // Helper: Parse elements inside a container div / col with strict deduplication
+    // Helper: Parse elements inside a container div / col
     const parseContainerChildren = ($container: any): any[] => {
       const children: any[] = [];
       const extractedTextList: string[] = [];
 
-      // Target semantic text tags first to avoid container duplication
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a.btn, a.button, button, input, textarea, select, li').each((i: number, el: any) => {
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, select, li, [class*="btn"], [class*="button"]').each((i: number, el: any) => {
         const $el = $(el);
         const tagName = el.tagName ? el.tagName.toLowerCase() : '';
-        const styleProps = extractStyleProps($el.attr('style'));
+        const styleProps = extractStyleProps($el.attr('style'), $el.attr('class'));
         const rawText = cleanText($el.text());
 
-        // 1. HEADINGS (h1 - h6)
-        if (tagName.startsWith('h')) {
+        // 1. BUTTONS / CTAs (a, button, or elements with btn/button class)
+        const isButton = tagName === 'button' || tagName === 'a' || $el.hasClass('btn') || $el.hasClass('button') || $el.hasClass('cta') || $el.attr('role') === 'button';
+        if (isButton && rawText && rawText.length > 1 && rawText.length < 120) {
+          if (!isDuplicateText(rawText, extractedTextList)) {
+            extractedTextList.push(rawText);
+            const btnBg = styleProps.bgColor || (rawText.toLowerCase().includes('oui') || rawText.includes('✅') ? '#16a34a' : '#dc2626');
+            children.push({
+              id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
+              type: 'ButtonCTA',
+              category: 'Bouton',
+              content: rawText,
+              data: {
+                btnColor: btnBg,
+                textColor: styleProps.textColor || '#ffffff',
+                linkUrl: makeAbsoluteUrl($el.attr('href'), targetUrl),
+              },
+            });
+            return;
+          }
+        }
+
+        // 2. HEADINGS (h1 - h6 or title class)
+        if (tagName.startsWith('h') || $el.hasClass('title') || $el.hasClass('heading') || $el.hasClass('headline')) {
           if (rawText && !isDuplicateText(rawText, extractedTextList)) {
             extractedTextList.push(rawText);
             children.push({
@@ -124,13 +162,15 @@ export async function POST(req: Request) {
               data: {
                 fontSize: tagName === 'h1' ? 'text-4xl' : tagName === 'h2' ? 'text-3xl' : 'text-xl',
                 fontWeight: 'font-black',
-                textColor: '#ffffff', // Ensure high contrast white text
+                textColor: styleProps.textColor || '#ffffff',
               },
             });
+            return;
           }
         }
-        // 2. IMAGES (img tags)
-        else if (tagName === 'img') {
+
+        // 3. IMAGES (img tags)
+        if (tagName === 'img') {
           const src = $el.attr('src') || $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('srcset');
           const absSrc = makeAbsoluteUrl(src, targetUrl);
           if (absSrc && !absSrc.includes('tracking') && !absSrc.includes('pixel') && !absSrc.endsWith('.svg')) {
@@ -144,29 +184,12 @@ export async function POST(req: Request) {
                 imgObjectFit: 'cover',
               },
             });
+            return;
           }
         }
-        // 3. BUTTONS / LINKS (a.btn, button)
-        else if (tagName === 'a' || tagName === 'button') {
-          if (rawText && rawText.length > 1 && rawText.length < 100) {
-            if (!isDuplicateText(rawText, extractedTextList)) {
-              extractedTextList.push(rawText);
-              children.push({
-                id: `cloned-btn-${now}-${Math.random().toString(36).substring(2, 6)}`,
-                type: 'ButtonCTA',
-                category: 'Bouton',
-                content: rawText,
-                data: {
-                  btnColor: styleProps.bgColor || '#00A0FF',
-                  textColor: '#ffffff',
-                  linkUrl: makeAbsoluteUrl($el.attr('href'), targetUrl),
-                },
-              });
-            }
-          }
-        }
+
         // 4. FORM INPUTS (input, textarea)
-        else if (tagName === 'input' || tagName === 'textarea') {
+        if (tagName === 'input' || tagName === 'textarea') {
           const placeholder = $el.attr('placeholder') || $el.attr('name') || 'Votre e-mail...';
           const type = $el.attr('type') || 'text';
           if (type !== 'hidden' && type !== 'submit') {
@@ -181,11 +204,13 @@ export async function POST(req: Request) {
                 title: $el.prev('label').text().trim() || 'Champ de formulaire',
               },
             });
+            return;
           }
         }
+
         // 5. PARAGRAPHS & LIST ITEMS (p, li)
-        else if (tagName === 'p' || tagName === 'li') {
-          if (rawText && rawText.length > 2 && !isDuplicateText(rawText, extractedTextList)) {
+        if (tagName === 'p' || tagName === 'li') {
+          if (rawText && rawText.length > 1 && !isDuplicateText(rawText, extractedTextList)) {
             extractedTextList.push(rawText);
             children.push({
               id: `cloned-text-${now}-${Math.random().toString(36).substring(2, 6)}`,
@@ -194,7 +219,7 @@ export async function POST(req: Request) {
               content: rawText,
               data: {
                 fontSize: 'text-base',
-                textColor: '#ffffff', // High contrast white text by default
+                textColor: styleProps.textColor || '#ffffff',
               },
             });
           }
@@ -204,8 +229,8 @@ export async function POST(req: Request) {
       return children;
     };
 
-    // 2. Detect Sections (<section>, or top-level containers)
-    let $sections = $('section, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"]');
+    // 2. Identify Section Elements (<section>, or top-level containers)
+    let $sections = $('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"]');
     if ($sections.length === 0) {
       $sections = $('body > div, body > main > div');
     }
@@ -214,29 +239,35 @@ export async function POST(req: Request) {
 
     $sections.each((sIdx: number, secEl: any) => {
       const $sec = $(secEl);
-      const styleProps = extractStyleProps($sec.attr('style'));
+      const styleProps = extractStyleProps($sec.attr('style'), $sec.attr('class'));
       const bgColor = styleProps.bgColor || (sectionIndex % 2 === 0 ? '#0b1329' : '#0f172a');
 
-      // Detect Columns / Grids inside this section
-      const $cols = $sec.find('> div, > .container > div, > .row > div, > .grid > div, > [class*="col"]');
-      const subChildren = parseContainerChildren($sec);
+      // Deep search for columns / grids inside section
+      let $cols = $sec.find('[class*="col"], [class*="grid"] > div, .row > div, .container > div');
+      if ($cols.length < 2) {
+        $cols = $sec.children('div');
+      }
 
+      const subChildren = parseContainerChildren($sec);
       if (subChildren.length === 0) return; // Skip empty containers
 
       sectionIndex++;
-      const isMultiCol = $cols.length >= 2;
+      const isMultiCol = $cols.length >= 2 && $cols.length <= 4;
       const numCols = isMultiCol ? Math.min($cols.length, 3) : 1;
       const layoutMode = numCols === 3 ? 'grid-3' : numCols === 2 ? 'grid-2' : 'grid-1';
 
       const childCols: any[] = [];
       for (let c = 0; c < numCols; c++) {
-        const colItems = isMultiCol ? parseContainerChildren($($cols[c])) : (c === 0 ? subChildren : []);
+        const $col = isMultiCol ? $($cols[c]) : null;
+        const colStyle = $col ? extractStyleProps($col.attr('style'), $col.attr('class')) : {};
+        const colItems = $col ? parseContainerChildren($col) : subChildren;
+
         childCols.push({
           id: `cloned-col-${now}-${sectionIndex}-${c}`,
           type: 'ContentBox',
           data: {
-            cardBgColor: 'transparent',
-            cardTextColor: '#ffffff',
+            cardBgColor: colStyle.bgColor || 'transparent',
+            cardTextColor: colStyle.textColor || '#ffffff',
             children: colItems.length > 0 ? colItems : (c === 0 ? subChildren : []),
           },
         });
@@ -249,7 +280,7 @@ export async function POST(req: Request) {
         content: `Section Clonée #${sectionIndex}`,
         data: {
           bgColor,
-          textColor: '#ffffff',
+          textColor: styleProps.textColor || '#ffffff',
           layoutMode,
           children: childCols,
           paddingY: 48,
@@ -258,7 +289,7 @@ export async function POST(req: Request) {
       });
     });
 
-    // Fallback if no specific section tags were matched: extract directly from body
+    // Fallback if no specific section tags were matched
     if (clonedElements.length === 0) {
       const allChildren = parseContainerChildren($('body'));
       clonedElements.push({
