@@ -3493,19 +3493,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                              className="w-full accent-[#00A0FF]"
                                            />
                                          </div>
-
                                          {/* MODE D AJUSTEMENT (OBJECT-FIT) */}
                                          <div className="space-y-1 pt-1">
                                            <label className="text-[10px] font-bold text-slate-400 block">Mode d ajustement</label>
                                            <select
                                              value={currentSubItem.objectFit || 'cover'}
-                                             onChange={(e) => {
-                                               const val = e.target.value;
-                                               const updatedItems = elItems.map((it: any, idx: number) =>
-                                                 idx === selectedSubItem.itemIndex ? { ...it, objectFit: val } : it
-                                               );
-                                               handleUpdateElementData(selectedEl.id, { items: updatedItems });
-                                             }}
+                                             onChange={(e) => updateSubItemProperty({ objectFit: e.target.value })}
                                              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none"
                                            >
                                              <option value="cover">Remplir le cadre (Cover)</option>
