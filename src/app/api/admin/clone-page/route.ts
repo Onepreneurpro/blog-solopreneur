@@ -64,10 +64,10 @@ export async function POST(req: Request) {
     const now = Date.now();
 
     // Helper to extract content from an HTML element
-    const parseContainerChildren = ($container: cheerio.Cheerio<cheerio.Element>): any[] => {
+    const parseContainerChildren = ($container: any): any[] => {
       const children: any[] = [];
 
-      $container.find('h1, h2, h3, h4, h5, h6, p, img, a.btn, a.button, button, input, form').each((i, el) => {
+      $container.find('h1, h2, h3, h4, h5, h6, p, img, a.btn, a.button, button, input, form').each((i: any, el: any) => {
         const $el = $(el);
         const tagName = el.tagName.toLowerCase();
 
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
     }
 
     if ($sections.length > 0) {
-      $sections.each((sIdx, secEl) => {
+      $sections.each((sIdx: number, secEl: any) => {
         const $sec = $(secEl);
         const style = $sec.attr('style');
         const bgColor = extractColorFromStyle(style) || (sIdx % 2 === 0 ? '#0b1329' : '#0f172a');
