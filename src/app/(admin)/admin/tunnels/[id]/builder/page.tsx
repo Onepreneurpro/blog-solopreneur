@@ -1477,7 +1477,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto flex justify-center"
         >
           <div
-            className={`w-full bg-slate-900 rounded-3xl border border-slate-800 p-0 overflow-hidden shadow-2xl transition-all ${
+            className={`w-full bg-slate-900 rounded-none border border-slate-800 p-0 overflow-hidden shadow-2xl transition-all ${
               previewMode === 'MOBILE'
                 ? 'max-w-sm'
                 : pageWidthMode === 'full'
@@ -1534,7 +1534,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       handleCanvasDrop(e, idx);
                     }}
                     onClick={() => setSelectedElementId(el.id)}
-                    className={`relative rounded-2xl border-2 transition-all cursor-move group ${
+                    className={`relative rounded-none border-2 transition-all cursor-move group ${
                       isSelected
                         ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/30'
                         : 'border-slate-800/80 hover:border-slate-700 bg-slate-950/40'
@@ -2279,7 +2279,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 </div>
                               </div>
                             ) : (
-                              <div className="space-y-6">
+                                 <div className="space-y-6">
                                 {(el.data?.children || []).map((child: CanvasElement, cIdx: number) => (
                                    <div
                                      key={child.id || cIdx}
@@ -2289,7 +2289,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                        setSelectedChildIndex(cIdx);
                                        setSelectedSubItem(null);
                                      }}
-                                     className={`relative group/child p-3 rounded-2xl border transition-all ${
+                                     className={`relative group/child p-3 rounded-none border transition-all ${
                                        selectedChildIndex === cIdx
                                          ? 'border-[#00A0FF] bg-blue-500/10 ring-2 ring-[#00A0FF]/40 shadow-lg'
                                          : 'border-transparent hover:border-amber-500/60 bg-slate-900/30'
