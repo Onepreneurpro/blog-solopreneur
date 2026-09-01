@@ -3522,11 +3522,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       }}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF] cursor-pointer"
                     >
-                      <option value="fr">🇫🇷 Français (French - LTR)</option>
-                      <option value="en">🇬🇧 Anglais (English - LTR)</option>
-                      <option value="ar">🇦🇪 Arabe (العربية - RTL Droite à Gauche)</option>
-                      <option value="es">🇪🇸 Espagnol (Español - LTR)</option>
-                      <option value="de">🇩🇪 Allemand (Deutsch - LTR)</option>
+                      <option value="fr">Français</option>
+                      <option value="ar">Arabe (RTL - Droite à Gauche)</option>
+                      <option value="en">Anglais</option>
                     </select>
                   </div>
                   {pageDir === 'rtl' && (
