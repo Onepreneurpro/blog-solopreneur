@@ -1941,25 +1941,124 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   )}
                 </div>
+
+                {/* 7. CADRE & BORDURE (BORDER STYLE, WIDTH IN PX, COLOR, RADIUS) */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                  <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
+                    <span>🖼️ Cadre & Bordure {selectedSubItem ? '(Élément)' : selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
+                  </div>
+
+                  {/* A. STYLE DU CADRE (CONTINU, TIRETS, POINTILLÉ, DOUBLE, AUCUN) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-300 block">Style du Cadre / Ligne</label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: 'none', label: 'Aucun' },
+                        { id: 'solid', label: '── Continu' },
+                        { id: 'dashed', label: '╌╌ Tirets' },
+                        { id: 'dotted', label: '┈ ┈ Pointillé' },
+                        { id: 'double', label: '══ Double' },
+                      ].map((styleOpt) => {
+                        const isActive = (targetData.borderStyle || 'none') === styleOpt.id;
+                        return (
+                          <button
+                            key={styleOpt.id}
+                            type="button"
+                            onClick={() => {
+                              const defaultW = styleOpt.id !== 'none' && (!targetData.borderWidth || targetData.borderWidth === 0) ? 2 : (targetData.borderWidth || 0);
+                              updateMarginData({ borderStyle: styleOpt.id, borderWidth: defaultW });
+                            }}
+                            className={`px-2.5 py-1.5 text-xs font-bold rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+                              isActive
+                                ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-md'
+                                : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
+                            }`}
+                          >
+                            <span>{styleOpt.label}</span>
+                            {isActive && <span className="text-[10px]">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* B. ÉPAISSEUR DU CADRE (EN PX) */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-slate-300">Épaisseur de ligne (Largeur)</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min={0}
+                          max={30}
+                          value={targetData.borderWidth !== undefined ? targetData.borderWidth : ((targetData.borderStyle && targetData.borderStyle !== 'none') ? 1 : 0)}
+                          onChange={(e) => updateMarginData({ borderWidth: Number(e.target.value) })}
+                          className="w-14 px-1.5 py-0.5 bg-slate-900 border border-slate-700 rounded text-right text-xs font-mono text-[#00A0FF] focus:outline-none focus:border-[#00A0FF]"
+                        />
+                        <span className="text-[11px] font-mono text-slate-400">px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={20}
+                      value={targetData.borderWidth !== undefined ? targetData.borderWidth : ((targetData.borderStyle && targetData.borderStyle !== 'none') ? 1 : 0)}
+                      onChange={(e) => updateMarginData({ borderWidth: Number(e.target.value) })}
+                      className="w-full accent-[#00A0FF] cursor-pointer"
+                    />
+                  </div>
+
+                  {/* C. COULEUR DU CADRE */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-slate-300 block">Couleur de la ligne du cadre</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={targetData.borderColor || '#00A0FF'}
+                        onChange={(e) => updateMarginData({ borderColor: e.target.value })}
+                        className="w-9 h-9 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer p-0.5"
+                      />
+                      <input
+                        type="text"
+                        value={targetData.borderColor || '#00A0FF'}
+                        onChange={(e) => updateMarginData({ borderColor: e.target.value })}
+                        className="flex-1 px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-[#00A0FF]"
+                      />
+                    </div>
+                    {/* PRESET COLOR SWATCHES */}
+                    <div className="flex items-center gap-1.5 pt-1">
+                      {['#00A0FF', '#ffffff', '#334155', '#000000', '#ef4444', '#22c55e', '#eab308', '#a855f7'].map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => updateMarginData({ borderColor: c })}
+                          className="w-5 h-5 rounded-full border border-slate-700 cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                          style={{ backgroundColor: c }}
+                          title={c}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* D. ARRONDISSEMENT DES COINS (BORDER RADIUS) */}
+                  <div className="space-y-1.5 pt-2 border-t border-slate-800">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-slate-300">Arrondissement des coins (Rayon)</span>
+                      <span className="text-xs font-mono text-[#00A0FF]">{targetData.borderRadius || 0}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={60}
+                      value={targetData.borderRadius || 0}
+                      onChange={(e) => updateMarginData({ borderRadius: Number(e.target.value) })}
+                      className="w-full accent-[#00A0FF] cursor-pointer"
+                    />
+                  </div>
+                </div>
               </div>
             );
           })()}
-
-          {/* 7. BORDURE & ARRONDI */}
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-slate-400">Arrondissement des coins</span>
-              <span className="text-xs font-mono text-slate-300">{elData.borderRadius || 0}px</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={60}
-              value={elData.borderRadius || 0}
-              onChange={(e) => handleUpdateElementData(selectedEl.id, { borderRadius: Number(e.target.value) })}
-              className="w-full accent-[#00A0FF]"
-            />
-          </div>
         </div>
       </div>
     );
@@ -3436,6 +3535,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
                             marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                             marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
+                            borderStyle: el.data?.borderStyle && el.data.borderStyle !== 'none' ? el.data.borderStyle : undefined,
+                            borderWidth: el.data?.borderWidth !== undefined ? `${el.data.borderWidth}px` : (el.data?.borderStyle && el.data.borderStyle !== 'none' ? '2px' : undefined),
+                            borderColor: el.data?.borderColor || undefined,
+                            borderRadius: el.data?.borderRadius ? `${el.data.borderRadius}px` : undefined,
                           }}
                           className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0`}
                         >
@@ -3506,6 +3609,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
+                                          borderStyle: child.data?.borderStyle && child.data.borderStyle !== 'none' ? child.data.borderStyle : undefined,
+                                          borderWidth: child.data?.borderWidth !== undefined ? `${child.data.borderWidth}px` : (child.data?.borderStyle && child.data.borderStyle !== 'none' ? '2px' : undefined),
+                                          borderColor: child.data?.borderColor || undefined,
+                                          borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : undefined,
                                         }}
                                         className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
                                         selectedChildIndex === cIdx
@@ -3933,6 +4040,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         style={{
                                                           objectFit: subChild.data?.imgObjectFit || 'cover',
                                                           borderRadius: subChild.data?.borderRadius ? `${subChild.data.borderRadius}px` : 0,
+                                                          borderStyle: subChild.data?.borderStyle && subChild.data.borderStyle !== 'none' ? subChild.data.borderStyle : undefined,
+                                                          borderWidth: subChild.data?.borderWidth !== undefined ? `${subChild.data.borderWidth}px` : (subChild.data?.borderStyle && subChild.data.borderStyle !== 'none' ? '2px' : undefined),
+                                                          borderColor: subChild.data?.borderColor || undefined,
                                                         }}
                                                         className="w-full h-full min-h-[140px] block rounded-none"
                                                       />

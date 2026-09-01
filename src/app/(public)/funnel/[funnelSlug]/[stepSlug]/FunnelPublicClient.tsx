@@ -488,6 +488,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                                     marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                     marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
+                                    borderStyle: child.data?.borderStyle && child.data.borderStyle !== 'none' ? child.data.borderStyle : undefined,
+                                    borderWidth: child.data?.borderWidth !== undefined ? `${child.data.borderWidth}px` : (child.data?.borderStyle && child.data.borderStyle !== 'none' ? '2px' : undefined),
+                                    borderColor: child.data?.borderColor || undefined,
                                   }}
                                   className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-6' : ''}`}
                                 >
