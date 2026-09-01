@@ -1309,7 +1309,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <span>&lt; Retour</span>
           </button>
           <div className="text-[11px] font-bold text-slate-400 truncate flex-1 text-center">
-            <span className="text-slate-400">Section</span> &gt;{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedChildIndex(null);
+                setSelectedSubItem(null);
+              }}
+              className="text-[#00A0FF] hover:underline font-extrabold cursor-pointer"
+              title="Retourner aux réglages globaux de la Section"
+            >
+              Section
+            </button>{' '}
+            &gt;{' '}
             <span className="text-white font-extrabold">
               {selectedSubItem
                 ? selectedSubItem.subType === 'image'
@@ -3505,8 +3516,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     >
                       {/* TYPE NAME BADGE */}
                       <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedElementId(el.id);
+                          setSelectedChildIndex(null);
+                          setSelectedSubItem(null);
+                        }}
                         style={{ color: '#ffffff' }}
-                        className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md ${
+                        className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer hover:opacity-90 transition-opacity ${
                           el.type === 'ContentBox' ? 'bg-[#10B981]' : el.type === 'Image' ? 'bg-[#FF7A00]' : 'bg-[#00A0FF]'
                         }`}
                       >
@@ -3531,6 +3548,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedElementId(el.id);
+                            setSelectedChildIndex(null);
+                            setSelectedSubItem(null);
                           }}
                           className="p-1 hover:bg-white/20 rounded transition-colors !text-white"
                           style={{ color: '#ffffff' }}
@@ -3982,6 +4001,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                       return (
                         <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedElementId(el.id);
+                            setSelectedChildIndex(null);
+                            setSelectedSubItem(null);
+                          }}
                           onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                           onDrop={(e) => handleBlockDrop(e, el.id)}
                           style={{
