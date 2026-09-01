@@ -434,7 +434,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           updated.splice(insertIdx, 0, newEl);
           return updated;
         });
-        setSelectedElementId(newEl.id);
+        // Keep main palette menu visible for adding multiple elements in a row
       } else if (data.draggedElementId !== undefined) {
         const fromIndex = data.draggedIndex;
         let toIndex = targetIndex !== undefined ? targetIndex : elements.length;
@@ -446,7 +446,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             updated.splice(toIndex, 0, moved);
             return updated;
           });
-          setSelectedElementId(data.draggedElementId);
+          // Keep main palette menu visible
         }
       }
     } catch (err) {
@@ -480,7 +480,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
       }
 
-      setSelectedElementId(blockId);
+      // Keep main palette menu visible
       setSelectedSubItem({ blockId, itemIndex, subType: 'image' });
     } catch (err) {
       console.error(err);
@@ -522,7 +522,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         if (!data.isNew && data.draggedElementId) {
           setElements((prev) => prev.filter((el) => el.id !== data.draggedElementId));
         }
-        setSelectedElementId(blockId);
+        // Keep main palette menu visible
         return;
       }
 
@@ -1065,7 +1065,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       data: getDefaultBlockData(type, defaultContent),
     };
     setElements((prev) => [...prev, newEl]);
-    setSelectedElementId(newEl.id);
+    // Keep main palette menu visible for adding multiple elements in a row
   };
 
   const handleUpdateElementData = (id: string, newData: any) => {
