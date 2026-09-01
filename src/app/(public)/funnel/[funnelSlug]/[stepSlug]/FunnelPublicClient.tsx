@@ -226,7 +226,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
     const publicWidthClass =
       pageWidthMode === 'full'
-        ? 'w-full max-w-full px-4 sm:px-8'
+        ? 'w-full max-w-full p-0 m-0'
         : pageWidthMode === 'wide'
         ? 'max-w-6xl mx-auto w-full'
         : 'max-w-4xl mx-auto w-full';
@@ -370,6 +370,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
               const mainBg = el.data?.bgColor || '#0F172A';
               const bgImage = el.data?.bgImage || '';
+              const bgSize = el.data?.bgSize || 'cover';
               const bgZoom = el.data?.bgZoom || 100;
               const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
               const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
@@ -425,7 +426,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                         className="absolute inset-0 w-full h-full"
                         style={{
                           backgroundImage: `url(${bgImage})`,
-                          backgroundSize: 'cover',
+                          backgroundSize: bgSize,
                           backgroundPosition: 'center',
                           transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
                           transformOrigin: 'center center',

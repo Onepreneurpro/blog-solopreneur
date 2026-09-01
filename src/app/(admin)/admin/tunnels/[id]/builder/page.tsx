@@ -1865,6 +1865,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {targetData.bgImage && (
                       <div className="space-y-3 pt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
                         <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-slate-300 block">Mode de Remplissage de l Image</label>
+                          <select
+                            value={targetData.bgSize || 'cover'}
+                            onChange={(e) => applyBgImageUpdate({ bgSize: e.target.value })}
+                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 font-bold focus:border-[#00A0FF] outline-none cursor-pointer"
+                          >
+                            <option value="cover">📐 Couvrir tout le conteneur (Cover)</option>
+                            <option value="100% auto">↔️ Adapter à la largeur (100% Auto)</option>
+                            <option value="auto 100%">↕️ Adapter à la hauteur (Auto 100%)</option>
+                            <option value="100% 100%">↔️ Étirer sur la section (100% 100%)</option>
+                            <option value="contain">🖼️ Ajuster sans couper (Contain)</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs font-bold">
                             <span className="text-slate-300">Zoom de l image</span>
                             <span className="text-xs font-mono text-[#00A0FF]">{targetData.bgZoom || 100}%</span>
@@ -4345,6 +4360,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
                       const mainBg = el.data?.bgColor || '#0F172A';
                       const bgImage = el.data?.bgImage || '';
+                      const bgSize = el.data?.bgSize || 'cover';
                       const bgZoom = el.data?.bgZoom || 100;
                       const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
                       const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
@@ -4386,7 +4402,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 className="absolute inset-0 w-full h-full"
                                 style={{
                                   backgroundImage: `url(${bgImage})`,
-                                  backgroundSize: 'cover',
+                                  backgroundSize: bgSize,
                                   backgroundPosition: 'center',
                                   transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
                                   transformOrigin: 'center center',
