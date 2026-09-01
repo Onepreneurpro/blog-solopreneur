@@ -3659,22 +3659,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       )}
 
                                       {child.type === 'Image' && (
-                                        <div className="space-y-2">
-                                          <div className="max-w-sm rounded-xl overflow-hidden shadow-md border border-white/10 max-h-56">
-                                            <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
-                                          </div>
-                                          <input
-                                            type="text"
-                                            value={child.data?.img || child.content}
-                                            onChange={(e) => {
-                                              const updated = el.data.children.map((ch: any, i: number) =>
-                                                i === cIdx ? { ...ch, content: e.target.value, data: { ...ch.data, img: e.target.value } } : ch
-                                              );
-                                              handleUpdateElementData(el.id, { children: updated });
-                                            }}
-                                            className="w-full text-xs bg-slate-950 p-2 rounded border border-slate-700 text-slate-300"
-                                            placeholder="URL de l image..."
-                                          />
+                                        <div className="w-full rounded-xl overflow-hidden shadow-md border border-white/10 max-h-72">
+                                          <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
                                         </div>
                                       )}
 
