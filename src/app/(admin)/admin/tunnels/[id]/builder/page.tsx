@@ -1084,13 +1084,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       const numColumns = type === 'Col4' ? 4 : type === 'Col3' ? 3 : 2;
       const timestamp = Date.now();
 
-      // Check if a Section is selected or if there is a Section on canvas to target
-      const activeSelectedEl = selectedElementId ? elements.find((e) => e.id === selectedElementId) : null;
-      const targetSection = (activeSelectedEl && (activeSelectedEl.type === 'Section' || activeSelectedEl.type === 'BlockSectionFull'))
-        ? activeSelectedEl
-        : (elements.length > 0 && (elements[elements.length - 1].type === 'Section' || elements[elements.length - 1].type === 'BlockSectionFull'))
-        ? elements[elements.length - 1]
-        : null;
+      // Bulletproof targetSection resolution: find selected section, parent section of selected child, or last section on canvas
+      let targetSection: CanvasElement | null = null;
+      if (selectedElementId) {
+        const directEl = elements.find((e) => e.id === selectedElementId);
+        if (directEl && (directEl.type === 'Section' || directEl.type === 'BlockSectionFull' || directEl.type === 'Section3Col')) {
+          targetSection = directEl;
+        } else {
+          targetSection = elements.find((e) => (e.type === 'Section' || e.type === 'BlockSectionFull' || e.type === 'Section3Col') && e.data?.children?.some((c: any) => c.id === selectedElementId)) || null;
+        }
+      }
+      if (!targetSection) {
+        targetSection = [...elements].reverse().find((e) => e.type === 'Section' || e.type === 'BlockSectionFull' || e.type === 'Section3Col') || null;
+      }
 
       const hasExistingChildren = !!(targetSection?.data?.children && targetSection.data.children.length > 0);
 
