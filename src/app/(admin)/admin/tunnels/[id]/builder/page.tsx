@@ -2766,8 +2766,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             : 'bg-[#FF7700]'
                         }`}
                       >
-                        <span>{el.type === 'Section' || el.type === 'BlockSectionFull' ? 'Section' : el.type === 'ContentBox' ? 'Conteneur DIV' : el.type}</span>
-                        <span className="text-[10px]">⬇️</span>
+                        <span className="text-white font-black">{el.type === 'Section' || el.type === 'BlockSectionFull' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}</span>
+                        <span className="text-[10px] text-white">⬇️</span>
                       </div>
 
                       {/* ACTIONS BADGE */}
@@ -3525,9 +3525,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
-                                        className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
-                                          selectedChildIndex === cIdx ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100'
-                                        }`}
+                                        className="absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
@@ -3535,8 +3533,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             child.type === 'ContentBox' ? 'bg-sky-500' : 'bg-[#FF7700]'
                                           }`}
                                         >
-                                          <span>{child.type === 'ContentBox' ? 'Rangée / DIV' : child.type}</span>
-                                          <span className="text-[10px]">⬇️</span>
+                                          <span className="text-white font-black">{child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}</span>
+                                          <span className="text-[10px] text-white">⬇️</span>
                                         </div>
 
                                         {/* ACTIONS BADGE */}
