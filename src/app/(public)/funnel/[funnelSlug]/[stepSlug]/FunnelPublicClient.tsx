@@ -416,7 +416,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                       ...renderBorderStyles(el.data),
                     }}
-                    className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
+                    className={`relative w-full ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
                   {/* SECTION BACKGROUND IMAGE LAYER WITH ZOOM AND TRANSLATION */}
                   {bgImage && (
