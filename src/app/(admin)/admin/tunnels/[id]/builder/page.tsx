@@ -313,47 +313,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       }
     };
 
-    const applyInlineHtmlFormat = (htmlFormatter: (selectedTxt: string) => string) => {
+    const executeRichCommand = (command: string, value: string = '') => {
       if (targetDomRef.current) {
         targetDomRef.current.focus();
       }
       restoreSelection();
-      const sel = window.getSelection();
-      let selectedTxt = sel ? sel.toString().trim() : '';
-
-      if (!selectedTxt && floatingTextMenu.selectedText) {
-        selectedTxt = floatingTextMenu.selectedText.trim();
-      }
-
-      if (targetDomRef.current && selectedTxt.length > 0) {
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-          const range = sel.getRangeAt(0);
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = htmlFormatter(selectedTxt);
-          const formattedNode = tempDiv.firstChild || document.createTextNode(selectedTxt);
-
-          range.deleteContents();
-          range.insertNode(formattedNode);
-
-          try {
-            const newRange = document.createRange();
-            newRange.selectNodeContents(formattedNode);
-            sel.removeAllRanges();
-            sel.addRange(newRange);
-            savedRangeRef.current = newRange.cloneRange();
-          } catch (e) {}
-
-          updateTargetContentOnly(targetDomRef.current.innerHTML);
-        } else {
-          // Precise text replacement inside targetDomRef.current.innerHTML
-          const currentHtml = targetDomRef.current.innerHTML;
-          if (currentHtml.includes(selectedTxt)) {
-            const formattedSnippet = htmlFormatter(selectedTxt);
-            const updatedHtml = currentHtml.replace(selectedTxt, formattedSnippet);
-            targetDomRef.current.innerHTML = updatedHtml;
-            updateTargetContentOnly(updatedHtml);
-          }
-        }
+      try {
+        document.execCommand(command, false, value);
+      } catch (err) {}
+      saveSelection();
+      if (targetDomRef.current) {
+        updateTargetContentOnly(targetDomRef.current.innerHTML);
       }
     };
 
@@ -538,7 +508,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: color }}
                     onClick={() => {
-                      applyInlineHtmlFormat((txt) => `<span style="color: ${color} !important;">${txt}</span>`);
+                      executeRichCommand('foreColor', color);
                       setOpenFloatingPopover(null);
                     }}
                     className="w-8 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
@@ -634,9 +604,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            updateTarget({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
-          }}
+          onClick={() => executeRichCommand('formatBlock', '<h2>')}
           className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Grand Titre H2"
         >
@@ -647,9 +615,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            updateTarget({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
-          }}
+          onClick={() => executeRichCommand('formatBlock', '<h3>')}
           className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Sous-Titre H3"
         >
