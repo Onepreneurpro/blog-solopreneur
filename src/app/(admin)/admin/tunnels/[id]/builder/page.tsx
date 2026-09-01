@@ -4935,11 +4935,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               <div className="w-full min-h-[120px] border border-dashed border-slate-300 rounded-lg bg-white" />
                             ) : (() => {
                               const childrenList = el.data?.children || [];
-                              // Group children by row break (child.data?.newRow) to compute width per row
+                              // Group children by row break and separate non-Div elements to ensure 100% full width for text/headings
                               const childRowGroups: number[][] = [];
                               let currentGroup: number[] = [];
                               childrenList.forEach((child: CanvasElement, index: number) => {
-                                if (child.data?.newRow && currentGroup.length > 0) {
+                                if (child.type !== 'ContentBox') {
+                                  if (currentGroup.length > 0) {
+                                    childRowGroups.push(currentGroup);
+                                    currentGroup = [];
+                                  }
+                                  childRowGroups.push([index]);
+                                } else if (child.data?.newRow && currentGroup.length > 0) {
                                   childRowGroups.push(currentGroup);
                                   currentGroup = [index];
                                 } else {
@@ -4951,7 +4957,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               const colWidths: { [index: number]: number } = {};
                               childRowGroups.forEach((group) => {
                                 const count = group.length;
-                                const width = count > 0 ? 100 / count : 100;
+                                const isNonDiv = count === 1 && childrenList[group[0]]?.type !== 'ContentBox';
+                                const width = isNonDiv ? 100 : (count > 0 ? 100 / count : 100);
                                 group.forEach((idx) => { colWidths[idx] = width; });
                               });
 
@@ -4962,7 +4969,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
-                                      {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
+                                      {(child.data?.newRow || child.type !== 'ContentBox') && <div className="w-full basis-full h-0 shrink-0" />}
                                       <div
                                         onClick={(e) => {
                                           e.stopPropagation();

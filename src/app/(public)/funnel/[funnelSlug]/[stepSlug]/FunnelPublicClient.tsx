@@ -446,7 +446,13 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       const childRowGroups: number[][] = [];
                       let currentGroup: number[] = [];
                       childrenList.forEach((child: any, index: number) => {
-                        if (child.data?.newRow && currentGroup.length > 0) {
+                        if (child.type !== 'ContentBox') {
+                          if (currentGroup.length > 0) {
+                            childRowGroups.push(currentGroup);
+                            currentGroup = [];
+                          }
+                          childRowGroups.push([index]);
+                        } else if (child.data?.newRow && currentGroup.length > 0) {
                           childRowGroups.push(currentGroup);
                           currentGroup = [index];
                         } else {
@@ -458,7 +464,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       const colWidths: { [index: number]: number } = {};
                       childRowGroups.forEach((group) => {
                         const count = group.length;
-                        const width = count > 0 ? 100 / count : 100;
+                        const isNonDiv = count === 1 && childrenList[group[0]]?.type !== 'ContentBox';
+                        const width = isNonDiv ? 100 : (count > 0 ? 100 / count : 100);
                         group.forEach((idx) => { colWidths[idx] = width; });
                       });
 
