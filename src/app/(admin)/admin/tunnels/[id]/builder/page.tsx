@@ -1323,6 +1323,54 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </button>
                 </div>
 
+                {/* 📐 DISPOSITION DANS LA SECTION (MÊME LIGNE / EN DESSOUS) */}
+                <div className="space-y-2 pt-2 border-t border-slate-800">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    📐 Disposition dans la Section (Même Ligne ou En dessous)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentChildren = [...(selectedEl.data?.children || [])];
+                        const targetChild = currentChildren[selectedChildIndex];
+                        currentChildren[selectedChildIndex] = {
+                          ...targetChild,
+                          data: { ...(targetChild.data || {}), newRow: false },
+                        };
+                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                      }}
+                      className={`px-3 py-2 text-xs font-extrabold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
+                        !activeChild.data?.newRow
+                          ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-md'
+                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
+                      }`}
+                    >
+                      <span>↔️ Même Ligne</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentChildren = [...(selectedEl.data?.children || [])];
+                        const targetChild = currentChildren[selectedChildIndex];
+                        currentChildren[selectedChildIndex] = {
+                          ...targetChild,
+                          data: { ...(targetChild.data || {}), newRow: true },
+                        };
+                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                      }}
+                      className={`px-3 py-2 text-xs font-extrabold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
+                        activeChild.data?.newRow
+                          ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-md'
+                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
+                      }`}
+                    >
+                      <span>⬇️ En Dessous</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* COULEURS DE TOUTES LES CARTES DE LA COLONNE */}
                 <div className="space-y-2 pt-2 border-t border-slate-800">
                   <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
@@ -4736,10 +4784,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap md:flex-nowrap gap-0'} items-stretch w-full relative flex-1 h-full`}
+                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap gap-4'} items-stretch w-full relative flex-1 h-full`}
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
+                                      {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
                                       <div
                                         onClick={(e) => {
                                           e.stopPropagation();
