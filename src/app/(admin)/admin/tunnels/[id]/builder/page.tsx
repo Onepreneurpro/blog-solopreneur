@@ -319,32 +319,41 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       }
       restoreSelection();
       const sel = window.getSelection();
-      const selectedTxt = sel ? sel.toString().trim() : '';
+      let selectedTxt = sel ? sel.toString().trim() : '';
 
-      if (targetDomRef.current && selectedTxt.length > 0 && sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlFormatter(selectedTxt);
-        const formattedNode = tempDiv.firstChild || document.createTextNode(selectedTxt);
+      if (!selectedTxt && floatingTextMenu.selectedText) {
+        selectedTxt = floatingTextMenu.selectedText.trim();
+      }
 
-        range.deleteContents();
-        range.insertNode(formattedNode);
+      if (targetDomRef.current && selectedTxt.length > 0) {
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+          const range = sel.getRangeAt(0);
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = htmlFormatter(selectedTxt);
+          const formattedNode = tempDiv.firstChild || document.createTextNode(selectedTxt);
 
-        // Keep text selection active after formatting!
-        try {
-          const newRange = document.createRange();
-          newRange.selectNodeContents(formattedNode);
-          sel.removeAllRanges();
-          sel.addRange(newRange);
-          savedRangeRef.current = newRange.cloneRange();
-        } catch (e) {}
+          range.deleteContents();
+          range.insertNode(formattedNode);
 
-        const updatedHtml = targetDomRef.current.innerHTML;
-        updateTargetContentOnly(updatedHtml);
-      } else if (targetDomRef.current) {
-        const fullTxt = (targetDomRef.current as HTMLElement).innerText || targetDomRef.current.textContent || 'Texte';
-        targetDomRef.current.innerHTML = htmlFormatter(fullTxt);
-        updateTargetContentOnly(targetDomRef.current.innerHTML);
+          try {
+            const newRange = document.createRange();
+            newRange.selectNodeContents(formattedNode);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+            savedRangeRef.current = newRange.cloneRange();
+          } catch (e) {}
+
+          updateTargetContentOnly(targetDomRef.current.innerHTML);
+        } else {
+          // Precise text replacement inside targetDomRef.current.innerHTML
+          const currentHtml = targetDomRef.current.innerHTML;
+          if (currentHtml.includes(selectedTxt)) {
+            const formattedSnippet = htmlFormatter(selectedTxt);
+            const updatedHtml = currentHtml.replace(selectedTxt, formattedSnippet);
+            targetDomRef.current.innerHTML = updatedHtml;
+            updateTargetContentOnly(updatedHtml);
+          }
+        }
       }
     };
 
