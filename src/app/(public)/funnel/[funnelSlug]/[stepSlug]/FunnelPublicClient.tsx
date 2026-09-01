@@ -450,7 +450,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                       return (
-                        <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-stretch w-full flex-1 h-full">
+                        <div className="flex flex-wrap gap-4 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
                               flex: `0 0 ${colWidths[cIdx]}%`,
@@ -652,9 +652,12 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                             }
 
                             return (
-                              <div key={child.id || cIdx} style={colStyle} className="h-full flex flex-col overflow-hidden">
-                                {renderedChild}
-                              </div>
+                              <React.Fragment key={child.id || cIdx}>
+                                {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
+                                <div style={colStyle} className="h-full flex flex-col overflow-hidden">
+                                  {renderedChild}
+                                </div>
+                              </React.Fragment>
                             );
                           })}
                         </div>

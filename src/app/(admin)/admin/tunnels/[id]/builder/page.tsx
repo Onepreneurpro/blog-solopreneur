@@ -4736,10 +4736,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap md:flex-nowrap gap-0'} items-stretch w-full relative flex-1 h-full`}
+                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap gap-4'} items-stretch w-full relative flex-1 h-full`}
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
+                                      {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
                                       <div
                                         onClick={(e) => {
                                           e.stopPropagation();
