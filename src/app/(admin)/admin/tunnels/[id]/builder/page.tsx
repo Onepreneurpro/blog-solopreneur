@@ -173,7 +173,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
   const savedRangeRef = useRef<Range | null>(null);
+  const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
+
+  // Continuously capture DOM selection as the user selects text
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      if (typeof window !== 'undefined') {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+          savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+          lastSelectedTextRef.current = sel.toString();
+        }
+      }
+    };
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, []);
 
   // Click outside listener to dismiss floating text formatting toolbar
   useEffect(() => {
@@ -221,8 +237,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     if (savedRangeRef.current && typeof window !== 'undefined') {
       const sel = window.getSelection();
       if (sel) {
-        sel.removeAllRanges();
-        sel.addRange(savedRangeRef.current);
+        try {
+          sel.removeAllRanges();
+          sel.addRange(savedRangeRef.current);
+        } catch (e) {}
       }
     }
   };
@@ -331,7 +349,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div
         id="floating-builder-text-toolbar"
         style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* ↶ ANNULER */}
