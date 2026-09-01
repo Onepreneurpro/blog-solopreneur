@@ -2805,14 +2805,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               setSelectedElementId(null);
               setActiveTab('SETTINGS');
             }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'SETTINGS' && !selectedElementId
-                ? 'bg-[#00A0FF] text-white shadow-sm'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+            className={`px-3.5 py-1.5 bg-[#00A0FF] hover:bg-[#0080FF] text-white text-xs font-black rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'SETTINGS' && !selectedElementId ? 'ring-2 ring-white/50' : ''
             }`}
-            title="Ouvrir les Paramètres de la Page (Taille, Langue, RTL Arabe, Polices)"
+            title="Ouvrir les Paramètres de la Page (Taille, Langue, Polices)"
           >
-            <Sliders className="w-3.5 h-3.5 text-[#00A0FF]" />
+            <Sliders className="w-4 h-4 stroke-[2.5]" />
             <span>Paramètres</span>
           </button>
         </div>
@@ -2827,47 +2825,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         {/* RIGHT ACTION BUTTONS */}
         <div className="flex items-center gap-3">
           
-          {/* DESKTOP / MOBILE / GRID TOGGLE & DISPLAY WIDTH BUTTONS */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
-
-
-
-          </div>
-
-          {/* PAGE DISPLAY WIDTH SELECTOR (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%) */}
-          <div className="hidden lg:flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
-            <button
-              type="button"
-              onClick={() => handleSetPageWidthMode('standard')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                pageWidthMode === 'standard' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Affichage Standard (896px - Centré)"
-            >
-              📱 Standard (896px)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSetPageWidthMode('wide')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                pageWidthMode === 'wide' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Affichage Large (1152px - Étendu)"
-            >
-              💻 Large (1152px)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSetPageWidthMode('full')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                pageWidthMode === 'full' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Affichage Plein Écran (100% - Full Width)"
-            >
-              🖥️ Plein Écran (100%)
-            </button>
-          </div>
-
           {/* VOIR LA PAGE (PUBLIC VIEW) BUTTON */}
           <a
             href={
@@ -2916,11 +2873,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div className="w-80 sm:w-96 md:w-[410px] max-w-[90vw] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden transition-all">
           {!selectedElementId ? (
             <React.Fragment>
-              {/* TABS: ÉLÉMENTS / BLOCS / PARAMÈTRES / PC-MOBILE */}
-              <div className="p-2 border-b border-slate-800 grid grid-cols-4 gap-1 bg-slate-950 shrink-0">
+              {/* TABS: ÉLÉMENTS / BLOCS / PC-MOBILE */}
+              <div className="p-2 border-b border-slate-800 grid grid-cols-3 gap-1.5 bg-slate-950 shrink-0">
                 <button
                   onClick={() => setActiveTab('ELEMENTS')}
-                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
                     activeTab === 'ELEMENTS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -2928,23 +2885,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </button>
                 <button
                   onClick={() => setActiveTab('BLOCKS')}
-                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
                     activeTab === 'BLOCKS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Blocs
                 </button>
                 <button
-                  onClick={() => setActiveTab('SETTINGS')}
-                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
-                    activeTab === 'SETTINGS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  ⚙️ Paramètres
-                </button>
-                <button
                   onClick={() => setPreviewMode(previewMode === 'DESKTOP' ? 'MOBILE' : 'DESKTOP')}
-                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all flex items-center justify-center gap-0.5 border ${
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all flex items-center justify-center gap-1 border ${
                     previewMode === 'MOBILE'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs font-extrabold'
                       : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
@@ -3523,7 +3472,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF] cursor-pointer"
                     >
                       <option value="fr">Français</option>
-                      <option value="ar">Arabe (RTL - Droite à Gauche)</option>
+                      <option value="ar">Arabe</option>
                       <option value="en">Anglais</option>
                     </select>
                   </div>
