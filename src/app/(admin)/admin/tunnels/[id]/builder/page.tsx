@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
@@ -603,7 +603,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            updateTargetStyles({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
+            updateTarget({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
           }}
           className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Grand Titre H2"
@@ -616,7 +616,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            updateTargetStyles({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
+            updateTarget({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
           }}
           className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Sous-Titre H3"
