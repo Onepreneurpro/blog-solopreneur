@@ -22,29 +22,36 @@ const renderBorderStyles = (data: any) => {
   const borderRadius = hasRadius ? `${rTL}px ${rTR}px ${rBR}px ${rBL}px` : undefined;
   const clipPath = hasRadius ? `inset(0 round ${rTL}px ${rTR}px ${rBR}px ${rBL}px)` : undefined;
 
+  // BOX SHADOW COMPUTATION
+  const shadowColor = data.shadowColor || '#000000';
+  const opacityPct = data.shadowOpacity !== undefined ? data.shadowOpacity : (data.shadowBlur || data.shadowOffsetY ? 25 : 0);
+  const offsetX = data.shadowOffsetX !== undefined ? data.shadowOffsetX : 0;
+  const offsetY = data.shadowOffsetY !== undefined ? data.shadowOffsetY : (opacityPct > 0 ? 10 : 0);
+  const blur = data.shadowBlur !== undefined ? data.shadowBlur : (opacityPct > 0 ? 15 : 0);
+  const spread = data.shadowSpread !== undefined ? data.shadowSpread : 0;
+  const isInset = data.shadowInset ? 'inset ' : '';
+
+  let boxShadow = data.boxShadow;
+  if (!boxShadow && (opacityPct > 0 || blur > 0 || offsetX !== 0 || offsetY !== 0)) {
+    const hexToRgba = (hex: string, op: number) => {
+      if (!hex || hex === 'transparent') return 'transparent';
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+      const num = parseInt(c, 16) || 0;
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${op / 100})`;
+    };
+    boxShadow = `${isInset}${offsetX}px ${offsetY}px ${blur}px ${spread}px ${hexToRgba(shadowColor, opacityPct)}`;
+  }
+
   if (!data.borderStyle || data.borderStyle === 'none') {
     return {
       borderRadius,
       clipPath,
       WebkitClipPath: clipPath,
-    };
-  }
-
-  if (data.borderStyle === 'wavy') {
-    const encodedColor = encodeURIComponent(bColor);
-    const strokeW = Math.max(3, bWidth * 1.5);
-    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M 0 10 Q 5 0, 10 10 T 20 10' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round'/%3E%3C/svg%3E`;
-
-    return {
-      borderStyle: 'solid',
-      borderWidth: `${Math.max(4, bWidth)}px`,
-      borderColor: 'transparent',
-      borderImageSource: `url("${svgWave}")`,
-      borderImageSlice: '6',
-      borderImageRepeat: 'repeat',
-      borderRadius,
-      clipPath,
-      WebkitClipPath: clipPath,
+      boxShadow,
     };
   }
 
@@ -55,6 +62,7 @@ const renderBorderStyles = (data: any) => {
     borderRadius,
     clipPath,
     WebkitClipPath: clipPath,
+    boxShadow,
   };
 };
 
@@ -362,9 +370,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
               const mainBg = el.data?.bgColor || '#0F172A';
               const bgImage = el.data?.bgImage || '';
+              const bgZoom = el.data?.bgZoom || 100;
+              const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
+              const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
               const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
-              const bgSize = el.data?.bgSize || 'cover';
-              const bgPos = el.data?.bgPosition || 'center';
               const textColor = el.data?.textColor || '#ffffff';
               const innerWidth = el.data?.innerContentWidth || 'standard';
 
@@ -395,9 +404,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                   <section
                     style={{
                       backgroundColor: mainBg,
-                      backgroundImage: bgImage ? `url(${bgImage})` : undefined,
-                      backgroundSize: bgSize,
-                      backgroundPosition: bgPos,
                       color: textColor,
                       minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                       paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
@@ -412,6 +418,22 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     }}
                     className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
+                  {/* SECTION BACKGROUND IMAGE LAYER WITH ZOOM AND TRANSLATION */}
+                  {bgImage && (
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          backgroundImage: `url(${bgImage})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
+                          transformOrigin: 'center center',
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
                     <div
@@ -580,9 +602,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                   alt="Child"
                                                   style={{
                                                     objectFit: sub.data?.imgObjectFit || 'cover',
-                                                    objectPosition: `${sub.data?.posX !== undefined ? sub.data.posX : 50}% ${sub.data?.posY !== undefined ? sub.data.posY : 50}%`,
-                                                    transform: `scale(${(sub.data?.imgZoom || 100) / 100})`,
-                                                    ...renderBorderStyles(sub.data),
+                                                    transform: `scale(${(sub.data?.imgZoom || (sub.imgZoom !== undefined ? sub.imgZoom : 120)) / 100}) translate(${50 - (sub.data?.posX !== undefined ? sub.data.posX : (sub.posX !== undefined ? sub.posX : 50))}%, ${50 - (sub.data?.posY !== undefined ? sub.data.posY : (sub.posY !== undefined ? sub.posY : 50))}%)`,
+                                                    ...renderBorderStyles(sub.data || sub),
                                                   }}
                                                   className="w-full h-full object-cover overflow-hidden"
                                                 />
