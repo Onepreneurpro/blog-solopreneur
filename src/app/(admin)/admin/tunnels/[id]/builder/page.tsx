@@ -1381,6 +1381,61 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <option value="fill">Étirer (Fill)</option>
                   </select>
                 </div>
+
+                {/* POSITION X / Y & ZOOM D'IMAGE */}
+                <div className="pt-2 border-t border-slate-800 space-y-3">
+                  <div className="text-[10px] font-black text-amber-400 uppercase tracking-wider">
+                    🖼️ Position & Zoom de l Image dans le Cadre
+                  </div>
+
+                  {/* POSITION HORIZONTALE (X) */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                      <span>Position Horizontale (X)</span>
+                      <span className="font-mono text-white">{currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={currentSubItem.posX !== undefined ? currentSubItem.posX : 50}
+                      onChange={(e) => updateSubItemProperty({ posX: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1 cursor-pointer"
+                    />
+                  </div>
+
+                  {/* POSITION VERTICALE (Y) */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                      <span>Position Verticale (Y)</span>
+                      <span className="font-mono text-white">{currentSubItem.posY !== undefined ? currentSubItem.posY : 50}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
+                      onChange={(e) => updateSubItemProperty({ posY: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1 cursor-pointer"
+                    />
+                  </div>
+
+                  {/* ZOOM / ÉCHELLE */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                      <span>Zoom / Échelle</span>
+                      <span className="font-mono text-white">{currentSubItem.imgZoom || 100}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={100}
+                      max={300}
+                      value={currentSubItem.imgZoom || 100}
+                      onChange={(e) => updateSubItemProperty({ imgZoom: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1 cursor-pointer"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -2170,7 +2225,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <input
                             type="number"
                             min={0}
-                            max={60}
+                            max={500}
                             disabled={openMarginDetail.borderRadius}
                             value={
                               openMarginDetail.borderRadius
@@ -2178,7 +2233,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 : radiusVal
                             }
                             onChange={(e) => {
-                              const val = Math.max(0, Math.min(60, Number(e.target.value) || 0));
+                              const val = Math.max(0, Math.min(500, Number(e.target.value) || 0));
                               updateMarginData({
                                 borderRadius: val,
                                 borderTopLeftRadius: undefined,
@@ -2187,7 +2242,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 borderBottomRightRadius: undefined,
                               });
                             }}
-                            className={`w-9 text-right text-xs font-mono bg-transparent outline-none border-none p-0 ${
+                            className={`w-11 text-right text-xs font-mono bg-transparent outline-none border-none p-0 ${
                               openMarginDetail.borderRadius ? 'text-slate-500 cursor-not-allowed' : 'text-white font-bold'
                             }`}
                           />
@@ -2211,7 +2266,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <input
                       type="range"
                       min={0}
-                      max={60}
+                      max={500}
                       disabled={openMarginDetail.borderRadius}
                       value={
                         openMarginDetail.borderRadius
@@ -2252,10 +2307,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 <input
                                   type="number"
                                   min={0}
-                                  max={60}
+                                  max={500}
                                   value={rTL}
                                   onChange={(e) => updateMarginData({ borderTopLeftRadius: Number(e.target.value) })}
-                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                  className="w-10 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
                                 />
                                 <span className="text-[8px] font-mono text-slate-400">px</span>
                               </div>
@@ -2263,7 +2318,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             <input
                               type="range"
                               min={0}
-                              max={60}
+                              max={500}
                               value={rTL}
                               onChange={(e) => updateMarginData({ borderTopLeftRadius: Number(e.target.value) })}
                               className="w-full accent-[#00A0FF] h-1 cursor-pointer"
@@ -2278,10 +2333,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 <input
                                   type="number"
                                   min={0}
-                                  max={60}
+                                  max={500}
                                   value={rTR}
                                   onChange={(e) => updateMarginData({ borderTopRightRadius: Number(e.target.value) })}
-                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                  className="w-10 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
                                 />
                                 <span className="text-[8px] font-mono text-slate-400">px</span>
                               </div>
@@ -2289,7 +2344,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             <input
                               type="range"
                               min={0}
-                              max={60}
+                              max={500}
                               value={rTR}
                               onChange={(e) => updateMarginData({ borderTopRightRadius: Number(e.target.value) })}
                               className="w-full accent-[#00A0FF] h-1 cursor-pointer"
@@ -2304,10 +2359,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 <input
                                   type="number"
                                   min={0}
-                                  max={60}
+                                  max={500}
                                   value={rBL}
                                   onChange={(e) => updateMarginData({ borderBottomLeftRadius: Number(e.target.value) })}
-                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                  className="w-10 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
                                 />
                                 <span className="text-[8px] font-mono text-slate-400">px</span>
                               </div>
@@ -2315,7 +2370,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             <input
                               type="range"
                               min={0}
-                              max={60}
+                              max={500}
                               value={rBL}
                               onChange={(e) => updateMarginData({ borderBottomLeftRadius: Number(e.target.value) })}
                               className="w-full accent-[#00A0FF] h-1 cursor-pointer"
@@ -2330,10 +2385,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 <input
                                   type="number"
                                   min={0}
-                                  max={60}
+                                  max={500}
                                   value={rBR}
                                   onChange={(e) => updateMarginData({ borderBottomRightRadius: Number(e.target.value) })}
-                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                  className="w-10 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
                                 />
                                 <span className="text-[8px] font-mono text-slate-400">px</span>
                               </div>
@@ -2341,7 +2396,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             <input
                               type="range"
                               min={0}
-                              max={60}
+                              max={500}
                               value={rBR}
                               onChange={(e) => updateMarginData({ borderBottomRightRadius: Number(e.target.value) })}
                               className="w-full accent-[#00A0FF] h-1 cursor-pointer"
@@ -4343,6 +4398,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         alt="SubImage"
                                                         style={{
                                                           objectFit: subChild.data?.imgObjectFit || 'cover',
+                                                          objectPosition: `${subChild.data?.posX !== undefined ? subChild.data.posX : 50}% ${subChild.data?.posY !== undefined ? subChild.data.posY : 50}%`,
+                                                          transform: `scale(${(subChild.data?.imgZoom || 100) / 100})`,
                                                           ...renderBorderStyles(subChild.data),
                                                         }}
                                                         className="w-full h-full min-h-[140px] block rounded-none"

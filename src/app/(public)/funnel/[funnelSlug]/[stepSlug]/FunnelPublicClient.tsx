@@ -580,6 +580,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                   alt="Child"
                                                   style={{
                                                     objectFit: sub.data?.imgObjectFit || 'cover',
+                                                    objectPosition: `${sub.data?.posX !== undefined ? sub.data.posX : 50}% ${sub.data?.posY !== undefined ? sub.data.posY : 50}%`,
+                                                    transform: `scale(${(sub.data?.imgZoom || 100) / 100})`,
                                                     ...renderBorderStyles(sub.data),
                                                   }}
                                                   className="w-full h-full object-cover overflow-hidden"
