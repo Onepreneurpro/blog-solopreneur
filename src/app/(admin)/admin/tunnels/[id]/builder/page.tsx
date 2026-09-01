@@ -3738,26 +3738,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
                       ©️ Pied de page & Copyright
                     </label>
-                    <div className="flex items-center bg-slate-900 p-0.5 rounded-xl border border-slate-800 gap-0.5">
-                      <button
-                        type="button"
-                        onClick={() => setShowCopyright(true)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
-                          showCopyright ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        👁️ Afficher
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCopyright(false)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
-                          !showCopyright ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        🙈 Masquer
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowCopyright(!showCopyright)}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                        showCopyright
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                          : 'bg-rose-500/10 text-rose-400 border-rose-500/30 hover:bg-rose-500/20'
+                      }`}
+                    >
+                      <span>{showCopyright ? '👁️ Afficher' : '🙈 Masquer'}</span>
+                    </button>
                   </div>
 
                   {showCopyright && (
