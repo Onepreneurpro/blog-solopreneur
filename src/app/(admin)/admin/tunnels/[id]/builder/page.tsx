@@ -5958,10 +5958,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </React.Fragment>
               );
             })}
-            {/* CANVAS BOTTOM FOOTER COPYRIGHT */}
-            <div className="w-full text-center text-xs text-slate-500 border-t border-slate-900/60 pt-6 mt-12 pb-12 font-medium">
-              {pageCopyright || '© 2026 Onepreneur&Co. Tous droits réservés.'}
-            </div>
           </div>
         </div>
       </div>
