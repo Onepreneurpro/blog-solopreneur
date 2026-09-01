@@ -3827,7 +3827,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           className="min-h-[80px] w-full border border-dashed border-slate-300 rounded-lg bg-white/60 transition-all hover:border-[#00A0FF]"
                                         >
                                           {(!child.data?.children || child.data.children.length === 0) ? (
-                                            <div className="w-full h-full min-h-[80px]" />
+                                            <div className="w-full h-full min-h-[80px] border-2 border-dashed border-sky-400/30 rounded-lg flex items-center justify-center p-3 text-[11px] text-sky-400/70 font-semibold bg-sky-500/5 select-none">
+                                              <span>Glissez-déposez un élément ici (Image, Texte, Bouton...)</span>
+                                            </div>
                                           ) : (
                                             <div className="w-full space-y-3">
                                               {(child.data.children || []).map((subChild: any, sIdx: number) => {
@@ -3838,7 +3840,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                   currentSubList[sIdx] = {
                                                     ...currentSubList[sIdx],
                                                     data: { ...(currentSubList[sIdx].data || {}), ...changes },
-                                            content: changes.content !== undefined ? changes.content : currentSubList[sIdx].content,
+                                                    content: changes.content !== undefined ? changes.content : currentSubList[sIdx].content,
                                                   };
                                                   currentChildren[cIdx] = {
                                                     ...targetChild,
@@ -3847,8 +3849,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                   handleUpdateElementData(el.id, { children: currentChildren });
                                                 };
 
-                                                const removeSubChild = () => {
+                                                const removeSubChild = (e?: React.MouseEvent) => {
+                                                  if (e) e.stopPropagation();
                                                   const currentChildren = [...(el.data?.children || [])];
+                                                  if (!currentChildren[cIdx]) return;
                                                   const targetChild = currentChildren[cIdx];
                                                   const currentSubList = (targetChild.data?.children || []).filter((_: any, i: number) => i !== sIdx);
                                                   currentChildren[cIdx] = {
@@ -3856,6 +3860,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     data: { ...(targetChild.data || {}), children: currentSubList },
                                                   };
                                                   handleUpdateElementData(el.id, { children: currentChildren });
+                                                  setSelectedSubItem(null);
                                                 };
 
                                                 const isSubSel = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx && selectedSubItem?.itemIndex === sIdx;
@@ -3911,7 +3916,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                             type="button"
                                                             onClick={(e) => {
                                                               e.stopPropagation();
-                                                              removeSubChild();
+                                                              removeSubChild(e);
                                                             }}
                                                             className="p-0.5 hover:bg-black/20 rounded transition-colors"
                                                             title="Supprimer l image"
@@ -3941,7 +3946,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                       <span className="text-[9px] uppercase tracking-wider font-extrabold text-[#00A0FF]">{subChild.type}</span>
                                                       <button
                                                         type="button"
-                                                        onClick={removeSubChild}
+                                                        onClick={(e) => removeSubChild(e)}
                                                         className="p-0.5 text-slate-400 hover:text-red-400 rounded transition-colors"
                                                         title="Supprimer l élément"
                                                       >
