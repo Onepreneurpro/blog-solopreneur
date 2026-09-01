@@ -126,15 +126,38 @@ const renderBorderStyles = (data: any) => {
   const borderRadius = hasRadius ? `${rTL}px ${rTR}px ${rBR}px ${rBL}px` : undefined;
   const clipPath = hasRadius ? `inset(0 round ${rTL}px ${rTR}px ${rBR}px ${rBL}px)` : undefined;
 
+  // BOX SHADOW COMPUTATION
+  const shadowColor = data.shadowColor || '#000000';
+  const opacityPct = data.shadowOpacity !== undefined ? data.shadowOpacity : (data.shadowBlur || data.shadowOffsetY ? 25 : 0);
+  const offsetX = data.shadowOffsetX !== undefined ? data.shadowOffsetX : 0;
+  const offsetY = data.shadowOffsetY !== undefined ? data.shadowOffsetY : (opacityPct > 0 ? 10 : 0);
+  const blur = data.shadowBlur !== undefined ? data.shadowBlur : (opacityPct > 0 ? 15 : 0);
+  const spread = data.shadowSpread !== undefined ? data.shadowSpread : 0;
+  const isInset = data.shadowInset ? 'inset ' : '';
+
+  let boxShadow = data.boxShadow;
+  if (!boxShadow && (opacityPct > 0 || blur > 0 || offsetX !== 0 || offsetY !== 0)) {
+    const hexToRgba = (hex: string, op: number) => {
+      if (!hex || hex === 'transparent') return 'transparent';
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+      const num = parseInt(c, 16) || 0;
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${op / 100})`;
+    };
+    boxShadow = `${isInset}${offsetX}px ${offsetY}px ${blur}px ${spread}px ${hexToRgba(shadowColor, opacityPct)}`;
+  }
+
   if (!data.borderStyle || data.borderStyle === 'none') {
     return {
       borderRadius,
       clipPath,
       WebkitClipPath: clipPath,
+      boxShadow,
     };
   }
-
-
 
   return {
     borderStyle: data.borderStyle,
@@ -143,6 +166,7 @@ const renderBorderStyles = (data: any) => {
     borderRadius,
     clipPath,
     WebkitClipPath: clipPath,
+    boxShadow,
   };
 };
 
@@ -2514,6 +2538,165 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* E. OMBRAGE & OMBRE PORTÉE (BOX SHADOW) */}
+                  <div className="space-y-3 pt-3 border-t border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                        ✨ Ombrage & Ombre Portée (Box Shadow)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
+                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase transition-all border ${
+                          targetData.shadowInset
+                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                        }`}
+                      >
+                        {targetData.shadowInset ? '🔲 Interne (Inset)' : '🔳 Externe (Normal)'}
+                      </button>
+                    </div>
+
+                    {/* PRESETS RAPIDES */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { label: '🚫 Aucune', data: { shadowOpacity: 0, shadowBlur: 0, shadowOffsetX: 0, shadowOffsetY: 0, shadowSpread: 0 } },
+                        { label: '☁️ Douce', data: { shadowOpacity: 20, shadowBlur: 15, shadowOffsetX: 0, shadowOffsetY: 6, shadowSpread: 0 } },
+                        { label: '🌖 Moyenne', data: { shadowOpacity: 35, shadowBlur: 25, shadowOffsetX: 0, shadowOffsetY: 12, shadowSpread: 0 } },
+                        { label: '🌘 Forte', data: { shadowOpacity: 55, shadowBlur: 35, shadowOffsetX: 0, shadowOffsetY: 18, shadowSpread: 2 } },
+                        { label: '🌟 Néon', data: { shadowOpacity: 80, shadowBlur: 20, shadowOffsetX: 0, shadowOffsetY: 0, shadowSpread: 2, shadowColor: targetData.borderColor || '#00A0FF' } },
+                        { label: '🔲 Inset', data: { shadowOpacity: 30, shadowBlur: 10, shadowOffsetX: 0, shadowOffsetY: 2, shadowSpread: 0, shadowInset: true } },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => updateMarginData(preset.data)}
+                          className="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition-all text-center"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* 1. OPACITÉ DE L'OMBRE */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-300">Opacité de l ombre</span>
+                        <span className="text-xs font-mono text-[#00A0FF] font-bold">
+                          {targetData.shadowOpacity !== undefined ? targetData.shadowOpacity : (targetData.shadowBlur || targetData.shadowOffsetY ? 25 : 0)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={targetData.shadowOpacity !== undefined ? targetData.shadowOpacity : (targetData.shadowBlur || targetData.shadowOffsetY ? 25 : 0)}
+                        onChange={(e) => updateMarginData({ shadowOpacity: Number(e.target.value) })}
+                        className="w-full accent-[#00A0FF] cursor-pointer"
+                      />
+                    </div>
+
+                    {/* 2. FLOU / DIFFUS */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-300">Flou & Diffus (Adoucissement)</span>
+                        <span className="text-xs font-mono text-[#00A0FF] font-bold">
+                          {targetData.shadowBlur !== undefined ? targetData.shadowBlur : (targetData.shadowOpacity ? 15 : 0)}px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={targetData.shadowBlur !== undefined ? targetData.shadowBlur : (targetData.shadowOpacity ? 15 : 0)}
+                        onChange={(e) => updateMarginData({ shadowBlur: Number(e.target.value) })}
+                        className="w-full accent-[#00A0FF] cursor-pointer"
+                      />
+                    </div>
+
+                    {/* 3. DISTANCE VERTICALE & HORIZONTALE */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold">
+                          <span className="text-slate-300">Distance Y (Vert)</span>
+                          <span className="font-mono text-[#00A0FF]">{targetData.shadowOffsetY !== undefined ? targetData.shadowOffsetY : 10}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={50}
+                          value={targetData.shadowOffsetY !== undefined ? targetData.shadowOffsetY : 10}
+                          onChange={(e) => updateMarginData({ shadowOffsetY: Number(e.target.value) })}
+                          className="w-full accent-[#00A0FF] cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold">
+                          <span className="text-slate-300">Distance X (Horiz)</span>
+                          <span className="font-mono text-[#00A0FF]">{targetData.shadowOffsetX !== undefined ? targetData.shadowOffsetX : 0}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={50}
+                          value={targetData.shadowOffsetX !== undefined ? targetData.shadowOffsetX : 0}
+                          onChange={(e) => updateMarginData({ shadowOffsetX: Number(e.target.value) })}
+                          className="w-full accent-[#00A0FF] cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 4. ÉTALEMENT / SPREAD */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-300">Étalement & Taille (Spread)</span>
+                        <span className="text-xs font-mono text-[#00A0FF] font-bold">
+                          {targetData.shadowSpread !== undefined ? targetData.shadowSpread : 0}px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={-20}
+                        max={50}
+                        value={targetData.shadowSpread !== undefined ? targetData.shadowSpread : 0}
+                        onChange={(e) => updateMarginData({ shadowSpread: Number(e.target.value) })}
+                        className="w-full accent-[#00A0FF] cursor-pointer"
+                      />
+                    </div>
+
+                    {/* 5. COULEUR DE L'OMBRE */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-300 block">Couleur de l ombre</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={targetData.shadowColor || '#000000'}
+                          onChange={(e) => updateMarginData({ shadowColor: e.target.value })}
+                          className="w-8 h-8 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer p-0.5"
+                        />
+                        <input
+                          type="text"
+                          value={targetData.shadowColor || '#000000'}
+                          onChange={(e) => updateMarginData({ shadowColor: e.target.value })}
+                          className="flex-1 px-2.5 py-1 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-[#00A0FF]"
+                        />
+                      </div>
+                      <div className="flex items-center gap-1.5 pt-1">
+                        {['#000000', '#00A0FF', '#10B981', '#FF7A00', '#EF4444', '#8B5CF6', '#ffffff'].map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => updateMarginData({ shadowColor: c })}
+                            className="w-5 h-5 rounded-full border border-slate-700 cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                            style={{ backgroundColor: c }}
+                            title={c}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
