@@ -1616,6 +1616,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             </div>
 
             {(() => {
+              const targetData = selectedChildIndex !== null
+                ? (selectedEl.data?.children?.[selectedChildIndex]?.data || {})
+                : (selectedEl.data || {});
+
+              const applyBgImageUpdate = (update: Record<string, any>) => {
+                if (selectedChildIndex !== null) {
+                  const currentChildren = [...(selectedEl.data?.children || [])];
+                  const targetChild = currentChildren[selectedChildIndex];
+                  currentChildren[selectedChildIndex] = {
+                    ...targetChild,
+                    data: {
+                      ...(targetChild.data || {}),
+                      ...update,
+                    },
+                  };
+                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                } else {
+                  handleUpdateElementData(selectedEl.id, update);
+                }
+              };
+
               const bgVal = selectedChildIndex !== null
                 ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent')
                 : (elData.bgColor || 'transparent');
@@ -1809,7 +1830,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       {targetData.bgImage && (
                         <button
                           type="button"
-                          onClick={() => updateMarginData({ bgImage: '', bgZoom: 100, bgPosX: 50, bgPosY: 50 })}
+                          onClick={() => applyBgImageUpdate({ bgImage: '', bgZoom: 100, bgPosX: 50, bgPosY: 50 })}
                           className="text-[9px] font-bold text-rose-400 hover:text-rose-300 underline"
                         >
                           🗑️ Supprimer
@@ -1822,7 +1843,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         type="button"
                         onClick={() => {
                           triggerImageFileUpload((base64Url) => {
-                            updateMarginData({ bgImage: base64Url });
+                            applyBgImageUpdate({ bgImage: base64Url });
                           });
                         }}
                         className="w-full py-2 px-3 bg-gradient-to-r from-[#00A0FF] to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
@@ -1835,7 +1856,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           type="text"
                           placeholder="Ou coller une URL d image..."
                           value={targetData.bgImage || ''}
-                          onChange={(e) => updateMarginData({ bgImage: e.target.value })}
+                          onChange={(e) => applyBgImageUpdate({ bgImage: e.target.value })}
                           className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
                         />
                       </div>
@@ -1853,7 +1874,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             min={100}
                             max={300}
                             value={targetData.bgZoom || 100}
-                            onChange={(e) => updateMarginData({ bgZoom: Number(e.target.value) })}
+                            onChange={(e) => applyBgImageUpdate({ bgZoom: Number(e.target.value) })}
                             className="w-full accent-[#00A0FF] cursor-pointer"
                           />
                         </div>
@@ -1868,7 +1889,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             min={0}
                             max={100}
                             value={targetData.bgPosX !== undefined ? targetData.bgPosX : 50}
-                            onChange={(e) => updateMarginData({ bgPosX: Number(e.target.value) })}
+                            onChange={(e) => applyBgImageUpdate({ bgPosX: Number(e.target.value) })}
                             className="w-full accent-[#00A0FF] cursor-pointer"
                           />
                         </div>
@@ -1883,7 +1904,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             min={0}
                             max={100}
                             value={targetData.bgPosY !== undefined ? targetData.bgPosY : 50}
-                            onChange={(e) => updateMarginData({ bgPosY: Number(e.target.value) })}
+                            onChange={(e) => applyBgImageUpdate({ bgPosY: Number(e.target.value) })}
                             className="w-full accent-[#00A0FF] cursor-pointer"
                           />
                         </div>
@@ -1891,7 +1912,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <div className="pt-1 flex justify-end">
                           <button
                             type="button"
-                            onClick={() => updateMarginData({ bgPosX: 50, bgPosY: 50, bgZoom: 100 })}
+                            onClick={() => applyBgImageUpdate({ bgPosX: 50, bgPosY: 50, bgZoom: 100 })}
                             className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg transition-colors"
                           >
                             🎯 Centrer (50% 50%)
