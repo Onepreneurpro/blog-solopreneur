@@ -278,6 +278,62 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   // Canvas elements state (starts clean and empty)
   const [elements, setElements] = useState<CanvasElement[]>([]);
 
+  // UNDO / REDO HISTORY SYSTEM
+  const [history, setHistory] = useState<CanvasElement[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const isHistoryActionRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isHistoryActionRef.current) {
+      isHistoryActionRef.current = false;
+      return;
+    }
+    setHistory((prevHistory) => {
+      const newHistory = prevHistory.slice(0, historyIndex + 1);
+      return [...newHistory, elements];
+    });
+    setHistoryIndex((prev) => prev + 1);
+  }, [elements]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      isHistoryActionRef.current = true;
+      const prevIndex = historyIndex - 1;
+      setHistoryIndex(prevIndex);
+      setElements(history[prevIndex]);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      isHistoryActionRef.current = true;
+      const nextIndex = historyIndex + 1;
+      setHistoryIndex(nextIndex);
+      setElements(history[nextIndex]);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if (isCtrlOrCmd && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [historyIndex, history]);
+
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -2335,14 +2391,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           {/* UNDO / REDO */}
           <div className="flex items-center gap-1">
             <button
-              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Annuler (Ctrl+Z)"
+              type="button"
+              onClick={handleUndo}
+              disabled={historyIndex <= 0}
+              className={`p-1.5 rounded-lg transition-colors ${
+                historyIndex > 0
+                  ? 'text-slate-200 hover:text-white hover:bg-slate-800 cursor-pointer'
+                  : 'text-slate-600 opacity-40 cursor-not-allowed'
+              }`}
+              title="Annuler / Revenir (Ctrl+Z)"
             >
               <Undo className="w-4 h-4" />
             </button>
             <button
-              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Rétablir (Ctrl+Y)"
+              type="button"
+              onClick={handleRedo}
+              disabled={historyIndex >= history.length - 1}
+              className={`p-1.5 rounded-lg transition-colors ${
+                historyIndex < history.length - 1
+                  ? 'text-slate-200 hover:text-white hover:bg-slate-800 cursor-pointer'
+                  : 'text-slate-600 opacity-40 cursor-not-allowed'
+              }`}
+              title="Rétablir / Avancer (Ctrl+Y)"
             >
               <Redo className="w-4 h-4" />
             </button>
