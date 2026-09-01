@@ -171,6 +171,354 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     childIdx?: number | null;
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
+
+  const renderFloatingToolbar = () => {
+    if (!floatingTextMenu.visible) return null;
+    const targetId = floatingTextMenu.targetElId || selectedElementId;
+    const childIdx = (floatingTextMenu.childIdx !== undefined && floatingTextMenu.childIdx !== null)
+      ? floatingTextMenu.childIdx
+      : selectedChildIndex;
+
+    const updateTarget = (styleUpdates: Record<string, any>, extraProps?: Record<string, any>) => {
+      if (!targetId) return;
+      if (childIdx !== null && childIdx !== undefined) {
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children) {
+          const children = [...targetSection.data.children];
+          const child = children[childIdx];
+          if (child) {
+            children[childIdx] = {
+              ...child,
+              ...(extraProps || {}),
+              data: { ...(child.data || {}), ...styleUpdates }
+            };
+            handleUpdateElementData(targetId, { children });
+          }
+        }
+      } else {
+        handleUpdateElementData(targetId, styleUpdates);
+      }
+    };
+
+    return (
+      <div
+        id="floating-builder-text-toolbar"
+        style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
+        onMouseDown={(e) => e.preventDefault()}
+        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
+      >
+        {/* ↶ ANNULER */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => handleUndo()}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
+          title="↶ Annuler la dernière modification"
+        >
+          <Undo className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* ↷ RÉTABLIR */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => handleRedo()}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
+          title="↷ Rétablir la modification"
+        >
+          <Redo className="w-4 h-4 text-slate-900" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+        {/* B GRAS */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            const targetSection = elements.find(e => e.id === targetId);
+            let curBold = false;
+            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+              const child = targetSection.data.children[childIdx];
+              curBold = child.data?.fontWeight === 'black' || child.data?.fontWeight === 'bold';
+            } else if (targetSection) {
+              curBold = targetSection.data?.fontWeight === 'black' || targetSection.data?.fontWeight === 'bold';
+            }
+            updateTarget({ fontWeight: curBold ? 'normal' : 'black' });
+          }}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 font-black text-xs flex items-center justify-center min-w-[32px]"
+          title="B Gras (Extrabold)"
+        >
+          <Bold className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* I ITALIQUE */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            const targetSection = elements.find(e => e.id === targetId);
+            let curItalic = false;
+            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+              const child = targetSection.data.children[childIdx];
+              curItalic = child.data?.fontStyle === 'italic';
+            } else if (targetSection) {
+              curItalic = targetSection.data?.fontStyle === 'italic';
+            }
+            updateTarget({ fontStyle: curItalic ? 'normal' : 'italic' });
+          }}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 italic font-black text-xs flex items-center justify-center min-w-[32px]"
+          title="I Italique"
+        >
+          <Italic className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* ∪ SOULIGNÉ */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            const targetSection = elements.find(e => e.id === targetId);
+            let curU = false;
+            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+              const child = targetSection.data.children[childIdx];
+              curU = child.data?.textDecoration === 'underline';
+            } else if (targetSection) {
+              curU = targetSection.data?.textDecoration === 'underline';
+            }
+            updateTarget({ textDecoration: curU ? 'none' : 'underline' });
+          }}
+          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+          title="Souligner le texte"
+        >
+          <Underline className="w-4 h-4 text-sky-600" />
+          <span>Souligné</span>
+        </button>
+
+        {/* T TAILLE DROPDOWN */}
+        <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full border border-slate-300">
+          <Type className="w-4 h-4 text-slate-700 shrink-0" />
+          <select
+            onMouseDown={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val) updateTarget({ fontSize: val });
+            }}
+            className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer"
+            title="Taille de la police"
+          >
+            <option value="">Taille ▾</option>
+            <option value="14px">14px (Petit)</option>
+            <option value="18px">18px (Normal)</option>
+            <option value="24px">24px (Moyen)</option>
+            <option value="32px">32px (Grand)</option>
+            <option value="48px">48px (Très Grand)</option>
+            <option value="64px">64px (Géant)</option>
+          </select>
+        </div>
+
+        {/* 🎨 COULEUR TEXTE POPOVER */}
+        <div className="relative">
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setOpenFloatingPopover(prev => prev === 'color' ? null : 'color')}
+            className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            title="Couleur du texte"
+          >
+            <Palette className="w-4 h-4 text-emerald-600" />
+            <span>Couleur</span>
+            <span className="text-[10px] text-emerald-700">▾</span>
+          </button>
+
+          {openFloatingPopover === 'color' && (
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Couleur du texte</div>
+              <div className="grid grid-cols-5 gap-2">
+                {['#000000', '#ffffff', '#EF4444', '#00A0FF', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#64748B', '#0F172A'].map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{ backgroundColor: color }}
+                    onClick={() => {
+                      updateTarget({ textColor: color });
+                      setOpenFloatingPopover(null);
+                    }}
+                    className="w-8 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ✨ NÉON POPOVER (FOND DE TEXTE NÉON FLUO) */}
+        <div className="relative">
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setOpenFloatingPopover(prev => prev === 'neon' ? null : 'neon')}
+            className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            title="Surlignage Néon Fluo"
+          >
+            <Highlighter className="w-4 h-4 text-amber-600" />
+            <span>Néon</span>
+            <span className="text-[10px] text-amber-700">▾</span>
+          </button>
+
+          {openFloatingPopover === 'neon' && (
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Surlignage Néon Fluo</div>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { color: '#fef08a', label: 'Jaune Fluo' },
+                  { color: '#bbf7d0', label: 'Vert Fluo' },
+                  { color: '#fbcfe8', label: 'Rose Fluo' },
+                  { color: '#fed7aa', label: 'Orange Fluo' },
+                  { color: '#bae6fd', label: 'Bleu Fluo' },
+                  { color: '#e9d5ff', label: 'Violet Fluo' },
+                  { color: '#EF4444', label: 'Rouge' },
+                  { color: '#00A0FF', label: 'Bleu SPC' }
+                ].map(item => (
+                  <button
+                    key={item.color}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    style={{ backgroundColor: item.color }}
+                    onClick={() => {
+                      updateTarget({ bgColor: item.color });
+                      setOpenFloatingPopover(null);
+                    }}
+                    className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
+                    title={item.label}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 🧹 EFFACER */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            updateTarget({
+              textColor: undefined,
+              bgColor: 'transparent',
+              fontWeight: 'normal',
+              fontStyle: 'normal',
+              textDecoration: 'none'
+            });
+          }}
+          className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+          title="Effacer les couleurs et le style"
+        >
+          <Eraser className="w-4 h-4 text-rose-600" />
+          <span>Effacer</span>
+        </button>
+
+        <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+        {/* H2 */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            updateTarget({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
+          }}
+          className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
+          title="Convertir en Grand Titre H2"
+        >
+          H2
+        </button>
+
+        {/* H3 */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            updateTarget({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
+          }}
+          className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
+          title="Convertir en Sous-Titre H3"
+        >
+          H3
+        </button>
+
+        <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+        {/* 🔗 LIEN */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            const url = prompt('Entrez l URL du lien :', 'https://');
+            if (url) updateTarget({ linkUrl: url });
+          }}
+          className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
+          title="Ajouter un lien"
+        >
+          <Link2 className="w-3.5 h-3.5" />
+          <span>Lien</span>
+        </button>
+
+        {/* 📷 PHOTO */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            if (targetId) handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80');
+          }}
+          className="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
+          title="Ajouter une image"
+        >
+          <ImageIcon className="w-3.5 h-3.5" />
+          <span>Photo</span>
+        </button>
+
+        {/* 🎥 VIDÉO */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            if (targetId) handleAddElement('Video', 'Média', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+          }}
+          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
+          title="Ajouter une vidéo"
+        >
+          <Video className="w-3.5 h-3.5" />
+          <span>Vidéo</span>
+        </button>
+
+        {/* ⊞ CTA */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            if (targetId) handleAddElement('ButtonCTA', 'Formulaires & CTA', 'JE PROCÈDE MAINTENANT');
+          }}
+          className="px-3 py-1 bg-pink-600 hover:bg-pink-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
+          title="Ajouter un Bouton d action CTA"
+        >
+          <MousePointerClick className="w-3.5 h-3.5" />
+          <span>CTA</span>
+        </button>
+
+        {/* ✕ FERMER */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setFloatingTextMenu({ visible: false, x: 0, y: 0, selectedText: '' })}
+          className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-500 hover:text-slate-800 ml-1"
+          title="Fermer la barre de formatage"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // MAGNETIC SNAP GUIDE LINE STATE FOR AUTOMATIC ALIGNMENT
@@ -6383,464 +6731,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
         </div>
       </div>
+      {renderFloatingToolbar()}
     </div>
-        {/* FLOATING TEXT FORMATTING TOOLBAR BAR (RIGHT-CLICK OR TEXT SELECTION) */}
-      {floatingTextMenu.visible && (
-        <div
-          id="floating-builder-text-toolbar"
-          style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-          className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
-        >
-          {/* ↶ ANNULER */}
-          <button
-            type="button"
-            onClick={() => handleUndo()}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
-            title="↶ Annuler la dernière modification"
-          >
-            <Undo className="w-4 h-4 text-slate-900" />
-          </button>
-
-          {/* ↷ RÉTABLIR */}
-          <button
-            type="button"
-            onClick={() => handleRedo()}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
-            title="↷ Rétablir la modification"
-          >
-            <Redo className="w-4 h-4 text-slate-900" />
-          </button>
-
-          <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
-
-          {/* B GRAS */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) {
-                if (selectedChildIndex !== null) {
-                  const targetSection = elements.find(e => e.id === selectedElementId);
-                  if (targetSection && targetSection.data?.children) {
-                    const children = [...targetSection.data.children];
-                    const child = children[selectedChildIndex];
-                    if (child) {
-                      const curBold = child.data?.fontWeight === 'black' || child.data?.fontWeight === 'bold';
-                      children[selectedChildIndex] = {
-                        ...child,
-                        data: { ...(child.data || {}), fontWeight: curBold ? 'normal' : 'black' }
-                      };
-                      handleUpdateElementData(selectedElementId, { children });
-                    }
-                  }
-                } else {
-                  const targetEl = elements.find(e => e.id === selectedElementId);
-                  if (targetEl) {
-                    const curBold = targetEl.data?.fontWeight === 'black' || targetEl.data?.fontWeight === 'bold';
-                    handleUpdateElementData(selectedElementId, { fontWeight: curBold ? 'normal' : 'black' });
-                  }
-                }
-              }
-            }}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 font-black text-xs flex items-center justify-center min-w-[32px]"
-            title="B Gras (Extrabold)"
-          >
-            <Bold className="w-4 h-4 text-slate-900" />
-          </button>
-
-          {/* I ITALIQUE */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) {
-                if (selectedChildIndex !== null) {
-                  const targetSection = elements.find(e => e.id === selectedElementId);
-                  if (targetSection && targetSection.data?.children) {
-                    const children = [...targetSection.data.children];
-                    const child = children[selectedChildIndex];
-                    if (child) {
-                      const curItalic = child.data?.fontStyle === 'italic';
-                      children[selectedChildIndex] = {
-                        ...child,
-                        data: { ...(child.data || {}), fontStyle: curItalic ? 'normal' : 'italic' }
-                      };
-                      handleUpdateElementData(selectedElementId, { children });
-                    }
-                  }
-                } else {
-                  const targetEl = elements.find(e => e.id === selectedElementId);
-                  if (targetEl) {
-                    const curItalic = targetEl.data?.fontStyle === 'italic';
-                    handleUpdateElementData(selectedElementId, { fontStyle: curItalic ? 'normal' : 'italic' });
-                  }
-                }
-              }
-            }}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 italic font-black text-xs flex items-center justify-center min-w-[32px]"
-            title="I Italique"
-          >
-            <Italic className="w-4 h-4 text-slate-900" />
-          </button>
-
-          {/* ∪ SOULIGNÉ */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) {
-                if (selectedChildIndex !== null) {
-                  const targetSection = elements.find(e => e.id === selectedElementId);
-                  if (targetSection && targetSection.data?.children) {
-                    const children = [...targetSection.data.children];
-                    const child = children[selectedChildIndex];
-                    if (child) {
-                      const curU = child.data?.textDecoration === 'underline';
-                      children[selectedChildIndex] = {
-                        ...child,
-                        data: { ...(child.data || {}), textDecoration: curU ? 'none' : 'underline' }
-                      };
-                      handleUpdateElementData(selectedElementId, { children });
-                    }
-                  }
-                } else {
-                  const targetEl = elements.find(e => e.id === selectedElementId);
-                  if (targetEl) {
-                    const curU = targetEl.data?.textDecoration === 'underline';
-                    handleUpdateElementData(selectedElementId, { textDecoration: curU ? 'none' : 'underline' });
-                  }
-                }
-              }
-            }}
-            className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-            title="Souligner le texte"
-          >
-            <Underline className="w-4 h-4 text-sky-600" />
-            <span>Souligné</span>
-          </button>
-
-          {/* T TAILLE DROPDOWN */}
-          <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full border border-slate-300">
-            <Type className="w-4 h-4 text-slate-700 shrink-0" />
-            <select
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val || !selectedElementId) return;
-                if (selectedChildIndex !== null) {
-                  const targetSection = elements.find(el => el.id === selectedElementId);
-                  if (targetSection && targetSection.data?.children) {
-                    const children = [...targetSection.data.children];
-                    const child = children[selectedChildIndex];
-                    if (child) {
-                      children[selectedChildIndex] = {
-                        ...child,
-                        data: { ...(child.data || {}), fontSize: val }
-                      };
-                      handleUpdateElementData(selectedElementId, { children });
-                    }
-                  }
-                } else {
-                  handleUpdateElementData(selectedElementId, { fontSize: val });
-                }
-              }}
-              className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer"
-              title="Taille de la police"
-            >
-              <option value="">Taille ▾</option>
-              <option value="14px">14px (Petit)</option>
-              <option value="18px">18px (Normal)</option>
-              <option value="24px">24px (Moyen)</option>
-              <option value="32px">32px (Grand)</option>
-              <option value="48px">48px (Très Grand)</option>
-              <option value="64px">64px (Géant)</option>
-            </select>
-          </div>
-
-          {/* 🎨 COULEUR TEXTE POPOVER */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setOpenFloatingPopover(prev => prev === 'color' ? null : 'color')}
-              className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-              title="Couleur du texte"
-            >
-              <Palette className="w-4 h-4 text-emerald-600" />
-              <span>Couleur</span>
-              <span className="text-[10px] text-emerald-700">▾</span>
-            </button>
-
-            {openFloatingPopover === 'color' && (
-              <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
-                <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Couleur du texte</div>
-                <div className="grid grid-cols-5 gap-2">
-                  {['#000000', '#ffffff', '#EF4444', '#00A0FF', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#64748B', '#0F172A'].map(color => (
-                    <button
-                      key={color}
-                      type="button"
-                      style={{ backgroundColor: color }}
-                      onClick={() => {
-                        if (selectedElementId) {
-                          if (selectedChildIndex !== null) {
-                            const targetSection = elements.find(el => el.id === selectedElementId);
-                            if (targetSection && targetSection.data?.children) {
-                              const children = [...targetSection.data.children];
-                              const child = children[selectedChildIndex];
-                              if (child) {
-                                children[selectedChildIndex] = {
-                                  ...child,
-                                  data: { ...(child.data || {}), textColor: color }
-                                };
-                                handleUpdateElementData(selectedElementId, { children });
-                              }
-                            }
-                          } else {
-                            handleUpdateElementData(selectedElementId, { textColor: color });
-                          }
-                        }
-                        setOpenFloatingPopover(null);
-                      }}
-                      className="w-8 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ✨ NÉON POPOVER (FOND DE TEXTE NÉON FLUO) */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setOpenFloatingPopover(prev => prev === 'neon' ? null : 'neon')}
-              className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-              title="Surlignage Néon Fluo"
-            >
-              <Highlighter className="w-4 h-4 text-amber-600" />
-              <span>Néon</span>
-              <span className="text-[10px] text-amber-700">▾</span>
-            </button>
-
-            {openFloatingPopover === 'neon' && (
-              <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
-                <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Surlignage Néon Fluo</div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { color: '#fef08a', label: 'Jaune Fluo' },
-                    { color: '#bbf7d0', label: 'Vert Fluo' },
-                    { color: '#fbcfe8', label: 'Rose Fluo' },
-                    { color: '#fed7aa', label: 'Orange Fluo' },
-                    { color: '#bae6fd', label: 'Bleu Fluo' },
-                    { color: '#e9d5ff', label: 'Violet Fluo' },
-                    { color: '#EF4444', label: 'Rouge' },
-                    { color: '#00A0FF', label: 'Bleu SPC' }
-                  ].map(item => (
-                    <button
-                      key={item.color}
-                      type="button"
-                      style={{ backgroundColor: item.color }}
-                      onClick={() => {
-                        if (selectedElementId) {
-                          if (selectedChildIndex !== null) {
-                            const targetSection = elements.find(el => el.id === selectedElementId);
-                            if (targetSection && targetSection.data?.children) {
-                              const children = [...targetSection.data.children];
-                              const child = children[selectedChildIndex];
-                              if (child) {
-                                children[selectedChildIndex] = {
-                                  ...child,
-                                  data: { ...(child.data || {}), bgColor: item.color }
-                                };
-                                handleUpdateElementData(selectedElementId, { children });
-                              }
-                            }
-                          } else {
-                            handleUpdateElementData(selectedElementId, { bgColor: item.color });
-                          }
-                        }
-                        setOpenFloatingPopover(null);
-                      }}
-                      className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
-                      title={item.label}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 🧹 EFFACER */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) {
-                if (selectedChildIndex !== null) {
-                  const targetSection = elements.find(el => el.id === selectedElementId);
-                  if (targetSection && targetSection.data?.children) {
-                    const children = [...targetSection.data.children];
-                    const child = children[selectedChildIndex];
-                    if (child) {
-                      children[selectedChildIndex] = {
-                        ...child,
-                        data: {
-                          ...(child.data || {}),
-                          textColor: undefined,
-                          bgColor: 'transparent',
-                          fontWeight: 'normal',
-                          fontStyle: 'normal',
-                          textDecoration: 'none'
-                        }
-                      };
-                      handleUpdateElementData(selectedElementId, { children });
-                    }
-                  }
-                } else {
-                  handleUpdateElementData(selectedElementId, {
-                    textColor: undefined,
-                    bgColor: 'transparent',
-                    fontWeight: 'normal',
-                    fontStyle: 'normal',
-                    textDecoration: 'none'
-                  });
-                }
-              }
-            }}
-            className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-            title="Effacer les couleurs et le style"
-          >
-            <Eraser className="w-4 h-4 text-rose-600" />
-            <span>Effacer</span>
-          </button>
-
-          <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
-
-          {/* H2 */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId && selectedChildIndex !== null) {
-                const targetSection = elements.find(el => el.id === selectedElementId);
-                if (targetSection && targetSection.data?.children) {
-                  const children = [...targetSection.data.children];
-                  const child = children[selectedChildIndex];
-                  if (child) {
-                    children[selectedChildIndex] = {
-                      ...child,
-                      type: 'Heading',
-                      data: { ...(child.data || {}), fontSize: '36px', fontWeight: 'black' }
-                    };
-                    handleUpdateElementData(selectedElementId, { children });
-                  }
-                }
-              }
-            }}
-            className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
-            title="Convertir en Grand Titre H2"
-          >
-            H2
-          </button>
-
-          {/* H3 */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId && selectedChildIndex !== null) {
-                const targetSection = elements.find(el => el.id === selectedElementId);
-                if (targetSection && targetSection.data?.children) {
-                  const children = [...targetSection.data.children];
-                  const child = children[selectedChildIndex];
-                  if (child) {
-                    children[selectedChildIndex] = {
-                      ...child,
-                      type: 'Heading',
-                      data: { ...(child.data || {}), fontSize: '24px', fontWeight: 'bold' }
-                    };
-                    handleUpdateElementData(selectedElementId, { children });
-                  }
-                }
-              }
-            }}
-            className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
-            title="Convertir en Sous-Titre H3"
-          >
-            H3
-          </button>
-
-          <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
-
-          {/* 🔗 LIEN */}
-          <button
-            type="button"
-            onClick={() => {
-              const url = prompt('Entrez l URL du lien :', 'https://');
-              if (url && selectedElementId && selectedChildIndex !== null) {
-                const targetSection = elements.find(el => el.id === selectedElementId);
-                if (targetSection && targetSection.data?.children) {
-                  const children = [...targetSection.data.children];
-                  const child = children[selectedChildIndex];
-                  if (child) {
-                    children[selectedChildIndex] = {
-                      ...child,
-                      data: { ...(child.data || {}), linkUrl: url }
-                    };
-                    handleUpdateElementData(selectedElementId, { children });
-                  }
-                }
-              }
-            }}
-            className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
-            title="Ajouter un lien"
-          >
-            <Link2 className="w-3.5 h-3.5" />
-            <span>Lien</span>
-          </button>
-
-          {/* 📷 PHOTO */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) handleAddElement('Image', 'Média', 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80');
-            }}
-            className="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
-            title="Ajouter une image"
-          >
-            <ImageIcon className="w-3.5 h-3.5" />
-            <span>Photo</span>
-          </button>
-
-          {/* 🎥 VIDÉO */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) handleAddElement('Video', 'Média', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-            }}
-            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
-            title="Ajouter une vidéo"
-          >
-            <Video className="w-3.5 h-3.5" />
-            <span>Vidéo</span>
-          </button>
-
-          {/* ⊞ CTA */}
-          <button
-            type="button"
-            onClick={() => {
-              if (selectedElementId) handleAddElement('ButtonCTA', 'Formulaires & CTA', 'JE PROCÈDE MAINTENANT');
-            }}
-            className="px-3 py-1 bg-pink-600 hover:bg-pink-700 text-white font-black rounded-full text-xs shadow-xs flex items-center gap-1"
-            title="Ajouter un Bouton d action CTA"
-          >
-            <MousePointerClick className="w-3.5 h-3.5" />
-            <span>CTA</span>
-          </button>
-
-          {/* ✕ FERMER */}
-          <button
-            type="button"
-            onClick={() => setFloatingTextMenu({ visible: false, x: 0, y: 0, selectedText: '' })}
-            className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-500 hover:text-slate-800 ml-1"
-            title="Fermer la barre de formatage"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-</div>
+  </div>
 );
 }
