@@ -3923,7 +3923,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                             ...renderBorderStyles(el.data),
                           }}
-                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0`}
+                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0 overflow-hidden`}
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
