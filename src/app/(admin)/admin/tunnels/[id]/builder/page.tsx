@@ -2621,8 +2621,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               }}
               className={`transition-all rounded-t-3xl flex items-center justify-center gap-2 font-black text-xs cursor-pointer ${
                 dragOverIndex === 0
-                  ? 'h-14 bg-[#00A0FF]/30 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/40'
-                  : 'h-2 bg-transparent hover:h-8 hover:bg-emerald-950/40 hover:border-b hover:border-emerald-500/40 text-emerald-400'
+                  ? 'h-14 my-2 bg-[#00A0FF]/30 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/40'
+                  : 'h-0 m-0 p-0 border-0 overflow-hidden opacity-0'
               }`}
             >
               {dragOverIndex === 0 && (
@@ -4611,19 +4611,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       e.stopPropagation();
                       handleCanvasDrop(e, idx + 1);
                     }}
-                    className={`transition-all rounded-xl cursor-pointer flex items-center justify-center gap-2 font-bold text-xs my-2 ${
+                    className={`transition-all rounded-xl cursor-pointer flex items-center justify-center gap-2 font-bold text-xs ${
                       dragOverIndex === idx + 1
-                        ? 'h-12 bg-[#00A0FF]/20 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/30 scale-[1.01]'
-                        : 'h-3 hover:h-8 bg-transparent hover:bg-slate-800/60 border border-dashed border-transparent hover:border-slate-700 text-slate-400 opacity-60 hover:opacity-100'
+                        ? 'h-12 my-2 bg-[#00A0FF]/20 border-2 border-dashed border-[#00A0FF] text-[#00A0FF] shadow-lg ring-4 ring-[#00A0FF]/30 scale-[1.01]'
+                        : 'h-0 m-0 p-0 border-0 overflow-hidden opacity-0'
                     }`}
                   >
-                    {dragOverIndex === idx + 1 ? (
+                    {dragOverIndex === idx + 1 && (
                       <>
                         <span>📍</span>
                         <span>✨ Relâcher pour insérer ici (Position #{idx + 2})</span>
                       </>
-                    ) : (
-                      <span className="hidden hover:inline">➕ Déposer ici (Position #{idx + 2})</span>
                     )}
                   </div>
                 </React.Fragment>
