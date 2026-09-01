@@ -648,24 +648,51 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                 </div>
                               );
                             } else {
+                              const childBg = child.data?.bgColor || child.data?.cardBgColor || undefined;
+                              const childTextColor = child.data?.textColor || undefined;
+                              const childPadTop = child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : '12px');
+                              const childPadBottom = child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : '12px');
+                              const childPadLeft = child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : '16px');
+                              const childPadRight = child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : '16px');
+                              const childMarTop = child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined;
+                              const childMarBottom = child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined;
+
+                              const commonChildStyle: any = {
+                                backgroundColor: childBg,
+                                color: childTextColor,
+                                paddingTop: childPadTop,
+                                paddingBottom: childPadBottom,
+                                paddingLeft: childPadLeft,
+                                paddingRight: childPadRight,
+                                marginTop: childMarTop,
+                                marginBottom: childMarBottom,
+                                ...renderBorderStyles(child.data),
+                              };
+
                               renderedChild = (
-                                <div className="w-full">
+                                <div className="w-full flex justify-center items-center">
                                   {child.type === 'Image' ? (
-                                    <div className={`w-full max-w-2xl mx-auto ${child.data?.imgHeight || 'h-64'} rounded-none overflow-hidden shadow-lg my-4`}>
+                                    <div style={commonChildStyle} className={`w-full max-w-2xl mx-auto ${child.data?.imgHeight || 'h-64'} rounded-none overflow-hidden shadow-lg`}>
                                       <img src={child.data?.img || child.content} alt="Child" className="w-full h-full object-cover" />
                                     </div>
                                   ) : child.type === 'Heading' ? (
-                                    <h2 className="text-2xl sm:text-4xl font-heading font-black text-center my-4">{child.content}</h2>
+                                    <h2 style={commonChildStyle} className="w-full text-2xl sm:text-4xl font-heading font-black text-center">
+                                      {child.content}
+                                    </h2>
                                   ) : child.type === 'Text' ? (
-                                    <p className="text-sm sm:text-base font-medium leading-relaxed text-center opacity-90 max-w-3xl mx-auto my-4">{child.content}</p>
+                                    <p style={commonChildStyle} className="w-full text-base sm:text-lg font-semibold leading-relaxed text-center">
+                                      {child.content}
+                                    </p>
                                   ) : child.type === 'ButtonCTA' ? (
-                                    <div className="text-center my-6">
+                                    <div style={commonChildStyle} className="w-full text-center">
                                       <button type="button" className="px-8 py-4 bg-[#00A0FF] text-white font-black text-base rounded-2xl shadow-xl">
                                         {child.content || 'BOUTON D ACTION'}
                                       </button>
                                     </div>
                                   ) : (
-                                    <div className="text-sm font-medium text-center">{child.content}</div>
+                                    <div style={commonChildStyle} className="w-full text-sm font-medium text-center">
+                                      {child.content}
+                                    </div>
                                   )}
                                 </div>
                               );
