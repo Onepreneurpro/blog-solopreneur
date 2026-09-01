@@ -1513,20 +1513,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
             const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 48;
             
-            // Computed values
-            const padYVal = targetData.paddingY !== undefined ? targetData.paddingY : (targetData.paddingTop !== undefined ? targetData.paddingTop : defaultPaddingVal);
+            // Computed values (Main Y/X values are strictly bound to paddingY/paddingX/marginY/marginX to avoid reacting when sub-sliders move)
+            const padYVal = targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal;
             const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : padYVal;
             const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : padYVal;
 
-            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (targetData.paddingLeft !== undefined ? targetData.paddingLeft : (selectedSubItem ? 0 : 24));
+            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24);
             const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : padXVal;
             const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : padXVal;
 
-            const marginYVal = targetData.marginY !== undefined ? targetData.marginY : (targetData.marginTop !== undefined ? targetData.marginTop : 0);
+            const marginYVal = targetData.marginY !== undefined ? targetData.marginY : 0;
             const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : marginYVal;
             const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : marginYVal;
 
-            const marginXVal = targetData.marginX !== undefined ? targetData.marginX : (targetData.marginLeft !== undefined ? targetData.marginLeft : 0);
+            const marginXVal = targetData.marginX !== undefined ? targetData.marginX : 0;
             const marginLeft = targetData.marginLeft !== undefined ? targetData.marginLeft : marginXVal;
             const marginRight = targetData.marginRight !== undefined ? targetData.marginRight : marginXVal;
 
