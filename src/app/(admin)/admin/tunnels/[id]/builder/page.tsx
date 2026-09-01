@@ -1596,133 +1596,193 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <span>🎨 Couleurs & Arrière-plan {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">
-                  {selectedChildIndex !== null ? `Fond du Bloc #${selectedChildIndex + 1}` : 'Fond de Section / Bloc'}
-                </label>
-                <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                  <input
-                    type="color"
-                    value={
-                      selectedChildIndex !== null
-                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#0F172A')
-                        : (elData.bgColor || '#0F172A')
-                    }
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (selectedChildIndex !== null) {
-                        const currentChildren = [...(selectedEl.data?.children || [])];
-                        const targetChild = currentChildren[selectedChildIndex];
-                        currentChildren[selectedChildIndex] = {
-                          ...targetChild,
-                          data: {
-                            ...(targetChild.data || {}),
-                            bgColor: val,
-                            cardBgColor: val,
-                          },
-                        };
-                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                      } else {
-                        handleUpdateElementData(selectedEl.id, { bgColor: val });
-                      }
-                    }}
-                    className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
-                  />
-                  <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                    {
-                      selectedChildIndex !== null
-                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#0F172A')
-                        : (elData.bgColor || '#0F172A')
-                    }
-                  </span>
-                </div>
-              </div>
+            {(() => {
+              const bgVal = selectedChildIndex !== null
+                ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent')
+                : (elData.bgColor || 'transparent');
 
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Couleur du Texte</label>
-                <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                  <input
-                    type="color"
-                    value={
-                      selectedChildIndex !== null
-                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
-                        : (elData.textColor || '#FFFFFF')
-                    }
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (selectedChildIndex !== null) {
-                        const currentChildren = [...(selectedEl.data?.children || [])];
-                        const targetChild = currentChildren[selectedChildIndex];
-                        currentChildren[selectedChildIndex] = {
-                          ...targetChild,
-                          data: {
-                            ...(targetChild.data || {}),
-                            textColor: val,
-                          },
-                        };
-                        handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                      } else {
-                        handleUpdateElementData(selectedEl.id, { textColor: val });
-                      }
-                    }}
-                    className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
-                  />
-                  <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                    {
-                      selectedChildIndex !== null
-                        ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
-                        : (elData.textColor || '#FFFFFF')
-                    }
-                  </span>
-                </div>
-              </div>
-            </div>
+              const cardBgVal = selectedChildIndex !== null
+                ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent')
+                : (elData.cardBgColor || 'transparent');
 
-            <div>
-              <label className="text-[10px] font-bold text-slate-400 block mb-1.5">
-                {selectedChildIndex !== null ? `Fond des Cartes (Bloc #${selectedChildIndex + 1})` : 'Fond des Cartes / Sub-Items'}
-              </label>
-              <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                <input
-                  type="color"
-                  value={
-                    selectedChildIndex !== null
-                      ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#2759ce')
-                      : (elData.cardBgColor || '#2759ce')
-                  }
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (selectedChildIndex !== null) {
-                      const currentChildren = [...(selectedEl.data?.children || [])];
-                      const targetChild = currentChildren[selectedChildIndex];
-                      const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                      const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
-                      currentChildren[selectedChildIndex] = {
-                        ...targetChild,
-                        data: {
-                          ...(targetChild.data || {}),
-                          cardBgColor: val,
-                          bgColor: val,
-                          items: updatedItems,
-                        },
-                      };
-                      handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                    } else {
-                      handleUpdateElementData(selectedEl.id, { cardBgColor: val });
-                    }
-                  }}
-                  className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
-                />
-                <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                  {
-                    selectedChildIndex !== null
-                      ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || '#2759ce')
-                      : (elData.cardBgColor || '#2759ce')
-                  }
-                </span>
-              </div>
-            </div>
+              const textVal = selectedChildIndex !== null
+                ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
+                : (elData.textColor || '#FFFFFF');
+
+              const applyBgChange = (val: string) => {
+                if (selectedChildIndex !== null) {
+                  const currentChildren = [...(selectedEl.data?.children || [])];
+                  const targetChild = currentChildren[selectedChildIndex];
+                  currentChildren[selectedChildIndex] = {
+                    ...targetChild,
+                    data: {
+                      ...(targetChild.data || {}),
+                      bgColor: val,
+                      cardBgColor: val,
+                    },
+                  };
+                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                } else {
+                  handleUpdateElementData(selectedEl.id, { bgColor: val });
+                }
+              };
+
+              const applyCardBgChange = (val: string) => {
+                if (selectedChildIndex !== null) {
+                  const currentChildren = [...(selectedEl.data?.children || [])];
+                  const targetChild = currentChildren[selectedChildIndex];
+                  const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
+                  const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
+                  currentChildren[selectedChildIndex] = {
+                    ...targetChild,
+                    data: {
+                      ...(targetChild.data || {}),
+                      cardBgColor: val,
+                      bgColor: val,
+                      items: updatedItems,
+                    },
+                  };
+                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                } else {
+                  handleUpdateElementData(selectedEl.id, { cardBgColor: val });
+                }
+              };
+
+              const applyTextChange = (val: string) => {
+                if (selectedChildIndex !== null) {
+                  const currentChildren = [...(selectedEl.data?.children || [])];
+                  const targetChild = currentChildren[selectedChildIndex];
+                  currentChildren[selectedChildIndex] = {
+                    ...targetChild,
+                    data: {
+                      ...(targetChild.data || {}),
+                      textColor: val,
+                    },
+                  };
+                  handleUpdateElementData(selectedEl.id, { children: currentChildren });
+                } else {
+                  handleUpdateElementData(selectedEl.id, { textColor: val });
+                }
+              };
+
+              const presets = ['transparent', '#0F172A', '#000000', '#FFFFFF', '#00A0FF', '#10B981', '#FF7A00', '#EF4444', '#8B5CF6'];
+
+              return (
+                <div className="space-y-4">
+                  {/* FOND DU BLOC */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-slate-400">
+                        {selectedChildIndex !== null ? `Fond du Bloc #${selectedChildIndex + 1}` : 'Fond de Section / Bloc'}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => applyBgChange(bgVal === 'transparent' ? '#0F172A' : 'transparent')}
+                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase transition-all border ${
+                          bgVal === 'transparent'
+                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                        }`}
+                      >
+                        {bgVal === 'transparent' ? '✓ Transparent' : '🚫 Transparent'}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                      <div className="relative w-7 h-7 shrink-0 rounded-lg overflow-hidden border border-slate-700">
+                        {bgVal === 'transparent' ? (
+                          <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-rose-400">
+                            🚫
+                          </div>
+                        ) : (
+                          <input
+                            type="color"
+                            value={bgVal.startsWith('#') ? bgVal : '#0F172A'}
+                            onChange={(e) => applyBgChange(e.target.value)}
+                            className="w-full h-full cursor-pointer border-none bg-transparent"
+                          />
+                        )}
+                      </div>
+                      <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate flex-1">
+                        {bgVal === 'transparent' ? 'TRANSPARENT' : bgVal}
+                      </span>
+                    </div>
+
+                    {/* PALETTE PALETTE PRESETS FOND DU BLOC */}
+                    <div className="flex items-center gap-1.5 pt-0.5 overflow-x-auto no-scrollbar">
+                      {presets.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => applyBgChange(c)}
+                          style={c !== 'transparent' ? { backgroundColor: c } : {}}
+                          className={`w-5 h-5 rounded-md border shrink-0 transition-transform hover:scale-110 flex items-center justify-center ${
+                            c === bgVal ? 'ring-2 ring-[#00A0FF] ring-offset-1 ring-offset-slate-950 border-white' : 'border-white/20'
+                          } ${c === 'transparent' ? 'bg-slate-800' : ''}`}
+                          title={c === 'transparent' ? 'Transparent' : c}
+                        >
+                          {c === 'transparent' && <span className="text-[8px] leading-none font-bold text-rose-400">🚫</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* GRID COULEUR DU TEXTE & FOND DES CARTES */}
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Couleur du Texte</label>
+                      <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                        <input
+                          type="color"
+                          value={textVal.startsWith('#') ? textVal : '#FFFFFF'}
+                          onChange={(e) => applyTextChange(e.target.value)}
+                          className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                        />
+                        <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
+                          {textVal}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 truncate">Fond Cartes</label>
+                        <button
+                          type="button"
+                          onClick={() => applyCardBgChange(cardBgVal === 'transparent' ? '#2759ce' : 'transparent')}
+                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase transition-all border ${
+                            cardBgVal === 'transparent'
+                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                              : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                          }`}
+                        >
+                          {cardBgVal === 'transparent' ? '✓ Transp.' : '🚫 Transp.'}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                        <div className="relative w-7 h-7 shrink-0 rounded-lg overflow-hidden border border-slate-700">
+                          {cardBgVal === 'transparent' ? (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-rose-400">
+                              🚫
+                            </div>
+                          ) : (
+                            <input
+                              type="color"
+                              value={cardBgVal.startsWith('#') ? cardBgVal : '#2759ce'}
+                              onChange={(e) => applyCardBgChange(e.target.value)}
+                              className="w-full h-full cursor-pointer border-none bg-transparent"
+                            />
+                          )}
+                        </div>
+                        <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate flex-1">
+                          {cardBgVal === 'transparent' ? 'TRANSPARENT' : cardBgVal}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* 📍 MARGES EXTERNES ET INTERNES (PADDING & MARGIN) */}
