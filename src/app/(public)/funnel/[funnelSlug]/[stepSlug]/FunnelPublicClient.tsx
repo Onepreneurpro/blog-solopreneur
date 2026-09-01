@@ -441,17 +441,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               flex: `0 0 ${colWidths[cIdx]}%`,
                               width: `${colWidths[cIdx]}%`,
                               minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
-                              backgroundColor: child.data?.bgColor || child.data?.cardBgColor,
-                              color: child.data?.textColor,
-                              paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
-                              paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
-                              paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
-                              paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                               marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
                               marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
                               marginLeft: child.data?.marginLeft !== undefined ? `${child.data.marginLeft}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
                               marginRight: child.data?.marginRight !== undefined ? `${child.data.marginRight}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
-                              ...renderBorderStyles(child.data),
                             };
 
                             let renderedChild = null;
