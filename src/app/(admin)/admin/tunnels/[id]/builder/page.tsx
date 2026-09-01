@@ -2590,10 +2590,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               setSelectedSubItem(null);
             }
           }}
-          className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto flex justify-center"
+          className="flex-1 bg-slate-950 p-4 sm:p-6 overflow-y-auto h-full flex justify-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900"
         >
           <div
-            className={`w-full bg-transparent rounded-none border-0 p-0 overflow-hidden shadow-none transition-all ${
+            className={`w-full bg-transparent rounded-none border-0 p-0 overflow-visible min-h-screen pb-52 shadow-none transition-all ${
               previewMode === 'MOBILE'
                 ? 'max-w-sm'
                 : pageWidthMode === 'full'
