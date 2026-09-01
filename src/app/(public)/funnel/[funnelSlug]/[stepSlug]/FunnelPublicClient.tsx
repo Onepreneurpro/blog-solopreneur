@@ -654,8 +654,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               const childPadBottom = child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : '12px');
                               const childPadLeft = child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : '16px');
                               const childPadRight = child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : '16px');
-                              const childMarTop = child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined;
-                              const childMarBottom = child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined;
+                              const childMarTop = child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : '0px');
+                              const childMarBottom = child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : '0px');
 
                               const commonChildStyle: any = {
                                 backgroundColor: childBg,

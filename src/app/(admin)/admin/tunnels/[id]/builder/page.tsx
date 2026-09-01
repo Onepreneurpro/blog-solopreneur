@@ -5019,7 +5019,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
-                                        className={`relative group/child ${child.type === 'ContentBox' ? 'flex flex-col flex-1 h-full' : 'h-auto flex-none my-2'} overflow-visible z-40`}>
+                                        className={`relative group/child ${child.type === 'ContentBox' ? 'flex flex-col flex-1 h-full' : 'h-auto flex-none my-0'} overflow-visible z-40`}>
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
                                         className="absolute -top-3.5 left-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
