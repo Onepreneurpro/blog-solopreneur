@@ -3222,14 +3222,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                         {/* RENDER NESTED CHILDREN IN THE CONTAINER */}
                         {(!el.data?.children || el.data.children.length === 0) ? (
-                          <div className="py-12 px-6 border-2 border-dashed border-slate-300/80 bg-[#FAFAFA]/80 rounded-xl text-center flex flex-col items-center justify-center space-y-1 cursor-pointer transition-all hover:border-[#00A0FF]/60 hover:bg-slate-50">
-                            <div className="text-xs font-black text-slate-400 uppercase tracking-widest font-heading">
-                              [ Section Vierge ]
-                            </div>
-                            <div className="text-xs font-semibold text-slate-500">
-                              Glissez-déposez un élément ou des colonnes ici
-                            </div>
-                          </div>
+                          <div className="w-full min-h-[120px] border border-dashed border-slate-300 rounded-lg bg-white" />
                         ) : (() => {
                           const layoutMode = el.data?.layoutMode || 'grid-3';
                           const gridClass =
@@ -3484,17 +3477,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             {/* RENDER NESTED CHILDREN INSIDE THE FULL SECTION */}
                             {(!el.data?.children || el.data.children.length === 0) ? (
-                              <div className="p-12 border-2 border-dashed border-purple-400/40 bg-purple-950/30 rounded-3xl text-center space-y-3">
-                                <div className="w-14 h-14 bg-purple-500/20 text-purple-300 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold">
-                                  🏛️
-                                </div>
-                                <div className="text-lg font-black text-white">
-                                  Glissez-déposez n importe quel élément ou colonne ici
-                                </div>
-                                <div className="text-xs text-purple-200 font-medium max-w-md mx-auto leading-relaxed">
-                                  Glissez vos colonnes (4, 3, 2 colonnes), votre conteneur d éléments, vos formulaires, images ou textes. Cette section s étendra à 100% sur toute la largeur de l écran de vos visiteurs !
-                                </div>
-                              </div>
+                              <div className="w-full min-h-[120px] border border-dashed border-slate-300 rounded-lg bg-white" />
                             ) : (() => {
                               const childrenList = el.data?.children || [];
                               const numCols = childrenList.length;
@@ -3842,13 +3825,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           style={{
                                             backgroundColor: child.data?.bgColor || 'transparent',
                                           }}
-                                          className="min-h-[90px] w-full p-4 rounded-xl border-2 border-dashed border-slate-300/80 hover:border-[#00A0FF] bg-white/40 text-slate-500 transition-all flex items-center justify-center text-xs font-bold"
+                                          className="min-h-[80px] w-full border border-dashed border-slate-300 rounded-lg bg-white/60 transition-all hover:border-[#00A0FF]"
                                         >
                                           {(!child.data?.children || child.data.children.length === 0) ? (
-                                            <div className="text-center py-3 space-y-0.5">
-                                              <span className="text-xs font-black text-slate-400 uppercase tracking-widest font-heading">[ Conteneur / Rangée Vierge ]</span>
-                                              <div className="text-[10px] text-slate-400 font-medium">Déposez des éléments ici</div>
-                                            </div>
+                                            <div className="w-full h-full min-h-[80px]" />
                                           ) : (
                                             <div className="w-full space-y-3">
                                               {(child.data.children || []).map((subChild: any, sIdx: number) => {
