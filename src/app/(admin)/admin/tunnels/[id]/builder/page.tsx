@@ -2482,7 +2482,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <span>Fonctionnalités</span>
                       </div>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-[#00A0FF]">
-                        11 blocs &gt;
+                        14 blocs &gt;
                       </span>
                     </div>
 
