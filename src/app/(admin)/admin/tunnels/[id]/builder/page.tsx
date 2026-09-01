@@ -173,6 +173,40 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
   const savedRangeRef = useRef<Range | null>(null);
+  const targetDomRef = useRef<HTMLElement | null>(null);
+
+  // Click outside listener to dismiss floating text formatting toolbar
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const toolbar = document.getElementById('floating-builder-text-toolbar');
+      if (toolbar && !toolbar.contains(e.target as Node)) {
+        setFloatingTextMenu((prev) => ({ ...prev, visible: false }));
+      }
+    };
+    if (floatingTextMenu.visible) {
+      window.addEventListener('mousedown', handleClickOutside);
+      return () => window.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [floatingTextMenu.visible]);
+
+  // Screen clamping so floating toolbar never exceeds PC viewport width
+  useLayoutEffect(() => {
+    if (floatingTextMenu.visible) {
+      const toolbarEl = document.getElementById('floating-builder-text-toolbar');
+      if (toolbarEl) {
+        const rect = toolbarEl.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        let clampedX = floatingTextMenu.x;
+        if (clampedX + rect.width > viewportWidth - 20) {
+          clampedX = Math.max(16, viewportWidth - rect.width - 20);
+        }
+        if (clampedX < 16) clampedX = 16;
+        if (clampedX !== floatingTextMenu.x) {
+          setFloatingTextMenu((prev) => ({ ...prev, x: clampedX }));
+        }
+      }
+    }
+  }, [floatingTextMenu.visible, floatingTextMenu.x]);
 
   const saveSelection = () => {
     if (typeof window !== 'undefined') {
@@ -197,6 +231,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     e.preventDefault();
     e.stopPropagation();
     saveSelection();
+    targetDomRef.current = e.currentTarget as HTMLElement;
     setSelectedElementId(targetId);
     if (childIdx !== undefined && childIdx !== null) setSelectedChildIndex(childIdx);
     const selection = window.getSelection();
@@ -568,7 +603,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            updateTarget({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
+            updateTargetStyles({ fontSize: '36px', fontWeight: 'black' }, { type: 'Heading' });
           }}
           className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Grand Titre H2"
@@ -581,7 +616,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            updateTarget({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
+            updateTargetStyles({ fontSize: '24px', fontWeight: 'bold' }, { type: 'Heading' });
           }}
           className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
           title="Convertir en Sous-Titre H3"
