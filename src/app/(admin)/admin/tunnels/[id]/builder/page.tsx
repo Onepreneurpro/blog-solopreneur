@@ -2265,7 +2265,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     draggable
                     onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Conteneur DIV')}
                     onClick={() => handleAddElement('ContentBox', 'Disposition', 'Conteneur DIV')}
-                    className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-blue-500/40 hover:border-blue-400 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-md mb-2"
+                    className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-blue-500/40 hover:border-blue-400 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-md font-heading font-black"
                   >
                     <div className="flex items-center gap-2.5">
                       <Box className="w-5 h-5 text-[#00A0FF] group-hover:text-white shrink-0" />
@@ -2276,38 +2276,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                     <Plus className="w-4 h-4 text-[#00A0FF] shrink-0" />
                   </button>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'Col4', 'Disposition', '4 Colonnes')}
-                      onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <LayoutGrid className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
-                    </button>
-
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'Col3', 'Disposition', '3 Colonnes')}
-                      onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
-                    </button>
-
-                    <button
-                      draggable
-                      onDragStart={(e) => handlePaletteDragStart(e, 'Col2', 'Disposition', '2 Colonnes')}
-                      onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
-                      className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                    >
-                      <Rows className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                      <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
-                    </button>
-                  </div>
                 </div>
 
                 {/* CATEGORY 4: FORMULAIRE */}
@@ -2406,9 +2374,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       Blocs Prêts à l emploi : Fonctionnalités
                     </div>
 
-                    {/* THE 11 READY-TO-USE FEATURE BLOCKS (FROM USER SCREENSHOTS) */}
+                    {/* THE READY-TO-USE FEATURE BLOCKS (INCLUDING 2, 3, 4 COLUMNS) */}
                     <div className="space-y-3">
                       {[
+                        {
+                          id: 'col-2-block',
+                          name: '2 colonnes d éléments (image, titre et texte)',
+                          type: 'Col2',
+                        },
+                        {
+                          id: 'col-3-block',
+                          name: '3 colonnes d éléments (image, titre et texte)',
+                          type: 'Col3',
+                        },
+                        {
+                          id: 'col-4-block',
+                          name: '4 colonnes d éléments (image, titre et texte)',
+                          type: 'Col4',
+                        },
                         {
                           id: 'feat-1',
                           name: 'Quatre colonnes d éléments (grande image, titre et texte)',
