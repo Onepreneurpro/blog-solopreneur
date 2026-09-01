@@ -3226,7 +3226,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   >
                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
                     <div
-                      className="absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                      className="absolute -top-3.5 right-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
                     >
                       {/* TYPE NAME BADGE */}
                       <div
@@ -4386,7 +4386,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     >
                                                       {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
                                                       <div
-                                                        className={`absolute -top-3.5 left-2 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                        className={`absolute -top-3.5 right-2 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
