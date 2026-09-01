@@ -1659,121 +1659,162 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   </div>
 
-                  {/* 🌄 IMAGE DE FOND (SECTION / BLOC) */}
-                  <div className="space-y-3 pt-3 border-t border-slate-800">
-                    <div className="flex items-center justify-between">
-                      <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                        🌄 Image de Fond {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}
-                      </label>
-                      {targetData.bgImage && (
-                        <button
-                          type="button"
-                          onClick={() => applyBgImageUpdate({ bgImage: '', bgZoom: 100, bgPosX: 50, bgPosY: 50 })}
-                          className="text-[9px] font-bold text-rose-400 hover:text-rose-300 underline"
-                        >
-                          🗑️ Supprimer
-                        </button>
-                      )}
-                    </div>
+                  {/* 🌄 IMAGE DE FOND (SECTION / BLOC) - DUAL PC / MOBILE */}
+                  {(() => {
+                    const isMob = previewMode === 'MOBILE';
+                    const imgKey = isMob ? 'mobileBgImage' : 'bgImage';
+                    const zoomKey = isMob ? 'mobileBgZoom' : 'bgZoom';
+                    const posXKey = isMob ? 'mobileBgPosX' : 'bgPosX';
+                    const posYKey = isMob ? 'mobileBgPosY' : 'bgPosY';
+                    const sizeKey = isMob ? 'mobileBgSize' : 'bgSize';
 
-                    <div className="space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          triggerImageFileUpload((base64Url) => {
-                            applyBgImageUpdate({ bgImage: base64Url });
-                          });
-                        }}
-                        className="w-full py-2 px-3 bg-gradient-to-r from-[#00A0FF] to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                      >
-                        <span>📁 Choisir une photo sur mon PC</span>
-                      </button>
+                    const currentImg = targetData[imgKey] || '';
+                    const currentZoom = targetData[zoomKey] !== undefined ? targetData[zoomKey] : 100;
+                    const currentPosX = targetData[posXKey] !== undefined ? targetData[posXKey] : 50;
+                    const currentPosY = targetData[posYKey] !== undefined ? targetData[posYKey] : 50;
+                    const currentSize = targetData[sizeKey] || 'cover';
 
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          placeholder="Ou coller une URL d image..."
-                          value={targetData.bgImage || ''}
-                          onChange={(e) => applyBgImageUpdate({ bgImage: e.target.value })}
-                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
-                        />
-                      </div>
-                    </div>
-
-                    {targetData.bgImage && (
-                      <div className="space-y-3 pt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-300 block">Mode de Remplissage de l Image</label>
-                          <select
-                            value={targetData.bgSize || 'cover'}
-                            onChange={(e) => applyBgImageUpdate({ bgSize: e.target.value })}
-                            className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 font-bold focus:border-[#00A0FF] outline-none cursor-pointer"
-                          >
-                            <option value="cover">📐 Couvrir tout le conteneur (Cover)</option>
-                            <option value="100% auto">↔️ Adapter à la largeur (100% Auto)</option>
-                            <option value="auto 100%">↕️ Adapter à la hauteur (Auto 100%)</option>
-                            <option value="100% 100%">↔️ Étirer sur la section (100% 100%)</option>
-                            <option value="contain">🖼️ Ajuster sans couper (Contain)</option>
-                          </select>
+                    return (
+                      <div className="space-y-3 pt-3 border-t border-slate-800">
+                        {/* TOGGLE TABS FOR PC VS MOBILE BACKGROUND */}
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                            🌄 Image de Fond {isMob ? '(MOBILE 📱)' : '(PC 💻)'}
+                          </label>
+                          {currentImg && (
+                            <button
+                              type="button"
+                              onClick={() => applyBgImageUpdate({ [imgKey]: '', [zoomKey]: 100, [posXKey]: 50, [posYKey]: 50 })}
+                              className="text-[9px] font-bold text-rose-400 hover:text-rose-300 underline"
+                            >
+                              🗑️ Supprimer
+                            </button>
+                          )}
                         </div>
 
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs font-bold">
-                            <span className="text-slate-300">Zoom de l image</span>
-                            <span className="text-xs font-mono text-[#00A0FF]">{targetData.bgZoom || 100}%</span>
-                          </div>
-                          <input
-                            type="range"
-                            min={100}
-                            max={300}
-                            value={targetData.bgZoom || 100}
-                            onChange={(e) => applyBgImageUpdate({ bgZoom: Number(e.target.value) })}
-                            className="w-full accent-[#00A0FF] cursor-pointer"
-                          />
-                        </div>
-
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-[10px] font-bold">
-                            <span className="text-slate-300">Position Horizontale (X)</span>
-                            <span className="font-mono text-[#00A0FF]">{targetData.bgPosX !== undefined ? targetData.bgPosX : 50}%</span>
-                          </div>
-                          <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            value={targetData.bgPosX !== undefined ? targetData.bgPosX : 50}
-                            onChange={(e) => applyBgImageUpdate({ bgPosX: Number(e.target.value) })}
-                            className="w-full accent-[#00A0FF] cursor-pointer"
-                          />
-                        </div>
-
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-[10px] font-bold">
-                            <span className="text-slate-300">Position Verticale (Y)</span>
-                            <span className="font-mono text-[#00A0FF]">{targetData.bgPosY !== undefined ? targetData.bgPosY : 50}%</span>
-                          </div>
-                          <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            value={targetData.bgPosY !== undefined ? targetData.bgPosY : 50}
-                            onChange={(e) => applyBgImageUpdate({ bgPosY: Number(e.target.value) })}
-                            className="w-full accent-[#00A0FF] cursor-pointer"
-                          />
-                        </div>
-
-                        <div className="pt-1 flex justify-end">
+                        <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-900 rounded-xl border border-slate-800">
                           <button
                             type="button"
-                            onClick={() => applyBgImageUpdate({ bgPosX: 50, bgPosY: 50, bgZoom: 100 })}
-                            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg transition-colors"
+                            onClick={() => setPreviewMode('DESKTOP')}
+                            className={`py-1.5 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+                              !isMob ? 'bg-[#00A0FF] text-white shadow-xs font-black' : 'text-slate-400 hover:text-white'
+                            }`}
                           >
-                            🎯 Centrer (50% 50%)
+                            <span>💻 Fond PC</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewMode('MOBILE')}
+                            className={`py-1.5 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+                              isMob ? 'bg-emerald-500 text-white shadow-xs font-black' : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            <span>📱 Fond Mobile</span>
                           </button>
                         </div>
+
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              triggerImageFileUpload((base64Url) => {
+                                applyBgImageUpdate({ [imgKey]: base64Url });
+                              });
+                            }}
+                            className={`w-full py-2 px-3 bg-gradient-to-r ${
+                              isMob ? 'from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500' : 'from-[#00A0FF] to-blue-600 hover:from-blue-500 hover:to-blue-700'
+                            } text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer`}
+                          >
+                            <span>📁 Choisir photo ${isMob ? 'Mobile' : 'PC'} sur mon PC</span>
+                          </button>
+
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder={`Ou coller URL image ${isMob ? 'Mobile' : 'PC'}...`}
+                              value={currentImg}
+                              onChange={(e) => applyBgImageUpdate({ [imgKey]: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
+                            />
+                          </div>
+                        </div>
+
+                        {currentImg && (
+                          <div className="space-y-3 pt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                            <div className="space-y-1">
+                              <label className="text-[10px] font-bold text-slate-300 block">Mode de Remplissage ${isMob ? 'Mobile' : 'PC'}</label>
+                              <select
+                                value={currentSize}
+                                onChange={(e) => applyBgImageUpdate({ [sizeKey]: e.target.value })}
+                                className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 font-bold focus:border-[#00A0FF] outline-none cursor-pointer"
+                              >
+                                <option value="cover">📐 Couvrir tout le conteneur (Cover)</option>
+                                <option value="100% auto">↔️ Adapter à la largeur (100% Auto)</option>
+                                <option value="auto 100%">↕️ Adapter à la hauteur (Auto 100%)</option>
+                                <option value="100% 100%">↔️ Étirer sur la section (100% 100%)</option>
+                                <option value="contain">🖼️ Ajuster sans couper (Contain)</option>
+                              </select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-300">Zoom ${isMob ? 'Mobile' : 'PC'}</span>
+                                <span className="text-xs font-mono text-[#00A0FF]">{currentZoom}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min={100}
+                                max={300}
+                                value={currentZoom}
+                                onChange={(e) => applyBgImageUpdate({ [zoomKey]: Number(e.target.value) })}
+                                className="w-full accent-[#00A0FF] cursor-pointer"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-[10px] font-bold">
+                                <span className="text-slate-300">Position Horizontale (X) ${isMob ? 'Mobile' : 'PC'}</span>
+                                <span className="font-mono text-[#00A0FF]">{currentPosX}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min={0}
+                                max={100}
+                                value={currentPosX}
+                                onChange={(e) => applyBgImageUpdate({ [posXKey]: Number(e.target.value) })}
+                                className="w-full accent-[#00A0FF] cursor-pointer"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-[10px] font-bold">
+                                <span className="text-slate-300">Position Verticale (Y) ${isMob ? 'Mobile' : 'PC'}</span>
+                                <span className="font-mono text-[#00A0FF]">{currentPosY}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min={0}
+                                max={100}
+                                value={currentPosY}
+                                onChange={(e) => applyBgImageUpdate({ [posYKey]: Number(e.target.value) })}
+                                className="w-full accent-[#00A0FF] cursor-pointer"
+                              />
+                            </div>
+
+                            <div className="pt-1 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => applyBgImageUpdate({ [posXKey]: 50, [posYKey]: 50, [zoomKey]: 100 })}
+                                className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg transition-colors"
+                              >
+                                🎯 Centrer (50% 50%)
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </div>
               );
             })()}
@@ -2776,26 +2817,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           
           {/* DESKTOP / MOBILE / GRID TOGGLE & DISPLAY WIDTH BUTTONS */}
           <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
-            <button
-              type="button"
-              onClick={() => setPreviewMode('DESKTOP')}
-              className={`p-1.5 rounded-lg transition-all ${
-                previewMode === 'DESKTOP' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Aperçu Ordinateur"
-            >
-              <Monitor className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewMode('MOBILE')}
-              className={`p-1.5 rounded-lg transition-all ${
-                previewMode === 'MOBILE' ? 'bg-[#00A0FF] text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Aperçu Mobile"
-            >
-              <Smartphone className="w-4 h-4" />
-            </button>
+
 
 
           </div>
@@ -2882,8 +2904,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div className="w-80 sm:w-96 md:w-[410px] max-w-[90vw] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden transition-all">
           {!selectedElementId ? (
             <React.Fragment>
-              {/* TABS: ÉLÉMENTS / BLOCS */}
-              <div className="p-3 border-b border-slate-800 grid grid-cols-2 gap-2 bg-slate-950 shrink-0">
+              {/* TABS: ÉLÉMENTS / BLOCS / PC-MOBILE */}
+              <div className="p-2 border-b border-slate-800 grid grid-cols-3 gap-1.5 bg-slate-950 shrink-0">
                 <button
                   onClick={() => setActiveTab('ELEMENTS')}
                   className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
@@ -2899,6 +2921,17 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   }`}
                 >
                   Blocs
+                </button>
+                <button
+                  onClick={() => setPreviewMode(previewMode === 'DESKTOP' ? 'MOBILE' : 'DESKTOP')}
+                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all flex items-center justify-center gap-1 border ${
+                    previewMode === 'MOBILE'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs font-extrabold'
+                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+                  }`}
+                  title={previewMode === 'MOBILE' ? 'Basculer vers Mode Ordinateur (PC)' : 'Basculer vers Mode Mobile'}
+                >
+                  {previewMode === 'MOBILE' ? '📱 Mobile' : '💻 PC'}
                 </button>
               </div>
 
@@ -4155,11 +4188,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
                       const mainBg = el.data?.bgColor || '#0F172A';
-                      const bgImage = el.data?.bgImage || '';
-                      const bgSize = el.data?.bgSize || 'cover';
-                      const bgZoom = el.data?.bgZoom || 100;
-                      const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
-                      const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
+                      const isMobMode = previewMode === 'MOBILE';
+                      const bgImage = (isMobMode && el.data?.mobileBgImage) ? el.data.mobileBgImage : (el.data?.bgImage || '');
+                      const bgSize = (isMobMode && el.data?.mobileBgSize) ? el.data.mobileBgSize : (el.data?.bgSize || 'cover');
+                      const bgZoom = (isMobMode && el.data?.mobileBgZoom !== undefined) ? el.data.mobileBgZoom : (el.data?.bgZoom || 100);
+                      const bgPosX = (isMobMode && el.data?.mobileBgPosX !== undefined) ? el.data.mobileBgPosX : (el.data?.bgPosX !== undefined ? el.data.bgPosX : 50);
+                      const bgPosY = (isMobMode && el.data?.mobileBgPosY !== undefined) ? el.data.mobileBgPosY : (el.data?.bgPosY !== undefined ? el.data.bgPosY : 50);
                       const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
                       const textColor = el.data?.textColor || '#ffffff';
                       const innerWidth = el.data?.innerContentWidth || 'standard';

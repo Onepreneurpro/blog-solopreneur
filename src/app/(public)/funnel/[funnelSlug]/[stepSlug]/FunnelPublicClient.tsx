@@ -308,6 +308,13 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               const bgZoom = el.data?.bgZoom || 100;
               const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
               const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
+
+              const mobileBgImage = el.data?.mobileBgImage || '';
+              const mobileBgSize = el.data?.mobileBgSize || bgSize;
+              const mobileBgZoom = el.data?.mobileBgZoom !== undefined ? el.data.mobileBgZoom : bgZoom;
+              const mobileBgPosX = el.data?.mobileBgPosX !== undefined ? el.data.mobileBgPosX : bgPosX;
+              const mobileBgPosY = el.data?.mobileBgPosY !== undefined ? el.data.mobileBgPosY : bgPosY;
+
               const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
               const textColor = el.data?.textColor || '#ffffff';
               const innerWidth = el.data?.innerContentWidth || 'standard';
@@ -353,9 +360,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     }}
                     className={`relative w-full ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
-                  {/* SECTION BACKGROUND IMAGE LAYER WITH ZOOM AND TRANSLATION */}
+                  {/* DESKTOP BACKGROUND IMAGE LAYER */}
                   {bgImage && (
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                    <div className={`absolute inset-0 overflow-hidden pointer-events-none z-0 ${mobileBgImage ? 'hidden md:block' : ''}`}>
                       <div
                         className="absolute inset-0 w-full h-full"
                         style={{
@@ -363,6 +370,22 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           backgroundSize: bgSize,
                           backgroundPosition: 'top center',
                           transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
+                          transformOrigin: 'top center',
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* MOBILE BACKGROUND IMAGE LAYER */}
+                  {mobileBgImage && (
+                    <div className="block md:hidden absolute inset-0 overflow-hidden pointer-events-none z-0">
+                      <div
+                        className="absolute inset-0 w-full h-full"
+                        style={{
+                          backgroundImage: `url(${mobileBgImage})`,
+                          backgroundSize: mobileBgSize,
+                          backgroundPosition: 'top center',
+                          transform: `scale(${mobileBgZoom / 100}) translate(${50 - mobileBgPosX}%, ${50 - mobileBgPosY}%)`,
                           transformOrigin: 'top center',
                         }}
                       />
