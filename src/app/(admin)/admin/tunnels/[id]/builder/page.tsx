@@ -4805,9 +4805,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           } catch (err) { console.error(err); }
                                         }}
                                         style={{
-                                          flex: previewMode === 'MOBILE' ? '1 1 100%' : `0 0 ${colWidths[cIdx]}%`,
+                                          flex: previewMode === 'MOBILE' ? '1 1 100%' : (child.data?.colWidth ? `0 0 ${child.data.colWidth}%` : '1 1 0%'),
                                           width: previewMode === 'MOBILE' ? '100%' : undefined,
-                                          minWidth: previewMode === 'MOBILE' ? '100%' : '120px',
+                                          minWidth: previewMode === 'MOBILE' ? '100%' : '80px',
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
