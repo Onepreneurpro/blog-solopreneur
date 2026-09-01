@@ -427,7 +427,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       }
     };
 
-
+    const executeRichCommand = (command: string, value: string = '') => {
+      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+        targetDomRef.current = (window as any).__activeRichTextDom;
+      }
+      if (!targetDomRef.current) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+          if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+          const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
+          if (editableEl) targetDomRef.current = editableEl as HTMLElement;
+        }
+      }
+      if (targetDomRef.current) {
+        targetDomRef.current.focus();
+      }
+      restoreSelection();
+      try {
+        document.execCommand(command, false, value);
+      } catch (err) {}
+      saveSelection();
+      if (targetDomRef.current) {
+        updateTargetContentOnly(targetDomRef.current.innerHTML);
+      }
+    };
 
     return (
       <div
@@ -2085,64 +2109,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  const updateTargetContentOnly = (newContent: string) => {
-    const targetId = selectedElementId;
-    const childIdx = selectedChildIndex;
-    const subChildIdx = typeof selectedSubItem === 'number' ? selectedSubItem : (typeof selectedSubItem === 'object' && selectedSubItem !== null ? (selectedSubItem as any).itemIndex : null);
-    if (!targetId) return;
-    if (childIdx !== null && childIdx !== undefined && subChildIdx !== null && subChildIdx !== undefined) {
-      const targetSection = elements.find(e => e.id === targetId);
-      if (targetSection && targetSection.data?.children?.[childIdx]?.data?.children) {
-        const children = [...targetSection.data.children];
-        const childDiv = { ...children[childIdx] };
-        const divChildren = [...(childDiv.data?.children || [])];
-        if (divChildren[subChildIdx]) {
-          divChildren[subChildIdx] = { ...divChildren[subChildIdx], content: newContent };
-          childDiv.data = { ...(childDiv.data || {}), children: divChildren };
-          children[childIdx] = childDiv;
-          handleUpdateElementData(targetId, { children });
-        }
-      }
-    } else if (childIdx !== null && childIdx !== undefined) {
-      const targetSection = elements.find(e => e.id === targetId);
-      if (targetSection && targetSection.data?.children) {
-        const children = [...targetSection.data.children];
-        if (children[childIdx]) {
-          children[childIdx] = { ...children[childIdx], content: newContent };
-          handleUpdateElementData(targetId, { children });
-        }
-      }
-    } else {
-      setElements(prev => prev.map(item => item.id === targetId ? { ...item, content: newContent } : item));
-    }
-  };
-
-  const executeRichCommand = (command: string, value: string = '') => {
-    if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
-      targetDomRef.current = (window as any).__activeRichTextDom;
-    }
-    if (!targetDomRef.current) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) {
-        let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
-        const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
-        if (editableEl) targetDomRef.current = editableEl as HTMLElement;
-      }
-    }
-    if (targetDomRef.current) {
-      targetDomRef.current.focus();
-    }
-    restoreSelection();
-    try {
-      document.execCommand(command, false, value);
-    } catch (err) {}
-    saveSelection();
-    if (targetDomRef.current) {
-      updateTargetContentOnly(targetDomRef.current.innerHTML);
-    }
-  };
-
   const renderInspectorPanel = () => {
     if (!selectedElementId) return null;
     const selectedEl = elements.find((el) => el.id === selectedElementId);
@@ -2270,187 +2236,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
         {/* INSPECTOR CONTROLS SCROLLABLE CONTAINER */}
         <div className="p-4 space-y-5 text-xs overflow-y-auto flex-1 builder-sidebar-scroll">
-          {/* SECTION FORMATAGE DE TEXTE & SURLIGNAGE NÉON FLUO (SOLUTION 1: SYSTEME.IO / ELEMENTOR SIDEBAR) */}
-          <div className="p-4 bg-slate-900 rounded-2xl border border-amber-500/40 space-y-4 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Highlighter className="w-4 h-4 text-amber-400" />
-                <span>✨ Formatage Texte & Néon Fluo</span>
-              </span>
-            </div>
-
-            {/* 1. SURLIGNAGE NÉON FLUO */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block flex items-center justify-between">
-                <span>✨ Surlignage Néon Fluo</span>
-                <span className="text-[9px] text-amber-400 font-normal">Appliquer sur texte</span>
-              </label>
-              <div className="grid grid-cols-6 gap-1.5">
-                {neonColors.map((c) => (
-                  <button
-                    key={c.color}
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => {
-                      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
-                        targetDomRef.current = (window as any).__activeRichTextDom;
-                      }
-                      if (targetDomRef.current) targetDomRef.current.focus();
-                      restoreSelection();
-                      const sel = window.getSelection();
-                      const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
-                      const markHtml = (txt: string) =>
-                        `<mark color="${c.color}" style="background-color: ${c.color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
-
-                      if (selTxt && targetDomRef.current) {
-                        const curContent = targetDomRef.current.innerHTML;
-                        if (curContent.includes(selTxt)) {
-                          const updatedContent = curContent.replace(selTxt, markHtml(selTxt));
-                          targetDomRef.current.innerHTML = updatedContent;
-                        } else {
-                          try { document.execCommand('insertHTML', false, markHtml(selTxt)); } catch(e) {}
-                        }
-                      } else {
-                        try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
-                      }
-
-                      if (targetDomRef.current) {
-                        const finalHtml = targetDomRef.current.innerHTML;
-                        if (selectedChildIndex !== null && selectedEl.data?.children?.[selectedChildIndex]) {
-                          const updated = selectedEl.data.children.map((ch: any, i: number) =>
-                            i === selectedChildIndex ? { ...ch, content: finalHtml } : ch
-                          );
-                          handleUpdateElementData(selectedEl.id, { children: updated });
-                        } else {
-                          handleUpdateElementData(selectedEl.id, { content: finalHtml });
-                        }
-                      }
-                    }}
-                    style={{ backgroundColor: c.color }}
-                    className="w-7 h-7 rounded-xl border border-slate-700 hover:scale-110 transition-transform cursor-pointer shadow-xs"
-                    title={c.label}
-                  />
-                ))}
-              </div>
-
-              {/* CURSEUR SLIDER COULEUR NÉON */}
-              <div className="pt-1 flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold text-slate-400">Nuance libre :</span>
-                <input
-                  type="color"
-                  defaultValue="#a3e635"
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
-                      targetDomRef.current = (window as any).__activeRichTextDom;
-                    }
-                    if (targetDomRef.current) targetDomRef.current.focus();
-                    restoreSelection();
-                    const sel = window.getSelection();
-                    const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
-                    const markHtml = (txt: string) =>
-                      `<mark color="${val}" style="background-color: ${val} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
-
-                    if (selTxt && targetDomRef.current) {
-                      const curContent = targetDomRef.current.innerHTML;
-                      if (curContent.includes(selTxt)) {
-                        targetDomRef.current.innerHTML = curContent.replace(selTxt, markHtml(selTxt));
-                      } else {
-                        try { document.execCommand('insertHTML', false, markHtml(selTxt)); } catch(err) {}
-                      }
-                    }
-
-                    if (targetDomRef.current) {
-                      const finalHtml = targetDomRef.current.innerHTML;
-                      if (selectedChildIndex !== null && selectedEl.data?.children?.[selectedChildIndex]) {
-                        const updated = selectedEl.data.children.map((ch: any, i: number) =>
-                          i === selectedChildIndex ? { ...ch, content: finalHtml } : ch
-                        );
-                        handleUpdateElementData(selectedEl.id, { children: updated });
-                      } else {
-                        handleUpdateElementData(selectedEl.id, { content: finalHtml });
-                      }
-                    }
-                  }}
-                  className="w-8 h-8 bg-slate-900 cursor-pointer rounded-xl border border-slate-700 p-0.5"
-                  title="Explorer toutes les nuances Néon"
-                />
-              </div>
-            </div>
-
-            {/* 2. COULEUR DE TEXTE SIDEBAR */}
-            <div className="space-y-2 pt-2 border-t border-slate-800">
-              <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block">
-                🎨 Couleur du Texte
-              </label>
-              <div className="grid grid-cols-6 gap-1.5">
-                {textColors.map((c) => (
-                  <button
-                    key={c.color}
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => {
-                      if (targetDomRef.current) targetDomRef.current.focus();
-                      restoreSelection();
-                      executeRichCommand('foreColor', c.color);
-                    }}
-                    style={{ backgroundColor: c.color }}
-                    className="w-7 h-7 rounded-xl border border-slate-700 hover:scale-110 transition-transform cursor-pointer shadow-xs"
-                    title={c.label}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* 3. STYLE DE TEXTE SIDEBAR (GRAS / ITALIQUE / SOULIGNÉ / EFFACER) */}
-            <div className="space-y-2 pt-2 border-t border-slate-800">
-              <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block">
-                ✍️ Style & Formatage
-              </label>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => executeRichCommand('bold')}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-black text-xs rounded-xl border border-slate-700 flex items-center gap-1"
-                  title="Mettre en gras"
-                >
-                  <Bold className="w-3.5 h-3.5" />
-                  <span>Gras</span>
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => executeRichCommand('italic')}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-black text-xs rounded-xl border border-slate-700 italic flex items-center gap-1"
-                  title="Mettre en italique"
-                >
-                  <Italic className="w-3.5 h-3.5" />
-                  <span>Italique</span>
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => executeRichCommand('underline')}
-                  className="px-3 py-1.5 bg-sky-950/60 hover:bg-sky-900/80 text-sky-300 font-black text-xs rounded-xl border border-sky-600/40 flex items-center gap-1"
-                  title="Souligner"
-                >
-                  <Underline className="w-3.5 h-3.5" />
-                  <span>Souligné</span>
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => executeRichCommand('removeFormat')}
-                  className="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 font-black text-xs rounded-xl border border-rose-600/40 flex items-center gap-1"
-                  title="Effacer le style"
-                >
-                  <Eraser className="w-3.5 h-3.5" />
-                  <span>Effacer</span>
-                </button>
-              </div>
-            </div>
-          </div>
           {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
           {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
             const activeChild = selectedEl.data.children[selectedChildIndex];
