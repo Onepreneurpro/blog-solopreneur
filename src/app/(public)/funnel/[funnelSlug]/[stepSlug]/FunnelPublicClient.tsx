@@ -303,6 +303,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               const sectionClassName = el.data?.className || '';
 
               const mainBg = el.data?.bgColor || '#0F172A';
+              const mobileBgColor = el.data?.mobileBgColor !== undefined ? el.data.mobileBgColor : (el.data?.mobileBgImage ? 'transparent' : mainBg);
               const bgImage = el.data?.bgImage || '';
               const bgSize = el.data?.bgSize || 'cover';
               const bgZoom = el.data?.bgZoom || 100;
@@ -415,7 +416,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                       return (
-                        <div className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full flex-1 h-full">
+                        <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
                               flex: `0 0 ${colWidths[cIdx]}%`,

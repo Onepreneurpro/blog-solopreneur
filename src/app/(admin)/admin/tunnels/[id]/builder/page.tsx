@@ -1475,19 +1475,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 }
               };
 
+              const isMobInspect = previewMode === 'MOBILE';
               const bgVal = selectedChildIndex !== null
-                ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent')
-                : (elData.bgColor || 'transparent');
+                ? (isMobInspect
+                    ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.mobileBgColor || 'transparent')
+                    : (selectedEl.data?.children?.[selectedChildIndex]?.data?.bgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent'))
+                : (isMobInspect ? (elData.mobileBgColor || 'transparent') : (elData.bgColor || 'transparent'));
 
               const cardBgVal = selectedChildIndex !== null
-                ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent')
-                : (elData.cardBgColor || 'transparent');
+                ? (isMobInspect
+                    ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.mobileCardBgColor || selectedEl.data?.children?.[selectedChildIndex]?.data?.mobileBgColor || 'transparent')
+                    : (selectedEl.data?.children?.[selectedChildIndex]?.data?.cardBgColor || 'transparent'))
+                : (isMobInspect ? (elData.mobileCardBgColor || 'transparent') : (elData.cardBgColor || 'transparent'));
 
               const textVal = selectedChildIndex !== null
                 ? (selectedEl.data?.children?.[selectedChildIndex]?.data?.textColor || '#FFFFFF')
                 : (elData.textColor || '#FFFFFF');
 
               const applyBgChange = (val: string) => {
+                const bgProp = previewMode === 'MOBILE' ? 'mobileBgColor' : 'bgColor';
+                const cardBgProp = previewMode === 'MOBILE' ? 'mobileCardBgColor' : 'cardBgColor';
                 if (selectedChildIndex !== null) {
                   const currentChildren = [...(selectedEl.data?.children || [])];
                   const targetChild = currentChildren[selectedChildIndex];
@@ -1495,34 +1502,36 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     ...targetChild,
                     data: {
                       ...(targetChild.data || {}),
-                      bgColor: val,
-                      cardBgColor: val,
+                      [bgProp]: val,
+                      [cardBgProp]: val,
                     },
                   };
                   handleUpdateElementData(selectedEl.id, { children: currentChildren });
                 } else {
-                  handleUpdateElementData(selectedEl.id, { bgColor: val });
+                  handleUpdateElementData(selectedEl.id, { [bgProp]: val });
                 }
               };
 
               const applyCardBgChange = (val: string) => {
+                const cardBgProp = previewMode === 'MOBILE' ? 'mobileCardBgColor' : 'cardBgColor';
+                const bgProp = previewMode === 'MOBILE' ? 'mobileBgColor' : 'bgColor';
                 if (selectedChildIndex !== null) {
                   const currentChildren = [...(selectedEl.data?.children || [])];
                   const targetChild = currentChildren[selectedChildIndex];
                   const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                  const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val }));
+                  const updatedItems = currentItems.map((it: any) => ({ ...it, bgColor: val, mobileBgColor: val }));
                   currentChildren[selectedChildIndex] = {
                     ...targetChild,
                     data: {
                       ...(targetChild.data || {}),
-                      cardBgColor: val,
-                      bgColor: val,
+                      [cardBgProp]: val,
+                      [bgProp]: val,
                       items: updatedItems,
                     },
                   };
                   handleUpdateElementData(selectedEl.id, { children: currentChildren });
                 } else {
-                  handleUpdateElementData(selectedEl.id, { cardBgColor: val });
+                  handleUpdateElementData(selectedEl.id, { [cardBgProp]: val });
                 }
               };
 
@@ -4065,7 +4074,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       console.error(err);
                                     }
                                   }}
-                                  style={{ backgroundColor: (child as any).bgColor || cardBg, color: (child as any).textColor || textColor }}
+                                  style={{
+                                    backgroundColor: previewMode === 'MOBILE'
+                                      ? ((child as any).data?.mobileBgColor !== undefined ? (child as any).data.mobileBgColor : ((child as any).data?.mobileBgImage ? 'transparent' : ((child as any).data?.cardBgColor || (child as any).bgColor || cardBg)))
+                                      : ((child as any).data?.cardBgColor || (child as any).bgColor || cardBg),
+                                    color: (child as any).textColor || textColor
+                                  }}
                                   className="p-4 border border-slate-200/80 rounded-2xl relative group/child space-y-2 hover:border-[#00A0FF] transition-all cursor-grab active:cursor-grabbing shadow-xs hover:shadow-md"
                                 >
                                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-200/60 pb-1">
@@ -4187,13 +4201,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
-                      const mainBg = el.data?.bgColor || '#0F172A';
                       const isMobMode = previewMode === 'MOBILE';
-                      const bgImage = (isMobMode && el.data?.mobileBgImage) ? el.data.mobileBgImage : (el.data?.bgImage || '');
-                      const bgSize = (isMobMode && el.data?.mobileBgSize) ? el.data.mobileBgSize : (el.data?.bgSize || 'cover');
-                      const bgZoom = (isMobMode && el.data?.mobileBgZoom !== undefined) ? el.data.mobileBgZoom : (el.data?.bgZoom || 100);
-                      const bgPosX = (isMobMode && el.data?.mobileBgPosX !== undefined) ? el.data.mobileBgPosX : (el.data?.bgPosX !== undefined ? el.data.bgPosX : 50);
-                      const bgPosY = (isMobMode && el.data?.mobileBgPosY !== undefined) ? el.data.mobileBgPosY : (el.data?.bgPosY !== undefined ? el.data.bgPosY : 50);
+                      const mainBg = isMobMode
+                        ? (el.data?.mobileBgColor !== undefined ? el.data.mobileBgColor : (el.data?.mobileBgImage ? 'transparent' : (el.data?.bgColor || '#0F172A')))
+                        : (el.data?.bgColor || '#0F172A');
+                      const bgImage = isMobMode ? (el.data?.mobileBgImage || '') : (el.data?.bgImage || '');
+                      const bgSize = isMobMode ? (el.data?.mobileBgSize || 'cover') : (el.data?.bgSize || 'cover');
+                      const bgZoom = isMobMode ? (el.data?.mobileBgZoom !== undefined ? el.data.mobileBgZoom : 100) : (el.data?.bgZoom || 100);
+                      const bgPosX = isMobMode ? (el.data?.mobileBgPosX !== undefined ? el.data.mobileBgPosX : 50) : (el.data?.bgPosX !== undefined ? el.data.bgPosX : 50);
+                      const bgPosY = isMobMode ? (el.data?.mobileBgPosY !== undefined ? el.data.mobileBgPosY : 50) : (el.data?.bgPosY !== undefined ? el.data.bgPosY : 50);
                       const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
                       const textColor = el.data?.textColor || '#ffffff';
                       const innerWidth = el.data?.innerContentWidth || 'standard';
@@ -4285,7 +4301,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full relative flex-1 h-full"
+                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap md:flex-nowrap gap-0'} items-stretch w-full relative flex-1 h-full`}
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
@@ -4319,8 +4335,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           } catch (err) {}
                                         }}
                                         style={{
-                                          flex: `0 0 ${colWidths[cIdx]}%`,
-                                          minWidth: '120px',
+                                          flex: previewMode === 'MOBILE' ? '1 1 100%' : `0 0 ${colWidths[cIdx]}%`,
+                                          width: previewMode === 'MOBILE' ? '100%' : undefined,
+                                          minWidth: previewMode === 'MOBILE' ? '100%' : '120px',
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
