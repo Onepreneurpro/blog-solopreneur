@@ -4403,9 +4403,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                 style={{
                                   backgroundImage: `url(${bgImage})`,
                                   backgroundSize: bgSize,
-                                  backgroundPosition: 'center',
+                                  backgroundPosition: 'top center',
                                   transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
-                                  transformOrigin: 'center center',
+                                  transformOrigin: 'top center',
                                 }}
                               />
                             </div>

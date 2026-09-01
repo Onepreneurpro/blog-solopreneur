@@ -427,9 +427,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                         style={{
                           backgroundImage: `url(${bgImage})`,
                           backgroundSize: bgSize,
-                          backgroundPosition: 'center',
+                          backgroundPosition: 'top center',
                           transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
-                          transformOrigin: 'center center',
+                          transformOrigin: 'top center',
                         }}
                       />
                     </div>
