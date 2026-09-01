@@ -1965,6 +1965,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         { id: 'dashed', label: '╌╌ Tirets' },
                         { id: 'dotted', label: '┈ ┈ Pointillé' },
                         { id: 'double', label: '══ Double' },
+                        { id: 'wavy', label: '🌊 Vagues' },
                       ].map((styleOpt) => {
                         const isActive = (targetData.borderStyle || 'none') === styleOpt.id;
                         return (
