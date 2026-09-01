@@ -420,6 +420,49 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     try {
       const data = JSON.parse(dataStr);
+
+      // Handle dragging 2, 3, or 4 columns blocks (Col2, Col3, Col4)
+      if (data.type === 'Col2' || data.type === 'Col3' || data.type === 'Col4') {
+        const numColumns = data.type === 'Col4' ? 4 : data.type === 'Col3' ? 3 : 2;
+        const timestamp = Date.now();
+
+        // Find target Section for canvas drop
+        const targetEl = targetIndex !== undefined ? elements[targetIndex] : null;
+        let targetSecId = targetEl ? targetEl.id : null;
+        if (targetEl && targetEl.type !== 'Section' && targetEl.type !== 'BlockSectionFull') {
+          const parentSec = elements.find((e) => (e.type === 'Section' || e.type === 'BlockSectionFull') && e.data?.children?.some((ch: any) => ch.id === targetEl.id));
+          if (parentSec) targetSecId = parentSec.id;
+        }
+        if (!targetSecId) {
+          targetSecId = [...elements].reverse().find((e) => e.type === 'Section' || e.type === 'BlockSectionFull')?.id || null;
+        }
+
+        setElements((prev) =>
+          prev.map((el) => {
+            if (el.id !== targetSecId) return el;
+            const currentChildren = el.data?.children || [];
+            const hasExisting = currentChildren.length > 0;
+            const newDivs: CanvasElement[] = Array.from({ length: numColumns }).map((_, i) => ({
+              id: `child-${timestamp}-${i + 1}`,
+              type: 'ContentBox',
+              category: 'Disposition',
+              content: `Conteneur DIV ${i + 1}`,
+              data: {
+                ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+                newRow: i === 0 && hasExisting,
+              },
+            }));
+            return {
+              ...el,
+              data: {
+                ...el.data,
+                children: [...currentChildren, ...newDivs],
+              },
+            };
+          })
+        );
+        return;
+      }
       if (data.isNew) {
         const newEl: CanvasElement = {
           id: `el-${Date.now()}`,
@@ -495,6 +538,43 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     try {
       const data = JSON.parse(dataStr);
+
+      if (data.type === 'Col2' || data.type === 'Col3' || data.type === 'Col4') {
+        let targetSecId = blockId;
+        const directSec = elements.find((e) => e.id === blockId && (e.type === 'Section' || e.type === 'BlockSectionFull'));
+        if (!directSec) {
+          const parentSec = elements.find((e) => (e.type === 'Section' || e.type === 'BlockSectionFull') && e.data?.children?.some((ch: any) => ch.id === blockId));
+          if (parentSec) targetSecId = parentSec.id;
+        }
+
+        setElements((prev) =>
+          prev.map((el) => {
+            if (el.id !== targetSecId) return el;
+            const currentChildren = el.data?.children || [];
+            const hasExisting = currentChildren.length > 0;
+            const numColumns = data.type === 'Col4' ? 4 : data.type === 'Col3' ? 3 : 2;
+            const timestamp = Date.now();
+            const newDivs: CanvasElement[] = Array.from({ length: numColumns }).map((_, i) => ({
+              id: `child-${timestamp}-${i + 1}`,
+              type: 'ContentBox',
+              category: 'Disposition',
+              content: `Conteneur DIV ${i + 1}`,
+              data: {
+                ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+                newRow: i === 0 && hasExisting,
+              },
+            }));
+            return {
+              ...el,
+              data: {
+                ...el.data,
+                children: [...currentChildren, ...newDivs],
+              },
+            };
+          })
+        );
+        return;
+      }
       const newChild: CanvasElement = {
         id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
         type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
