@@ -477,7 +477,43 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [editingBlock, setEditingBlock] = useState<CanvasElement | null>(null);
 
   const getDefaultBlockData = (type: string, name: string) => {
-    if (type === 'BlockFeat4ColImg' || type === 'Col4') {
+    if (type === 'Col4') {
+      return {
+        title: '',
+        layoutMode: 'grid-4',
+        bgColor: 'transparent',
+        children: [
+          { id: 'c1', type: 'ContentBox', data: { children: [] } },
+          { id: 'c2', type: 'ContentBox', data: { children: [] } },
+          { id: 'c3', type: 'ContentBox', data: { children: [] } },
+          { id: 'c4', type: 'ContentBox', data: { children: [] } },
+        ],
+      };
+    }
+    if (type === 'Col3') {
+      return {
+        title: '',
+        layoutMode: 'grid-3',
+        bgColor: 'transparent',
+        children: [
+          { id: 'c1', type: 'ContentBox', data: { children: [] } },
+          { id: 'c2', type: 'ContentBox', data: { children: [] } },
+          { id: 'c3', type: 'ContentBox', data: { children: [] } },
+        ],
+      };
+    }
+    if (type === 'Col2') {
+      return {
+        title: '',
+        layoutMode: 'grid-2',
+        bgColor: 'transparent',
+        children: [
+          { id: 'c1', type: 'ContentBox', data: { children: [] } },
+          { id: 'c2', type: 'ContentBox', data: { children: [] } },
+        ],
+      };
+    }
+    if (type === 'BlockFeat4ColImg') {
       return {
         title: 'GRILLE 4 COLONNES (SECTION DÉMONSTRATION)',
         items: [
@@ -488,7 +524,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         ],
       };
     }
-    if (type === 'BlockFeat3ColImg' || type === 'Col3') {
+    if (type === 'BlockFeat3ColImg') {
       return {
         title: 'Le Savoir-Faire des Experts à Votre Portée (3 Colonnes)',
         subtitle: 'CE QUE VOUS OBTENEZ',
@@ -499,7 +535,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         ],
       };
     }
-    if (type === 'BlockFeat2ColIconsLeft' || type === 'Col2') {
+    if (type === 'BlockFeat2ColIconsLeft') {
       return {
         title: 'Nos Services & Garanties (2 Colonnes)',
         items: [
@@ -513,6 +549,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     if (type === 'ContentBox') {
       return {
         title: '',
+        bgColor: 'transparent',
         children: [],
       };
     }
@@ -520,12 +557,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       return {
         title: '',
         isFullWidth: true,
-        bgColor: '#0F172A',
+        bgColor: '#ffffff',
         bgImage: '',
         bgOverlay: 0,
         bgSize: 'cover',
         bgPosition: 'center',
-        textColor: '#ffffff',
+        textColor: '#0f172a',
         children: [],
       };
     }
@@ -3185,15 +3222,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                         {/* RENDER NESTED CHILDREN IN THE CONTAINER */}
                         {(!el.data?.children || el.data.children.length === 0) ? (
-                          <div className="p-10 border-2 border-dashed border-[#00A0FF]/40 bg-blue-50/40 rounded-2xl text-center space-y-3">
-                            <div className="w-12 h-12 bg-[#00A0FF]/10 text-[#00A0FF] rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">
-                              📥
+                          <div className="py-12 px-6 border-2 border-dashed border-slate-300/80 bg-[#FAFAFA]/80 rounded-xl text-center flex flex-col items-center justify-center space-y-1 cursor-pointer transition-all hover:border-[#00A0FF]/60 hover:bg-slate-50">
+                            <div className="text-xs font-black text-slate-400 uppercase tracking-widest font-heading">
+                              [ Section Vierge ]
                             </div>
-                            <div className="text-base font-extrabold text-slate-800">
-                              Glissez-déposez n importe quel élément ici
-                            </div>
-                            <div className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
-                              Glissez des images, titres, paragraphes ou boutons depuis le menu à gauche pour les disposer côte à côte ou en liste dans ce conteneur.
+                            <div className="text-xs font-semibold text-slate-500">
+                              Glissez-déposez un élément ou des colonnes ici
                             </div>
                           </div>
                         ) : (() => {
@@ -3808,12 +3842,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           style={{
                                             backgroundColor: child.data?.bgColor || 'transparent',
                                           }}
-                                          className="min-h-[100px] w-full p-4 rounded-none border-2 border-dashed border-sky-400/40 hover:border-sky-400 bg-sky-950/20 text-sky-300 transition-all flex items-center justify-center text-xs font-bold"
+                                          className="min-h-[90px] w-full p-4 rounded-xl border-2 border-dashed border-slate-300/80 hover:border-[#00A0FF] bg-white/40 text-slate-500 transition-all flex items-center justify-center text-xs font-bold"
                                         >
                                           {(!child.data?.children || child.data.children.length === 0) ? (
-                                            <div className="text-center py-4 space-y-1">
-                                              <span className="text-sm font-bold text-sky-300">📦 Rangée / Conteneur DIV (Vierge)</span>
-                                              <div className="text-[10px] text-sky-400/70 font-normal">Déposez vos cartes ou éléments dans ce bloc</div>
+                                            <div className="text-center py-3 space-y-0.5">
+                                              <span className="text-xs font-black text-slate-400 uppercase tracking-widest font-heading">[ Conteneur / Rangée Vierge ]</span>
+                                              <div className="text-[10px] text-slate-400 font-medium">Déposez des éléments ici</div>
                                             </div>
                                           ) : (
                                             <div className="w-full space-y-3">
