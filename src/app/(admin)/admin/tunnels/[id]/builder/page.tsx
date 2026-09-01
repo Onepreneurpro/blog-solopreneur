@@ -590,11 +590,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           prev.map((el) => {
             if (el.id !== blockId) return el;
             const currentChildren = el.data?.children || [];
+            const isNonDiv = newChild.type !== 'ContentBox' && newChild.type !== 'Section' && newChild.type !== 'BlockSectionFull';
+            const hasDivColumns = currentChildren.some((c: any) => c.type === 'ContentBox');
+            // If dropping a text/heading or non-div element onto a Section with Divs, place it DIRECTLY AT THE TOP above Divs!
+            const updatedChildren = (isNonDiv && hasDivColumns)
+              ? [newChild, ...currentChildren]
+              : [...currentChildren, newChild];
+
             return {
               ...el,
               data: {
                 ...el.data,
-                children: [...currentChildren, newChild],
+                children: updatedChildren,
               },
             };
           })
