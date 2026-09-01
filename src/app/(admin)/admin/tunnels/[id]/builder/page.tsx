@@ -102,6 +102,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [cloneError, setCloneError] = useState<string | null>(null);
   const [cloneMode, setCloneMode] = useState<'replace' | 'append'>('replace');
   const [cloneStyle, setCloneStyle] = useState<'raw' | 'native'>('raw');
+  const [searchTarget, setSearchTarget] = useState<string>('');
+  const [replaceTarget, setReplaceTarget] = useState<string>('');
 
   const handleClonePage = async () => {
     if (!cloneUrlInput.trim()) {
@@ -1238,6 +1240,69 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {mode.label}
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* RAW HTML INSPECTOR PANEL FOR CLONED PAGES */}
+          {(selectedEl.type === 'RawHTML' || selectedEl.data?.rawHtml) && (
+            <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/60 space-y-4 shadow-xl mb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="text-xs font-black text-amber-400 uppercase flex items-center gap-1.5">
+                  <span>⚡</span>
+                  <span>Inspecteur Page Clonée (HTML/CSS)</span>
+                </span>
+              </div>
+
+              {/* QUICK SEARCH & REPLACE IN CLONED PAGE */}
+              <div className="space-y-2 pt-1 border-t border-slate-800">
+                <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-heading">
+                  🔍 Rechercher & Remplacer (Texte ou Liens)
+                </label>
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={searchTarget}
+                    onChange={(e) => setSearchTarget(e.target.value)}
+                    placeholder="Texte ou URL d origine à remplacer"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={replaceTarget}
+                    onChange={(e) => setReplaceTarget(e.target.value)}
+                    placeholder="Votre nouveau texte ou lien"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!searchTarget.trim()) return;
+                      const currentHtml = selectedEl.data?.rawHtml || selectedEl.content || '';
+                      const newHtml = currentHtml.replaceAll(searchTarget.trim(), replaceTarget);
+                      handleUpdateElementData(selectedEl.id, { rawHtml: newHtml });
+                      alert(`✅ Remplacement réussi pour "${searchTarget}" !`);
+                    }}
+                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition-all shadow-md"
+                  >
+                    ⚡ Remplacer Tout dans la Page
+                  </button>
+                </div>
+              </div>
+
+              {/* RAW CODE EDITOR */}
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block font-heading">
+                  📝 Éditeur de Code HTML Brut
+                </label>
+                <textarea
+                  rows={8}
+                  value={selectedEl.data?.rawHtml || selectedEl.content || ''}
+                  onChange={(e) => {
+                    handleUpdateElementData(selectedEl.id, { rawHtml: e.target.value });
+                  }}
+                  className="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-[11px] font-mono text-emerald-400 focus:border-amber-500 outline-none leading-relaxed"
+                />
               </div>
             </div>
           )}
@@ -3208,6 +3273,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         </div>
                       );
                     })()}
+
+                    {/* RAW HTML CLONED PAGE WORKSPACE CANVAS RENDERER */}
+                    {(el.type === 'RawHTML' || el.data?.rawHtml) && (
+                      <div className="w-full relative overflow-hidden my-2 border border-dashed border-amber-500/50 rounded-xl p-2 bg-slate-950/60">
+                        <div className="flex items-center justify-between bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1 rounded-lg font-bold mb-2 border border-amber-500/30">
+                          <span>⚡ PAGE HTML/CSS CLONÉE (PIXEL PERFECT)</span>
+                          <span className="text-[10px] text-slate-400">Sélectionnez pour utiliser la Recherche & Remplacement dans le panneau gauche</span>
+                        </div>
+                        {el.data?.stylesheetUrls && el.data.stylesheetUrls.map((url: string, uIdx: number) => (
+                          <link key={`canvascss-${uIdx}`} rel="stylesheet" href={url} />
+                        ))}
+                        {el.data?.customCss && (
+                          <style dangerouslySetInnerHTML={{ __html: el.data.customCss }} />
+                        )}
+                        <div dangerouslySetInnerHTML={{ __html: el.data?.rawHtml || el.content }} />
+                      </div>
+                    )}
 
                     {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
