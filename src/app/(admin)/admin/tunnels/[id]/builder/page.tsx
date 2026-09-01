@@ -5135,7 +5135,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             ? 'grid-cols-1 md:grid-cols-2'
                                             : 'grid-cols-1 md:grid-cols-3';
 
-                                        const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content).items;
+                                        const itemsList = child.data?.items || getDefaultBlockData(child.type, child.content)?.items || [];
 
                                         const updateNestedColumnItem = (itemIdx: number, itemChanges: any) => {
                                            const currentChildren = [...(el.data?.children || [])];
