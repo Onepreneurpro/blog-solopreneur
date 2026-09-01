@@ -161,6 +161,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     paddingX?: boolean;
     marginY?: boolean;
     marginX?: boolean;
+    borderRadius?: boolean;
   }>({});
 
   const handleClonePage = async () => {
@@ -1564,6 +1565,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             const marginLeft = targetData.marginLeft !== undefined ? targetData.marginLeft : marginXVal;
             const marginRight = targetData.marginRight !== undefined ? targetData.marginRight : marginXVal;
 
+            const radiusVal = targetData.borderRadius || 0;
+            const rTL = targetData.borderTopLeftRadius !== undefined ? targetData.borderTopLeftRadius : radiusVal;
+            const rTR = targetData.borderTopRightRadius !== undefined ? targetData.borderTopRightRadius : radiusVal;
+            const rBL = targetData.borderBottomLeftRadius !== undefined ? targetData.borderBottomLeftRadius : radiusVal;
+            const rBR = targetData.borderBottomRightRadius !== undefined ? targetData.borderBottomRightRadius : radiusVal;
+
             return (
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                 <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
@@ -2040,20 +2047,201 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   </div>
 
-                  {/* D. ARRONDISSEMENT DES COINS (BORDER RADIUS) */}
-                  <div className="space-y-1.5 pt-2 border-t border-slate-800">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-slate-300">Arrondissement des coins (Rayon)</span>
-                      <span className="text-xs font-mono text-[#00A0FF]">{targetData.borderRadius || 0}px</span>
+                  {/* D. ARRONDISSEMENT DES COINS (BORDER RADIUS GLOBAL & 4 COINS SÉPARÉS) */}
+                  <div className="space-y-2 pt-2 border-t border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${openMarginDetail.borderRadius ? 'text-slate-500' : 'text-slate-300'}`}>
+                        Arrondissement des coins (Rayon)
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border transition-all ${
+                          openMarginDetail.borderRadius
+                            ? 'bg-slate-800/80 border-slate-700/60'
+                            : 'bg-slate-900 border-slate-700 focus-within:border-[#00A0FF]'
+                        }`}>
+                          <input
+                            type="number"
+                            min={0}
+                            max={60}
+                            disabled={openMarginDetail.borderRadius}
+                            value={
+                              openMarginDetail.borderRadius
+                                ? (rTL === rTR && rTR === rBR && rBR === rBL ? rTL : radiusVal)
+                                : radiusVal
+                            }
+                            onChange={(e) => {
+                              const val = Math.max(0, Math.min(60, Number(e.target.value) || 0));
+                              updateMarginData({
+                                borderRadius: val,
+                                borderTopLeftRadius: undefined,
+                                borderTopRightRadius: undefined,
+                                borderBottomLeftRadius: undefined,
+                                borderBottomRightRadius: undefined,
+                              });
+                            }}
+                            className={`w-9 text-right text-xs font-mono bg-transparent outline-none border-none p-0 ${
+                              openMarginDetail.borderRadius ? 'text-slate-500 cursor-not-allowed' : 'text-white font-bold'
+                            }`}
+                          />
+                          <span className={`text-[9px] font-mono ${openMarginDetail.borderRadius ? 'text-slate-600' : 'text-slate-400'}`}>px</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setOpenMarginDetail(prev => ({ ...prev, borderRadius: !prev.borderRadius }))}
+                          className={`p-1 rounded hover:bg-slate-800 transition-colors cursor-pointer border ${
+                            openMarginDetail.borderRadius ? 'border-[#00A0FF] bg-[#00A0FF]/10' : 'border-slate-800'
+                          }`}
+                          title={openMarginDetail.borderRadius ? 'Fermer pour réactiver le rayon principal' : 'Ouvrir pour régler chaque coin séparément'}
+                        >
+                          {openMarginDetail.borderRadius ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                        </button>
+                      </div>
                     </div>
+
+                    {/* BARRE PRINCIPALE - GRISE & INACTIVE SI ACCORDION SECTEUR DÉTAILLÉ EST OUVERT */}
                     <input
                       type="range"
                       min={0}
                       max={60}
-                      value={targetData.borderRadius || 0}
-                      onChange={(e) => updateMarginData({ borderRadius: Number(e.target.value) })}
-                      className="w-full accent-[#00A0FF] cursor-pointer"
+                      disabled={openMarginDetail.borderRadius}
+                      value={
+                        openMarginDetail.borderRadius
+                          ? (rTL === rTR && rTR === rBR && rBR === rBL ? rTL : radiusVal)
+                          : radiusVal
+                      }
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        updateMarginData({
+                          borderRadius: val,
+                          borderTopLeftRadius: undefined,
+                          borderTopRightRadius: undefined,
+                          borderBottomLeftRadius: undefined,
+                          borderBottomRightRadius: undefined,
+                        });
+                      }}
+                      className={`w-full cursor-pointer transition-opacity ${
+                        openMarginDetail.borderRadius
+                          ? 'opacity-30 cursor-not-allowed accent-slate-600'
+                          : 'accent-[#00A0FF]'
+                      }`}
                     />
+
+                    {/* DÉTAIL DES 4 COINS SÉPARÉS (HAUT-GAUCHE, HAUT-DROITE, BAS-GAUCHE, BAS-DROITE) */}
+                    {openMarginDetail.borderRadius && (
+                      <div className="pt-2 space-y-2.5 bg-slate-900/80 p-3 rounded-xl border border-slate-800/80">
+                        <div className="text-[9px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1">
+                          <span>📐 Réglage Individuel des 4 Coins</span>
+                          <span className="text-[8px] text-slate-400 normal-case">(La barre principale reste grisée)</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* 1. HAUT-GAUCHE (TL) */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                              <span>Haut-Gauche</span>
+                              <div className="flex items-center gap-0.5">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={60}
+                                  value={rTL}
+                                  onChange={(e) => updateMarginData({ borderTopLeftRadius: Number(e.target.value) })}
+                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                />
+                                <span className="text-[8px] font-mono text-slate-400">px</span>
+                              </div>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={60}
+                              value={rTL}
+                              onChange={(e) => updateMarginData({ borderTopLeftRadius: Number(e.target.value) })}
+                              className="w-full accent-[#00A0FF] h-1 cursor-pointer"
+                            />
+                          </div>
+
+                          {/* 2. HAUT-DROITE (TR) */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                              <span>Haut-Droite</span>
+                              <div className="flex items-center gap-0.5">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={60}
+                                  value={rTR}
+                                  onChange={(e) => updateMarginData({ borderTopRightRadius: Number(e.target.value) })}
+                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                />
+                                <span className="text-[8px] font-mono text-slate-400">px</span>
+                              </div>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={60}
+                              value={rTR}
+                              onChange={(e) => updateMarginData({ borderTopRightRadius: Number(e.target.value) })}
+                              className="w-full accent-[#00A0FF] h-1 cursor-pointer"
+                            />
+                          </div>
+
+                          {/* 3. BAS-GAUCHE (BL) */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                              <span>Bas-Gauche</span>
+                              <div className="flex items-center gap-0.5">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={60}
+                                  value={rBL}
+                                  onChange={(e) => updateMarginData({ borderBottomLeftRadius: Number(e.target.value) })}
+                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                />
+                                <span className="text-[8px] font-mono text-slate-400">px</span>
+                              </div>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={60}
+                              value={rBL}
+                              onChange={(e) => updateMarginData({ borderBottomLeftRadius: Number(e.target.value) })}
+                              className="w-full accent-[#00A0FF] h-1 cursor-pointer"
+                            />
+                          </div>
+
+                          {/* 4. BAS-DROITE (BR) */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                              <span>Bas-Droite</span>
+                              <div className="flex items-center gap-0.5">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={60}
+                                  value={rBR}
+                                  onChange={(e) => updateMarginData({ borderBottomRightRadius: Number(e.target.value) })}
+                                  className="w-8 text-right text-[10px] font-mono bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white outline-none focus:border-[#00A0FF]"
+                                />
+                                <span className="text-[8px] font-mono text-slate-400">px</span>
+                              </div>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={60}
+                              value={rBR}
+                              onChange={(e) => updateMarginData({ borderBottomRightRadius: Number(e.target.value) })}
+                              className="w-full accent-[#00A0FF] h-1 cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3612,7 +3800,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           borderStyle: child.data?.borderStyle && child.data.borderStyle !== 'none' ? child.data.borderStyle : undefined,
                                           borderWidth: child.data?.borderWidth !== undefined ? `${child.data.borderWidth}px` : (child.data?.borderStyle && child.data.borderStyle !== 'none' ? '2px' : undefined),
                                           borderColor: child.data?.borderColor || undefined,
-                                          borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : undefined,
+                                          borderRadius: (child.data?.borderTopLeftRadius !== undefined || child.data?.borderTopRightRadius !== undefined || child.data?.borderBottomLeftRadius !== undefined || child.data?.borderBottomRightRadius !== undefined)
+                                             ? `${child.data?.borderTopLeftRadius || 0}px ${child.data?.borderTopRightRadius || 0}px ${child.data?.borderBottomRightRadius || 0}px ${child.data?.borderBottomLeftRadius || 0}px`
+                                             : (child.data?.borderRadius ? `${child.data.borderRadius}px` : undefined),
                                         }}
                                         className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
                                         selectedChildIndex === cIdx

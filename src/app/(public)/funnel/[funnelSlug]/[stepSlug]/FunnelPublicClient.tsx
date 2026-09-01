@@ -480,7 +480,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                 <div
                                   style={{
                                     backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
-                                    borderRadius: child.data?.borderRadius ? `${child.data.borderRadius}px` : 0,
+                                     borderRadius: (child.data?.borderTopLeftRadius !== undefined || child.data?.borderTopRightRadius !== undefined || child.data?.borderBottomLeftRadius !== undefined || child.data?.borderBottomRightRadius !== undefined)
+                                       ? `${child.data?.borderTopLeftRadius || 0}px ${child.data?.borderTopRightRadius || 0}px ${child.data?.borderBottomRightRadius || 0}px ${child.data?.borderBottomLeftRadius || 0}px`
+                                       : (child.data?.borderRadius ? `${child.data.borderRadius}px` : 0),
                                     color: child.data?.textColor || 'inherit',
                                     paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
                                     paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
