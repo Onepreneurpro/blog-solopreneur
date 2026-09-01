@@ -134,19 +134,40 @@ const renderBorderStyles = (data: any) => {
     };
   }
 
-  if (data.borderStyle === 'wavy' || data.borderStyle === 'wave' || data.borderStyle === 'vague') {
-    const strokeW = Math.max(3, bWidth);
-    const strokeColor = bColor && bColor !== 'transparent' ? bColor : '#00A0FF';
-
+  if (bStyle === 'glow') {
     return {
       borderStyle: 'solid',
-      borderWidth: `${strokeW}px`,
-      borderColor: strokeColor,
+      borderWidth: `${Math.max(2, bWidth)}px`,
+      borderColor: bColor,
+      boxShadow: `0 0 18px ${bColor}, inset 0 0 15px ${bColor}22`,
       borderRadius,
       clipPath,
       WebkitClipPath: clipPath,
-      filter: 'url(#wavy-border-smooth)',
-      WebkitFilter: 'url(#wavy-border-smooth)',
+    };
+  }
+
+  if (bStyle === 'shadow3d') {
+    const offsetW = Math.max(4, bWidth + 2);
+    return {
+      borderStyle: 'solid',
+      borderWidth: `${Math.max(2, bWidth)}px`,
+      borderColor: bColor,
+      boxShadow: `${offsetW}px ${offsetW}px 0px ${bColor}`,
+      borderRadius,
+      clipPath,
+      WebkitClipPath: clipPath,
+    };
+  }
+
+  if (bStyle === 'softshadow') {
+    return {
+      borderStyle: 'solid',
+      borderWidth: `${Math.max(1, bWidth)}px`,
+      borderColor: bColor,
+      boxShadow: `0 10px 25px -5px ${bColor}66, 0 8px 10px -6px ${bColor}33`,
+      borderRadius,
+      clipPath,
+      WebkitClipPath: clipPath,
     };
   }
 
@@ -2251,7 +2272,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         { id: 'dashed', label: '╌╌ Tirets' },
                         { id: 'dotted', label: '┈ ┈ Pointillé' },
                         { id: 'double', label: '══ Double' },
-                        { id: 'wavy', label: '🌊 Vagues' },
+                        { id: 'glow', label: '🌟 Néon Lumineux' },
+                        { id: 'shadow3d', label: '🔳 Ombre 3D Pop' },
+                        { id: 'softshadow', label: '✨ Ombre Douce' },
                       ].map((styleOpt) => {
                         const isActive = (targetData.borderStyle || 'none') === styleOpt.id;
                         return (
@@ -2541,15 +2564,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   return (
     <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden">
-      {/* GLOBAL SVG FILTER FOR SERPENTINE / WAVY BORDER ALL ALONG ALL CURVES & CORNERS */}
-      <svg className="absolute w-0 h-0 pointer-events-none" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
-        <defs>
-          <filter id="wavy-border-smooth" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="turbulence" baseFrequency="0.025 0.025" numOctaves="2" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-      </svg>
       
       {/* 1. TOP BUILDER TOOLBAR (INDEPENDENT WORKSPACE MODE) */}
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
