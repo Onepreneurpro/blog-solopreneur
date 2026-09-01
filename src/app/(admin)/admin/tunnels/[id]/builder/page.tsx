@@ -4105,6 +4105,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           setSelectedChildIndex(cIdx);
                                           setSelectedSubItem(null);
                                         }}
+                                        onDragOver={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          e.dataTransfer.dropEffect = 'move';
+                                        }}
+                                        onDrop={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          try {
+                                            const raw = e.dataTransfer.getData('text/plain');
+                                            if (!raw) return;
+                                            const dragData = JSON.parse(raw);
+                                            if (dragData.type === 'BLOCK_SWAP' && dragData.parentId === el.id && dragData.index !== undefined && dragData.index !== cIdx) {
+                                              const currentChildren = [...(el.data?.children || [])];
+                                              const draggedBlock = currentChildren[dragData.index];
+                                              currentChildren.splice(dragData.index, 1);
+                                              currentChildren.splice(cIdx, 0, draggedBlock);
+                                              handleUpdateElementData(el.id, { children: currentChildren });
+                                              setSelectedChildIndex(cIdx);
+                                            }
+                                          } catch (err) {}
+                                        }}
                                         style={{
                                           flex: `0 0 ${colWidths[cIdx]}%`,
                                           minWidth: '120px',
@@ -4118,9 +4140,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
+                                          draggable
+                                          onDragStart={(e) => {
+                                            e.stopPropagation();
+                                            e.dataTransfer.setData('text/plain', JSON.stringify({
+                                              type: 'BLOCK_SWAP',
+                                              parentId: el.id,
+                                              index: cIdx
+                                            }));
+                                            e.dataTransfer.effectAllowed = 'move';
+                                          }}
                                           style={{ color: '#ffffff' }}
-                                          className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#10B981]"
+                                          className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#10B981] cursor-grab active:cursor-grabbing hover:bg-emerald-600 transition-colors"
+                                          title="✋ Cliquez et glissez pour permuter ce bloc avec un autre"
                                         >
+                                          <span className="text-xs font-black text-white/90">⋮⋮</span>
                                           <span className="!text-white font-black" style={{ color: '#ffffff' }}>
                                             {child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}
                                           </span>
