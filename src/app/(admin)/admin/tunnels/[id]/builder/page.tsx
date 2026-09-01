@@ -223,27 +223,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   });
   const toggleAccordion = (sec: string) => setOpenAccordion((prev) => ({ ...prev, [sec]: !prev[sec] }));
 
-  // Canvas elements state
-  const [elements, setElements] = useState<CanvasElement[]>([
-    {
-      id: 'el-1',
-      type: 'Heading',
-      category: 'Texte',
-      content: 'Votre emploi de rêve n est qu à un clic',
-    },
-    {
-      id: 'el-2',
-      type: 'Text',
-      category: 'Texte',
-      content: 'Découvrez nos méthodes prouvées, nos templates d organisation et nos automations pour développer un business rentable.',
-    },
-    {
-      id: 'el-3',
-      type: 'OptinForm',
-      category: 'Formulaire',
-      content: 'Formulaire de Capture Email',
-    },
-  ]);
+  // Canvas elements state (starts clean and empty)
+  const [elements, setElements] = useState<CanvasElement[]>([]);
 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -267,10 +248,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 if (foundMode && ['standard', 'wide', 'full'].includes(foundMode)) {
                   setPageWidthMode(foundMode);
                 }
+              } else {
+                setElements([]);
               }
             } catch (e) {
-              console.error(e);
+              setElements([]);
             }
+          } else {
+            setElements([]);
           }
         }
       } catch (err) {
