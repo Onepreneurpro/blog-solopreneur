@@ -1799,6 +1799,107 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     </div>
                   </div>
+
+                  {/* 🌄 IMAGE DE FOND (SECTION / BLOC) */}
+                  <div className="space-y-3 pt-3 border-t border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                        🌄 Image de Fond {selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}
+                      </label>
+                      {targetData.bgImage && (
+                        <button
+                          type="button"
+                          onClick={() => updateMarginData({ bgImage: '', bgZoom: 100, bgPosX: 50, bgPosY: 50 })}
+                          className="text-[9px] font-bold text-rose-400 hover:text-rose-300 underline"
+                        >
+                          🗑️ Supprimer
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerImageFileUpload((base64Url) => {
+                            updateMarginData({ bgImage: base64Url });
+                          });
+                        }}
+                        className="w-full py-2 px-3 bg-gradient-to-r from-[#00A0FF] to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                      >
+                        <span>📁 Choisir une photo sur mon PC</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Ou coller une URL d image..."
+                          value={targetData.bgImage || ''}
+                          onChange={(e) => updateMarginData({ bgImage: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
+                        />
+                      </div>
+                    </div>
+
+                    {targetData.bgImage && (
+                      <div className="space-y-3 pt-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs font-bold">
+                            <span className="text-slate-300">Zoom de l image</span>
+                            <span className="text-xs font-mono text-[#00A0FF]">{targetData.bgZoom || 100}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={100}
+                            max={300}
+                            value={targetData.bgZoom || 100}
+                            onChange={(e) => updateMarginData({ bgZoom: Number(e.target.value) })}
+                            className="w-full accent-[#00A0FF] cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[10px] font-bold">
+                            <span className="text-slate-300">Position Horizontale (X)</span>
+                            <span className="font-mono text-[#00A0FF]">{targetData.bgPosX !== undefined ? targetData.bgPosX : 50}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            value={targetData.bgPosX !== undefined ? targetData.bgPosX : 50}
+                            onChange={(e) => updateMarginData({ bgPosX: Number(e.target.value) })}
+                            className="w-full accent-[#00A0FF] cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[10px] font-bold">
+                            <span className="text-slate-300">Position Verticale (Y)</span>
+                            <span className="font-mono text-[#00A0FF]">{targetData.bgPosY !== undefined ? targetData.bgPosY : 50}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            value={targetData.bgPosY !== undefined ? targetData.bgPosY : 50}
+                            onChange={(e) => updateMarginData({ bgPosY: Number(e.target.value) })}
+                            className="w-full accent-[#00A0FF] cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="pt-1 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => updateMarginData({ bgPosX: 50, bgPosY: 50, bgZoom: 100 })}
+                            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg transition-colors"
+                          >
+                            🎯 Centrer (50% 50%)
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })()}
@@ -4222,9 +4323,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
                       const mainBg = el.data?.bgColor || '#0F172A';
                       const bgImage = el.data?.bgImage || '';
+                      const bgZoom = el.data?.bgZoom || 100;
+                      const bgPosX = el.data?.bgPosX !== undefined ? el.data.bgPosX : 50;
+                      const bgPosY = el.data?.bgPosY !== undefined ? el.data.bgPosY : 50;
                       const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
-                      const bgSize = el.data?.bgSize || 'cover';
-                      const bgPos = el.data?.bgPosition || 'center';
                       const textColor = el.data?.textColor || '#ffffff';
                       const innerWidth = el.data?.innerContentWidth || 'standard';
 
@@ -4241,9 +4343,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           onDrop={(e) => handleBlockDrop(e, el.id)}
                           style={{
                             backgroundColor: mainBg,
-                            backgroundImage: bgImage ? `url(${bgImage})` : undefined,
-                            backgroundSize: bgSize,
-                            backgroundPosition: bgPos,
                             color: textColor,
                             minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                             paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
@@ -4258,6 +4357,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           }}
                           className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0`}
                         >
+                          {/* SECTION BACKGROUND IMAGE LAYER WITH ZOOM AND TRANSLATION */}
+                          {bgImage && (
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                              <div
+                                className="absolute inset-0 w-full h-full"
+                                style={{
+                                  backgroundImage: `url(${bgImage})`,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  transform: `scale(${bgZoom / 100}) translate(${50 - bgPosX}%, ${50 - bgPosY}%)`,
+                                  transformOrigin: 'center center',
+                                }}
+                              />
+                            </div>
+                          )}
+
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
                             <div
