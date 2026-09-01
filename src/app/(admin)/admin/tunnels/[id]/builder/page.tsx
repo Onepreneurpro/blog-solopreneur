@@ -4003,7 +4003,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         {/* TYPE NAME BADGE */}
                                         <div
                                           style={{ color: '#ffffff' }}
-                                          className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#00A0FF]"
+                                          className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#10B981]"
                                         >
                                           <span className="!text-white font-black" style={{ color: '#ffffff' }}>
                                             {child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}
@@ -4390,11 +4390,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
-                                                        <div className="bg-amber-500 text-white px-2 py-0.5 rounded-l font-extrabold text-[10px] uppercase flex items-center gap-1">
+                                                        <div style={{ color: '#ffffff' }} className="bg-[#FF7A00] !text-white px-2 py-0.5 rounded-l font-extrabold text-[10px] uppercase flex items-center gap-1">
                                                           <span>Image</span>
                                                           <span>⬇️</span>
                                                         </div>
-                                                        <div className="bg-amber-600 text-white px-1 py-0.5 rounded-r flex items-center gap-1 border-l border-amber-700">
+                                                        <div style={{ color: '#ffffff' }} className="bg-[#FF7A00] !text-white px-1 py-0.5 rounded-r flex items-center gap-1 border-l border-orange-300">
                                                           <button
                                                             type="button"
                                                             onClick={(e) => {
