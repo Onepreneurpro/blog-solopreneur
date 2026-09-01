@@ -205,6 +205,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   }, [floatingTextMenu.visible]);
 
+  // Re-apply DOM selection when popover opens so text stays highlighted on screen
+  useLayoutEffect(() => {
+    if (openFloatingPopover && savedRangeRef.current && typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (sel) {
+        try {
+          sel.removeAllRanges();
+          sel.addRange(savedRangeRef.current);
+        } catch (e) {}
+      }
+    }
+  }, [openFloatingPopover]);
+
   // Screen clamping so floating toolbar never exceeds PC viewport width
   useLayoutEffect(() => {
     if (floatingTextMenu.visible) {
@@ -527,6 +540,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: color }}
                     onClick={() => {
+                      restoreSelection();
                       executeRichCommand('foreColor', color);
                       setOpenFloatingPopover(null);
                     }}
@@ -572,6 +586,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: item.color }}
                     onClick={() => {
+                      restoreSelection();
                       executeRichCommand('hiliteColor', item.color);
                       setOpenFloatingPopover(null);
                     }}
