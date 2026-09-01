@@ -346,7 +346,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
                       marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                     }}
-                    className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-none transition-all my-0 m-0 overflow-hidden flex flex-col justify-between`}
+                    className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (

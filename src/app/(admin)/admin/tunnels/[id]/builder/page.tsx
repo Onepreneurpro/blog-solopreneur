@@ -3378,7 +3378,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
                             marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                           }}
-                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-6 sm:p-10' : ''}`}
+                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between p-0`}
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
@@ -3458,7 +3458,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
-                                        className={`relative group/child ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-3' : ''} rounded-none border transition-all flex flex-col flex-1 h-full ${
+                                        className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
                                           selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
