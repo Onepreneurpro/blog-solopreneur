@@ -2976,6 +2976,35 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 
                 {activeTab === 'ELEMENTS' && (
                   <>
+{/* CATEGORY 1: DISPOSITION & SECTIONS FULL-WIDTH */}
+                    <div className="space-y-2.5">
+                      <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
+                        Disposition &amp; Sections Full-Width
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
+                          onClick={() => handleAddElement('Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Maximize2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Section</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Conteneur DIV')}
+                          onClick={() => handleAddElement('ContentBox', 'Disposition', 'Conteneur DIV')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Box className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Div</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    
                     {/* CATEGORY 1: TEXTE (SCREEN 1) */}
                     <div className="space-y-2.5">
                       <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
@@ -3060,47 +3089,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <span className="text-[10px] font-bold text-slate-300">Audio</span>
                     </button>
                   </div>
-                </div>
-
-                {/* CATEGORY 3: DISPOSITION DES COLONNES & SECTIONS FULL-WIDTH */}
-                <div className="space-y-2.5">
-                  <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                    Disposition & Sections Full-Width
-                  </div>
-
-                  {/* FULL-WIDTH SECTION BUTTON */}
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
-                    onClick={() => handleAddElement('Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
-                    className="w-full p-3 bg-gradient-to-r from-purple-900/60 to-blue-900/60 hover:from-purple-800 hover:to-blue-800 border border-purple-500/50 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-lg mb-2"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Maximize2 className="w-5 h-5 text-purple-300 group-hover:text-white shrink-0" />
-                      <div>
-                        <div className="text-xs font-black text-white">Section HTML5 (100% Plein Écran)</div>
-                        <div className="text-[10px] text-purple-200 font-medium leading-tight">Balise &lt;section&gt; bord à bord pour colonnes, conteneurs, formulaires, images &amp; textes</div>
-                      </div>
-                    </div>
-                    <Plus className="w-4 h-4 text-purple-300 shrink-0" />
-                  </button>
-
-                  {/* BLOC DIV CONTENEUR BUTTON */}
-                  <button
-                    draggable
-                    onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Conteneur DIV')}
-                    onClick={() => handleAddElement('ContentBox', 'Disposition', 'Conteneur DIV')}
-                    className="w-full p-3 bg-slate-950 hover:bg-slate-900 border border-blue-500/40 hover:border-blue-400 rounded-xl flex items-center justify-between text-left transition-all group cursor-grab active:cursor-grabbing shadow-md font-heading font-black"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Box className="w-5 h-5 text-[#00A0FF] group-hover:text-white shrink-0" />
-                      <div>
-                        <div className="text-xs font-black text-white">📦 Bloc DIV / Conteneur (Mise en Page)</div>
-                        <div className="text-[10px] text-slate-400 font-medium leading-tight">Balise &lt;div&gt; souple pour regrouper et centrer vos éléments dans la section</div>
-                      </div>
-                    </div>
-                    <Plus className="w-4 h-4 text-[#00A0FF] shrink-0" />
-                  </button>
                 </div>
 
                 {/* CATEGORY 4: FORMULAIRE */}
