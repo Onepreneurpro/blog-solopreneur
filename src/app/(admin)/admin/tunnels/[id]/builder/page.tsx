@@ -4399,7 +4399,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     >
                                                       {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
                                                       <div
-                                                        className={`absolute -top-3.5 left-1/2 -translate-x-1/2 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                        className={`absolute -bottom-3.5 left-1/2 -translate-x-1/2 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
