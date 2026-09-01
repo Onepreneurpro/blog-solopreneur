@@ -4102,6 +4102,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
                                         </div>
+
+                                       {/* INNER CLIPPED DIV FOR BACKGROUND, BORDER RADIUS, DASHED BORDER & CLIPPATH */}
+                                       <div
+                                         style={{
+                                           backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
+                                           minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                                           paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                           paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                           paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                           paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                           ...renderBorderStyles(child.data),
+                                         }}
+                                         className={`w-full h-full flex-1 flex flex-col min-h-[160px] overflow-hidden transition-all space-y-4 rounded-none border ${
+                                           selectedChildIndex === cIdx
+                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                             : 'border-white/10 hover:border-amber-500/60'
+                                         }`}
+                                       >
                                       </div>
 
                                       {child.type === 'Heading' && (
@@ -4511,6 +4529,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       )}
 
                                     </div>
+                                     </div>
 
                                     {/* VERTICAL SEAM RESIZER BETWEEN ADJACENT DIVS MATCHING SCREEN 2 */}
                                      {cIdx < numCols - 1 && (
