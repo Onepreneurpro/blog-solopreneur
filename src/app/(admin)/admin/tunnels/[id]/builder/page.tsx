@@ -5241,7 +5241,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
                                           ...renderBorderStyles(child.data),
                                         }}
-                                        className={`w-full h-full flex-1 flex flex-col min-h-[160px] overflow-hidden transition-all space-y-4 border ${
+                                        className={`w-full ${child.type === 'ContentBox' ? 'h-full flex-1 flex flex-col min-h-[160px] border space-y-2' : 'h-auto flex-none border-0 p-2 m-0 flex flex-col justify-center items-center'} overflow-hidden transition-all ${
                                           selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
