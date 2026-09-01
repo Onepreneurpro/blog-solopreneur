@@ -3967,20 +3967,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                               return (
-<div
+                                <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
                                   className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full relative flex-1 h-full"
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
                                       <div
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedElementId(el.id);
+                                          setSelectedChildIndex(cIdx);
+                                          setSelectedSubItem(null);
+                                        }}
                                         style={{
                                           flex: `0 0 ${colWidths[cIdx]}%`,
                                           minWidth: '120px',
+                                          minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                                          paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                          paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                                          paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                                          paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
+                                          backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
+                                          ...renderBorderStyles(child.data),
                                         }}
-                                        className="relative group/child flex flex-col flex-1 h-full overflow-visible z-10"
+                                        className={`relative group/child transition-all flex flex-col flex-1 h-full overflow-hidden border ${
+                                          selectedChildIndex === cIdx
+                                            ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
+                                            : 'border-white/10 hover:border-amber-500/60'
+                                        }`}
                                       >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
