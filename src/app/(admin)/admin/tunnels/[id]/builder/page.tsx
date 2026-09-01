@@ -562,7 +562,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         bgOverlay: 0,
         bgSize: 'cover',
         bgPosition: 'center',
-        textColor: '#0f172a',
+        textColor: '#ffffff',
         children: [],
       };
     }
@@ -2748,9 +2748,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   >
                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
                     <div
-                      className={`absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
-                        isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                      }`}
+                      className="absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
                     >
                       {/* TYPE NAME BADGE */}
                       <div
