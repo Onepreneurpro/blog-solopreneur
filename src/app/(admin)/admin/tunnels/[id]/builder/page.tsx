@@ -1256,45 +1256,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             </div>
           )}
 
-          {/* 📐 DISPOSITION DES RANGÉES & BLOCS DIV DANS LA SECTION */}
-          {(selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
-            <div className="p-4 bg-slate-950 rounded-2xl border border-purple-500/60 space-y-3 shadow-lg">
-              <div className="text-[10px] font-black text-purple-300 uppercase tracking-wider flex items-center justify-between">
-                <span>📐 Disposition des Rangées / Blocs DIV</span>
-                <span className="text-[9px] font-mono text-purple-400">
-                  {selectedEl.data?.layoutMode || 'Automatique'}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { key: 'grid-1', label: '1 Rangée (100%)' },
-                  { key: 'grid-2', label: '2 Rangées (50% / 50%)' },
-                  { key: 'grid-3', label: '3 Rangées (33% chacun)' },
-                  { key: 'grid-4', label: '4 Rangées (25% chacun)' },
-                  { key: 'vertical', label: 'Empilés (Vertical)' },
-                  { key: 'flex-row', label: 'Côte à côte (Flex)' },
-                ].map((mode) => (
-                  <button
-                    key={mode.key}
-                    type="button"
-                    onClick={() => handleUpdateElementData(selectedEl.id, { layoutMode: mode.key })}
-                    className={`py-2 px-2 text-[11px] font-bold rounded-xl border transition-all text-center flex items-center justify-center gap-1 ${
-                      (selectedEl.data?.layoutMode || (
-                        selectedEl.data?.children?.length === 2 ? 'grid-2' :
-                        selectedEl.data?.children?.length === 3 ? 'grid-3' :
-                        selectedEl.data?.children?.length >= 4 ? 'grid-4' : 'vertical'
-                      )) === mode.key
-                        ? 'bg-purple-600 text-white border-purple-500 shadow-md ring-2 ring-purple-400/40'
-                        : 'bg-slate-900 text-purple-200 border-slate-800 hover:text-white hover:border-purple-500/50'
-                    }`}
-                  >
-                    {mode.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* RAW HTML INSPECTOR PANEL FOR CLONED PAGES */}
           {(selectedEl.type === 'RawHTML' || selectedEl.data?.rawHtml) && (
