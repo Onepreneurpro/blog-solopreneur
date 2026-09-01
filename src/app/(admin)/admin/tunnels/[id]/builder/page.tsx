@@ -355,6 +355,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const triggerImageFileUpload = (onFileLoaded: (base64Url: string) => void) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files[0]) {
+        const file = target.files[0];
+        const reader = new FileReader();
+        reader.onload = (loadEvent) => {
+          const base64Url = loadEvent.target?.result as string;
+          if (base64Url) {
+            onFileLoaded(base64Url);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
   const handleImageMouseDown = (
     e: React.MouseEvent<HTMLImageElement>,
     currentXVal: number,
@@ -3348,8 +3369,38 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Image' && (
-                      <div className="aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
-                        <img src={el.content} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 relative group/imgbox">
+                        <img
+                          src={el.data?.img || el.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80'}
+                          alt="Preview"
+                          onMouseDown={(e) => {
+                            const currentX = el.data?.posX !== undefined ? el.data.posX : 50;
+                            const currentY = el.data?.posY !== undefined ? el.data.posY : 50;
+                            handleImageMouseDown(e, currentX, currentY, (newX, newY) => {
+                              handleUpdateElementData(el.id, { posX: newX, posY: newY });
+                            });
+                          }}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            triggerImageFileUpload((base64Url) => {
+                              handleUpdateElementContent(el.id, base64Url);
+                              handleUpdateElementData(el.id, { img: base64Url });
+                            });
+                          }}
+                          onWheel={(e) => {
+                            e.preventDefault();
+                            const currZoom = el.data?.imgZoom || 100;
+                            const nextZoom = Math.max(100, Math.min(300, currZoom + (e.deltaY < 0 ? 10 : -10)));
+                            handleUpdateElementData(el.id, { imgZoom: nextZoom });
+                          }}
+                          style={{
+                            objectFit: 'cover',
+                            objectPosition: `${el.data?.posX !== undefined ? el.data.posX : 50}% ${el.data?.posY !== undefined ? el.data.posY : 50}%`,
+                            transform: `scale(${(el.data?.imgZoom || 100) / 100})`,
+                            ...renderBorderStyles(el.data),
+                          }}
+                          className="w-full h-full object-cover cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
+                        />
                       </div>
                     )}
 
@@ -4498,6 +4549,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                               updateSubChildData({ posX: newX, posY: newY });
                                                             });
                                                           }}
+                                                          onDoubleClick={(e) => {
+                                                            e.stopPropagation();
+                                                            triggerImageFileUpload((base64Url) => {
+                                                              updateSubChildData({ img: base64Url });
+                                                            });
+                                                          }}
                                                           onWheel={(e) => {
                                                             e.preventDefault();
                                                             const currZoom = subChild.data?.imgZoom || 100;
@@ -4512,11 +4569,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           }}
                                                           className="w-full h-full min-h-[140px] block cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
                                                         />
-                                                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-black/80 backdrop-blur text-white text-[9px] font-bold rounded-full opacity-0 group-hover/imgbox:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg border border-white/20 whitespace-nowrap">
-                                                          <span>✋ Glissez la souris pour cadrer</span>
-                                                          <span>•</span>
-                                                          <span>🔍 Molette zoom ({subChild.data?.imgZoom || 100}%)</span>
-                                                        </div>
+                                                        
                                                       </div>
                                                     </div>
                                                   );
