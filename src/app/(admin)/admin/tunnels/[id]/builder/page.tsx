@@ -2758,7 +2758,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     >
                       {/* TYPE NAME BADGE */}
                       <div
-                        className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
+                        style={{ color: '#ffffff' }}
+                        className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
                           el.type === 'Section' || el.type === 'BlockSectionFull'
                             ? 'bg-[#00A0FF]'
                             : el.type === 'ContentBox'
@@ -2766,13 +2767,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             : 'bg-[#FF7700]'
                         }`}
                       >
-                        <span className="text-white font-black">{el.type === 'Section' || el.type === 'BlockSectionFull' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}</span>
-                        <span className="text-[10px] text-white">⬇️</span>
+                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>{el.type === 'Section' || el.type === 'BlockSectionFull' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}</span>
+                        <span className="text-[10px] !text-white" style={{ color: '#ffffff' }}>⬇️</span>
                       </div>
 
                       {/* ACTIONS BADGE */}
                       <div
-                        className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                        style={{ color: '#ffffff' }}
+                        className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
                           el.type === 'Section' || el.type === 'BlockSectionFull'
                             ? 'bg-[#00A0FF] border-blue-400'
                             : el.type === 'ContentBox'
@@ -2787,20 +2789,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             e.stopPropagation();
                             setSelectedElementId(el.id);
                           }}
-                          className="p-1 hover:bg-black/20 rounded transition-colors"
+                          className="p-1 hover:bg-black/20 rounded transition-colors !text-white"
+                          style={{ color: '#ffffff' }}
                           title="⚙️ Paramètres du bloc"
                         >
-                          <Settings className="w-3.5 h-3.5 text-white" />
+                          <Settings className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                         </button>
 
                         {/* 📋 DUPLIQUER */}
                         <button
                           type="button"
                           onClick={(e) => handleDuplicateElement(el.id, e)}
-                          className="p-1 hover:bg-black/20 rounded transition-colors"
+                          className="p-1 hover:bg-black/20 rounded transition-colors !text-white"
+                          style={{ color: '#ffffff' }}
                           title="📋 Dupliquer le bloc"
                         >
-                          <Copy className="w-3.5 h-3.5 text-white" />
+                          <Copy className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                         </button>
 
                         {/* ▲ MONTER */}
@@ -2808,10 +2812,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           type="button"
                           disabled={idx === 0}
                           onClick={(e) => moveElementToPosition(idx, 'up', e)}
-                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
-                          title="▲ Monter"
+                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40 !text-white"
+                          style={{ color: '#ffffff' }}
+                          title="▲ Monter le bloc"
                         >
-                          <ChevronUp className="w-3.5 h-3.5 text-white" />
+                          <ChevronUp className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                         </button>
 
                         {/* ▼ DESCENDRE */}
@@ -2819,20 +2824,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           type="button"
                           disabled={idx === elements.length - 1}
                           onClick={(e) => moveElementToPosition(idx, 'down', e)}
-                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
-                          title="▼ Descendre"
+                          className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40 !text-white"
+                          style={{ color: '#ffffff' }}
+                          title="▼ Descendre le bloc"
                         >
-                          <ChevronDown className="w-3.5 h-3.5 text-white" />
+                          <ChevronDown className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                         </button>
 
                         {/* 🗑️ SUPPRIMER */}
                         <button
                           type="button"
                           onClick={(e) => handleDeleteElement(el.id, e)}
-                          className="p-1 hover:bg-red-700 rounded transition-colors"
-                          title="🗑️ Supprimer"
+                          className="p-1 hover:bg-red-700/80 rounded transition-colors !text-white"
+                          style={{ color: '#ffffff' }}
+                          title="🗑️ Supprimer le bloc"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-white" />
+                          <Trash2 className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                         </button>
                       </div>
                     </div>
@@ -3518,7 +3525,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
                                         className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
-                                          selectedChildIndex === cIdx
+                                        selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
                                         }`}
@@ -3529,17 +3536,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
-                                          className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
+                                          style={{ color: '#ffffff' }}
+                                          className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
                                             child.type === 'ContentBox' ? 'bg-sky-500' : 'bg-[#FF7700]'
                                           }`}
                                         >
-                                          <span className="text-white font-black">{child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}</span>
-                                          <span className="text-[10px] text-white">⬇️</span>
+                                          <span className="!text-white font-black" style={{ color: '#ffffff' }}>{child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}</span>
+                                          <span className="text-[10px] !text-white" style={{ color: '#ffffff' }}>⬇️</span>
                                         </div>
 
                                         {/* ACTIONS BADGE */}
                                         <div
-                                          className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                                          style={{ color: '#ffffff' }}
+                                          className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
                                             child.type === 'ContentBox' ? 'bg-sky-500 border-sky-600' : 'bg-[#FF7700] border-amber-600'
                                           }`}
                                         >
@@ -3552,10 +3561,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               setSelectedChildIndex(cIdx);
                                               setSelectedSubItem(null);
                                             }}
-                                            className="p-1 hover:bg-black/20 rounded transition-colors"
+                                            className="p-1 hover:bg-black/20 rounded transition-colors !text-white"
+                                            style={{ color: '#ffffff' }}
                                             title="⚙️ Contrôler le bloc / Paramètres"
                                           >
-                                            <Settings className="w-3.5 h-3.5 text-white" />
+                                            <Settings className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                                           </button>
 
                                           {/* 📋 DUPLIQUER */}
@@ -3569,10 +3579,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               updated.splice(cIdx + 1, 0, copy);
                                               handleUpdateElementData(el.id, { children: updated });
                                             }}
-                                            className="p-1 hover:bg-black/20 rounded transition-colors"
+                                            className="p-1 hover:bg-black/20 rounded transition-colors !text-white"
+                                            style={{ color: '#ffffff' }}
                                             title="📋 Dupliquer le bloc"
                                           >
-                                            <Copy className="w-3.5 h-3.5 text-white" />
+                                            <Copy className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                                           </button>
 
                                           {/* ▲ MONTER */}
@@ -3589,10 +3600,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                 handleUpdateElementData(el.id, { children: updated });
                                               }
                                             }}
-                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40 !text-white"
+                                            style={{ color: '#ffffff' }}
                                             title="▲ Monter"
                                           >
-                                            <ChevronUp className="w-3.5 h-3.5 text-white" />
+                                            <ChevronUp className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                                           </button>
 
                                           {/* ▼ DESCENDRE */}
@@ -3609,10 +3621,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                 handleUpdateElementData(el.id, { children: updated });
                                               }
                                             }}
-                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40"
+                                            className="p-1 hover:bg-black/20 rounded transition-colors disabled:opacity-40 !text-white"
+                                            style={{ color: '#ffffff' }}
                                             title="▼ Descendre"
                                           >
-                                            <ChevronDown className="w-3.5 h-3.5 text-white" />
+                                            <ChevronDown className="w-3.5 h-3.5 !text-white" style={{ color: '#ffffff' }} />
                                           </button>
 
                                           {/* 🗑️ SUPPRIMER */}
