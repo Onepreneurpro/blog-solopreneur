@@ -3226,7 +3226,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   >
                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
                     <div
-                      className="absolute -top-3.5 right-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                      className="absolute -top-3.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
                     >
                       {/* TYPE NAME BADGE */}
                       <div
@@ -3994,7 +3994,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                           ...renderBorderStyles(child.data),
                                         }}
-                                        className={`relative group/child overflow-hidden border transition-all flex flex-col flex-1 h-full ${
+                                        className={`relative group/child overflow-visible z-40 border transition-all flex flex-col flex-1 h-full ${
                                         selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
@@ -4002,7 +4002,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                       >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
-                                        className="absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
+                                        className="absolute -top-3.5 left-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
