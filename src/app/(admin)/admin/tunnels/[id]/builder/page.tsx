@@ -361,6 +361,341 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     });
   };
 
+  const renderTopStickyToolbar = () => {
+    const targetId = selectedElementId;
+    const childIdx = selectedChildIndex;
+    const subChildIdx = typeof selectedSubItem === 'number' ? selectedSubItem : (typeof selectedSubItem === 'object' && selectedSubItem !== null ? (selectedSubItem as any).itemIndex : null);
+
+    const updateTargetContentOnly = (newContent: string) => {
+      if (!targetId) return;
+      if (childIdx !== null && childIdx !== undefined && subChildIdx !== null && subChildIdx !== undefined) {
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children?.[childIdx]?.data?.children) {
+          const children = [...targetSection.data.children];
+          const childDiv = { ...children[childIdx] };
+          const divChildren = [...(childDiv.data?.children || [])];
+          if (divChildren[subChildIdx]) {
+            divChildren[subChildIdx] = { ...divChildren[subChildIdx], content: newContent };
+            childDiv.data = { ...(childDiv.data || {}), children: divChildren };
+            children[childIdx] = childDiv;
+            handleUpdateElementData(targetId, { children });
+          }
+        }
+      } else if (childIdx !== null && childIdx !== undefined) {
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children) {
+          const children = [...targetSection.data.children];
+          if (children[childIdx]) {
+            children[childIdx] = { ...children[childIdx], content: newContent };
+            handleUpdateElementData(targetId, { children });
+          }
+        }
+      } else {
+        setElements(prev => prev.map(item => item.id === targetId ? { ...item, content: newContent } : item));
+      }
+    };
+
+    const executeRichCommand = (command: string, value: string = '') => {
+      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+        targetDomRef.current = (window as any).__activeRichTextDom;
+      }
+      if (!targetDomRef.current) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+          if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+          const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
+          if (editableEl) targetDomRef.current = editableEl as HTMLElement;
+        }
+      }
+      if (targetDomRef.current) {
+        targetDomRef.current.focus();
+      }
+      restoreSelection();
+      try {
+        document.execCommand(command, false, value);
+      } catch (err) {}
+      saveSelection();
+      if (targetDomRef.current) {
+        updateTargetContentOnly(targetDomRef.current.innerHTML);
+      }
+    };
+
+    return (
+      <div
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        className="sticky top-2 z-[99999] mx-auto mb-4 bg-white/95 backdrop-blur-md text-slate-900 rounded-full shadow-2xl p-2 flex items-center justify-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
+      >
+        {/* ↶ ANNULER */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => handleUndo()}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
+          title="↶ Annuler la dernière modification"
+        >
+          <Undo className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* ↷ RÉTABLIR */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => handleRedo()}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-800 font-extrabold text-xs"
+          title="↷ Rétablir la modification"
+        >
+          <Redo className="w-4 h-4 text-slate-900" />
+        </button>
+
+        <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+        {/* B GRAS */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('bold')}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 font-black text-xs flex items-center justify-center min-w-[32px]"
+          title="B Gras (Extrabold)"
+        >
+          <Bold className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* I ITALIQUE */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('italic')}
+          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 italic font-black text-xs flex items-center justify-center min-w-[32px]"
+          title="I Italique"
+        >
+          <Italic className="w-4 h-4 text-slate-900" />
+        </button>
+
+        {/* ∪ SOULIGNÉ */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('underline')}
+          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+          title="Souligner le texte sélectionné"
+        >
+          <Underline className="w-4 h-4 text-sky-600" />
+          <span>Souligné</span>
+        </button>
+
+        {/* T TAILLE DROPDOWN */}
+        <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full border border-slate-300">
+          <Type className="w-4 h-4 text-slate-700 shrink-0" />
+          <select
+            onMouseDown={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val) executeRichCommand('fontSize', '4');
+            }}
+            className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer"
+            title="Taille de la police"
+          >
+            <option value="">Taille ▾</option>
+            <option value="14px">14px (Petit)</option>
+            <option value="18px">18px (Normal)</option>
+            <option value="24px">24px (Moyen)</option>
+            <option value="32px">32px (Grand)</option>
+            <option value="48px">48px (Très Grand)</option>
+            <option value="64px">64px (Géant)</option>
+          </select>
+        </div>
+
+        {/* 🎨 COULEUR TEXTE POPOVER */}
+        <div className="relative">
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              saveSelection();
+              setOpenFloatingPopover(prev => prev === 'color' ? null : 'color');
+            }}
+            className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            title="Couleur du texte"
+          >
+            <Palette className="w-4 h-4 text-emerald-600" />
+            <span>Couleur</span>
+            <span className="text-[10px] text-emerald-700">▾</span>
+          </button>
+
+          {openFloatingPopover === 'color' && (
+            <div className="absolute left-0 top-full mt-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                  <Palette className="w-4 h-4 text-emerald-600" />
+                  <span>Couleur du Texte</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-6 gap-1.5">
+                {textColors.map((c) => (
+                  <button
+                    key={c.color}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      restoreSelection();
+                      executeRichCommand('foreColor', c.color);
+                      setOpenFloatingPopover(null);
+                    }}
+                    style={{ backgroundColor: c.color }}
+                    className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                    title={c.label}
+                  />
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    defaultValue="#a3e635"
+                    onInput={(e) => {
+                      restoreSelection();
+                      executeRichCommand('foreColor', (e.target as HTMLInputElement).value);
+                    }}
+                    onChange={(e) => {
+                      restoreSelection();
+                      executeRichCommand('foreColor', e.target.value);
+                    }}
+                    className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                    title="Glissez le curseur pour explorer toutes les nuances"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpenFloatingPopover(null)}
+                    className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ✨ NÉON POPOVER (FOND DE TEXTE NÉON FLUO) */}
+        <div className="relative">
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              saveSelection();
+              setOpenFloatingPopover(prev => prev === 'neon' ? null : 'neon');
+            }}
+            className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            title="Surlignage Néon Fluo"
+          >
+            <Highlighter className="w-4 h-4 text-amber-600" />
+            <span>Néon</span>
+            <span className="text-[10px] text-amber-700">▾</span>
+          </button>
+
+          {openFloatingPopover === 'neon' && (
+            <div className="absolute left-0 top-full mt-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                  <Highlighter className="w-4 h-4 text-amber-600" />
+                  <span>Surlignage Néon Fluo</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-6 gap-1.5">
+                {neonColors.map((c) => (
+                  <button
+                    key={c.color}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      restoreSelection();
+                      executeRichCommand('hiliteColor', c.color);
+                      setOpenFloatingPopover(null);
+                    }}
+                    style={{ backgroundColor: c.color }}
+                    className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                    title={c.label}
+                  />
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    defaultValue="#a3e635"
+                    onInput={(e) => {
+                      restoreSelection();
+                      executeRichCommand('hiliteColor', (e.target as HTMLInputElement).value);
+                    }}
+                    onChange={(e) => {
+                      restoreSelection();
+                      executeRichCommand('hiliteColor', e.target.value);
+                    }}
+                    className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                    title="Glissez le curseur pour explorer toutes les nuances"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpenFloatingPopover(null)}
+                    className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 🧹 EFFACER */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('removeFormat')}
+          className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+          title="Effacer les couleurs et le style"
+        >
+          <Eraser className="w-4 h-4 text-rose-600" />
+          <span>Effacer</span>
+        </button>
+
+        <div className="h-5 w-[1px] bg-slate-300 mx-0.5" />
+
+        {/* H2 */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('formatBlock', '<h2>')}
+          className="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-full text-xs shadow-xs"
+          title="Convertir en Grand Titre H2"
+        >
+          H2
+        </button>
+
+        {/* H3 */}
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => executeRichCommand('formatBlock', '<h3>')}
+          className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-slate-950 font-black rounded-full text-xs shadow-xs"
+          title="Convertir en Sous-Titre H3"
+        >
+          H3
+        </button>
+      </div>
+    );
+  };
+
   const renderFloatingToolbar = () => {
     if (!floatingTextMenu.visible) return null;
     const targetId = floatingTextMenu.targetElId || selectedElementId;
@@ -4762,8 +5097,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             backgroundPosition: pageBgImage ? `${pageBgPosX ?? 50}% ${pageBgPosY ?? 0}%` : undefined,
             backgroundRepeat: 'no-repeat'
           }}
-          className="flex-1 p-0 overflow-y-auto h-full flex justify-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900 transition-colors duration-300"
+          className="flex-1 p-0 overflow-y-auto h-full flex flex-col items-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900 transition-colors duration-300"
         >
+          {renderTopStickyToolbar()}
           <div
             dir={pageDir}
             className={`w-full bg-transparent rounded-none border-0 p-0 overflow-visible min-h-screen pb-52 shadow-none transition-all ${
