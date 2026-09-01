@@ -5037,7 +5037,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             e.dataTransfer.effectAllowed = 'move';
                                           }}
                                           style={{ color: '#ffffff' }}
-                                          className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#10B981] cursor-grab active:cursor-grabbing hover:bg-emerald-600 transition-colors"
+                                          className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md ${
+                                             ['Heading', 'Text', 'Image', 'ButtonCTA', 'OptinForm'].includes(child.type)
+                                               ? 'bg-[#FF7A00] hover:bg-orange-600'
+                                               : 'bg-[#10B981] hover:bg-emerald-600'
+                                           } cursor-grab active:cursor-grabbing transition-colors`}
                                           title="✋ Cliquez et glissez pour permuter ce bloc avec un autre"
                                         >
                                           <span className="text-xs font-black text-white/90">⋮⋮</span>
