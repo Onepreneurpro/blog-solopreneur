@@ -135,22 +135,18 @@ const renderBorderStyles = (data: any) => {
   }
 
   if (data.borderStyle === 'wavy' || data.borderStyle === 'wave' || data.borderStyle === 'vague') {
-    const strokeW = Math.max(2, bWidth);
+    const strokeW = Math.max(3, bWidth);
     const strokeColor = bColor && bColor !== 'transparent' ? bColor : '#00A0FF';
-    const encodedColor = encodeURIComponent(strokeColor);
-
-    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12' viewBox='0 0 24 12'%3E%3Cpath d='M 0 6 C 4 0, 8 0, 12 6 C 16 12, 20 12, 24 6' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
 
     return {
       borderStyle: 'solid',
-      borderWidth: `${Math.max(3, strokeW)}px`,
-      borderColor: 'transparent',
-      borderImageSource: `url("${svgWave}")`,
-      borderImageSlice: '12',
-      borderImageRepeat: 'round',
+      borderWidth: `${strokeW}px`,
+      borderColor: strokeColor,
       borderRadius,
       clipPath,
       WebkitClipPath: clipPath,
+      filter: 'url(#wavy-border-smooth)',
+      WebkitFilter: 'url(#wavy-border-smooth)',
     };
   }
 
@@ -2545,6 +2541,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   return (
     <div className="h-screen w-screen bg-slate-950 text-white flex flex-col overflow-hidden">
+      {/* GLOBAL SVG FILTER FOR SERPENTINE / WAVY BORDER ALL ALONG ALL CURVES & CORNERS */}
+      <svg className="absolute w-0 h-0 pointer-events-none" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
+        <defs>
+          <filter id="wavy-border-smooth" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="turbulence" baseFrequency="0.025 0.025" numOctaves="2" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
       
       {/* 1. TOP BUILDER TOOLBAR (INDEPENDENT WORKSPACE MODE) */}
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-40">
