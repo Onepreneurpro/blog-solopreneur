@@ -172,10 +172,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     subChildIdx?: number | null;
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
+  const savedRangeRef = useRef<Range | null>(null);
+
+  const saveSelection = () => {
+    if (typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+        savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+      }
+    }
+  };
+
+  const restoreSelection = () => {
+    if (savedRangeRef.current && typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedRangeRef.current);
+      }
+    }
+  };
 
   const handleOpenFormattingToolbar = (e: React.MouseEvent, targetId: string, childIdx?: number | null, subChildIdx?: number | null, defaultContent?: string) => {
     e.preventDefault();
     e.stopPropagation();
+    saveSelection();
     setSelectedElementId(targetId);
     if (childIdx !== undefined && childIdx !== null) setSelectedChildIndex(childIdx);
     const selection = window.getSelection();
