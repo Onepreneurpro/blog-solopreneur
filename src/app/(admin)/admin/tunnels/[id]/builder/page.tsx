@@ -1748,13 +1748,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           </button>
 
                           <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              placeholder={`Ou coller URL image ${isMob ? 'Mobile' : 'PC'}...`}
-                              value={currentImg}
-                              onChange={(e) => applyBgImageUpdate({ [imgKey]: e.target.value })}
-                              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
-                            />
+                            {currentImg && currentImg.startsWith('data:image/') ? (
+                              <div className="w-full p-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] font-bold text-slate-300 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <span>📷</span>
+                                  <span className="text-[#00A0FF]">Image locale importée du PC</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => applyBgImageUpdate({ [imgKey]: '' })}
+                                  className="text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer"
+                                >
+                                  Supprimer
+                                </button>
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                placeholder={`Ou coller URL image ${isMob ? 'Mobile' : 'PC'}...`}
+                                value={currentImg}
+                                onChange={(e) => applyBgImageUpdate({ [imgKey]: e.target.value })}
+                                className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 outline-none focus:border-[#00A0FF]"
+                              />
+                            )}
                           </div>
                         </div>
 
@@ -3579,13 +3595,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       )}
                     </div>
 
-                    <input
-                      type="text"
-                      placeholder="Ou coller une URL d image..."
-                      value={pageBgImage || ''}
-                      onChange={(e) => setPageBgImage(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
-                    />
+                    {pageBgImage && pageBgImage.startsWith('data:image/') ? (
+                      <div className="w-full p-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] font-bold text-slate-300 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span>📷</span>
+                          <span className="text-[#00A0FF]">Image locale importée du PC</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setPageBgImage('')}
+                          className="text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder="Ou coller une URL d image..."
+                        value={pageBgImage || ''}
+                        onChange={(e) => setPageBgImage(e.target.value)}
+                        className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
+                      />
+                    )}
 
                     {/* MODES D AFFICHAGE DE L IMAGE (PAGE BG SIZE) */}
                     {pageBgImage && (
