@@ -443,11 +443,24 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     )}
                     {(() => {
                       const childrenList = el.data?.children || [];
-                      const numCols = childrenList.length;
-                      const colWidths =
-                        el.data?.colWidths && el.data.colWidths.length === numCols
-                          ? el.data.colWidths
-                          : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
+                      const childRowGroups: number[][] = [];
+                      let currentGroup: number[] = [];
+                      childrenList.forEach((child: any, index: number) => {
+                        if (child.data?.newRow && currentGroup.length > 0) {
+                          childRowGroups.push(currentGroup);
+                          currentGroup = [index];
+                        } else {
+                          currentGroup.push(index);
+                        }
+                      });
+                      if (currentGroup.length > 0) childRowGroups.push(currentGroup);
+
+                      const colWidths: { [index: number]: number } = {};
+                      childRowGroups.forEach((group) => {
+                        const count = group.length;
+                        const width = count > 0 ? 100 / count : 100;
+                        group.forEach((idx) => { colWidths[idx] = width; });
+                      });
 
                       return (
                         <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-stretch w-full flex-1 h-full">

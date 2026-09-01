@@ -1082,8 +1082,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     // Multi-column row / Section handling (Col2, Col3, Col4)
     if (type === 'Col2' || type === 'Col3' || type === 'Col4') {
       const numColumns = type === 'Col4' ? 4 : type === 'Col3' ? 3 : 2;
-      const childDivs: CanvasElement[] = [];
       const timestamp = Date.now();
+
+      // Check if a Section is selected or if there is a Section on canvas to target
+      const activeSelectedEl = selectedElementId ? elements.find((e) => e.id === selectedElementId) : null;
+      const targetSection = (activeSelectedEl && (activeSelectedEl.type === 'Section' || activeSelectedEl.type === 'BlockSectionFull'))
+        ? activeSelectedEl
+        : (elements.length > 0 && (elements[elements.length - 1].type === 'Section' || elements[elements.length - 1].type === 'BlockSectionFull'))
+        ? elements[elements.length - 1]
+        : null;
+
+      const hasExistingChildren = !!(targetSection?.data?.children && targetSection.data.children.length > 0);
+
+      const childDivs: CanvasElement[] = [];
       for (let i = 0; i < numColumns; i++) {
         childDivs.push({
           id: `child-${timestamp}-${i + 1}`,
@@ -1092,14 +1103,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           content: `Conteneur DIV ${i + 1}`,
           data: {
             ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+            newRow: i === 0 && hasExistingChildren, // 1st Div starts a new row if section already has children
           },
         });
       }
 
-      // If a Section is selected, add the Divs into the selected Section
-      const activeSelectedEl = selectedElementId ? elements.find((e) => e.id === selectedElementId) : null;
-      if (activeSelectedEl && (activeSelectedEl.type === 'Section' || activeSelectedEl.type === 'BlockSectionFull')) {
-        handleUpdateElementData(activeSelectedEl.id, { children: [...(activeSelectedEl.data?.children || []), ...childDivs] });
+      if (targetSection) {
+        handleUpdateElementData(targetSection.id, { children: [...(targetSection.data?.children || []), ...childDivs] });
         return;
       }
 
@@ -4839,19 +4849,34 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               <div className="w-full min-h-[120px] border border-dashed border-slate-300 rounded-lg bg-white" />
                             ) : (() => {
                               const childrenList = el.data?.children || [];
-                              const numCols = childrenList.length;
-                              const colWidths =
-                                el.data?.colWidths && el.data.colWidths.length === numCols
-                                  ? el.data.colWidths
-                                  : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
+                              // Group children by row break (child.data?.newRow) to compute width per row
+                              const childRowGroups: number[][] = [];
+                              let currentGroup: number[] = [];
+                              childrenList.forEach((child: CanvasElement, index: number) => {
+                                if (child.data?.newRow && currentGroup.length > 0) {
+                                  childRowGroups.push(currentGroup);
+                                  currentGroup = [index];
+                                } else {
+                                  currentGroup.push(index);
+                                }
+                              });
+                              if (currentGroup.length > 0) childRowGroups.push(currentGroup);
+
+                              const colWidths: { [index: number]: number } = {};
+                              childRowGroups.forEach((group) => {
+                                const count = group.length;
+                                const width = count > 0 ? 100 / count : 100;
+                                group.forEach((idx) => { colWidths[idx] = width; });
+                              });
 
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap md:flex-nowrap gap-0'} items-stretch w-full relative flex-1 h-full`}
+                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap gap-0'} items-stretch w-full relative flex-1 h-full`}
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
+                                      {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
                                       <div
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -5502,7 +5527,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           </button>
                                         </div>
                                       )}
-
                                       {child.type === 'FormInput' && (
                                         <div className="max-w-md mx-auto space-y-1 text-left">
                                           <label className="text-[10px] font-bold text-slate-300 block">{child.data?.title || 'Champ de formulaire'}</label>
@@ -5519,7 +5543,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                     </div>
 
                                     {/* VERTICAL SEAM RESIZER BETWEEN ADJACENT DIVS MATCHING SCREEN 2 */}
-                                     {cIdx < numCols - 1 && (
+                                     {cIdx < childrenList.length - 1 && (
                                        <div
                                          onMouseDown={(e) => handleStartColWidthResize(e, el.id, cIdx, sectionContainerRefs.current[el.id])}
                                          className="w-4 -mx-2 cursor-col-resize z-40 flex flex-col items-center justify-center group/colseam self-stretch transition-all select-none relative"
