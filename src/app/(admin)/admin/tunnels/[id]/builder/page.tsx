@@ -23,6 +23,18 @@ function RichTextElement({ content, onChange, onContextMenu, style, className }:
       onBlur={() => {
         if (ref.current) onChange(ref.current.innerHTML);
       }}
+      onMouseUp={() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
+          (window as any).__activeRichTextDom = ref.current;
+        }
+      }}
+      onKeyUp={() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
+          (window as any).__activeRichTextDom = ref.current;
+        }
+      }}
       onContextMenu={onContextMenu}
       onMouseDown={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
@@ -241,7 +253,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
 
-  // Continuously capture DOM selection as the user selects text
+  // Continuously capture DOM selection & target element as the user selects text
   useEffect(() => {
     const handleSelectionChange = () => {
       if (typeof window !== 'undefined') {
@@ -249,6 +261,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
           savedRangeRef.current = sel.getRangeAt(0).cloneRange();
           lastSelectedTextRef.current = sel.toString();
+          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+          if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+          const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
+          if (editableEl && typeof window !== 'undefined') {
+            (window as any).__activeRichTextDom = editableEl as HTMLElement;
+          }
         }
       }
     };
@@ -410,6 +428,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     };
 
     const executeRichCommand = (command: string, value: string = '') => {
+      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+        targetDomRef.current = (window as any).__activeRichTextDom;
+      }
+      if (!targetDomRef.current) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+          if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+          const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
+          if (editableEl) targetDomRef.current = editableEl as HTMLElement;
+        }
+      }
       if (targetDomRef.current) {
         targetDomRef.current.focus();
       }
