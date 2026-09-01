@@ -111,6 +111,40 @@ function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls =
   );
 }
 
+const renderBorderStyles = (data: any) => {
+  if (!data || !data.borderStyle || data.borderStyle === 'none') return {};
+
+  const bWidth = data.borderWidth !== undefined ? data.borderWidth : 2;
+  const bColor = data.borderColor || '#00A0FF';
+
+  const borderRadius = (data.borderTopLeftRadius !== undefined || data.borderTopRightRadius !== undefined || data.borderBottomLeftRadius !== undefined || data.borderBottomRightRadius !== undefined)
+    ? `${data.borderTopLeftRadius || 0}px ${data.borderTopRightRadius || 0}px ${data.borderBottomRightRadius || 0}px ${data.borderBottomLeftRadius || 0}px`
+    : (data.borderRadius ? `${data.borderRadius}px` : undefined);
+
+  if (data.borderStyle === 'wavy') {
+    const encodedColor = encodeURIComponent(bColor);
+    const strokeW = Math.max(3, bWidth * 1.5);
+    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M 0 10 Q 5 0, 10 10 T 20 10' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round'/%3E%3C/svg%3E`;
+
+    return {
+      borderStyle: 'solid',
+      borderWidth: `${Math.max(4, bWidth)}px`,
+      borderColor: 'transparent',
+      borderImageSource: `url("${svgWave}")`,
+      borderImageSlice: '6',
+      borderImageRepeat: 'repeat',
+      borderRadius,
+    };
+  }
+
+  return {
+    borderStyle: data.borderStyle,
+    borderWidth: `${bWidth}px`,
+    borderColor: bColor,
+    borderRadius,
+  };
+};
+
 export default function VisualPageBuilderPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -3724,10 +3758,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
                             marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                             marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
-                            borderStyle: el.data?.borderStyle && el.data.borderStyle !== 'none' ? el.data.borderStyle : undefined,
-                            borderWidth: el.data?.borderWidth !== undefined ? `${el.data.borderWidth}px` : (el.data?.borderStyle && el.data.borderStyle !== 'none' ? '2px' : undefined),
-                            borderColor: el.data?.borderColor || undefined,
-                            borderRadius: el.data?.borderRadius ? `${el.data.borderRadius}px` : undefined,
+                            ...renderBorderStyles(el.data),
                           }}
                           className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0`}
                         >
@@ -3798,12 +3829,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
-                                          borderStyle: child.data?.borderStyle && child.data.borderStyle !== 'none' ? child.data.borderStyle : undefined,
-                                          borderWidth: child.data?.borderWidth !== undefined ? `${child.data.borderWidth}px` : (child.data?.borderStyle && child.data.borderStyle !== 'none' ? '2px' : undefined),
-                                          borderColor: child.data?.borderColor || undefined,
-                                          borderRadius: (child.data?.borderTopLeftRadius !== undefined || child.data?.borderTopRightRadius !== undefined || child.data?.borderBottomLeftRadius !== undefined || child.data?.borderBottomRightRadius !== undefined)
-                                             ? `${child.data?.borderTopLeftRadius || 0}px ${child.data?.borderTopRightRadius || 0}px ${child.data?.borderBottomRightRadius || 0}px ${child.data?.borderBottomLeftRadius || 0}px`
-                                             : (child.data?.borderRadius ? `${child.data.borderRadius}px` : undefined),
+                                          ...renderBorderStyles(child.data),
                                         }}
                                         className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
                                         selectedChildIndex === cIdx
@@ -4230,10 +4256,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         alt="SubImage"
                                                         style={{
                                                           objectFit: subChild.data?.imgObjectFit || 'cover',
-                                                          borderRadius: subChild.data?.borderRadius ? `${subChild.data.borderRadius}px` : 0,
-                                                          borderStyle: subChild.data?.borderStyle && subChild.data.borderStyle !== 'none' ? subChild.data.borderStyle : undefined,
-                                                          borderWidth: subChild.data?.borderWidth !== undefined ? `${subChild.data.borderWidth}px` : (subChild.data?.borderStyle && subChild.data.borderStyle !== 'none' ? '2px' : undefined),
-                                                          borderColor: subChild.data?.borderColor || undefined,
+                                                          ...renderBorderStyles(subChild.data),
                                                         }}
                                                         className="w-full h-full min-h-[140px] block rounded-none"
                                                       />

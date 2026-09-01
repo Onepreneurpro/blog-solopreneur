@@ -7,6 +7,40 @@ import { Button } from '@/components/ui/button';
 
 import { useEffect, useRef } from 'react';
 
+const renderBorderStyles = (data: any) => {
+  if (!data || !data.borderStyle || data.borderStyle === 'none') return {};
+
+  const bWidth = data.borderWidth !== undefined ? data.borderWidth : 2;
+  const bColor = data.borderColor || '#00A0FF';
+
+  const borderRadius = (data.borderTopLeftRadius !== undefined || data.borderTopRightRadius !== undefined || data.borderBottomLeftRadius !== undefined || data.borderBottomRightRadius !== undefined)
+    ? `${data.borderTopLeftRadius || 0}px ${data.borderTopRightRadius || 0}px ${data.borderBottomRightRadius || 0}px ${data.borderBottomLeftRadius || 0}px`
+    : (data.borderRadius ? `${data.borderRadius}px` : undefined);
+
+  if (data.borderStyle === 'wavy') {
+    const encodedColor = encodeURIComponent(bColor);
+    const strokeW = Math.max(3, bWidth * 1.5);
+    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M 0 10 Q 5 0, 10 10 T 20 10' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round'/%3E%3C/svg%3E`;
+
+    return {
+      borderStyle: 'solid',
+      borderWidth: `${Math.max(4, bWidth)}px`,
+      borderColor: 'transparent',
+      borderImageSource: `url("${svgWave}")`,
+      borderImageSlice: '6',
+      borderImageRepeat: 'repeat',
+      borderRadius,
+    };
+  }
+
+  return {
+    borderStyle: data.borderStyle,
+    borderWidth: `${bWidth}px`,
+    borderColor: bColor,
+    borderRadius,
+  };
+};
+
 function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls = [], customJs = '' }: any) {
   const [frameHeight, setFrameHeight] = useState<number>(800);
 
@@ -480,9 +514,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                 <div
                                   style={{
                                     backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
-                                     borderRadius: (child.data?.borderTopLeftRadius !== undefined || child.data?.borderTopRightRadius !== undefined || child.data?.borderBottomLeftRadius !== undefined || child.data?.borderBottomRightRadius !== undefined)
-                                       ? `${child.data?.borderTopLeftRadius || 0}px ${child.data?.borderTopRightRadius || 0}px ${child.data?.borderBottomRightRadius || 0}px ${child.data?.borderBottomLeftRadius || 0}px`
-                                       : (child.data?.borderRadius ? `${child.data.borderRadius}px` : 0),
+                                    ...renderBorderStyles(child.data),
                                     color: child.data?.textColor || 'inherit',
                                     paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
                                     paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
@@ -490,9 +522,6 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                                     marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                     marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
-                                    borderStyle: child.data?.borderStyle && child.data.borderStyle !== 'none' ? child.data.borderStyle : undefined,
-                                    borderWidth: child.data?.borderWidth !== undefined ? `${child.data.borderWidth}px` : (child.data?.borderStyle && child.data.borderStyle !== 'none' ? '2px' : undefined),
-                                    borderColor: child.data?.borderColor || undefined,
                                   }}
                                   className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-6' : ''}`}
                                 >
