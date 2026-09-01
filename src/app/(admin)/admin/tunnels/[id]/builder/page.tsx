@@ -1229,6 +1229,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       if (selectedSubItem.parentBlockId === selectedEl.id && selectedSubItem.childIndex !== undefined) {
         const childEl = selectedEl.data?.children?.[selectedSubItem.childIndex];
         if (childEl) {
+          const subChildren = childEl.data?.children || [];
+          if (subChildren[selectedSubItem.itemIndex]) {
+            const targetSub = subChildren[selectedSubItem.itemIndex];
+            return targetSub.data || targetSub;
+          }
           const childItems = childEl.data?.items || getDefaultBlockData(childEl.type, childEl.content).items || [];
           return childItems[selectedSubItem.itemIndex] || null;
         }
@@ -1245,6 +1250,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         const cIdx = selectedSubItem.childIndex;
         const currentChildren = [...(selectedEl.data?.children || [])];
         const targetChild = currentChildren[cIdx];
+        const subChildren = [...(targetChild.data?.children || [])];
+        if (subChildren[selectedSubItem.itemIndex]) {
+          subChildren[selectedSubItem.itemIndex] = {
+            ...subChildren[selectedSubItem.itemIndex],
+            data: { ...(subChildren[selectedSubItem.itemIndex].data || {}), ...changes },
+            content: changes.content !== undefined ? changes.content : (changes.img !== undefined ? changes.img : subChildren[selectedSubItem.itemIndex].content),
+          };
+          currentChildren[cIdx] = {
+            ...targetChild,
+            data: { ...(targetChild.data || {}), children: subChildren },
+          };
+          handleUpdateElementData(selectedEl.id, { children: currentChildren });
+          return;
+        }
         const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
         const updatedItems = currentItems.map((item: any, i: number) =>
           i === selectedSubItem.itemIndex ? { ...item, ...changes } : item
@@ -1384,18 +1403,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               </div>
 
               <div className="space-y-3">
-                {/* IMAGE URL INPUT */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider block">
-                    URL de l Image
-                  </label>
-                  <input
-                    type="text"
-                    value={currentSubItem.img || currentSubItem.content || ''}
-                    onChange={(e) => updateSubItemProperty({ img: e.target.value, content: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-400 outline-none"
-                    placeholder="https://..."
-                  />
+                {/* IMAGE URL INPUT & FILE UPLOAD */}
+                <div className="space-y-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider block">
+                      URL de l Image
+                    </label>
+                    <input
+                      type="text"
+                      value={currentSubItem.img || currentSubItem.content || ''}
+                      onChange={(e) => updateSubItemProperty({ img: e.target.value, content: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-400 outline-none"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerImageFileUpload((base64Url) => {
+                        updateSubItemProperty({ img: base64Url, content: base64Url });
+                      });
+                    }}
+                    className="w-full py-2 px-3 bg-amber-500 hover:bg-amber-600 text-black font-black text-[11px] rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                  >
+                    <span>📁 Choisir une photo sur mon PC</span>
+                  </button>
                 </div>
 
                 {/* CADRAGE À LA SOURIS & ZOOM D'IMAGE */}
