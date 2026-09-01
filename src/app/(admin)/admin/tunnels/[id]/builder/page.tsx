@@ -574,28 +574,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: item.color }}
                     onClick={() => {
-                      const sel = window.getSelection();
-                      if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
-                        const range = sel.getRangeAt(0);
-                        const mark = document.createElement('mark');
-                        mark.style.backgroundColor = item.color;
-                        mark.style.color = '#0F172A';
-                        mark.style.padding = '2px 8px';
-                        mark.style.borderRadius = '6px';
-                        mark.style.fontWeight = 'bold';
-                        mark.className = 'inline-block rounded-md shadow-xs';
-                        try {
-                          range.surroundContents(mark);
-                        } catch (err) {
-                          document.execCommand('hiliteColor', false, item.color);
-                        }
-                        const activeEl = document.activeElement;
-                        if (activeEl && activeEl.getAttribute('contenteditable')) {
-                          updateTarget({}, { content: activeEl.innerHTML });
-                        }
-                      } else {
-                        updateTarget({ bgColor: item.color });
-                      }
+                      applyInlineHtmlFormat((txt) => `<mark style="background-color: ${item.color} !important; color: #0F172A !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`);
                       setOpenFloatingPopover(null);
                     }}
                     className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
