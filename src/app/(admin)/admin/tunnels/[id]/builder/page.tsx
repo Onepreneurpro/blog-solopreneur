@@ -112,14 +112,27 @@ function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls =
 }
 
 const renderBorderStyles = (data: any) => {
-  if (!data || !data.borderStyle || data.borderStyle === 'none') return {};
+  if (!data) return {};
 
   const bWidth = data.borderWidth !== undefined ? data.borderWidth : 2;
   const bColor = data.borderColor || '#00A0FF';
 
-  const borderRadius = (data.borderTopLeftRadius !== undefined || data.borderTopRightRadius !== undefined || data.borderBottomLeftRadius !== undefined || data.borderBottomRightRadius !== undefined)
-    ? `${data.borderTopLeftRadius || 0}px ${data.borderTopRightRadius || 0}px ${data.borderBottomRightRadius || 0}px ${data.borderBottomLeftRadius || 0}px`
-    : (data.borderRadius ? `${data.borderRadius}px` : undefined);
+  const rTL = data.borderTopLeftRadius !== undefined ? data.borderTopLeftRadius : (data.borderRadius || 0);
+  const rTR = data.borderTopRightRadius !== undefined ? data.borderTopRightRadius : (data.borderRadius || 0);
+  const rBR = data.borderBottomRightRadius !== undefined ? data.borderBottomRightRadius : (data.borderRadius || 0);
+  const rBL = data.borderBottomLeftRadius !== undefined ? data.borderBottomLeftRadius : (data.borderRadius || 0);
+
+  const hasRadius = rTL > 0 || rTR > 0 || rBR > 0 || rBL > 0;
+  const borderRadius = hasRadius ? `${rTL}px ${rTR}px ${rBR}px ${rBL}px` : undefined;
+  const clipPath = hasRadius ? `inset(0 round ${rTL}px ${rTR}px ${rBR}px ${rBL}px)` : undefined;
+
+  if (!data.borderStyle || data.borderStyle === 'none') {
+    return {
+      borderRadius,
+      clipPath,
+      WebkitClipPath: clipPath,
+    };
+  }
 
   if (data.borderStyle === 'wavy') {
     const encodedColor = encodeURIComponent(bColor);
@@ -134,8 +147,8 @@ const renderBorderStyles = (data: any) => {
       borderImageSlice: '6',
       borderImageRepeat: 'repeat',
       borderRadius,
-      backgroundClip: 'padding-box',
-      WebkitBackgroundClip: 'padding-box',
+      clipPath,
+      WebkitClipPath: clipPath,
     };
   }
 
@@ -144,8 +157,8 @@ const renderBorderStyles = (data: any) => {
     borderWidth: `${bWidth}px`,
     borderColor: bColor,
     borderRadius,
-    backgroundClip: 'padding-box',
-    WebkitBackgroundClip: 'padding-box',
+    clipPath,
+    WebkitClipPath: clipPath,
   };
 };
 
