@@ -468,10 +468,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         layoutMode: 'grid-4',
         bgColor: 'transparent',
         children: [
-          { id: 'c1', type: 'ContentBox', data: { children: [] } },
-          { id: 'c2', type: 'ContentBox', data: { children: [] } },
-          { id: 'c3', type: 'ContentBox', data: { children: [] } },
-          { id: 'c4', type: 'ContentBox', data: { children: [] } },
+          { id: 'c1', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c2', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c3', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c4', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
         ],
       };
     }
@@ -481,9 +481,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         layoutMode: 'grid-3',
         bgColor: 'transparent',
         children: [
-          { id: 'c1', type: 'ContentBox', data: { children: [] } },
-          { id: 'c2', type: 'ContentBox', data: { children: [] } },
-          { id: 'c3', type: 'ContentBox', data: { children: [] } },
+          { id: 'c1', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c2', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c3', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
         ],
       };
     }
@@ -493,8 +493,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         layoutMode: 'grid-2',
         bgColor: 'transparent',
         children: [
-          { id: 'c1', type: 'ContentBox', data: { children: [] } },
-          { id: 'c2', type: 'ContentBox', data: { children: [] } },
+          { id: 'c1', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
+          { id: 'c2', type: 'ContentBox', data: { children: [], paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingY: 10, paddingX: 10 } },
         ],
       };
     }
@@ -535,6 +535,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       return {
         title: '',
         bgColor: 'transparent',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingY: 10,
+        paddingX: 10,
         children: [],
       };
     }
@@ -1539,14 +1545,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               }
             };
 
-            const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 40;
+            const defaultPaddingVal = selectedSubItem ? 0 : (selectedChildIndex !== null ? 10 : 40);
             
             // Computed values (Main Y/X values are strictly bound to paddingY/paddingX/marginY/marginX to avoid reacting when sub-sliders move)
             const padYVal = targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal;
             const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : padYVal;
             const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : padYVal;
 
-            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 40);
+            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : (selectedChildIndex !== null ? 10 : 40));
             const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : padXVal;
             const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : padXVal;
 
