@@ -3993,6 +3993,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             {/* CANVAS RENDERED ELEMENTS */}
             <div className="space-y-0 min-h-[400px]">
               {elements.map((el, idx) => {
+                // If element is an old Col2, Col3, Col4 root element, convert to Section with child Divs
+                if (el.type === 'Col2' || el.type === 'Col3' || el.type === 'Col4') {
+                  const numCols = el.type === 'Col4' ? 4 : el.type === 'Col3' ? 3 : 2;
+                  el = {
+                    id: el.id,
+                    type: 'Section',
+                    category: 'Disposition',
+                    content: `SECTION (${numCols} COLONNES)`,
+                    data: {
+                      ...getDefaultBlockData('Section', 'SECTION'),
+                      children: Array.from({ length: numCols }).map((_, i) => ({
+                        id: `child-${Date.now()}-${i + 1}`,
+                        type: 'ContentBox',
+                        category: 'Disposition',
+                        content: `Conteneur DIV ${i + 1}`,
+                        data: getDefaultBlockData('ContentBox', 'Conteneur DIV'),
+                      })),
+                    },
+                  };
+                }
                 const isSelected = el.id === selectedElementId;
                 const isSection = el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col';
 
@@ -5127,11 +5147,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         </div>
                                       )}
 
-                                      {(child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg' || child.type === 'Col2' || child.type === 'BlockFeat2ColIconsLeft') && (() => {
+                                      {(child.type === 'BlockFeat4ColImg' || child.type === 'BlockFeat3ColImg' || child.type === 'BlockFeat2ColIconsLeft') && (() => {
                                         const colsClass =
-                                          child.type.includes('4') || child.type === 'Col4'
+                                          (child.type as string).includes('4')
                                             ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
-                                            : child.type.includes('2') || child.type === 'Col2'
+                                            : (child.type as string).includes('2')
                                             ? 'grid-cols-1 md:grid-cols-2'
                                             : 'grid-cols-1 md:grid-cols-3';
 
@@ -5531,7 +5551,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     })()}
 
                     {/* RICH DYNAMIC PRE-FILLED FEATURE BLOCKS RENDERERS WITH CLICK-TO-EDIT SUB-ITEMS */}
-                    {(el.type === 'BlockFeat4ColImg' || el.type === 'Col4') && (() => {
+                    {(el.type === 'BlockFeat4ColImg') && (() => {
                       const mainBg = el.data?.bgColor || '#ffffff';
                       const cardBg = el.data?.cardBgColor || 'transparent';
                       const textColor = el.data?.textColor || '#0f172a';
@@ -5735,7 +5755,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     );
                   })()}
 
-                  {(el.type === 'BlockFeat3ColImg' || el.type === 'Col3') && (() => {
+                  {(el.type === 'BlockFeat3ColImg') && (() => {
                     const mainBg = el.data?.bgColor || '#ffffff';
                     const cardBg = el.data?.cardBgColor || 'transparent';
                     const textColor = el.data?.textColor || '#0f172a';

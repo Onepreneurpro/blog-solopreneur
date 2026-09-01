@@ -464,7 +464,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
                             let renderedChild = null;
 
-                            if (child.type === 'Col4' || child.type === 'BlockFeat4ColImg' || child.type === 'Col3' || child.type === 'BlockFeat3ColImg') {
+                            if (child.type === 'BlockFeat4ColImg' || child.type === 'BlockFeat3ColImg') {
                               const is4 = child.type.includes('4') || child.type === 'Col4';
                               const defaultData = is4
                                 ? {
@@ -954,7 +954,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
-            if (el.type === 'BlockFeat4ColImg' || el.type === 'Col4' || el.type === 'BlockFeat3ColImg' || el.type === 'Col3') {
+            if (el.type === 'BlockFeat4ColImg' || el.type === 'BlockFeat3ColImg') {
               const defaultData = el.type.includes('4') || el.type === 'Col4'
                 ? {
                     title: 'GRILLE 4 COLONNES',
