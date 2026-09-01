@@ -1144,6 +1144,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           stepId: step.id,
           content: JSON.stringify({
             elements,
+            showCopyright,
+            pageCopyright,
+            copyrightFontSize,
+            copyrightTextColor,
+            showCopyrightLine,
+            copyrightLineColor,
+            copyrightLineOpacity,
             pageBgColor,
             pageBgImage,
             pageBgSize,
