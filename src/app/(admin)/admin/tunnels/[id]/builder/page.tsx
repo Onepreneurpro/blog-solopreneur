@@ -284,15 +284,25 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            const targetSection = elements.find(e => e.id === targetId);
-            let curBold = false;
-            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
-              const child = targetSection.data.children[childIdx];
-              curBold = child.data?.fontWeight === 'black' || child.data?.fontWeight === 'bold';
-            } else if (targetSection) {
-              curBold = targetSection.data?.fontWeight === 'black' || targetSection.data?.fontWeight === 'bold';
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed) {
+              document.execCommand('bold', false);
+              const activeEl = document.activeElement;
+              if (activeEl && activeEl.getAttribute('contenteditable')) {
+                const html = activeEl.innerHTML;
+                updateTarget({}, { content: html });
+              }
+            } else {
+              const targetSection = elements.find(e => e.id === targetId);
+              let curBold = false;
+              if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+                const child = targetSection.data.children[childIdx];
+                curBold = child.data?.fontWeight === 'black' || child.data?.fontWeight === 'bold';
+              } else if (targetSection) {
+                curBold = targetSection.data?.fontWeight === 'black' || targetSection.data?.fontWeight === 'bold';
+              }
+              updateTarget({ fontWeight: curBold ? 'normal' : 'black' });
             }
-            updateTarget({ fontWeight: curBold ? 'normal' : 'black' });
           }}
           className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 font-black text-xs flex items-center justify-center min-w-[32px]"
           title="B Gras (Extrabold)"
@@ -305,15 +315,25 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            const targetSection = elements.find(e => e.id === targetId);
-            let curItalic = false;
-            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
-              const child = targetSection.data.children[childIdx];
-              curItalic = child.data?.fontStyle === 'italic';
-            } else if (targetSection) {
-              curItalic = targetSection.data?.fontStyle === 'italic';
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed) {
+              document.execCommand('italic', false);
+              const activeEl = document.activeElement;
+              if (activeEl && activeEl.getAttribute('contenteditable')) {
+                const html = activeEl.innerHTML;
+                updateTarget({}, { content: html });
+              }
+            } else {
+              const targetSection = elements.find(e => e.id === targetId);
+              let curItalic = false;
+              if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+                const child = targetSection.data.children[childIdx];
+                curItalic = child.data?.fontStyle === 'italic';
+              } else if (targetSection) {
+                curItalic = targetSection.data?.fontStyle === 'italic';
+              }
+              updateTarget({ fontStyle: curItalic ? 'normal' : 'italic' });
             }
-            updateTarget({ fontStyle: curItalic ? 'normal' : 'italic' });
           }}
           className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 italic font-black text-xs flex items-center justify-center min-w-[32px]"
           title="I Italique"
@@ -326,15 +346,34 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            const targetSection = elements.find(e => e.id === targetId);
-            let curU = false;
-            if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
-              const child = targetSection.data.children[childIdx];
-              curU = child.data?.textDecoration === 'underline';
-            } else if (targetSection) {
-              curU = targetSection.data?.textDecoration === 'underline';
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+              const range = sel.getRangeAt(0);
+              const uSpan = document.createElement('u');
+              uSpan.style.textDecoration = 'underline';
+              uSpan.style.textDecorationColor = '#00A0FF';
+              uSpan.style.textDecorationThickness = '3px';
+              uSpan.style.textUnderlineOffset = '2px';
+              try {
+                range.surroundContents(uSpan);
+              } catch(err) {
+                document.execCommand('underline', false);
+              }
+              const activeEl = document.activeElement;
+              if (activeEl && activeEl.getAttribute('contenteditable')) {
+                updateTarget({}, { content: activeEl.innerHTML });
+              }
+            } else {
+              const targetSection = elements.find(e => e.id === targetId);
+              let curU = false;
+              if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
+                const child = targetSection.data.children[childIdx];
+                curU = child.data?.textDecoration === 'underline';
+              } else if (targetSection) {
+                curU = targetSection.data?.textDecoration === 'underline';
+              }
+              updateTarget({ textDecoration: curU ? 'none' : 'underline' });
             }
-            updateTarget({ textDecoration: curU ? 'none' : 'underline' });
           }}
           className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
           title="Souligner le texte"
@@ -435,7 +474,28 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: item.color }}
                     onClick={() => {
-                      updateTarget({ bgColor: item.color });
+                      const sel = window.getSelection();
+                      if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+                        const range = sel.getRangeAt(0);
+                        const mark = document.createElement('mark');
+                        mark.style.backgroundColor = item.color;
+                        mark.style.color = '#0F172A';
+                        mark.style.padding = '2px 8px';
+                        mark.style.borderRadius = '6px';
+                        mark.style.fontWeight = 'bold';
+                        mark.className = 'inline-block rounded-md shadow-xs';
+                        try {
+                          range.surroundContents(mark);
+                        } catch (err) {
+                          document.execCommand('hiliteColor', false, item.color);
+                        }
+                        const activeEl = document.activeElement;
+                        if (activeEl && activeEl.getAttribute('contenteditable')) {
+                          updateTarget({}, { content: activeEl.innerHTML });
+                        }
+                      } else {
+                        updateTarget({ bgColor: item.color });
+                      }
                       setOpenFloatingPopover(null);
                     }}
                     className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
@@ -452,13 +512,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            updateTarget({
-              textColor: undefined,
-              bgColor: 'transparent',
-              fontWeight: 'normal',
-              fontStyle: 'normal',
-              textDecoration: 'none'
-            });
+            document.execCommand('removeFormat', false);
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.getAttribute('contenteditable')) {
+              const cleanText = (activeEl as HTMLElement).innerText || activeEl.textContent || '';
+              updateTarget({
+                textColor: undefined,
+                bgColor: 'transparent',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                textDecoration: 'none'
+              }, { content: cleanText });
+            } else {
+              updateTarget({
+                textColor: undefined,
+                bgColor: 'transparent',
+                fontWeight: 'normal',
+                fontStyle: 'normal',
+                textDecoration: 'none'
+              });
+            }
           }}
           className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
           title="Effacer les couleurs et le style"
@@ -4667,17 +4740,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <input
-                        type="text"
-                        value={el.content}
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
                         onMouseDown={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -4687,22 +4765,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           textDecoration: el.data?.textDecoration,
                         }}
                         className="w-full text-2xl sm:text-4xl font-heading font-black text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1 transition-all hover:bg-white/5 focus:bg-slate-900/80 select-text"
-                        placeholder="Votre titre ici..."
                       />
                     )}
 
                     {el.type === 'Text' && (
-                      <textarea
-                        value={el.content}
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
                         onMouseDown={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        rows={2}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -4711,8 +4793,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           fontStyle: el.data?.fontStyle,
                           textDecoration: el.data?.textDecoration,
                         }}
-                        className="w-full text-sm text-slate-300 leading-relaxed font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none rounded-lg p-2 transition-all hover:bg-white/5 focus:bg-slate-900/80 select-text"
-                        placeholder="Votre texte ici..."
+                        className="w-full text-sm text-slate-300 leading-relaxed font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none rounded-lg p-2 transition-all hover:bg-white/5 focus:bg-slate-900/80 select-text min-h-[30px]"
                       />
                     )}
 
@@ -6086,14 +6167,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     </div>
 
                                                     {subChild.type === 'Heading' ? (
-                                                      <input
-                                                        type="text"
-                                                        value={subChild.content}
+                                                      <div
+                                                        contentEditable
+                                                        suppressContentEditableWarning
                                                         onMouseDown={(e) => e.stopPropagation()}
                                                         onPointerDown={(e) => e.stopPropagation()}
                                                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
-                                                        onChange={(e) => updateSubChildData({ content: e.target.value })}
+                                                        onBlur={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        onInput={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        dangerouslySetInnerHTML={{ __html: subChild.content }}
                                                         style={{
                                                           color: subChild.data?.textColor || '#ffffff',
                                                           backgroundColor: subChild.data?.bgColor || 'transparent',
@@ -6102,7 +6185,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           fontStyle: subChild.data?.fontStyle,
                                                           textDecoration: subChild.data?.textDecoration,
                                                         }}
-                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none text-white select-text"
+                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none text-white select-text min-h-[30px]"
                                                       />
                                                     ) : subChild.type === 'ButtonCTA' ? (
                                                       <div className="text-center py-1">
@@ -6121,14 +6204,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         />
                                                       </div>
                                                     ) : (
-                                                      <textarea
-                                                        rows={2}
-                                                        value={subChild.content}
+                                                      <div
+                                                        contentEditable
+                                                        suppressContentEditableWarning
                                                         onMouseDown={(e) => e.stopPropagation()}
                                                         onPointerDown={(e) => e.stopPropagation()}
                                                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
-                                                        onChange={(e) => updateSubChildData({ content: e.target.value })}
+                                                        onBlur={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        onInput={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        dangerouslySetInnerHTML={{ __html: subChild.content }}
                                                         style={{
                                                           color: subChild.data?.textColor || '#e2e8f0',
                                                           backgroundColor: subChild.data?.bgColor || 'transparent',
@@ -6137,7 +6222,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           fontStyle: subChild.data?.fontStyle,
                                                           textDecoration: subChild.data?.textDecoration,
                                                         }}
-                                                        className="w-full text-xs leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none text-slate-200 resize-none select-text"
+                                                        className="w-full text-xs leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none text-slate-200 select-text min-h-[30px]"
                                                       />
                                                     )}
                                                   </div>
