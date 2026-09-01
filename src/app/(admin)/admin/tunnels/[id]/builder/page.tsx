@@ -134,18 +134,20 @@ const renderBorderStyles = (data: any) => {
     };
   }
 
-  if (data.borderStyle === 'wavy') {
-    const encodedColor = encodeURIComponent(bColor);
-    const strokeW = Math.max(3, bWidth * 1.5);
-    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M 0 10 Q 5 0, 10 10 T 20 10' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round'/%3E%3C/svg%3E`;
+  if (data.borderStyle === 'wavy' || data.borderStyle === 'wave' || data.borderStyle === 'vague') {
+    const strokeW = Math.max(2, bWidth);
+    const strokeColor = bColor && bColor !== 'transparent' ? bColor : '#00A0FF';
+    const encodedColor = encodeURIComponent(strokeColor);
+
+    const svgWave = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12' viewBox='0 0 24 12'%3E%3Cpath d='M 0 6 C 4 0, 8 0, 12 6 C 16 12, 20 12, 24 6' fill='none' stroke='${encodedColor}' stroke-width='${strokeW}' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
 
     return {
       borderStyle: 'solid',
-      borderWidth: `${Math.max(4, bWidth)}px`,
+      borderWidth: `${Math.max(3, strokeW)}px`,
       borderColor: 'transparent',
       borderImageSource: `url("${svgWave}")`,
-      borderImageSlice: '6',
-      borderImageRepeat: 'repeat',
+      borderImageSlice: '12',
+      borderImageRepeat: 'round',
       borderRadius,
       clipPath,
       WebkitClipPath: clipPath,
