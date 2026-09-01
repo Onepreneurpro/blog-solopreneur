@@ -385,22 +385,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     e.preventDefault();
     e.stopPropagation();
 
-    const imgEl = e.currentTarget;
-    const rect = imgEl.getBoundingClientRect();
     const startX = e.clientX;
     const startY = e.clientY;
-    const initialX = currentXVal;
-    const initialY = currentYVal;
+    const initialX = currentXVal !== undefined ? currentXVal : 50;
+    const initialY = currentYVal !== undefined ? currentYVal : 50;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaXPixels = moveEvent.clientX - startX;
       const deltaYPixels = moveEvent.clientY - startY;
 
-      const percentDeltaX = (deltaXPixels / (rect.width || 300)) * 100;
-      const percentDeltaY = (deltaYPixels / (rect.height || 200)) * 100;
-
-      const newX = Math.max(0, Math.min(100, Math.round(initialX - percentDeltaX)));
-      const newY = Math.max(0, Math.min(100, Math.round(initialY - percentDeltaY)));
+      // Calculate smooth percentage position inside image frame
+      const newX = Math.max(0, Math.min(100, Math.round(initialX - deltaXPixels * 0.4)));
+      const newY = Math.max(0, Math.min(100, Math.round(initialY - deltaYPixels * 0.4)));
 
       updatePosition(newX, newY);
     };
@@ -3396,7 +3392,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{
                             objectFit: 'cover',
                             objectPosition: `${el.data?.posX !== undefined ? el.data.posX : 50}% ${el.data?.posY !== undefined ? el.data.posY : 50}%`,
-                            transform: `scale(${(el.data?.imgZoom || 100) / 100})`,
+                            transform: `scale(${(el.data?.imgZoom || 120) / 100})`,
                             ...renderBorderStyles(el.data),
                           }}
                           className="w-full h-full object-cover cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
@@ -4564,7 +4560,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                           style={{
                                                             objectFit: 'cover',
                                                             objectPosition: `${subChild.data?.posX !== undefined ? subChild.data.posX : 50}% ${subChild.data?.posY !== undefined ? subChild.data.posY : 50}%`,
-                                                            transform: `scale(${(subChild.data?.imgZoom || 100) / 100})`,
+                                                            transform: `scale(${(subChild.data?.imgZoom || 120) / 100})`,
                                                             ...renderBorderStyles(subChild.data),
                                                           }}
                                                           className="w-full h-full min-h-[140px] block cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
