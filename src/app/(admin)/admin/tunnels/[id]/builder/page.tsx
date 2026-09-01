@@ -156,6 +156,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [cloneStyle, setCloneStyle] = useState<'raw' | 'native'>('raw');
   const [searchTarget, setSearchTarget] = useState<string>('');
   const [replaceTarget, setReplaceTarget] = useState<string>('');
+  const [openMarginDetail, setOpenMarginDetail] = useState<{
+    paddingY?: boolean;
+    paddingX?: boolean;
+    marginY?: boolean;
+    marginX?: boolean;
+  }>({});
 
   const handleClonePage = async () => {
     if (!cloneUrlInput.trim()) {
@@ -1506,416 +1512,352 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             };
 
             const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 48;
-            const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : (targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal);
-            const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : (targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal);
-            const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
-            const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
-            const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : (targetData.marginY !== undefined ? targetData.marginY : 0);
-            const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : (targetData.marginY !== undefined ? targetData.marginY : 0);
-            const marginLeft = targetData.marginLeft !== undefined ? targetData.marginLeft : (targetData.marginX !== undefined ? targetData.marginX : 0);
-            const marginRight = targetData.marginRight !== undefined ? targetData.marginRight : (targetData.marginX !== undefined ? targetData.marginX : 0);
+            
+            // Computed values
+            const padYVal = targetData.paddingY !== undefined ? targetData.paddingY : (targetData.paddingTop !== undefined ? targetData.paddingTop : defaultPaddingVal);
+            const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : padYVal;
+            const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : padYVal;
 
-            const isSyncY = targetData.syncPaddingY !== false;
-            const isSyncX = targetData.syncPaddingX !== false;
-            const isSyncMargin = targetData.syncMarginY !== false;
-            const isSyncMarginX = targetData.syncMarginX !== false;
+            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (targetData.paddingLeft !== undefined ? targetData.paddingLeft : (selectedSubItem ? 0 : 24));
+            const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : padXVal;
+            const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : padXVal;
+
+            const marginYVal = targetData.marginY !== undefined ? targetData.marginY : (targetData.marginTop !== undefined ? targetData.marginTop : 0);
+            const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : marginYVal;
+            const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : marginYVal;
+
+            const marginXVal = targetData.marginX !== undefined ? targetData.marginX : (targetData.marginLeft !== undefined ? targetData.marginLeft : 0);
+            const marginLeft = targetData.marginLeft !== undefined ? targetData.marginLeft : marginXVal;
+            const marginRight = targetData.marginRight !== undefined ? targetData.marginRight : marginXVal;
 
             return (
-              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                 <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
                   <span>📐 Marges & Espacements (px) {selectedSubItem ? '(Image)' : selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
                 </div>
 
-                {/* MARGE INTERNE HAUT / BAS (PADDING Y) - CÔTÉ À CÔTÉ AVEC ICÔNE LINK AU CENTRE */}
-                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
-                  <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                    Marge Interne Verticale (Padding Y)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* TOP CONTROL */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate">Top (Haut)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={padTop}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncY) {
-                                updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
-                              } else {
-                                updateMarginData({ paddingTop: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
+                {/* 1. MARGE INTERNE VERTICALE (PADDING Y) */}
+                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Padding Vertical (Y)
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <input
+                          type="number"
+                          value={padYVal}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingY: val, paddingTop: val, paddingBottom: val });
+                          }}
+                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                        />
+                        <span className="text-[9px] text-slate-400 font-mono">px</span>
                       </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={padTop}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncY) {
-                            updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
-                          } else {
-                            updateMarginData({ paddingTop: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
-                    </div>
-
-                    {/* LINK / UNLINK ICON IN THE CENTER (INFINITY/LINK CONNECTOR) */}
-                    <button
-                      type="button"
-                      onClick={() => updateMarginData({ syncPaddingY: !isSyncY })}
-                      className={`p-2 rounded-lg border transition-all shrink-0 mt-3 ${
-                        isSyncY
-                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-md ring-2 ring-[#00A0FF]/30'
-                          : 'bg-slate-800 text-slate-500 border-slate-700 hover:text-white'
-                      }`}
-                      title={isSyncY ? 'Top & Bottom Liés (Cliquer pour séparer)' : 'Top & Bottom Séparés (Cliquer pour lier)'}
-                    >
-                      {isSyncY ? <Link2 className="w-4 h-4 text-[#00A0FF]" /> : <Unlink className="w-4 h-4 text-slate-400" />}
-                    </button>
-
-                    {/* BOTTOM CONTROL */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate">Bottom (Bas)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={padBottom}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncY) {
-                                updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
-                              } else {
-                                updateMarginData({ paddingBottom: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={padBottom}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncY) {
-                            updateMarginData({ paddingTop: val, paddingBottom: val, paddingY: val });
-                          } else {
-                            updateMarginData({ paddingBottom: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenMarginDetail(prev => ({ ...prev, paddingY: !prev.paddingY }))}
+                        className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
+                        title={openMarginDetail.paddingY ? 'Masquer le détail Haut/Bas' : 'Afficher le détail Haut/Bas'}
+                      >
+                        {openMarginDetail.paddingY ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                      </button>
                     </div>
                   </div>
+
+                  {/* BARRE PRINCIPALE PADDING Y (SYNCHRONISÉE) */}
+                  <input
+                    type="range"
+                    min={-50}
+                    max={150}
+                    value={padYVal}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      updateMarginData({ paddingY: val, paddingTop: val, paddingBottom: val });
+                    }}
+                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                  />
+
+                  {/* SOUS-BARRES DÉTAILLÉES HAUT & BAS (SUR CLIC FLECHE) */}
+                  {openMarginDetail.paddingY && (
+                    <div className="pt-2 mt-2 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Top (Haut)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={padTop}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingTop: val, paddingY: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{padTop}px</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Bottom (Bas)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={padBottom}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingBottom: val, paddingY: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{padBottom}px</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* MARGE INTERNE GAUCHE / DROITE (PADDING X) - CÔTÉ À CÔTÉ AVEC ICÔNE LINK AU CENTRE */}
-                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
-                  <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                    Marge Interne Horizontale (Padding X)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* LEFT CONTROL */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate">Left (Gauche)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={padLeft}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncX) {
-                                updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
-                              } else {
-                                updateMarginData({ paddingLeft: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
+                {/* 2. MARGE INTERNE HORIZONTALE (PADDING X) */}
+                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Padding Horizontal (X)
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <input
+                          type="number"
+                          value={padXVal}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingX: val, paddingLeft: val, paddingRight: val });
+                          }}
+                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                        />
+                        <span className="text-[9px] text-slate-400 font-mono">px</span>
                       </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={padLeft}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncX) {
-                            updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
-                          } else {
-                            updateMarginData({ paddingLeft: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
-                    </div>
-
-                    {/* LINK / UNLINK ICON IN THE CENTER */}
-                    <button
-                      type="button"
-                      onClick={() => updateMarginData({ syncPaddingX: !isSyncX })}
-                      className={`p-2 rounded-lg border transition-all shrink-0 mt-3 ${
-                        isSyncX
-                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-md ring-2 ring-[#00A0FF]/30'
-                          : 'bg-slate-800 text-slate-500 border-slate-700 hover:text-white'
-                      }`}
-                      title={isSyncX ? 'Left & Right Liés (Cliquer pour séparer)' : 'Left & Right Séparés (Cliquer pour lier)'}
-                    >
-                      {isSyncX ? <Link2 className="w-4 h-4 text-[#00A0FF]" /> : <Unlink className="w-4 h-4 text-slate-400" />}
-                    </button>
-
-                    {/* RIGHT CONTROL */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate">Right (Droite)</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={padRight}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncX) {
-                                updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
-                              } else {
-                                updateMarginData({ paddingRight: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={padRight}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncX) {
-                            updateMarginData({ paddingLeft: val, paddingRight: val, paddingX: val });
-                          } else {
-                            updateMarginData({ paddingRight: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenMarginDetail(prev => ({ ...prev, paddingX: !prev.paddingX }))}
+                        className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
+                        title={openMarginDetail.paddingX ? 'Masquer le détail Gauche/Droite' : 'Afficher le détail Gauche/Droite'}
+                      >
+                        {openMarginDetail.paddingX ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                      </button>
                     </div>
                   </div>
+
+                  {/* BARRE PRINCIPALE PADDING X (SYNCHRONISÉE) */}
+                  <input
+                    type="range"
+                    min={-50}
+                    max={150}
+                    value={padXVal}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      updateMarginData({ paddingX: val, paddingLeft: val, paddingRight: val });
+                    }}
+                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                  />
+
+                  {/* SOUS-BARRES DÉTAILLÉES GAUCHE & DROITE (SUR CLIC FLECHE) */}
+                  {openMarginDetail.paddingX && (
+                    <div className="pt-2 mt-2 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Left (Gauche)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={padLeft}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingLeft: val, paddingX: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{padLeft}px</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Right (Droite)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={padRight}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ paddingRight: val, paddingX: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{padRight}px</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* MARGES EXTERNES (MARGIN Y) - CÔTÉ À CÔTÉ AVEC ICÔNE LINK AU CENTRE */}
-                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
-                  <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                    Marge Externe Verticale (Margin Y)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* MARGIN HAUT */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate font-mono">Margin Haut</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={marginTop}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncMargin) {
-                                updateMarginData({ marginTop: val, marginBottom: val });
-                              } else {
-                                updateMarginData({ marginTop: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
+                {/* 3. MARGE EXTERNE VERTICALE (MARGIN Y) */}
+                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Margin Vertical (Y)
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <input
+                          type="number"
+                          value={marginYVal}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginY: val, marginTop: val, marginBottom: val });
+                          }}
+                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                        />
+                        <span className="text-[9px] text-slate-400 font-mono">px</span>
                       </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={marginTop}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncMargin) {
-                            updateMarginData({ marginTop: val, marginBottom: val });
-                          } else {
-                            updateMarginData({ marginTop: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
-                    </div>
-
-                    {/* LINK / UNLINK ICON IN THE CENTER */}
-                    <button
-                      type="button"
-                      onClick={() => updateMarginData({ syncMarginY: !isSyncMargin })}
-                      className={`p-2 rounded-lg border transition-all shrink-0 mt-3 ${
-                        isSyncMargin
-                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-md ring-2 ring-[#00A0FF]/30'
-                          : 'bg-slate-800 text-slate-500 border-slate-700 hover:text-white'
-                      }`}
-                      title={isSyncMargin ? 'Margin Haut & Bas Liés (Cliquer pour séparer)' : 'Margin Haut & Bas Séparés (Cliquer pour lier)'}
-                    >
-                      {isSyncMargin ? <Link2 className="w-4 h-4 text-[#00A0FF]" /> : <Unlink className="w-4 h-4 text-slate-400" />}
-                    </button>
-
-                    {/* MARGIN BAS */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate font-mono">Margin Bas</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={marginBottom}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncMargin) {
-                                updateMarginData({ marginTop: val, marginBottom: val });
-                              } else {
-                                updateMarginData({ marginBottom: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={marginBottom}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncMargin) {
-                            updateMarginData({ marginTop: val, marginBottom: val });
-                          } else {
-                            updateMarginData({ marginBottom: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenMarginDetail(prev => ({ ...prev, marginY: !prev.marginY }))}
+                        className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
+                        title={openMarginDetail.marginY ? 'Masquer le détail Haut/Bas' : 'Afficher le détail Haut/Bas'}
+                      >
+                        {openMarginDetail.marginY ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                      </button>
                     </div>
                   </div>
+
+                  {/* BARRE PRINCIPALE MARGIN Y (SYNCHRONISÉE) */}
+                  <input
+                    type="range"
+                    min={-50}
+                    max={150}
+                    value={marginYVal}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      updateMarginData({ marginY: val, marginTop: val, marginBottom: val });
+                    }}
+                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                  />
+
+                  {/* SOUS-BARRES DÉTAILLÉES HAUT & BAS (SUR CLIC FLECHE) */}
+                  {openMarginDetail.marginY && (
+                    <div className="pt-2 mt-2 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Haut (Top)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={marginTop}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginTop: val, marginY: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{marginTop}px</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Bas (Bottom)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={marginBottom}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginBottom: val, marginY: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{marginBottom}px</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* MARGES EXTERNES HORIZONTALES (MARGIN X - GAUCHE / DROITE) */}
-                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
-                  <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                    Marge Externe Horizontale (Margin X)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* MARGIN GAUCHE */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate font-mono">Margin Left</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={marginLeft}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncMarginX) {
-                                updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
-                              } else {
-                                updateMarginData({ marginLeft: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
+                {/* 4. MARGE EXTERNE HORIZONTALE (MARGIN X) */}
+                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      Margin Horizontal (X)
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                        <input
+                          type="number"
+                          value={marginXVal}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginX: val, marginLeft: val, marginRight: val });
+                          }}
+                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                        />
+                        <span className="text-[9px] text-slate-400 font-mono">px</span>
                       </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={marginLeft}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncMarginX) {
-                            updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
-                          } else {
-                            updateMarginData({ marginLeft: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
-                    </div>
-
-                    {/* LINK / UNLINK ICON IN THE CENTER */}
-                    <button
-                      type="button"
-                      onClick={() => updateMarginData({ syncMarginX: !isSyncMarginX })}
-                      className={`p-2 rounded-lg border transition-all shrink-0 mt-3 ${
-                        isSyncMarginX
-                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-md ring-2 ring-[#00A0FF]/30'
-                          : 'bg-slate-800 text-slate-500 border-slate-700 hover:text-white'
-                      }`}
-                      title={isSyncMarginX ? 'Margin Left & Right Liés (Cliquer pour séparer)' : 'Margin Left & Right Séparés (Cliquer pour lier)'}
-                    >
-                      {isSyncMarginX ? <Link2 className="w-4 h-4 text-[#00A0FF]" /> : <Unlink className="w-4 h-4 text-slate-400" />}
-                    </button>
-
-                    {/* MARGIN DROITE */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-400 font-bold truncate font-mono">Margin Right</span>
-                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
-                          <input
-                            type="number"
-                            value={marginRight}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (isSyncMarginX) {
-                                updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
-                              } else {
-                                updateMarginData({ marginRight: val });
-                              }
-                            }}
-                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
-                          />
-                          <span className="text-[9px] text-slate-400 font-mono">px</span>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min={-50}
-                        max={150}
-                        value={marginRight}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (isSyncMarginX) {
-                            updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
-                          } else {
-                            updateMarginData({ marginRight: val });
-                          }
-                        }}
-                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenMarginDetail(prev => ({ ...prev, marginX: !prev.marginX }))}
+                        className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
+                        title={openMarginDetail.marginX ? 'Masquer le détail Gauche/Droite' : 'Afficher le détail Gauche/Droite'}
+                      >
+                        {openMarginDetail.marginX ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                      </button>
                     </div>
                   </div>
+
+                  {/* BARRE PRINCIPALE MARGIN X (SYNCHRONISÉE) */}
+                  <input
+                    type="range"
+                    min={-50}
+                    max={150}
+                    value={marginXVal}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      updateMarginData({ marginX: val, marginLeft: val, marginRight: val });
+                    }}
+                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                  />
+
+                  {/* SOUS-BARRES DÉTAILLÉES GAUCHE & DROITE (SUR CLIC FLECHE) */}
+                  {openMarginDetail.marginX && (
+                    <div className="pt-2 mt-2 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Left (Gauche)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={marginLeft}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginLeft: val, marginX: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{marginLeft}px</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold text-slate-400 w-16">Right (Droite)</span>
+                        <input
+                          type="range"
+                          min={-50}
+                          max={150}
+                          value={marginRight}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateMarginData({ marginRight: val, marginX: val });
+                          }}
+                          className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
+                        />
+                        <span className="text-[9px] font-mono text-white font-bold w-8 text-right">{marginRight}px</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
