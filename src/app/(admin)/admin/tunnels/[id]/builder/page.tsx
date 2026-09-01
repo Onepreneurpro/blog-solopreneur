@@ -114,6 +114,7 @@ function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls =
 const renderBorderStyles = (data: any) => {
   if (!data) return {};
 
+  const bStyle = data.borderStyle || 'none';
   const bWidth = data.borderWidth !== undefined ? data.borderWidth : 2;
   const bColor = data.borderColor || '#00A0FF';
 
