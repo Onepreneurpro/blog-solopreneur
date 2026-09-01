@@ -451,6 +451,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
                               marginLeft: child.data?.marginLeft !== undefined ? `${child.data.marginLeft}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
                               marginRight: child.data?.marginRight !== undefined ? `${child.data.marginRight}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
+                              ...renderBorderStyles(child.data),
                             };
 
                             let renderedChild = null;
@@ -642,7 +643,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                             }
 
                             return (
-                              <div key={child.id || cIdx} style={colStyle} className="h-full flex flex-col">
+                              <div key={child.id || cIdx} style={colStyle} className="h-full flex flex-col overflow-hidden">
                                 {renderedChild}
                               </div>
                             );
