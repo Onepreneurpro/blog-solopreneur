@@ -3517,8 +3517,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <div
                           onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                           onDrop={(e) => handleBlockDrop(e, el.id)}
-                          style={{ backgroundColor: mainBg, color: textColor }}
-                          className="p-6 sm:p-8 rounded-none shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
+                          style={{
+                            backgroundColor: mainBg,
+                            color: textColor,
+                            ...renderBorderStyles(el.data),
+                          }}
+                          className="p-6 sm:p-8 overflow-hidden shadow-xl space-y-6 border-2 border-dashed border-[#00A0FF]/60 hover:border-[#00A0FF] relative transition-all group/box"
                         >
                           {el.data?.title && (
                             <div className="flex items-center justify-between border-b border-slate-100/60 pb-3">

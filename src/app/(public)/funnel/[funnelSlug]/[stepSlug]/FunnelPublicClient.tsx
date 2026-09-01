@@ -244,8 +244,18 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               return (
                 <div
                   key={el.id}
-                  style={{ backgroundColor: mainBg, color: textColor }}
-                  className="p-6 sm:p-8 rounded-none shadow-xl space-y-6 border border-slate-100 my-6"
+                  style={{
+                    backgroundColor: mainBg,
+                    color: textColor,
+                    paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                    paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                    paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                    paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                    marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
+                    marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
+                    ...renderBorderStyles(el.data),
+                  }}
+                  className="p-6 sm:p-8 overflow-hidden shadow-xl space-y-6 my-6"
                 >
                   {el.data?.title && (
                     <h3 className="text-2xl font-heading font-black border-b border-slate-100/60 pb-3" style={{ color: textColor }}>
