@@ -553,7 +553,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: item.color }}
                     onClick={() => {
-                      applyInlineHtmlFormat((txt) => `<mark style="background-color: ${item.color} !important; color: #0F172A !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`);
+                      executeRichCommand('hiliteColor', item.color);
                       setOpenFloatingPopover(null);
                     }}
                     className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
