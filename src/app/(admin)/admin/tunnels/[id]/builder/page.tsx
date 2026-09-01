@@ -1236,7 +1236,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           {/* CONTRÔLE DU BLOC INTÉGRÉ ENTIER DANS LA SECTION */}
           {selectedChildIndex !== null && !selectedSubItem && selectedEl.data?.children?.[selectedChildIndex] && (() => {
             const activeChild = selectedEl.data.children[selectedChildIndex];
-            const activeShape = activeChild.data?.imgShape || 'square';
 
             return (
               <div className="p-4 bg-slate-950 rounded-2xl border border-[#00A0FF]/60 space-y-4 shadow-xl mb-4">
@@ -1252,49 +1251,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   >
                     Retour Section
                   </button>
-                </div>
-
-                {/* FORME & DÉCOUPE DE TOUTES LES IMAGES DU BLOC */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                    🏛️ Forme & Découpe de TOUTES les Images du Bloc
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { key: 'arcade', label: '🏛️ Arche Arizona' },
-                      { key: 'circle', label: '⚪ Cercle' },
-                      { key: 'rounded-3xl', label: '🔲 Arrondi 3XL' },
-                      { key: 'square', label: '⬛ Droit' },
-                    ].map((s) => (
-                      <button
-                        key={s.key}
-                        type="button"
-                        onClick={() => {
-                          const currentChildren = [...(selectedEl.data?.children || [])];
-                          const targetChild = currentChildren[selectedChildIndex];
-                          const currentItems = targetChild.data?.items || getDefaultBlockData(targetChild.type, targetChild.content).items || [];
-                          const updatedItems = currentItems.map((it: any) => ({ ...it, imgShape: s.key }));
-
-                          currentChildren[selectedChildIndex] = {
-                            ...targetChild,
-                            data: {
-                              ...(targetChild.data || {}),
-                              imgShape: s.key,
-                              items: updatedItems,
-                            },
-                          };
-                          handleUpdateElementData(selectedEl.id, { children: currentChildren });
-                        }}
-                        className={`py-2.5 px-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
-                          activeShape === s.key
-                            ? 'bg-[#00A0FF] text-white border-[#00A0FF] shadow-lg ring-2 ring-[#00A0FF]/40'
-                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
-                        }`}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* COULEURS DE TOUTES LES CARTES DE LA COLONNE */}
