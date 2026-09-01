@@ -377,7 +377,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   };
 
   const handleImageMouseDown = (
-    e: React.MouseEvent<HTMLImageElement>,
+    e: React.MouseEvent<HTMLElement>,
     currentXVal: number,
     currentYVal: number,
     updatePosition: (posX: number, posY: number) => void
@@ -391,12 +391,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     const initialY = currentYVal !== undefined ? currentYVal : 50;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
+      moveEvent.preventDefault();
       const deltaXPixels = moveEvent.clientX - startX;
       const deltaYPixels = moveEvent.clientY - startY;
 
-      // Calculate smooth percentage position inside image frame
-      const newX = Math.max(0, Math.min(100, Math.round(initialX - deltaXPixels * 0.4)));
-      const newY = Math.max(0, Math.min(100, Math.round(initialY - deltaYPixels * 0.4)));
+      const newX = Math.max(0, Math.min(100, Math.round(initialX - deltaXPixels * 0.5)));
+      const newY = Math.max(0, Math.min(100, Math.round(initialY - deltaYPixels * 0.5)));
 
       updatePosition(newX, newY);
     };
@@ -4534,7 +4534,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                       </div>
 
                                                       {/* RAW IMAGE WITH MOUSE DRAG-TO-PAN & SCROLL-ZOOM */}
-                                                      <div className="relative w-full h-full min-h-[140px] group/imgbox overflow-hidden">
+                                                      <div
+                                                        onMouseDown={(e) => {
+                                                          const currentX = subChild.data?.posX !== undefined ? subChild.data.posX : 50;
+                                                          const currentY = subChild.data?.posY !== undefined ? subChild.data.posY : 50;
+                                                          handleImageMouseDown(e, currentX, currentY, (newX, newY) => {
+                                                            updateSubChildData({ posX: newX, posY: newY });
+                                                          });
+                                                        }}
+                                                        className="relative w-full h-full min-h-[140px] group/imgbox overflow-hidden cursor-grab active:cursor-grabbing select-none"
+                                                      >
                                                         <img
                                                           src={subChild.data?.img || subChild.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80'}
                                                           alt="SubImage"
@@ -4563,7 +4572,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                             transform: `scale(${(subChild.data?.imgZoom || 120) / 100})`,
                                                             ...renderBorderStyles(subChild.data),
                                                           }}
-                                                          className="w-full h-full min-h-[140px] block cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
+                                                          className="w-full h-full min-h-[140px] block cursor-grab active:cursor-grabbing select-none"
                                                         />
                                                         
                                                       </div>
