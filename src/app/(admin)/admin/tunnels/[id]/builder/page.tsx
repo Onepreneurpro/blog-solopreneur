@@ -148,7 +148,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   } | null>(null);
 
   // CANVAS BACKGROUND ALIGNMENT GRID STATE (GRILLAGE À CARREAUX ON/OFF)
-  const [showCanvasGrid, setShowCanvasGrid] = useState<boolean>(true);
+
   const sectionContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // PAGE DISPLAY WIDTH MODE STATE (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%)
@@ -2796,19 +2796,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             >
               <Smartphone className="w-4 h-4" />
             </button>
-            <div className="h-4 w-px bg-slate-800 my-auto" />
-            <button
-              type="button"
-              onClick={() => setShowCanvasGrid(!showCanvasGrid)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                showCanvasGrid
-                  ? 'bg-[#00A0FF]/20 text-[#00A0FF] border border-[#00A0FF]/50 shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="Activer/Désactiver le grillage à carreaux pour l alignement"
-            >
-              <span>🏁 Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
-            </button>
+
 
           </div>
 
@@ -3405,10 +3393,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 : pageWidthMode === 'wide'
                 ? 'max-w-6xl'
                 : 'max-w-4xl'
-            } ${
-              showCanvasGrid
-                ? 'bg-[linear-gradient(to_right,rgba(0,160,255,0.22)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,160,255,0.22)_1px,transparent_1px)] bg-[size:20px_20px]'
-                : ''
             }`}
           >
             {/* DYNAMIC TOP DROP INDICATOR (ONLY SHOWN WHILE DRAGGING OVER TOP) */}
