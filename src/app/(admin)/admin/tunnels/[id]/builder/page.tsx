@@ -520,27 +520,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            const sel = window.getSelection();
-            if (sel && !sel.isCollapsed) {
-              document.execCommand('italic', false);
-              const activeEl = document.activeElement;
-              if (activeEl && activeEl.getAttribute('contenteditable')) {
-                const html = activeEl.innerHTML;
-                updateTarget({}, { content: html });
-              }
-            } else {
-              const targetSection = elements.find(e => e.id === targetId);
-              let curItalic = false;
-              if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
-                const child = targetSection.data.children[childIdx];
-                curItalic = child.data?.fontStyle === 'italic';
-              } else if (targetSection) {
-                curItalic = targetSection.data?.fontStyle === 'italic';
-              }
-              updateTarget({ fontStyle: curItalic ? 'normal' : 'italic' });
-            }
-          }}
+          onClick={() => executeRichCommand('italic')}
           className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-900 italic font-black text-xs flex items-center justify-center min-w-[32px]"
           title="I Italique"
         >
@@ -551,38 +531,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            const sel = window.getSelection();
-            if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
-              const range = sel.getRangeAt(0);
-              const uSpan = document.createElement('u');
-              uSpan.style.textDecoration = 'underline';
-              uSpan.style.textDecorationColor = '#00A0FF';
-              uSpan.style.textDecorationThickness = '3px';
-              uSpan.style.textUnderlineOffset = '2px';
-              try {
-                range.surroundContents(uSpan);
-              } catch(err) {
-                document.execCommand('underline', false);
-              }
-              const activeEl = document.activeElement;
-              if (activeEl && activeEl.getAttribute('contenteditable')) {
-                updateTarget({}, { content: activeEl.innerHTML });
-              }
-            } else {
-              const targetSection = elements.find(e => e.id === targetId);
-              let curU = false;
-              if (childIdx !== null && childIdx !== undefined && targetSection?.data?.children?.[childIdx]) {
-                const child = targetSection.data.children[childIdx];
-                curU = child.data?.textDecoration === 'underline';
-              } else if (targetSection) {
-                curU = targetSection.data?.textDecoration === 'underline';
-              }
-              updateTarget({ textDecoration: curU ? 'none' : 'underline' });
-            }
-          }}
+          onClick={() => executeRichCommand('underline')}
           className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-          title="Souligner le texte"
+          title="Souligner le texte sélectionné"
         >
           <Underline className="w-4 h-4 text-sky-600" />
           <span>Souligné</span>
