@@ -3231,7 +3231,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       {/* TYPE NAME BADGE */}
                       <div
                         style={{ color: '#ffffff' }}
-                        className="!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md bg-[#00A0FF]"
+                        className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md ${
+                          el.type === 'ContentBox' ? 'bg-[#10B981]' : el.type === 'Image' ? 'bg-[#FF7A00]' : 'bg-[#00A0FF]'
+                        }`}
                       >
                         <span className="!text-white font-black" style={{ color: '#ffffff' }}>
                           {el.type === 'Section' || el.type === 'BlockSectionFull' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}
@@ -3244,7 +3246,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       {/* ACTIONS BADGE */}
                       <div
                         style={{ color: '#ffffff' }}
-                        className="!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-blue-400 bg-[#00A0FF]"
+                        className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                          el.type === 'ContentBox' ? 'border-emerald-400 bg-[#10B981]' : el.type === 'Image' ? 'border-orange-300 bg-[#FF7A00]' : 'border-blue-400 bg-[#00A0FF]'
+                        }`}
                       >
                         {/* ⚙️ PARAMÈTRES / INSPECTEUR */}
                         <button
@@ -4016,7 +4020,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         {/* ACTIONS BADGE */}
                                         <div
                                           style={{ color: '#ffffff' }}
-                                          className="!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-blue-400 bg-[#00A0FF]"
+                                          className="!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-emerald-400 bg-[#10B981]"
                                         >
                                           {/* ⚙️ CONTROLLER / INSPECTER */}
                                           <button
