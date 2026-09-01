@@ -59,58 +59,6 @@ interface CanvasElement {
   styles?: any;
 }
 
-function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls = [], customJs = '' }: any) {
-  const [frameHeight, setFrameHeight] = useState<number>(800);
-
-  const srcDoc = `
-    <!DOCTYPE html>
-    <html lang="fr">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        ${stylesheetUrls.map((url: string) => `<link rel="stylesheet" href="${url}">`).join('\n')}
-        <style>
-          html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
-          ${customCss || ''}
-        </style>
-      </head>
-      <body>
-        ${rawHtml || ''}
-        ${scriptUrls.map((url: string) => `<script src="${url}"><\/script>`).join('\n')}
-        <script>
-          ${customJs || ''}
-          function sendHeight() {
-            var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, 600);
-            window.parent.postMessage({ type: 'CLONED_IFRAME_HEIGHT', height: h }, '*');
-          }
-          window.addEventListener('load', sendHeight);
-          window.addEventListener('resize', sendHeight);
-          setInterval(sendHeight, 1000);
-        <\/script>
-      </body>
-    </html>
-  `;
-
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data && e.data.type === 'CLONED_IFRAME_HEIGHT' && e.data.height) {
-        setFrameHeight(e.data.height);
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  return (
-    <iframe
-      srcDoc={srcDoc}
-      title="Cloned Page Sandbox"
-      className="w-full border-0 transition-all overflow-hidden"
-      style={{ height: `${frameHeight}px`, minHeight: '600px' }}
-    />
-  );
-}
-
 const renderBorderStyles = (data: any) => {
   if (!data) return {};
 
@@ -206,15 +154,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   // PAGE DISPLAY WIDTH MODE STATE (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%)
   const [pageWidthMode, setPageWidthMode] = useState<'standard' | 'wide' | 'full'>('standard');
 
-  // PAGE CLONER STATE (IMPORT FROM URL)
-  const [showCloneModal, setShowCloneModal] = useState<boolean>(false);
-  const [cloneUrlInput, setCloneUrlInput] = useState<string>('');
-  const [isCloning, setIsCloning] = useState<boolean>(false);
-  const [cloneError, setCloneError] = useState<string | null>(null);
-  const [cloneMode, setCloneMode] = useState<'replace' | 'append'>('replace');
-  const [cloneStyle, setCloneStyle] = useState<'raw' | 'native'>('raw');
-  const [searchTarget, setSearchTarget] = useState<string>('');
-  const [replaceTarget, setReplaceTarget] = useState<string>('');
   const [openMarginDetail, setOpenMarginDetail] = useState<{
     paddingY?: boolean;
     paddingX?: boolean;
@@ -222,44 +161,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     marginX?: boolean;
     borderRadius?: boolean;
   }>({});
-
-  const handleClonePage = async () => {
-    if (!cloneUrlInput.trim()) {
-      setCloneError('Veuillez saisir une URL valide (ex: https://...)');
-      return;
-    }
-    setIsCloning(true);
-    setCloneError(null);
-
-    try {
-      const res = await fetch('/api/admin/clone-page', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: cloneUrlInput.trim(), mode: cloneStyle }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.elements) {
-        throw new Error(data.error || 'Échec lors du clonage de la page');
-      }
-
-      if (cloneMode === 'replace') {
-        setElements(data.elements);
-      } else {
-        setElements((prev) => [...prev, ...data.elements]);
-      }
-
-      setShowCloneModal(false);
-      setCloneUrlInput('');
-      alert(`🎉 Page clonée avec succès ! ${data.totalSections} section(s) importée(s).`);
-    } catch (err: any) {
-      console.error('Clone Error:', err);
-      setCloneError(err.message || 'Erreur réseau lors du clonage');
-    } finally {
-      setIsCloning(false);
-    }
-  };
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -1545,69 +1446,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           )}
 
 
-
-          {/* RAW HTML INSPECTOR PANEL FOR CLONED PAGES */}
-          {(selectedEl.type === 'RawHTML' || selectedEl.data?.rawHtml) && (
-            <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/60 space-y-4 shadow-xl mb-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-xs font-black text-amber-400 uppercase flex items-center gap-1.5">
-                  <span>⚡</span>
-                  <span>Inspecteur Page Clonée (HTML/CSS)</span>
-                </span>
-              </div>
-
-              {/* QUICK SEARCH & REPLACE IN CLONED PAGE */}
-              <div className="space-y-2 pt-1 border-t border-slate-800">
-                <label className="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-heading">
-                  🔍 Rechercher & Remplacer (Texte ou Liens)
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={searchTarget}
-                    onChange={(e) => setSearchTarget(e.target.value)}
-                    placeholder="Texte ou URL d origine à remplacer"
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none"
-                  />
-                  <input
-                    type="text"
-                    value={replaceTarget}
-                    onChange={(e) => setReplaceTarget(e.target.value)}
-                    placeholder="Votre nouveau texte ou lien"
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!searchTarget.trim()) return;
-                      const currentHtml = selectedEl.data?.rawHtml || selectedEl.content || '';
-                      const newHtml = currentHtml.replaceAll(searchTarget.trim(), replaceTarget);
-                      handleUpdateElementData(selectedEl.id, { rawHtml: newHtml });
-                      alert(`✅ Remplacement réussi pour "${searchTarget}" !`);
-                    }}
-                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition-all shadow-md"
-                  >
-                    ⚡ Remplacer Tout dans la Page
-                  </button>
-                </div>
-              </div>
-
-              {/* RAW CODE EDITOR */}
-              <div className="space-y-2 pt-2 border-t border-slate-800">
-                <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block font-heading">
-                  📝 Éditeur de Code HTML Brut
-                </label>
-                <textarea
-                  rows={8}
-                  value={selectedEl.data?.rawHtml || selectedEl.content || ''}
-                  onChange={(e) => {
-                    handleUpdateElementData(selectedEl.id, { rawHtml: e.target.value });
-                  }}
-                  className="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-[11px] font-mono text-emerald-400 focus:border-amber-500 outline-none leading-relaxed"
-                />
-              </div>
-            </div>
-          )}
 
           {/* 🎨 COULEURS ET ARRIÈRE-PLAN DES BLOCS, COLONNES ET TEXTES */}
           <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
@@ -2971,16 +2809,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             >
               <span>🏁 Grille {showCanvasGrid ? 'ON' : 'OFF'}</span>
             </button>
-            <div className="h-4 w-px bg-slate-800 my-auto" />
-            <button
-              type="button"
-              onClick={() => setShowCloneModal(true)}
-              className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md transition-all border border-purple-400/30"
-              title="Cloner une page web ou un funnel à partir de son URL (ClickFunnels, Systeme.io, etc.)"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>Cloner Page (URL)</span>
-            </button>
+
           </div>
 
           {/* PAGE DISPLAY WIDTH SELECTOR (STANDARD 896px, LARGE 1152px, FULL SCREEN 100%) */}
@@ -4338,23 +4167,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         </div>
                       );
                     })()}
-
-                    {/* RAW HTML CLONED PAGE WORKSPACE CANVAS RENDERER */}
-                    {(el.type === 'RawHTML' || el.data?.rawHtml) && (
-                      <div className="w-full relative overflow-hidden my-2 border border-dashed border-amber-500/50 rounded-xl p-2 bg-slate-950/60">
-                        <div className="flex items-center justify-between bg-amber-500/20 text-amber-300 text-[11px] px-3 py-1 rounded-lg font-bold mb-2 border border-amber-500/30">
-                          <span>⚡ PAGE HTML/CSS CLONÉE (PIXEL PERFECT)</span>
-                          <span className="text-[10px] text-slate-400">Sélectionnez pour utiliser la Recherche & Remplacement dans le panneau gauche</span>
-                        </div>
-                        <ClonedPageFrame
-                          rawHtml={el.data?.rawHtml || el.content}
-                          customCss={el.data?.customCss}
-                          stylesheetUrls={el.data?.stylesheetUrls}
-                          scriptUrls={el.data?.scriptUrls}
-                          customJs={el.data?.customJs}
-                        />
-                      </div>
-                    )}
 
                     {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
                     {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
@@ -5781,143 +5593,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </div>
         </div>
       </div>
-      {/* MODAL CLONNEUR DE PAGE VIA URL */}
-      {showCloneModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative text-left">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold border border-purple-500/30">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-white">Cloner une Page Web / Funnel</h3>
-                  <p className="text-[11px] text-slate-400">Importez Systeme.io, ClickFunnels, WordPress ou n importe quelle URL</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowCloneModal(false)}
-                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300 block">
-                  URL de la Page Cible
-                </label>
-                <div className="relative">
-                  <input
-                    type="url"
-                    value={cloneUrlInput}
-                    onChange={(e) => setCloneUrlInput(e.target.value)}
-                    placeholder="https://votre-page-cible.com/tunnel"
-                    className="w-full pl-3.5 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:border-purple-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-1">
-                <label className="text-xs font-bold text-slate-300 block">Style de Clonage</label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setCloneStyle('raw')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                      cloneStyle === 'raw'
-                        ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-md ring-1 ring-amber-500/50'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span>⚡ Copie Exacte HTML/CSS (Pixel-Perfect)</span>
-                    <span className="text-[9px] font-normal opacity-80">Rendu visuel 100% identique au site d origine</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCloneStyle('native')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                      cloneStyle === 'native'
-                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span>🎯 Blocs Natifs Éditables</span>
-                    <span className="text-[9px] font-normal opacity-80">Chaque titre et bouton séparé dans le Builder</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-1">
-                <label className="text-xs font-bold text-slate-300 block font-heading">Destination du Canvas</label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setCloneMode('replace')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                      cloneMode === 'replace'
-                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span>🔄 Remplacer le Canvas</span>
-                    <span className="text-[9px] font-normal opacity-80">Remplace le contenu actuel</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCloneMode('append')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                      cloneMode === 'append'
-                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span>➕ Ajouter à la suite</span>
-                    <span className="text-[9px] font-normal opacity-80">Conserve les sections actuelles</span>
-                  </button>
-                </div>
-              </div>
-
-              {cloneError && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 font-medium flex items-center gap-2">
-                  <span>⚠️</span>
-                  <span>{cloneError}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={() => setShowCloneModal(false)}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                type="button"
-                disabled={isCloning}
-                onClick={handleClonePage}
-                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs rounded-xl flex items-center gap-2 shadow-lg disabled:opacity-50 transition-all"
-              >
-                {isCloning ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>Analyse & Clonage...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 text-amber-300" />
-                    <span>Lancer le Clonage</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   </div>
 );
