@@ -88,21 +88,34 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
       parsedData = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
       if (Array.isArray(parsedData)) {
         customElements = parsedData;
-      } else if (parsedData?.elements && Array.isArray(parsedData.elements)) {
-        customElements = parsedData.elements;
+      } else if (parsedData && typeof parsedData === 'object') {
+        if (Array.isArray(parsedData.elements)) {
+          customElements = parsedData.elements;
+        }
       }
     } catch (e) {
       console.error('Error parsing step content:', e);
     }
   }
 
-  const showCopyright = (parsedData && parsedData.showCopyright !== undefined) ? Boolean(parsedData.showCopyright) : ((step?.data && step.data.showCopyright !== undefined) ? Boolean(step.data.showCopyright) : true);
-  const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
-  const copyrightFontSize = parsedData?.copyrightFontSize || step?.data?.copyrightFontSize || 12;
-  const copyrightTextColor = parsedData?.copyrightTextColor || step?.data?.copyrightTextColor || '#94a3b8';
-  const showCopyrightLine = parsedData?.showCopyrightLine !== undefined ? parsedData.showCopyrightLine : (step?.data?.showCopyrightLine !== undefined ? step.data.showCopyrightLine : true);
-  const copyrightLineColor = parsedData?.copyrightLineColor || step?.data?.copyrightLineColor || '#334155';
-  const copyrightLineOpacity = parsedData?.copyrightLineOpacity ?? step?.data?.copyrightLineOpacity ?? 40;
+  // BULLETPROOF METADATA & COPYRIGHT EXTRACTION
+  const metaObj = (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) ? parsedData : (step?.data || {});
+
+  const pageBgColor = metaObj.pageBgColor || step?.data?.pageBgColor || '#020617';
+  const pageBgImage = metaObj.pageBgImage || step?.data?.pageBgImage || '';
+  const pageBgSize = metaObj.pageBgSize || step?.data?.pageBgSize || 'cover';
+  const pageBgZoom = metaObj.pageBgZoom ?? step?.data?.pageBgZoom ?? 100;
+  const pageBgPosX = metaObj.pageBgPosX ?? step?.data?.pageBgPosX ?? 50;
+  const pageBgPosY = metaObj.pageBgPosY ?? step?.data?.pageBgPosY ?? 0;
+  const pageDir = metaObj.pageDir || step?.data?.pageDir || ((metaObj.pageLang || step?.data?.pageLang) === 'ar' ? 'rtl' : 'ltr');
+
+  const showCopyright = metaObj.showCopyright !== undefined ? Boolean(metaObj.showCopyright) : (step?.data?.showCopyright !== undefined ? Boolean(step.data.showCopyright) : true);
+  const pageCopyright = metaObj.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
+  const copyrightFontSize = metaObj.copyrightFontSize ?? step?.data?.copyrightFontSize ?? 12;
+  const copyrightTextColor = metaObj.copyrightTextColor || step?.data?.copyrightTextColor || '#94a3b8';
+  const showCopyrightLine = metaObj.showCopyrightLine !== undefined ? Boolean(metaObj.showCopyrightLine) : (step?.data?.showCopyrightLine !== undefined ? Boolean(step.data.showCopyrightLine) : true);
+  const copyrightLineColor = metaObj.copyrightLineColor || step?.data?.copyrightLineColor || '#334155';
+  const copyrightLineOpacity = metaObj.copyrightLineOpacity ?? step?.data?.copyrightLineOpacity ?? 40;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,14 +201,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         ? 'max-w-6xl mx-auto w-full'
         : 'max-w-4xl mx-auto w-full';
 
-    const pageBgColor = parsedData?.pageBgColor || step?.data?.pageBgColor || '#020617';
-    const pageBgImage = parsedData?.pageBgImage || step?.data?.pageBgImage || '';
-    const pageBgSize = parsedData?.pageBgSize || step?.data?.pageBgSize || 'cover';
-    const pageBgZoom = parsedData?.pageBgZoom ?? step?.data?.pageBgZoom ?? 100;
-    const pageBgPosX = parsedData?.pageBgPosX ?? step?.data?.pageBgPosX ?? 50;
-    const pageBgPosY = parsedData?.pageBgPosY ?? step?.data?.pageBgPosY ?? 0;
-    const pageDir = parsedData?.pageDir || step?.data?.pageDir || ((parsedData?.pageLang || step?.data?.pageLang) === 'ar' ? 'rtl' : 'ltr');
-    const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
+
 
     return (
     <div
