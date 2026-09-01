@@ -697,33 +697,92 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </button>
 
           {openFloatingPopover === 'neon' && (
-            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
-              <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Surlignage Néon Fluo</div>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { color: '#fef08a', label: 'Jaune Fluo' },
-                  { color: '#bbf7d0', label: 'Vert Fluo' },
-                  { color: '#fbcfe8', label: 'Rose Fluo' },
-                  { color: '#fed7aa', label: 'Orange Fluo' },
-                  { color: '#bae6fd', label: 'Bleu Fluo' },
-                  { color: '#e9d5ff', label: 'Violet Fluo' },
-                  { color: '#EF4444', label: 'Rouge' },
-                  { color: '#00A0FF', label: 'Bleu SPC' }
-                ].map(item => (
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                  <Highlighter className="w-4 h-4 text-amber-600" />
+                  <span>Surlignage Néon Fluo</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-6 gap-1.5">
+                {neonColors.map((c) => (
                   <button
-                    key={item.color}
+                    key={c.color}
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
-                    style={{ backgroundColor: item.color }}
                     onClick={() => {
+                      if (targetDomRef.current) {
+                        targetDomRef.current.focus();
+                      }
                       restoreSelection();
-                      executeRichCommand('hiliteColor', item.color);
+                      const sel = window.getSelection();
+                      const markHtml = (txt: string) =>
+                        `<mark color="${c.color}" style="background-color: ${c.color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
+
+                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                        const selectedText = sel.toString();
+                        document.execCommand('insertHTML', false, markHtml(selectedText));
+                        saveSelection();
+                      } else if (lastSelectedTextRef.current) {
+                        document.execCommand('insertHTML', false, markHtml(lastSelectedTextRef.current));
+                      }
+                      if (targetDomRef.current) {
+                        updateTargetContentOnly(targetDomRef.current.innerHTML);
+                      }
                       setOpenFloatingPopover(null);
                     }}
-                    className="w-10 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
-                    title={item.label}
+                    style={{ backgroundColor: c.color }}
+                    className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                    title={c.label}
                   />
                 ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    defaultValue="#a3e635"
+                    onInput={(e) => {
+                      if (targetDomRef.current) targetDomRef.current.focus();
+                      restoreSelection();
+                      const val = (e.target as HTMLInputElement).value;
+                      const sel = window.getSelection();
+                      const markHtml = (txt: string) =>
+                        `<mark color="${val}" style="background-color: ${val} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
+                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                        document.execCommand('insertHTML', false, markHtml(sel.toString()));
+                        saveSelection();
+                      }
+                      if (targetDomRef.current) updateTargetContentOnly(targetDomRef.current.innerHTML);
+                    }}
+                    onChange={(e) => {
+                      if (targetDomRef.current) targetDomRef.current.focus();
+                      restoreSelection();
+                      const val = e.target.value;
+                      const sel = window.getSelection();
+                      const markHtml = (txt: string) =>
+                        `<mark color="${val}" style="background-color: ${val} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
+                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                        document.execCommand('insertHTML', false, markHtml(sel.toString()));
+                        saveSelection();
+                      }
+                      if (targetDomRef.current) updateTargetContentOnly(targetDomRef.current.innerHTML);
+                    }}
+                    className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                    title="Glissez le curseur pour explorer toutes les nuances"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpenFloatingPopover(null)}
+                    className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                  >
+                    OK
+                  </button>
+                </div>
               </div>
             </div>
           )}
