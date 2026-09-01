@@ -1097,7 +1097,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           data: getDefaultBlockData(type, defaultContent),
         };
         const currentChildren = selectedEl.data?.children || [];
-        handleUpdateElementData(selectedEl.id, { children: [...currentChildren, newChild] });
+        // If adding a non-Div element (Text, Heading) to a Section that has Div columns, place it AT THE TOP above Divs
+        const isNonDiv = type !== 'ContentBox' && type !== 'Section' && type !== 'BlockSectionFull';
+        const hasDivColumns = currentChildren.some((c: any) => c.type === 'ContentBox');
+        const updatedChildren = (isNonDiv && hasDivColumns)
+          ? [newChild, ...currentChildren]
+          : [...currentChildren, newChild];
+        handleUpdateElementData(selectedEl.id, { children: updatedChildren });
         return;
       }
 
@@ -5041,7 +5047,25 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           style={{ color: '#ffffff' }}
                                           className="!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-emerald-400 bg-[#10B981]"
                                         >
-                                          {/* ⚙️ CONTROLLER / INSPECTER */}
+                                          {/* ⬆️ PLACER EN HAUT (AU-DESSUS DES DIVS) */}
+                                           <button
+                                             type="button"
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               const currentChildren = [...(el.data?.children || [])];
+                                               const [moved] = currentChildren.splice(cIdx, 1);
+                                               currentChildren.unshift(moved);
+                                               handleUpdateElementData(el.id, { children: currentChildren });
+                                               setSelectedChildIndex(0);
+                                             }}
+                                             className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 font-extrabold text-[10px] rounded text-white flex items-center gap-1 transition-colors shadow-sm"
+                                             style={{ color: '#ffffff' }}
+                                             title="⬆️ Déplacer cet élément tout en haut de la Section (au-dessus de tous les Divs)"
+                                           >
+                                             <span>⬆️ En haut</span>
+                                           </button>
+
+                                           {/* ⚙️ CONTROLLER / INSPECTER */}
                                           <button
                                             type="button"
                                             onClick={(e) => {
