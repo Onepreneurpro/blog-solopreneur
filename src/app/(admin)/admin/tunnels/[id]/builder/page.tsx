@@ -255,52 +255,96 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       : selectedChildIndex;
     const subChildIdx = floatingTextMenu.subChildIdx;
 
-    const updateTarget = (styleUpdates: Record<string, any>, extraProps?: Record<string, any>) => {
+    const updateTargetContentOnly = (newContent: string) => {
       if (!targetId) return;
       if (childIdx !== null && childIdx !== undefined && subChildIdx !== null && subChildIdx !== undefined) {
-        // Sub-child inside ContentBox Div
         const targetSection = elements.find(e => e.id === targetId);
         if (targetSection && targetSection.data?.children?.[childIdx]?.data?.children) {
           const children = [...targetSection.data.children];
           const childDiv = { ...children[childIdx] };
           const divChildren = [...(childDiv.data?.children || [])];
-          const subChild = divChildren[subChildIdx];
-          if (subChild) {
-            divChildren[subChildIdx] = {
-              ...subChild,
-              ...(extraProps || {}),
-              data: { ...(subChild.data || {}), ...styleUpdates }
-            };
+          if (divChildren[subChildIdx]) {
+            divChildren[subChildIdx] = { ...divChildren[subChildIdx], content: newContent };
             childDiv.data = { ...(childDiv.data || {}), children: divChildren };
             children[childIdx] = childDiv;
             handleUpdateElementData(targetId, { children });
           }
         }
       } else if (childIdx !== null && childIdx !== undefined) {
-        // Direct Section child
         const targetSection = elements.find(e => e.id === targetId);
         if (targetSection && targetSection.data?.children) {
           const children = [...targetSection.data.children];
-          const child = children[childIdx];
-          if (child) {
-            children[childIdx] = {
-              ...child,
-              ...(extraProps || {}),
-              data: { ...(child.data || {}), ...styleUpdates }
-            };
+          if (children[childIdx]) {
+            children[childIdx] = { ...children[childIdx], content: newContent };
             handleUpdateElementData(targetId, { children });
           }
         }
       } else {
-        // Root element
-        const targetEl = elements.find(e => e.id === targetId);
-        if (targetEl) {
-          if (extraProps?.type) {
-            setElements(prev => prev.map(item => item.id === targetId ? { ...item, type: extraProps.type, data: { ...(item.data || {}), ...styleUpdates } } : item));
-          } else {
-            handleUpdateElementData(targetId, styleUpdates);
+        setElements(prev => prev.map(item => item.id === targetId ? { ...item, content: newContent } : item));
+      }
+    };
+
+    const updateTarget = (styleUpdates: Record<string, any>, extraProps?: Record<string, any>) => {
+      if (!targetId) return;
+      if (childIdx !== null && childIdx !== undefined && subChildIdx !== null && subChildIdx !== undefined) {
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children?.[childIdx]?.data?.children) {
+          const children = [...targetSection.data.children];
+          const childDiv = { ...children[childIdx] };
+          const divChildren = [...(childDiv.data?.children || [])];
+          if (divChildren[subChildIdx]) {
+            divChildren[subChildIdx] = { ...divChildren[subChildIdx], ...(extraProps || {}), data: { ...(divChildren[subChildIdx].data || {}), ...styleUpdates } };
+            childDiv.data = { ...(childDiv.data || {}), children: divChildren };
+            children[childIdx] = childDiv;
+            handleUpdateElementData(targetId, { children });
           }
         }
+      } else if (childIdx !== null && childIdx !== undefined) {
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children) {
+          const children = [...targetSection.data.children];
+          if (children[childIdx]) {
+            children[childIdx] = { ...children[childIdx], ...(extraProps || {}), data: { ...(children[childIdx].data || {}), ...styleUpdates } };
+            handleUpdateElementData(targetId, { children });
+          }
+        }
+      } else {
+        handleUpdateElementData(targetId, styleUpdates);
+      }
+    };
+
+    const applyInlineHtmlFormat = (htmlFormatter: (selectedTxt: string) => string) => {
+      if (targetDomRef.current) {
+        targetDomRef.current.focus();
+      }
+      restoreSelection();
+      const sel = window.getSelection();
+      const selectedTxt = sel ? sel.toString().trim() : '';
+
+      if (targetDomRef.current && selectedTxt.length > 0 && sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlFormatter(selectedTxt);
+        const formattedNode = tempDiv.firstChild || document.createTextNode(selectedTxt);
+
+        range.deleteContents();
+        range.insertNode(formattedNode);
+
+        // Keep text selection active after formatting!
+        try {
+          const newRange = document.createRange();
+          newRange.selectNodeContents(formattedNode);
+          sel.removeAllRanges();
+          sel.addRange(newRange);
+          savedRangeRef.current = newRange.cloneRange();
+        } catch (e) {}
+
+        const updatedHtml = targetDomRef.current.innerHTML;
+        updateTargetContentOnly(updatedHtml);
+      } else if (targetDomRef.current) {
+        const fullTxt = (targetDomRef.current as HTMLElement).innerText || targetDomRef.current.textContent || 'Texte';
+        targetDomRef.current.innerHTML = htmlFormatter(fullTxt);
+        updateTargetContentOnly(targetDomRef.current.innerHTML);
       }
     };
 
@@ -485,7 +529,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ backgroundColor: color }}
                     onClick={() => {
-                      updateTarget({ textColor: color });
+                      applyInlineHtmlFormat((txt) => `<span style="color: ${color} !important;">${txt}</span>`);
                       setOpenFloatingPopover(null);
                     }}
                     className="w-8 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
