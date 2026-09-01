@@ -131,7 +131,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [pageLang, setPageLang] = useState<string>('fr');
   const [pageDir, setPageDir] = useState<'ltr' | 'rtl'>('ltr');
   const [pageFont, setPageFont] = useState<string>('Inter');
+  const [showCopyright, setShowCopyright] = useState<boolean>(true);
   const [pageCopyright, setPageCopyright] = useState<string>('© 2026 Onepreneur&Co. Tous droits réservés.');
+  const [copyrightFontSize, setCopyrightFontSize] = useState<number>(12);
+  const [copyrightTextColor, setCopyrightTextColor] = useState<string>('#94a3b8');
+  const [showCopyrightLine, setShowCopyrightLine] = useState<boolean>(true);
+  const [copyrightLineColor, setCopyrightLineColor] = useState<string>('#334155');
+  const [copyrightLineOpacity, setCopyrightLineOpacity] = useState<number>(40);
   const [pageBgColor, setPageBgColor] = useState<string>('#020617');
   const [pageBgImage, setPageBgImage] = useState<string>('');
   const [pageBgSize, setPageBgSize] = useState<string>('cover');
@@ -365,6 +371,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 if (parsed.pageDir) setPageDir(parsed.pageDir);
                 if (parsed.pageFont) setPageFont(parsed.pageFont);
                 if (parsed.pageCopyright) setPageCopyright(parsed.pageCopyright);
+                if (parsed.showCopyright !== undefined) setShowCopyright(parsed.showCopyright);
+                if (parsed.copyrightFontSize !== undefined) setCopyrightFontSize(parsed.copyrightFontSize);
+                if (parsed.copyrightTextColor) setCopyrightTextColor(parsed.copyrightTextColor);
+                if (parsed.showCopyrightLine !== undefined) setShowCopyrightLine(parsed.showCopyrightLine);
+                if (parsed.copyrightLineColor) setCopyrightLineColor(parsed.copyrightLineColor);
+                if (parsed.copyrightLineOpacity !== undefined) setCopyrightLineOpacity(parsed.copyrightLineOpacity);
               } else {
                 setElements([]);
               }
@@ -3714,20 +3726,115 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </div>
 
                 {/* 5. PIED DE PAGE & DROITS D AUTEUR (COPYRIGHT) */}
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
-                    ©️ Pied de page & Copyright
-                  </label>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 block">Texte du pied de page</label>
-                    <input
-                      type="text"
-                      placeholder="ex: © 2026 Mon Entreprise. Tous droits réservés."
-                      value={pageCopyright}
-                      onChange={(e) => setPageCopyright(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
-                    />
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                      ©️ Pied de page & Copyright
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowCopyright(!showCopyright)}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all ${
+                        showCopyright
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      }`}
+                    >
+                      {showCopyright ? '👁️ Afficher' : '🙈 Masquer'}
+                    </button>
                   </div>
+
+                  {showCopyright && (
+                    <div className="space-y-4 pt-1">
+                      {/* TEXTE DE COPYRIGHT */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-400 block">Texte de copyright</label>
+                        <input
+                          type="text"
+                          placeholder="ex: © 2026 Mon Entreprise. Tous droits réservés."
+                          value={pageCopyright}
+                          onChange={(e) => setPageCopyright(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
+                        />
+                      </div>
+
+                      {/* TAILLE TEXTE & COULEUR TEXTE */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+                            <span>Taille texte</span>
+                            <span>{copyrightFontSize || 12}px</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="9"
+                            max="24"
+                            value={copyrightFontSize || 12}
+                            onChange={(e) => setCopyrightFontSize(Number(e.target.value))}
+                            className="w-full accent-[#00A0FF] cursor-pointer"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-slate-400 font-bold block">Couleur du texte</span>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={copyrightTextColor || '#94a3b8'}
+                              onChange={(e) => setCopyrightTextColor(e.target.value)}
+                              className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                            />
+                            <span className="text-[10px] font-mono text-slate-400">{copyrightTextColor}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* LIGNE SÉPARATRICE (AFFICHER, COULEUR & OPACITÉ) */}
+                      <div className="space-y-3 pt-2 border-t border-slate-900">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-slate-300">Ligne séparatrice</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowCopyrightLine(!showCopyrightLine)}
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors ${
+                              showCopyrightLine ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-slate-800 text-slate-400'
+                            }`}
+                          >
+                            {showCopyrightLine ? 'Oui' : 'Non'}
+                          </button>
+                        </div>
+
+                        {showCopyrightLine && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <span className="text-[10px] text-slate-400 font-bold block">Couleur ligne</span>
+                              <input
+                                type="color"
+                                value={copyrightLineColor || '#334155'}
+                                onChange={(e) => setCopyrightLineColor(e.target.value)}
+                                className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+                                <span>Opacité ligne</span>
+                                <span>{copyrightLineOpacity ?? 40}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={copyrightLineOpacity ?? 40}
+                                onChange={(e) => setCopyrightLineOpacity(Number(e.target.value))}
+                                className="w-full accent-[#00A0FF] cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

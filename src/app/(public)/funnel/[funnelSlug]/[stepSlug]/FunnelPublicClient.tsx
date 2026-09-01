@@ -96,7 +96,13 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     }
   }
 
+  const showCopyright = parsedData?.showCopyright !== undefined ? parsedData.showCopyright : (step?.data?.showCopyright !== undefined ? step.data.showCopyright : true);
   const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
+  const copyrightFontSize = parsedData?.copyrightFontSize || step?.data?.copyrightFontSize || 12;
+  const copyrightTextColor = parsedData?.copyrightTextColor || step?.data?.copyrightTextColor || '#94a3b8';
+  const showCopyrightLine = parsedData?.showCopyrightLine !== undefined ? parsedData.showCopyrightLine : (step?.data?.showCopyrightLine !== undefined ? step.data.showCopyrightLine : true);
+  const copyrightLineColor = parsedData?.copyrightLineColor || step?.data?.copyrightLineColor || '#334155';
+  const copyrightLineOpacity = parsedData?.copyrightLineOpacity ?? step?.data?.copyrightLineOpacity ?? 40;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1084,9 +1090,28 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
           })}
         </div>
 
-        <div className="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
-          {pageCopyright}
-        </div>
+        {showCopyright && (
+          <div className="max-w-5xl mx-auto w-full text-center pt-6 pb-8">
+            {showCopyrightLine && (
+              <div
+                className="w-full mb-6 transition-opacity"
+                style={{
+                  borderTop: `1px solid ${copyrightLineColor}`,
+                  opacity: (copyrightLineOpacity ?? 40) / 100
+                }}
+              />
+            )}
+            <div
+              style={{
+                fontSize: `${copyrightFontSize || 12}px`,
+                color: copyrightTextColor || '#94a3b8'
+              }}
+              className="font-medium"
+            >
+              {pageCopyright}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1202,9 +1227,28 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
       </div>
 
       {/* FOOTER COPYRIGHT */}
-      <div className="max-w-6xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
-        {pageCopyright}
-      </div>
+      {showCopyright && (
+        <div className="max-w-6xl mx-auto w-full text-center pt-6 pb-8">
+          {showCopyrightLine && (
+            <div
+              className="w-full mb-6 transition-opacity"
+              style={{
+                borderTop: `1px solid ${copyrightLineColor}`,
+                opacity: (copyrightLineOpacity ?? 40) / 100
+              }}
+            />
+          )}
+          <div
+            style={{
+              fontSize: `${copyrightFontSize || 12}px`,
+              color: copyrightTextColor || '#94a3b8'
+            }}
+            className="font-medium"
+          >
+            {pageCopyright}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
