@@ -101,6 +101,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [isCloning, setIsCloning] = useState<boolean>(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
   const [cloneMode, setCloneMode] = useState<'replace' | 'append'>('replace');
+  const [cloneStyle, setCloneStyle] = useState<'raw' | 'native'>('raw');
 
   const handleClonePage = async () => {
     if (!cloneUrlInput.trim()) {
@@ -114,7 +115,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       const res = await fetch('/api/admin/clone-page', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: cloneUrlInput.trim() }),
+        body: JSON.stringify({ url: cloneUrlInput.trim(), mode: cloneStyle }),
       });
 
       const data = await res.json();
@@ -4537,7 +4538,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               </div>
 
               <div className="space-y-2 pt-1">
-                <label className="text-xs font-bold text-slate-300 block">Mode d importation</label>
+                <label className="text-xs font-bold text-slate-300 block">Style de Clonage</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setCloneStyle('raw')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      cloneStyle === 'raw'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-md ring-1 ring-amber-500/50'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>⚡ Copie Exacte HTML/CSS (Pixel-Perfect)</span>
+                    <span className="text-[9px] font-normal opacity-80">Rendu visuel 100% identique au site d origine</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCloneStyle('native')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      cloneStyle === 'native'
+                        ? 'bg-purple-600/20 border-purple-500 text-purple-300 shadow-md ring-1 ring-purple-500/50'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🎯 Blocs Natifs Éditables</span>
+                    <span className="text-[9px] font-normal opacity-80">Chaque titre et bouton séparé dans le Builder</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-bold text-slate-300 block font-heading">Destination du Canvas</label>
                 <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"

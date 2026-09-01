@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   let browser = null;
   try {
     const body = await req.json();
-    const { url } = body;
+    const { url, mode = 'native' } = body; // 'native' | 'raw'
 
     if (!url || typeof url !== 'string') {
       return NextResponse.json({ error: 'URL valide requise' }, { status: 400 });
@@ -29,16 +29,108 @@ export async function POST(req: Request) {
     );
 
     // Navigate and wait for DOM and network idle
-    await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 35000 });
 
     const pageTitle = await page.title();
     const now = Date.now();
 
-    // Execute in-browser DOM parsing with full CSS & JS capture
+    // MODE 1: RAW PIXEL-PERFECT HTML/CSS COPY
+    if (mode === 'raw') {
+      const rawData = await page.evaluate((baseUrl: string, nowVal: any) => {
+        // Rewrite relative URLs to absolute URLs
+        const makeAbs = (rel: string) => {
+          if (!rel) return '';
+          if (rel.startsWith('data:') || rel.startsWith('http://') || rel.startsWith('https://')) return rel;
+          try {
+            return new URL(rel, baseUrl).href;
+          } catch (e) {
+            return rel;
+          }
+        };
+
+        // Fix all img src and a href in DOM
+        document.querySelectorAll('img').forEach((img) => {
+          const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+          if (src) img.setAttribute('src', makeAbs(src));
+        });
+
+        document.querySelectorAll('a').forEach((a) => {
+          const href = a.getAttribute('href') || '';
+          if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+            a.setAttribute('href', makeAbs(href));
+          }
+        });
+
+        // 1. Extract CSS Stylesheet URLs and Inline CSS <style>
+        const stylesheetUrls: string[] = [];
+        document.querySelectorAll('link[rel="stylesheet"]').forEach((link: any) => {
+          if (link.href && !link.href.includes('google-analytics')) {
+            stylesheetUrls.push(makeAbs(link.getAttribute('href') || link.href));
+          }
+        });
+
+        let customCss = '';
+        document.querySelectorAll('style').forEach((styleEl: any) => {
+          const cssText = styleEl.textContent || '';
+          if (cssText.length > 5 && !cssText.includes('google-analytics')) {
+            customCss += cssText + '\n';
+          }
+        });
+
+        // 2. Extract JS Script URLs and Inline JS <script>
+        const scriptUrls: string[] = [];
+        document.querySelectorAll('script[src]').forEach((scriptEl: any) => {
+          const src = scriptEl.getAttribute('src');
+          if (src && !src.includes('google-analytics') && !src.includes('facebook') && !src.includes('gtm')) {
+            scriptUrls.push(makeAbs(src));
+          }
+        });
+
+        let customJs = '';
+        document.querySelectorAll('script:not([src])').forEach((scriptEl: any) => {
+          const jsText = scriptEl.textContent || '';
+          if (jsText.length > 5 && !jsText.includes('gtag') && !jsText.includes('fbq') && !jsText.includes('GoogleAnalytics')) {
+            customJs += jsText + '\n';
+          }
+        });
+
+        // Remove noise elements
+        document.querySelectorAll('script, nav.cookie, div.cookie, iframe[src*="facebook"]').forEach((el) => el.remove());
+
+        const bodyHtml = document.body ? document.body.innerHTML : '';
+
+        return [
+          {
+            id: `cloned-raw-${nowVal}`,
+            type: 'RawHTML',
+            category: 'Structure',
+            content: `Page Clonée Pixel-Perfect: ${document.title || 'Landing Page'}`,
+            data: {
+              rawHtml: bodyHtml,
+              customCss,
+              stylesheetUrls,
+              scriptUrls,
+              customJs,
+            },
+          },
+        ];
+      }, targetUrl, now);
+
+      await browser.close();
+      return NextResponse.json({
+        success: true,
+        elements: rawData,
+        sourceUrl: targetUrl,
+        title: pageTitle,
+        totalSections: 1,
+        mode: 'raw',
+      });
+    }
+
+    // MODE 2: NATIVE BUILDER BLOCKS CONVERSION
     const extractedData = await page.evaluate((nowVal: any) => {
       const results: any[] = [];
 
-      // 1. Extract CSS Stylesheets & Inline <style>
       const stylesheetUrls: string[] = [];
       Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach((link: any) => {
         if (link.href && !link.href.includes('google-analytics') && !link.href.includes('pixel')) {
@@ -54,7 +146,6 @@ export async function POST(req: Request) {
         }
       });
 
-      // 2. Extract JS Scripts & Inline <script>
       const scriptUrls: string[] = [];
       Array.from(document.querySelectorAll('script[src]')).forEach((scriptEl: any) => {
         const src = scriptEl.src;
@@ -71,13 +162,11 @@ export async function POST(req: Request) {
         }
       });
 
-      // Helper to check if element is visible
       const isVisible = (el: Element) => {
         const style = window.getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
       };
 
-      // Helper to convert rgb(r, g, b) to hex
       const rgbToHex = (rgb: string) => {
         if (!rgb || rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)') return 'transparent';
         const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -87,7 +176,6 @@ export async function POST(req: Request) {
 
       const cleanTextStr = (str: string) => str.replace(/\s+/g, ' ').trim();
 
-      // Find all sections or main layout blocks
       const sections = Array.from(
         document.querySelectorAll('section, header, footer, main, div[class*="section"], div[class*="hero"], div[class*="block"], div[class*="wrapper"], body > div')
       ).filter((sec) => isVisible(sec) && sec.clientHeight > 40);
@@ -99,7 +187,6 @@ export async function POST(req: Request) {
         const secBg = rgbToHex(secStyle.backgroundColor);
         const secTextCol = rgbToHex(secStyle.color);
 
-        // Find columns / rows inside this section
         const cols = Array.from(sec.querySelectorAll(':scope > div, :scope > .container > div, :scope > .row > div, :scope > .grid > div, [class*="col"]')).filter(
           (c) => isVisible(c) && c.clientWidth > 40
         );
@@ -112,7 +199,6 @@ export async function POST(req: Request) {
           const items: any[] = [];
           const textSet = new Set<string>();
 
-          // Find all buttons, headings, text, images, inputs
           const els = Array.from(rootEl.querySelectorAll('h1, h2, h3, h4, h5, h6, p, img, a, button, input, textarea, [class*="btn"], [class*="button"]')).filter(
             (e) => isVisible(e)
           );
@@ -125,7 +211,6 @@ export async function POST(req: Request) {
             const fg = rgbToHex(style.color);
             const className = e.className || '';
 
-            // BUTTONS / CTAs
             const isBtn = tag === 'button' || tag === 'a' || e.classList.contains('btn') || e.classList.contains('button') || e.getAttribute('role') === 'button';
             if (isBtn && text.length > 1 && text.length < 120 && !textSet.has(text)) {
               textSet.add(text);
@@ -146,7 +231,6 @@ export async function POST(req: Request) {
               return;
             }
 
-            // HEADINGS
             if (tag.startsWith('h') || e.classList.contains('title') || e.classList.contains('heading')) {
               if (text && text.length > 1 && !textSet.has(text)) {
                 textSet.add(text);
@@ -166,7 +250,6 @@ export async function POST(req: Request) {
               }
             }
 
-            // IMAGES
             if (tag === 'img') {
               const imgEl = e as HTMLImageElement;
               const src = imgEl.src || imgEl.getAttribute('data-src') || '';
@@ -186,7 +269,6 @@ export async function POST(req: Request) {
               }
             }
 
-            // PARAGRAPHS & TEXT
             if (tag === 'p' || tag === 'li') {
               if (text && text.length > 2 && !textSet.has(text)) {
                 textSet.add(text);
@@ -260,6 +342,7 @@ export async function POST(req: Request) {
       sourceUrl: targetUrl,
       title: pageTitle,
       totalSections: extractedData.length,
+      mode: 'native',
     });
   } catch (error: any) {
     if (browser) await browser.close();

@@ -224,6 +224,31 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
+            if (el.type === 'RawHTML' || el.type === 'CustomHtmlSection' || el.data?.rawHtml) {
+              const stylesheetUrls = el.data?.stylesheetUrls || [];
+              const customCss = el.data?.customCss || '';
+              const scriptUrls = el.data?.scriptUrls || [];
+              const customJs = el.data?.customJs || '';
+
+              return (
+                <React.Fragment key={el.id}>
+                  {stylesheetUrls.map((url: string, uIdx: number) => (
+                    <link key={`rawcss-${uIdx}`} rel="stylesheet" href={url} />
+                  ))}
+                  {customCss && (
+                    <style dangerouslySetInnerHTML={{ __html: customCss }} />
+                  )}
+                  <div className="w-full relative overflow-hidden" dangerouslySetInnerHTML={{ __html: el.data?.rawHtml || el.content }} />
+                  {scriptUrls.map((url: string, uIdx: number) => (
+                    <script key={`rawjs-${uIdx}`} src={url} defer />
+                  ))}
+                  {customJs && (
+                    <script dangerouslySetInnerHTML={{ __html: customJs }} />
+                  )}
+                </React.Fragment>
+              );
+            }
+
             if (el.type === 'Section' || el.type === 'BlockSectionFull') {
               const stylesheetUrls = el.data?.stylesheetUrls || [];
               const customCss = el.data?.customCss || '';
