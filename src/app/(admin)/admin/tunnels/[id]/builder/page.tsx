@@ -4107,7 +4107,71 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         </div>
                                       </div>
 
-                                      {/* INNER CLIPPED DIV FOR BACKGROUND, BORDER RADIUS, DASHED BORDER & CLIPPATH */}
+                                      {/* FLOATING HOVER TOOLBAR BADGE FOR IMAGE (ON OUTER OVERFLOW-VISIBLE CONTAINER FOR DIV) */}
+                                       {(() => {
+                                         const subChildren = child.data?.children || [];
+                                         const imgSubIdx = subChildren.findIndex((sc: any) => sc.type === 'Image');
+                                         if (imgSubIdx === -1 && child.type !== 'Image') return null;
+
+                                         const isImgSel = selectedSubItem?.parentBlockId === el.id && selectedSubItem?.childIndex === cIdx;
+
+                                         return (
+                                           <div
+                                             className={`absolute -top-3.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                               isImgSel ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto'
+                                             }`}
+                                           >
+                                             <div
+                                               style={{ color: '#ffffff' }}
+                                               className="bg-[#FF7A00] !text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer"
+                                               onClick={(e) => {
+                                                 e.stopPropagation();
+                                                 setSelectedElementId(el.id);
+                                                 setSelectedChildIndex(cIdx);
+                                                 if (imgSubIdx !== -1) {
+                                                   setSelectedSubItem({
+                                                     blockId: `${el.id}-c${cIdx}`,
+                                                     itemIndex: imgSubIdx,
+                                                     subType: 'image',
+                                                     childIndex: cIdx,
+                                                     parentBlockId: el.id,
+                                                   });
+                                                 }
+                                               }}
+                                             >
+                                               <span className="!text-white font-black" style={{ color: '#ffffff' }}>IMAGE</span>
+                                               <span>⬇️</span>
+                                             </div>
+                                             <div
+                                               style={{ color: '#ffffff' }}
+                                               className="bg-[#FF7A00] !text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-orange-300"
+                                             >
+                                               <button
+                                                 type="button"
+                                                 onClick={(e) => {
+                                                   e.stopPropagation();
+                                                   if (imgSubIdx !== -1) {
+                                                     const updatedSub = subChildren.filter((_: any, idx: number) => idx !== imgSubIdx);
+                                                     const updatedChildren = [...(el.data?.children || [])];
+                                                     updatedChildren[cIdx] = {
+                                                       ...updatedChildren[cIdx],
+                                                       data: { ...(updatedChildren[cIdx].data || {}), children: updatedSub },
+                                                     };
+                                                     handleUpdateElementData(el.id, { children: updatedChildren });
+                                                     setSelectedSubItem(null);
+                                                   }
+                                                 }}
+                                                 className="p-1 hover:bg-white/20 rounded transition-colors !text-white"
+                                                 title="Supprimer l image"
+                                               >
+                                                 <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                               </button>
+                                             </div>
+                                           </div>
+                                         );
+                                       })()}
+
+                                       {/* INNER CLIPPED DIV FOR BACKGROUND, BORDER RADIUS, DASHED BORDER & CLIPPATH */}
                                       <div
                                         style={{
                                           backgroundColor: child.data?.bgColor || child.data?.cardBgColor || 'transparent',
@@ -4399,7 +4463,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                     >
                                                       {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
                                                       <div
-                                                        className={`absolute -bottom-3.5 left-1/2 -translate-x-1/2 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                        className={`hidden absolute -bottom-3.5 left-1/2 -translate-x-1/2 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
