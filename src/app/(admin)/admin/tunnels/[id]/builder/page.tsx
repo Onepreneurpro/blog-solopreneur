@@ -4393,13 +4393,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         marginTop: imgMarginTop,
                                                         marginBottom: imgMarginBottom,
                                                       }}
-                                                      className={`relative group/subimg w-full cursor-pointer transition-all ${
+                                                      className={`relative group/subimg w-full overflow-visible z-40 cursor-pointer transition-all ${
                                                         isSubSel ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900' : 'hover:ring-1 hover:ring-amber-400/60'
                                                       }`}
                                                     >
                                                       {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
                                                       <div
-                                                        className={`absolute -top-3.5 right-2 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                        className={`absolute -top-3.5 right-2 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
