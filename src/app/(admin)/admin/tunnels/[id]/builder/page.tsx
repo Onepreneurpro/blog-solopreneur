@@ -278,38 +278,59 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   // Canvas elements state (starts clean and empty)
   const [elements, setElements] = useState<CanvasElement[]>([]);
 
-  // UNDO / REDO HISTORY SYSTEM
-  const [history, setHistory] = useState<CanvasElement[][]>([]);
-  const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  const isHistoryActionRef = useRef<boolean>(false);
+  // UNDO / REDO HISTORY SYSTEM (RELIABLE REF + STATE DRIVEN)
+  const historyRef = useRef<CanvasElement[][]>([]);
+  const historyIndexRef = useRef<number>(-1);
+  const isUndoRedoActionRef = useRef<boolean>(false);
+  const [canUndo, setCanUndo] = useState<boolean>(false);
+  const [canRedo, setCanRedo] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isHistoryActionRef.current) {
-      isHistoryActionRef.current = false;
+    if (isUndoRedoActionRef.current) {
+      isUndoRedoActionRef.current = false;
       return;
     }
-    setHistory((prevHistory) => {
-      const newHistory = prevHistory.slice(0, historyIndex + 1);
-      return [...newHistory, elements];
-    });
-    setHistoryIndex((prev) => prev + 1);
+    if (!elements) return;
+
+    // Deep clone current elements state snapshot
+    const snapshot = JSON.parse(JSON.stringify(elements));
+
+    // If we performed an action while viewing past history, truncate redo branch
+    const slicedHistory = historyRef.current.slice(0, historyIndexRef.current + 1);
+    const nextHistory = [...slicedHistory, snapshot];
+
+    historyRef.current = nextHistory;
+    historyIndexRef.current = nextHistory.length - 1;
+
+    setCanUndo(historyIndexRef.current > 0);
+    setCanRedo(false);
   }, [elements]);
 
   const handleUndo = () => {
-    if (historyIndex > 0) {
-      isHistoryActionRef.current = true;
-      const prevIndex = historyIndex - 1;
-      setHistoryIndex(prevIndex);
-      setElements(history[prevIndex]);
+    if (historyIndexRef.current > 0) {
+      isUndoRedoActionRef.current = true;
+      const targetIndex = historyIndexRef.current - 1;
+      historyIndexRef.current = targetIndex;
+
+      const targetSnapshot = JSON.parse(JSON.stringify(historyRef.current[targetIndex]));
+      setElements(targetSnapshot);
+
+      setCanUndo(targetIndex > 0);
+      setCanRedo(targetIndex < historyRef.current.length - 1);
     }
   };
 
   const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      isHistoryActionRef.current = true;
-      const nextIndex = historyIndex + 1;
-      setHistoryIndex(nextIndex);
-      setElements(history[nextIndex]);
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      isUndoRedoActionRef.current = true;
+      const targetIndex = historyIndexRef.current + 1;
+      historyIndexRef.current = targetIndex;
+
+      const targetSnapshot = JSON.parse(JSON.stringify(historyRef.current[targetIndex]));
+      setElements(targetSnapshot);
+
+      setCanUndo(targetIndex > 0);
+      setCanRedo(targetIndex < historyRef.current.length - 1);
     }
   };
 
@@ -332,7 +353,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [historyIndex, history]);
+  }, []);
 
   const handleImageMouseDown = (
     e: React.MouseEvent<HTMLImageElement>,
@@ -2444,9 +2465,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <button
               type="button"
               onClick={handleUndo}
-              disabled={historyIndex <= 0}
+              disabled={!canUndo}
               className={`p-1.5 rounded-lg transition-colors ${
-                historyIndex > 0
+                canUndo
                   ? 'text-slate-200 hover:text-white hover:bg-slate-800 cursor-pointer'
                   : 'text-slate-600 opacity-40 cursor-not-allowed'
               }`}
@@ -2457,9 +2478,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <button
               type="button"
               onClick={handleRedo}
-              disabled={historyIndex >= history.length - 1}
+              disabled={!canRedo}
               className={`p-1.5 rounded-lg transition-colors ${
-                historyIndex < history.length - 1
+                canRedo
                   ? 'text-slate-200 hover:text-white hover:bg-slate-800 cursor-pointer'
                   : 'text-slate-600 opacity-40 cursor-not-allowed'
               }`}
