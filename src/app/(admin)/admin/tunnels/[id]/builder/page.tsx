@@ -5258,13 +5258,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             );
                                             handleUpdateElementData(el.id, { children: updated });
                                           }}
-                                          className="w-full text-xl sm:text-2xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none"
+                                          style={{
+                                            color: child.data?.textColor || (el.data?.bgColor === '#ffffff' || !el.data?.bgColor || el.data?.bgColor === 'transparent' ? '#0F172A' : (el.data?.textColor || '#0F172A'))
+                                          }}
+                                          className="w-full text-xl sm:text-4xl font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none py-2 text-center"
                                         />
                                       )}
 
                                       {child.type === 'Text' && (
                                         <textarea
-                                          rows={3}
+                                          rows={2}
                                           value={child.content}
                                           onChange={(e) => {
                                             const updated = el.data.children.map((ch: any, i: number) =>
@@ -5272,7 +5275,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             );
                                             handleUpdateElementData(el.id, { children: updated });
                                           }}
-                                          className="w-full text-sm leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-y"
+                                          style={{
+                                            color: child.data?.textColor || (el.data?.bgColor === '#ffffff' || !el.data?.bgColor || el.data?.bgColor === 'transparent' ? '#0F172A' : (el.data?.textColor || '#0F172A'))
+                                          }}
+                                          className="w-full text-base sm:text-lg font-semibold leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-y py-1 text-center"
                                         />
                                       )}
 
