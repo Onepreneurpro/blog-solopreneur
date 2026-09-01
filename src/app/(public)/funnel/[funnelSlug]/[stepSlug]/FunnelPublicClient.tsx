@@ -96,7 +96,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     }
   }
 
-  const showCopyright = parsedData?.showCopyright !== undefined ? parsedData.showCopyright : (step?.data?.showCopyright !== undefined ? step.data.showCopyright : true);
+  const showCopyright = (parsedData && parsedData.showCopyright !== undefined) ? Boolean(parsedData.showCopyright) : ((step?.data && step.data.showCopyright !== undefined) ? Boolean(step.data.showCopyright) : true);
   const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
   const copyrightFontSize = parsedData?.copyrightFontSize || step?.data?.copyrightFontSize || 12;
   const copyrightTextColor = parsedData?.copyrightTextColor || step?.data?.copyrightTextColor || '#94a3b8';

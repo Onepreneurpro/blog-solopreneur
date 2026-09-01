@@ -3731,17 +3731,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
                       ©️ Pied de page & Copyright
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowCopyright(!showCopyright)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all ${
-                        showCopyright
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                      }`}
-                    >
-                      {showCopyright ? '👁️ Afficher' : '🙈 Masquer'}
-                    </button>
+                    <div className="flex items-center bg-slate-900 p-0.5 rounded-xl border border-slate-800 gap-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setShowCopyright(true)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
+                          showCopyright ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        👁️ Afficher
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCopyright(false)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all ${
+                          !showCopyright ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        🙈 Masquer
+                      </button>
+                    </div>
                   </div>
 
                   {showCopyright && (
