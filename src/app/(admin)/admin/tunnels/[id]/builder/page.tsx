@@ -145,6 +145,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [pageBgPosX, setPageBgPosX] = useState<number>(50);
   const [pageBgPosY, setPageBgPosY] = useState<number>(0);
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
+  const [childDropTarget, setChildDropTarget] = useState<{ blockId: string; childIndex: number; position: 'right' | 'bottom' } | null>(null);
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedSubItem, setSelectedSubItem] = useState<{
@@ -4736,10 +4737,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                               return (
                                 <div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
-                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap md:flex-nowrap gap-0'} items-stretch w-full relative flex-1 h-full`}
+                                  className={`flex ${previewMode === 'MOBILE' ? 'flex-col space-y-6' : 'flex-wrap gap-4'} items-stretch w-full relative flex-1 h-full`}
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
+                                      {child.data?.newRow && <div className="w-full basis-full h-0 shrink-0" />}
                                       <div
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -4751,23 +4753,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           e.preventDefault();
                                           e.stopPropagation();
                                           e.dataTransfer.dropEffect = 'move';
+                                          const rect = e.currentTarget.getBoundingClientRect();
+                                          const mouseY = e.clientY - rect.top;
+                                          const isBottom = mouseY > (rect.height * 0.5);
+                                          const pos = isBottom ? 'bottom' : 'right';
+                                          if (!childDropTarget || childDropTarget.blockId !== el.id || childDropTarget.childIndex !== cIdx || childDropTarget.position !== pos) {
+                                            setChildDropTarget({ blockId: el.id, childIndex: cIdx, position: pos });
+                                          }
                                         }}
+                                        onDragLeave={() => setChildDropTarget(null)}
                                         onDrop={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
+                                          const targetPos = childDropTarget?.position || 'right';
+                                          setChildDropTarget(null);
                                           try {
-                                            const raw = e.dataTransfer.getData('text/plain');
-                                            if (!raw) return;
-                                            const dragData = JSON.parse(raw);
-                                            if (dragData.type === 'BLOCK_SWAP' && dragData.parentId === el.id && dragData.index !== undefined && dragData.index !== cIdx) {
-                                              const currentChildren = [...(el.data?.children || [])];
-                                              const draggedBlock = currentChildren[dragData.index];
-                                              currentChildren.splice(dragData.index, 1);
-                                              currentChildren.splice(cIdx, 0, draggedBlock);
-                                              handleUpdateElementData(el.id, { children: currentChildren });
-                                              setSelectedChildIndex(cIdx);
+                                            const dataStr = e.dataTransfer.getData('application/json');
+                                            const textRaw = e.dataTransfer.getData('text/plain');
+                                            
+                                            if (textRaw) {
+                                              const dragData = JSON.parse(textRaw);
+                                              if (dragData.type === 'BLOCK_SWAP' && dragData.parentId === el.id && dragData.index !== undefined) {
+                                                const currentChildren = [...(el.data?.children || [])];
+                                                const [moved] = currentChildren.splice(dragData.index, 1);
+                                                moved.data = { ...(moved.data || {}), newRow: targetPos === 'bottom' };
+                                                const targetIdx = targetPos === 'bottom' ? cIdx + 1 : cIdx + 1;
+                                                currentChildren.splice(targetIdx > dragData.index ? targetIdx - 1 : targetIdx, 0, moved);
+                                                handleUpdateElementData(el.id, { children: currentChildren });
+                                                setSelectedChildIndex(cIdx);
+                                                return;
+                                              }
                                             }
-                                          } catch (err) {}
+
+                                            if (dataStr) {
+                                              const data = JSON.parse(dataStr);
+                                              const newChild: CanvasElement = {
+                                                id: `child-${Date.now()}`,
+                                                type: data.type || 'ContentBox',
+                                                category: data.category || 'Disposition',
+                                                content: data.defaultContent || 'Conteneur DIV',
+                                                data: {
+                                                  ...getDefaultBlockData(data.type, data.defaultContent),
+                                                  newRow: targetPos === 'bottom',
+                                                },
+                                              };
+                                              const currentChildren = [...(el.data?.children || [])];
+                                              currentChildren.splice(cIdx + 1, 0, newChild);
+                                              handleUpdateElementData(el.id, { children: currentChildren });
+                                              setSelectedChildIndex(cIdx + 1);
+                                            }
+                                          } catch (err) { console.error(err); }
                                         }}
                                         style={{
                                           flex: previewMode === 'MOBILE' ? '1 1 100%' : `0 0 ${colWidths[cIdx]}%`,
@@ -4777,6 +4812,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                         }}
                                         className="relative group/child flex flex-col flex-1 h-full overflow-visible z-40">
+                                      {/* VISUAL DROP TARGET INDICATOR (RIGHT OR BOTTOM) */}
+                                      {childDropTarget?.blockId === el.id && childDropTarget?.childIndex === cIdx && (
+                                        <div className={`absolute z-[1000] pointer-events-none transition-all flex items-center justify-center ${
+                                          childDropTarget.position === 'bottom'
+                                            ? '-bottom-3 left-0 right-0 h-1 bg-[#00A0FF] shadow-[0_0_12px_#00A0FF]'
+                                            : '-right-3 top-0 bottom-0 w-1 bg-[#00A0FF] shadow-[0_0_12px_#00A0FF]'
+                                        }`}>
+                                          <span className="bg-[#00A0FF] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-lg whitespace-nowrap">
+                                            {childDropTarget.position === 'bottom' ? '⬇️ Placer en dessous (Nouvelle Ligne)' : '➡️ Placer à côté (Même Ligne)'}
+                                          </span>
+                                        </div>
+                                      )}
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
                                         className="absolute -top-3.5 left-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
