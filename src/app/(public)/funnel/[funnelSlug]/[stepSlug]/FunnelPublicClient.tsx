@@ -463,7 +463,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       });
 
                       return (
-                        <div className="flex flex-col md:flex-row gap-6 md:gap-0 items-stretch w-full flex-1 h-full">
+                        <div className="flex flex-wrap gap-0 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
                               flex: `0 0 ${colWidths[cIdx]}%`,
