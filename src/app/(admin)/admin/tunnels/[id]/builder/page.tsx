@@ -4724,7 +4724,57 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                             {/* RENDER NESTED CHILDREN INSIDE THE FULL SECTION */}
                             {(!el.data?.children || el.data.children.length === 0) ? (
-                              <div className="w-full min-h-[120px] border border-dashed border-slate-300 rounded-lg bg-white" />
+                              <div className="w-full min-h-[140px] border-2 border-dashed border-[#00A0FF]/40 rounded-2xl bg-[#00A0FF]/5 p-6 flex flex-col items-center justify-center gap-3 text-center transition-all hover:bg-[#00A0FF]/10 select-none">
+                                <div className="text-xs font-heading font-black text-slate-300 uppercase tracking-wider">
+                                  ⚡ Section HTML5 Vide — Glissez des éléments ou créez la structure :
+                                </div>
+                                <div className="flex items-center gap-2 flex-wrap justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const newDiv: CanvasElement = {
+                                        id: `child-${Date.now()}`,
+                                        type: 'ContentBox',
+                                        category: 'Disposition',
+                                        content: 'Conteneur DIV 1200px',
+                                        data: { ...getDefaultBlockData('ContentBox', 'Conteneur DIV 1200px') },
+                                      };
+                                      handleUpdateElementData(el.id, { children: [...(el.data?.children || []), newDiv] });
+                                    }}
+                                    className="px-3.5 py-2 bg-[#00A0FF] hover:bg-[#0082D6] text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
+                                  >
+                                    <span>📦 Ajouter 1 DIV Conteneur (1200px)</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const div1: CanvasElement = { id: `child-${Date.now()}-1`, type: 'ContentBox', category: 'Disposition', content: 'DIV Colonne 1', data: getDefaultBlockData('ContentBox', 'DIV Colonne 1') };
+                                      const div2: CanvasElement = { id: `child-${Date.now()}-2`, type: 'ContentBox', category: 'Disposition', content: 'DIV Colonne 2', data: getDefaultBlockData('ContentBox', 'DIV Colonne 2') };
+                                      handleUpdateElementData(el.id, { children: [...(el.data?.children || []), div1, div2] });
+                                    }}
+                                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-extrabold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
+                                  >
+                                    <span>📦 Ajouter Ligne 2 DIVs (2 Colonnes)</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const div1: CanvasElement = { id: `child-${Date.now()}-1`, type: 'ContentBox', category: 'Disposition', content: 'DIV Col 1', data: getDefaultBlockData('ContentBox', 'DIV Col 1') };
+                                      const div2: CanvasElement = { id: `child-${Date.now()}-2`, type: 'ContentBox', category: 'Disposition', content: 'DIV Col 2', data: getDefaultBlockData('ContentBox', 'DIV Col 2') };
+                                      const div3: CanvasElement = { id: `child-${Date.now()}-3`, type: 'ContentBox', category: 'Disposition', content: 'DIV Col 3', data: getDefaultBlockData('ContentBox', 'DIV Col 3') };
+                                      handleUpdateElementData(el.id, { children: [...(el.data?.children || []), div1, div2, div3] });
+                                    }}
+                                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-extrabold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer transition-all"
+                                  >
+                                    <span>📦 Ajouter Ligne 3 DIVs (3 Colonnes)</span>
+                                  </button>
+                                </div>
+                              </div>
                             ) : (() => {
                               const childrenList = el.data?.children || [];
                               const numCols = childrenList.length;
