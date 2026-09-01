@@ -2756,13 +2756,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div
                         className={`text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md ${
                           el.type === 'Section' || el.type === 'BlockSectionFull'
-                            ? 'bg-purple-600'
+                            ? 'bg-[#00A0FF]'
                             : el.type === 'ContentBox'
                             ? 'bg-sky-500'
                             : 'bg-[#FF7700]'
                         }`}
                       >
-                        <span>{el.type === 'Section' ? 'Section HTML5' : el.type === 'ContentBox' ? 'Conteneur DIV' : el.type}</span>
+                        <span>{el.type === 'Section' || el.type === 'BlockSectionFull' ? 'Section' : el.type === 'ContentBox' ? 'Conteneur DIV' : el.type}</span>
                         <span className="text-[10px]">⬇️</span>
                       </div>
 
@@ -2770,7 +2770,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div
                         className={`text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
                           el.type === 'Section' || el.type === 'BlockSectionFull'
-                            ? 'bg-purple-600 border-purple-700'
+                            ? 'bg-[#00A0FF] border-blue-400'
                             : el.type === 'ContentBox'
                             ? 'bg-sky-500 border-sky-600'
                             : 'bg-[#FF7700] border-amber-600'
@@ -3443,7 +3443,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                             marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                           }}
-                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between p-0`}
+                          className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-slate-300 hover:border-[#00A0FF] flex flex-col justify-between p-0`}
                         >
                           {/* OVERLAY TINT FOR READABILITY */}
                           {bgOverlay > 0 && (
@@ -3469,8 +3469,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   className="text-xl sm:text-2xl font-heading font-black bg-transparent outline-none border-b border-transparent focus:border-[#00A0FF] w-full max-w-xl"
                                   placeholder="Titre de la Section..."
                                 />
-                                <span className="text-[10px] font-bold text-purple-300 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-700 shrink-0 flex items-center gap-1.5 shadow-sm">
-                                  🏛️ Section HTML5 (100% Plein Écran)
+                                <span className="text-[10px] font-bold text-[#00A0FF] bg-blue-50 px-3 py-1 rounded-full border border-blue-200 shrink-0 flex items-center gap-1.5 shadow-sm">
+                                  Section
                                 </span>
                               </div>
                             )}
