@@ -79,16 +79,17 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Check if content is saved Maison Builder customElements array
+  // Check if content is saved Maison Builder customElements array & page metadata
   let customElements: any[] | null = null;
+  let parsedData: any = null;
 
   if (step?.content) {
     try {
-      const parsed = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
-      if (Array.isArray(parsed)) {
-        customElements = parsed;
-      } else if (parsed?.elements && Array.isArray(parsed.elements)) {
-        customElements = parsed.elements;
+      parsedData = typeof step.content === 'string' ? JSON.parse(step.content) : step.content;
+      if (Array.isArray(parsedData)) {
+        customElements = parsedData;
+      } else if (parsedData?.elements && Array.isArray(parsedData.elements)) {
+        customElements = parsedData.elements;
       }
     } catch (e) {
       console.error('Error parsing step content:', e);
@@ -179,13 +180,13 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         ? 'max-w-6xl mx-auto w-full'
         : 'max-w-4xl mx-auto w-full';
 
-    const pageDir = step?.data?.pageDir || (step?.data?.pageLang === 'ar' ? 'rtl' : 'ltr');
-    const pageBgColor = step?.data?.pageBgColor || '#020617';
-    const pageBgImage = step?.data?.pageBgImage || '';
-    const pageBgSize = step?.data?.pageBgSize || 'cover';
-    const pageBgZoom = step?.data?.pageBgZoom || 100;
-    const pageBgPosX = step?.data?.pageBgPosX ?? 50;
-    const pageBgPosY = step?.data?.pageBgPosY ?? 0;
+    const pageBgColor = parsedData?.pageBgColor || step?.data?.pageBgColor || '#020617';
+    const pageBgImage = parsedData?.pageBgImage || step?.data?.pageBgImage || '';
+    const pageBgSize = parsedData?.pageBgSize || step?.data?.pageBgSize || 'cover';
+    const pageBgZoom = parsedData?.pageBgZoom ?? step?.data?.pageBgZoom ?? 100;
+    const pageBgPosX = parsedData?.pageBgPosX ?? step?.data?.pageBgPosX ?? 50;
+    const pageBgPosY = parsedData?.pageBgPosY ?? step?.data?.pageBgPosY ?? 0;
+    const pageDir = parsedData?.pageDir || step?.data?.pageDir || ((parsedData?.pageLang || step?.data?.pageLang) === 'ar' ? 'rtl' : 'ltr');
 
     return (
     <div

@@ -351,6 +351,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 if (foundMode && ['standard', 'wide', 'full'].includes(foundMode)) {
                   setPageWidthMode(foundMode);
                 }
+              } else if (parsed && typeof parsed === 'object') {
+                if (Array.isArray(parsed.elements)) setElements(parsed.elements);
+                if (parsed.pageBgColor) setPageBgColor(parsed.pageBgColor);
+                if (parsed.pageBgImage) setPageBgImage(parsed.pageBgImage);
+                if (parsed.pageBgSize) setPageBgSize(parsed.pageBgSize);
+                if (parsed.pageBgZoom !== undefined) setPageBgZoom(parsed.pageBgZoom);
+                if (parsed.pageBgPosX !== undefined) setPageBgPosX(parsed.pageBgPosX);
+                if (parsed.pageBgPosY !== undefined) setPageBgPosY(parsed.pageBgPosY);
+                if (parsed.pageWidthMode) setPageWidthMode(parsed.pageWidthMode);
+                if (parsed.pageLang) setPageLang(parsed.pageLang);
+                if (parsed.pageDir) setPageDir(parsed.pageDir);
+                if (parsed.pageFont) setPageFont(parsed.pageFont);
               } else {
                 setElements([]);
               }
@@ -1116,7 +1128,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stepId: step.id,
-          content: JSON.stringify(elements),
+          content: JSON.stringify({
+            elements,
+            pageBgColor,
+            pageBgImage,
+            pageBgSize,
+            pageBgZoom,
+            pageBgPosX,
+            pageBgPosY,
+            pageWidthMode,
+            pageLang,
+            pageDir,
+            pageFont,
+          }),
         }),
       });
 
@@ -3535,23 +3559,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   
                   {/* COULEUR DE FOND */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400 font-bold">Couleur de fond</span>
-                      <input
-                        type="color"
-                        value={pageBgColor || '#020617'}
-                        onChange={(e) => setPageBgColor(e.target.value)}
-                        className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
-                      />
-                    </div>
-                    {/* PRESETS DE COULEURS */}
-                    <div className="flex items-center gap-1.5 pt-1">
-                      {['#020617', '#ffffff', '#0f172a', '#1e1b4b', '#064e3b', '#78350f', '#881337', '#000000'].map((c) => (
+                    <span className="text-slate-400 font-bold block">Couleur de fond</span>
+                    
+                    {/* SÉLECTEUR PERSONNALISÉ EN DÉBUT DE LIGNE + PASTILLES VIVES */}
+                    <div className="flex items-center gap-2 pt-1 flex-wrap">
+                      <div className="relative group cursor-pointer" title="Choisir une couleur personnalisée sur mesure">
+                        <input
+                          type="color"
+                          value={pageBgColor || '#020617'}
+                          onChange={(e) => setPageBgColor(e.target.value)}
+                          className="w-7 h-7 rounded-lg cursor-pointer border-2 border-[#00A0FF] bg-transparent p-0 shadow-sm transition-transform hover:scale-110"
+                        />
+                      </div>
+
+                      {['#FFFFFF', '#EF4444', '#3B82F6', '#22C55E', '#EAB308', '#A855F7', '#F97316', '#000000', '#020617'].map((c) => (
                         <button
                           key={c}
                           type="button"
                           onClick={() => setPageBgColor(c)}
-                          className="w-5 h-5 rounded-full border border-slate-700 transition-transform hover:scale-110"
+                          className={`w-6 h-6 rounded-full border border-slate-700 transition-all hover:scale-110 ${
+                            pageBgColor?.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-[#00A0FF] scale-110' : ''
+                          }`}
                           style={{ backgroundColor: c }}
                           title={c}
                         />
