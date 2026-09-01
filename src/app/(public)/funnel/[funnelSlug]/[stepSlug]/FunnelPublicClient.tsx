@@ -30,6 +30,8 @@ const renderBorderStyles = (data: any) => {
       borderImageSlice: '6',
       borderImageRepeat: 'repeat',
       borderRadius,
+      backgroundClip: 'padding-box',
+      WebkitBackgroundClip: 'padding-box',
     };
   }
 
@@ -38,6 +40,8 @@ const renderBorderStyles = (data: any) => {
     borderWidth: `${bWidth}px`,
     borderColor: bColor,
     borderRadius,
+    backgroundClip: 'padding-box',
+    WebkitBackgroundClip: 'padding-box',
   };
 };
 
