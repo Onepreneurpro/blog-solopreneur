@@ -126,7 +126,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [funnel, setFunnel] = useState<any>(null);
   const [step, setStep] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS'>('ELEMENTS');
+  const [activeTab, setActiveTab] = useState<'ELEMENTS' | 'BLOCKS' | 'SETTINGS'>('ELEMENTS');
+  const [pageLang, setPageLang] = useState<string>('fr');
+  const [pageDir, setPageDir] = useState<'ltr' | 'rtl'>('ltr');
+  const [pageFont, setPageFont] = useState<string>('Inter');
+  const [pageBgColor, setPageBgColor] = useState<string>('#020617');
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
@@ -2795,7 +2799,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           <div className="h-5 w-px bg-slate-800" />
 
           {/* PARAMÈTRES DU TUNNEL */}
-          <button className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedElementId(null);
+              setActiveTab('SETTINGS');
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'SETTINGS' && !selectedElementId
+                ? 'bg-[#00A0FF] text-white shadow-sm'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+            }`}
+            title="Ouvrir les Paramètres de la Page (Taille, Langue, RTL Arabe, Polices)"
+          >
             <Sliders className="w-3.5 h-3.5 text-[#00A0FF]" />
             <span>Paramètres</span>
           </button>
@@ -2900,11 +2916,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div className="w-80 sm:w-96 md:w-[410px] max-w-[90vw] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-full overflow-hidden transition-all">
           {!selectedElementId ? (
             <React.Fragment>
-              {/* TABS: ÉLÉMENTS / BLOCS / PC-MOBILE */}
-              <div className="p-2 border-b border-slate-800 grid grid-cols-3 gap-1.5 bg-slate-950 shrink-0">
+              {/* TABS: ÉLÉMENTS / BLOCS / PARAMÈTRES / PC-MOBILE */}
+              <div className="p-2 border-b border-slate-800 grid grid-cols-4 gap-1 bg-slate-950 shrink-0">
                 <button
                   onClick={() => setActiveTab('ELEMENTS')}
-                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
                     activeTab === 'ELEMENTS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -2912,15 +2928,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </button>
                 <button
                   onClick={() => setActiveTab('BLOCKS')}
-                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all ${
+                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
                     activeTab === 'BLOCKS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Blocs
                 </button>
                 <button
+                  onClick={() => setActiveTab('SETTINGS')}
+                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all ${
+                    activeTab === 'SETTINGS' ? 'bg-[#00A0FF] !text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  ⚙️ Paramètres
+                </button>
+                <button
                   onClick={() => setPreviewMode(previewMode === 'DESKTOP' ? 'MOBILE' : 'DESKTOP')}
-                  className={`py-2 text-xs font-heading font-black rounded-xl transition-all flex items-center justify-center gap-1 border ${
+                  className={`py-2 text-[11px] font-heading font-black rounded-xl transition-all flex items-center justify-center gap-0.5 border ${
                     previewMode === 'MOBILE'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs font-extrabold'
                       : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
@@ -3425,6 +3449,132 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 )}
               </div>
             )}
+
+            {/* TAB CONTENT FOR PAGE SETTINGS (PARAMÈTRES DE LA PAGE) */}
+            {activeTab === 'SETTINGS' && (
+              <div className="space-y-5 text-xs animate-in fade-in duration-200">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 font-heading font-black text-sm text-white">
+                    <Sliders className="w-4 h-4 text-[#00A0FF]" />
+                    <span>Paramètres de la Page</span>
+                  </div>
+                </div>
+
+                {/* 1. LARGEUR DE LA PAGE */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    📐 Dimensions de la Page (Largeur du Canevas)
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleSetPageWidthMode('standard')}
+                      className={`p-2.5 rounded-xl border text-[11px] font-bold flex flex-col items-center gap-1 transition-all ${
+                        pageWidthMode === 'standard'
+                          ? 'bg-[#00A0FF]/20 border-[#00A0FF] text-white shadow-md'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>📱 Standard</span>
+                      <span className="text-[9px] font-mono opacity-70">896px</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSetPageWidthMode('wide')}
+                      className={`p-2.5 rounded-xl border text-[11px] font-bold flex flex-col items-center gap-1 transition-all ${
+                        pageWidthMode === 'wide'
+                          ? 'bg-[#00A0FF]/20 border-[#00A0FF] text-white shadow-md'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>💻 Large</span>
+                      <span className="text-[9px] font-mono opacity-70">1152px</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSetPageWidthMode('full')}
+                      className={`p-2.5 rounded-xl border text-[11px] font-bold flex flex-col items-center gap-1 transition-all ${
+                        pageWidthMode === 'full'
+                          ? 'bg-[#00A0FF]/20 border-[#00A0FF] text-white shadow-md'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>🖥️ Plein Écran</span>
+                      <span className="text-[9px] font-mono opacity-70">100%</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. LANGUE DE LA PAGE & SENS DE LECTURE (RTL ARABE / LTR) */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    🌐 Langue de la page & Direction
+                  </label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 block">Choisir la langue</label>
+                    <select
+                      value={pageLang}
+                      onChange={(e) => {
+                        const lang = e.target.value;
+                        const dir = lang === 'ar' ? 'rtl' : 'ltr';
+                        setPageLang(lang);
+                        setPageDir(dir);
+                      }}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF] cursor-pointer"
+                    >
+                      <option value="fr">🇫🇷 Français (French - LTR)</option>
+                      <option value="en">🇬🇧 Anglais (English - LTR)</option>
+                      <option value="ar">🇦🇪 Arabe (العربية - RTL Droite à Gauche)</option>
+                      <option value="es">🇪🇸 Espagnol (Español - LTR)</option>
+                      <option value="de">🇩🇪 Allemand (Deutsch - LTR)</option>
+                    </select>
+                  </div>
+                  {pageDir === 'rtl' && (
+                    <div className="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-300 font-bold flex items-center gap-2">
+                      <span>✨ Mode RTL Actif (Texte & Alignements Droite à Gauche)</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. POLICES DES TITRES & DU TEXTE */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    🔤 Polices des titres & du texte
+                  </label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 block">Type de police des Titres</label>
+                    <select
+                      value={pageFont}
+                      onChange={(e) => setPageFont(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF] cursor-pointer"
+                    >
+                      <option value="Inter">Same font as page (Inter)</option>
+                      <option value="Poppins">Poppins (Moderne & Gras)</option>
+                      <option value="Montserrat">Montserrat (Élégant)</option>
+                      <option value="Roboto">Roboto (Clean)</option>
+                      <option value="Playfair Display">Playfair Display (Serif)</option>
+                      <option value="Tajawal">Tajawal (Spécial Arabe RTL)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* 4. ARRIÈRE-PLAN GLOBAL DE LA PAGE */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    🎨 Arrière-plan global de la page
+                  </label>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Couleur d arrière-plan</span>
+                    <input
+                      type="color"
+                      value={pageBgColor}
+                      onChange={(e) => setPageBgColor(e.target.value)}
+                      className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </React.Fragment>
       ) : (
@@ -3446,6 +3596,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           className="flex-1 bg-slate-950 p-0 overflow-y-auto h-full flex justify-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900"
         >
           <div
+            dir={pageDir}
             className={`w-full bg-transparent rounded-none border-0 p-0 overflow-visible min-h-screen pb-52 shadow-none transition-all ${
               previewMode === 'MOBILE'
                 ? 'max-w-sm'

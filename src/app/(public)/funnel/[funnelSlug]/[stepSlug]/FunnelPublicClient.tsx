@@ -179,8 +179,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         ? 'max-w-6xl mx-auto w-full'
         : 'max-w-4xl mx-auto w-full';
 
+    const pageDir = step?.data?.pageDir || (step?.data?.pageLang === 'ar' ? 'rtl' : 'ltr');
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-x-hidden">
+      <div dir={pageDir} className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-x-hidden">
         <div className={`${publicWidthClass} flex-1`}>
           {customElements.map((el: any, index: number) => {
             if (el.type === 'BlockNavArizona') {
