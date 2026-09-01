@@ -1539,44 +1539,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 {/* 1. MARGE INTERNE VERTICALE (PADDING Y) */}
                 <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${openMarginDetail.paddingY ? 'text-slate-500' : 'text-slate-300'}`}>
                       Padding Vertical (Y)
                     </span>
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                      <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border transition-all ${
+                        openMarginDetail.paddingY
+                          ? 'bg-slate-950/40 border-slate-800/80 opacity-50'
+                          : 'bg-slate-950 border-slate-700'
+                      }`}>
                         <input
                           type="number"
-                          value={padYVal}
+                          disabled={openMarginDetail.paddingY}
+                          value={openMarginDetail.paddingY ? (padTop === padBottom ? padTop : padYVal) : padYVal}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             updateMarginData({ paddingY: val, paddingTop: val, paddingBottom: val });
                           }}
-                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          className={`w-8 bg-transparent text-right font-mono text-[11px] font-bold outline-none ${
+                            openMarginDetail.paddingY ? 'text-slate-500 cursor-not-allowed' : 'text-white'
+                          }`}
                         />
-                        <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        <span className={`text-[9px] font-mono ${openMarginDetail.paddingY ? 'text-slate-600' : 'text-slate-400'}`}>px</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setOpenMarginDetail(prev => ({ ...prev, paddingY: !prev.paddingY }))}
                         className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
-                        title={openMarginDetail.paddingY ? 'Masquer le détail Haut/Bas' : 'Afficher le détail Haut/Bas'}
+                        title={openMarginDetail.paddingY ? 'Fermer pour réactiver la barre principale' : 'Ouvrir pour régler Haut/Bas séparément'}
                       >
                         {openMarginDetail.paddingY ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* BARRE PRINCIPALE PADDING Y (SYNCHRONISÉE) */}
+                  {/* BARRE PRINCIPALE PADDING Y (DÉSACTIVÉE ET GRISE QUAND FLÈCHE OUVERTE) */}
                   <input
                     type="range"
                     min={-50}
                     max={150}
+                    disabled={openMarginDetail.paddingY}
                     value={padYVal}
                     onChange={(e) => {
                       const val = Number(e.target.value);
                       updateMarginData({ paddingY: val, paddingTop: val, paddingBottom: val });
                     }}
-                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                    className={`w-full min-w-0 h-1.5 transition-all ${
+                      openMarginDetail.paddingY
+                        ? 'opacity-30 grayscale cursor-not-allowed accent-slate-600'
+                        : 'accent-[#00A0FF] cursor-pointer'
+                    }`}
                   />
 
                   {/* SOUS-BARRES DÉTAILLÉES HAUT & BAS (SUR CLIC FLECHE) */}
@@ -1591,7 +1603,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={padTop}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ paddingTop: val, paddingY: val });
+                            updateMarginData({ paddingTop: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1607,7 +1619,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={padBottom}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ paddingBottom: val, paddingY: val });
+                            updateMarginData({ paddingBottom: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1620,44 +1632,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 {/* 2. MARGE INTERNE HORIZONTALE (PADDING X) */}
                 <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${openMarginDetail.paddingX ? 'text-slate-500' : 'text-slate-300'}`}>
                       Padding Horizontal (X)
                     </span>
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                      <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border transition-all ${
+                        openMarginDetail.paddingX
+                          ? 'bg-slate-950/40 border-slate-800/80 opacity-50'
+                          : 'bg-slate-950 border-slate-700'
+                      }`}>
                         <input
                           type="number"
-                          value={padXVal}
+                          disabled={openMarginDetail.paddingX}
+                          value={openMarginDetail.paddingX ? (padLeft === padRight ? padLeft : padXVal) : padXVal}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             updateMarginData({ paddingX: val, paddingLeft: val, paddingRight: val });
                           }}
-                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          className={`w-8 bg-transparent text-right font-mono text-[11px] font-bold outline-none ${
+                            openMarginDetail.paddingX ? 'text-slate-500 cursor-not-allowed' : 'text-white'
+                          }`}
                         />
-                        <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        <span className={`text-[9px] font-mono ${openMarginDetail.paddingX ? 'text-slate-600' : 'text-slate-400'}`}>px</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setOpenMarginDetail(prev => ({ ...prev, paddingX: !prev.paddingX }))}
                         className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
-                        title={openMarginDetail.paddingX ? 'Masquer le détail Gauche/Droite' : 'Afficher le détail Gauche/Droite'}
+                        title={openMarginDetail.paddingX ? 'Fermer pour réactiver la barre principale' : 'Ouvrir pour régler Gauche/Droite séparément'}
                       >
                         {openMarginDetail.paddingX ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* BARRE PRINCIPALE PADDING X (SYNCHRONISÉE) */}
+                  {/* BARRE PRINCIPALE PADDING X (DÉSACTIVÉE ET GRISE QUAND FLÈCHE OUVERTE) */}
                   <input
                     type="range"
                     min={-50}
                     max={150}
+                    disabled={openMarginDetail.paddingX}
                     value={padXVal}
                     onChange={(e) => {
                       const val = Number(e.target.value);
                       updateMarginData({ paddingX: val, paddingLeft: val, paddingRight: val });
                     }}
-                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                    className={`w-full min-w-0 h-1.5 transition-all ${
+                      openMarginDetail.paddingX
+                        ? 'opacity-30 grayscale cursor-not-allowed accent-slate-600'
+                        : 'accent-[#00A0FF] cursor-pointer'
+                    }`}
                   />
 
                   {/* SOUS-BARRES DÉTAILLÉES GAUCHE & DROITE (SUR CLIC FLECHE) */}
@@ -1672,7 +1696,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={padLeft}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ paddingLeft: val, paddingX: val });
+                            updateMarginData({ paddingLeft: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1688,7 +1712,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={padRight}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ paddingRight: val, paddingX: val });
+                            updateMarginData({ paddingRight: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1701,44 +1725,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 {/* 3. MARGE EXTERNE VERTICALE (MARGIN Y) */}
                 <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${openMarginDetail.marginY ? 'text-slate-500' : 'text-slate-300'}`}>
                       Margin Vertical (Y)
                     </span>
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                      <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border transition-all ${
+                        openMarginDetail.marginY
+                          ? 'bg-slate-950/40 border-slate-800/80 opacity-50'
+                          : 'bg-slate-950 border-slate-700'
+                      }`}>
                         <input
                           type="number"
-                          value={marginYVal}
+                          disabled={openMarginDetail.marginY}
+                          value={openMarginDetail.marginY ? (marginTop === marginBottom ? marginTop : marginYVal) : marginYVal}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             updateMarginData({ marginY: val, marginTop: val, marginBottom: val });
                           }}
-                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          className={`w-8 bg-transparent text-right font-mono text-[11px] font-bold outline-none ${
+                            openMarginDetail.marginY ? 'text-slate-500 cursor-not-allowed' : 'text-white'
+                          }`}
                         />
-                        <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        <span className={`text-[9px] font-mono ${openMarginDetail.marginY ? 'text-slate-600' : 'text-slate-400'}`}>px</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setOpenMarginDetail(prev => ({ ...prev, marginY: !prev.marginY }))}
                         className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
-                        title={openMarginDetail.marginY ? 'Masquer le détail Haut/Bas' : 'Afficher le détail Haut/Bas'}
+                        title={openMarginDetail.marginY ? 'Fermer pour réactiver la barre principale' : 'Ouvrir pour régler Haut/Bas séparément'}
                       >
                         {openMarginDetail.marginY ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* BARRE PRINCIPALE MARGIN Y (SYNCHRONISÉE) */}
+                  {/* BARRE PRINCIPALE MARGIN Y (DÉSACTIVÉE ET GRISE QUAND FLÈCHE OUVERTE) */}
                   <input
                     type="range"
                     min={-50}
                     max={150}
+                    disabled={openMarginDetail.marginY}
                     value={marginYVal}
                     onChange={(e) => {
                       const val = Number(e.target.value);
                       updateMarginData({ marginY: val, marginTop: val, marginBottom: val });
                     }}
-                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                    className={`w-full min-w-0 h-1.5 transition-all ${
+                      openMarginDetail.marginY
+                        ? 'opacity-30 grayscale cursor-not-allowed accent-slate-600'
+                        : 'accent-[#00A0FF] cursor-pointer'
+                    }`}
                   />
 
                   {/* SOUS-BARRES DÉTAILLÉES HAUT & BAS (SUR CLIC FLECHE) */}
@@ -1753,7 +1789,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={marginTop}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ marginTop: val, marginY: val });
+                            updateMarginData({ marginTop: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1769,7 +1805,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={marginBottom}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ marginBottom: val, marginY: val });
+                            updateMarginData({ marginBottom: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1782,44 +1818,56 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 {/* 4. MARGE EXTERNE HORIZONTALE (MARGIN X) */}
                 <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${openMarginDetail.marginX ? 'text-slate-500' : 'text-slate-300'}`}>
                       Margin Horizontal (X)
                     </span>
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">
+                      <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border transition-all ${
+                        openMarginDetail.marginX
+                          ? 'bg-slate-950/40 border-slate-800/80 opacity-50'
+                          : 'bg-slate-950 border-slate-700'
+                      }`}>
                         <input
                           type="number"
-                          value={marginXVal}
+                          disabled={openMarginDetail.marginX}
+                          value={openMarginDetail.marginX ? (marginLeft === marginRight ? marginLeft : marginXVal) : marginXVal}
                           onChange={(e) => {
                             const val = Number(e.target.value);
                             updateMarginData({ marginX: val, marginLeft: val, marginRight: val });
                           }}
-                          className="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          className={`w-8 bg-transparent text-right font-mono text-[11px] font-bold outline-none ${
+                            openMarginDetail.marginX ? 'text-slate-500 cursor-not-allowed' : 'text-white'
+                          }`}
                         />
-                        <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        <span className={`text-[9px] font-mono ${openMarginDetail.marginX ? 'text-slate-600' : 'text-slate-400'}`}>px</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setOpenMarginDetail(prev => ({ ...prev, marginX: !prev.marginX }))}
                         className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors"
-                        title={openMarginDetail.marginX ? 'Masquer le détail Gauche/Droite' : 'Afficher le détail Gauche/Droite'}
+                        title={openMarginDetail.marginX ? 'Fermer pour réactiver la barre principale' : 'Ouvrir pour régler Gauche/Droite séparément'}
                       >
                         {openMarginDetail.marginX ? <ChevronUp className="w-3.5 h-3.5 text-[#00A0FF]" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* BARRE PRINCIPALE MARGIN X (SYNCHRONISÉE) */}
+                  {/* BARRE PRINCIPALE MARGIN X (DÉSACTIVÉE ET GRISE QUAND FLÈCHE OUVERTE) */}
                   <input
                     type="range"
                     min={-50}
                     max={150}
+                    disabled={openMarginDetail.marginX}
                     value={marginXVal}
                     onChange={(e) => {
                       const val = Number(e.target.value);
                       updateMarginData({ marginX: val, marginLeft: val, marginRight: val });
                     }}
-                    className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                    className={`w-full min-w-0 h-1.5 transition-all ${
+                      openMarginDetail.marginX
+                        ? 'opacity-30 grayscale cursor-not-allowed accent-slate-600'
+                        : 'accent-[#00A0FF] cursor-pointer'
+                    }`}
                   />
 
                   {/* SOUS-BARRES DÉTAILLÉES GAUCHE & DROITE (SUR CLIC FLECHE) */}
@@ -1834,7 +1882,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={marginLeft}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ marginLeft: val, marginX: val });
+                            updateMarginData({ marginLeft: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
@@ -1850,7 +1898,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           value={marginRight}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            updateMarginData({ marginRight: val, marginX: val });
+                            updateMarginData({ marginRight: val });
                           }}
                           className="flex-1 accent-[#00A0FF] h-1 cursor-pointer"
                         />
