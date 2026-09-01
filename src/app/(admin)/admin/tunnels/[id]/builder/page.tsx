@@ -1079,6 +1079,45 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       }
     }
 
+    // Multi-column row / Section handling (Col2, Col3, Col4)
+    if (type === 'Col2' || type === 'Col3' || type === 'Col4') {
+      const numColumns = type === 'Col4' ? 4 : type === 'Col3' ? 3 : 2;
+      const childDivs: CanvasElement[] = [];
+      const timestamp = Date.now();
+      for (let i = 0; i < numColumns; i++) {
+        childDivs.push({
+          id: `child-${timestamp}-${i + 1}`,
+          type: 'ContentBox',
+          category: 'Disposition',
+          content: `Conteneur DIV ${i + 1}`,
+          data: {
+            ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+          },
+        });
+      }
+
+      // If a Section is selected, add the Divs into the selected Section
+      const activeSelectedEl = selectedElementId ? elements.find((e) => e.id === selectedElementId) : null;
+      if (activeSelectedEl && (activeSelectedEl.type === 'Section' || activeSelectedEl.type === 'BlockSectionFull')) {
+        handleUpdateElementData(activeSelectedEl.id, { children: [...(activeSelectedEl.data?.children || []), ...childDivs] });
+        return;
+      }
+
+      // Otherwise create a new Section containing the child Divs
+      const newSection: CanvasElement = {
+        id: `el-${timestamp}`,
+        type: 'Section',
+        category: 'Disposition',
+        content: `SECTION (${numColumns} COLONNES)`,
+        data: {
+          ...getDefaultBlockData('Section', `SECTION (${numColumns} COLONNES)`),
+          children: childDivs,
+        },
+      };
+      setElements((prev) => [...prev, newSection]);
+      return;
+    }
+
     // Default: Add standalone element to canvas
     const newEl: CanvasElement = {
       id: `el-${Date.now()}`,
@@ -3002,37 +3041,57 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 {/* CATEGORY 1: DISPOSITION & SECTIONS FULL-WIDTH */}
                     <div className="space-y-2.5">
                       <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
-                        Disposition &amp; Sections Full-Width
+                        Disposition des colonnes
                       </div>
                       <div className="grid grid-cols-3 gap-2">
                         <button
                           draggable
-                          onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
-                          onClick={() => handleAddElement('Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
-                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Col4', 'Disposition', '4 Colonnes')}
+                          onClick={() => handleAddElement('Col4', 'Disposition', '4 Colonnes')}
+                          className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all group cursor-grab active:cursor-grabbing"
                         >
-                          <Maximize2 className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <Columns className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">4 colonnes</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Col3', 'Disposition', '3 Colonnes')}
+                          onClick={() => handleAddElement('Col3', 'Disposition', '3 Colonnes')}
+                          className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Columns className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">3 colonnes</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Col2', 'Disposition', '2 Colonnes')}
+                          onClick={() => handleAddElement('Col2', 'Disposition', '2 Colonnes')}
+                          className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Columns className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">2 colonnes</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Rangée / Div')}
+                          onClick={() => handleAddElement('ContentBox', 'Disposition', 'Rangée / Div')}
+                          className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Box className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Rangée</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'Section')}
+                          onClick={() => handleAddElement('Section', 'Disposition', 'Section')}
+                          className="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Maximize2 className="w-4 h-4 text-slate-400 group-hover:text-[#00A0FF]" />
                           <span className="text-[10px] font-bold text-slate-300">Section</span>
-                        </button>
-
-                        <button
-                          draggable
-                          onDragStart={(e) => handlePaletteDragStart(e, 'ContentBox', 'Disposition', 'Conteneur DIV')}
-                          onClick={() => handleAddElement('ContentBox', 'Disposition', 'Conteneur DIV')}
-                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                        >
-                          <Box className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                          <span className="text-[10px] font-bold text-slate-300">Div</span>
-                        </button>
-
-                        <button
-                          draggable
-                          onDragStart={(e) => handlePaletteDragStart(e, 'Section3Col', 'Disposition', 'SECTION 3 DIVS (CÔTE À CÔTE)')}
-                          onClick={() => handleAddElement('Section3Col', 'Disposition', 'SECTION 3 DIVS (CÔTE À CÔTE)')}
-                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
-                        >
-                          <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
-                          <span className="text-[10px] font-bold text-slate-300">Section (3 Divs)</span>
                         </button>
                       </div>
                     </div>
