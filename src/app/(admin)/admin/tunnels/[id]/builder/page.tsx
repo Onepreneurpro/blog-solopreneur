@@ -3967,38 +3967,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                   : Array(numCols).fill(numCols > 0 ? 100 / numCols : 100);
 
                               return (
-                                <div
+<div
                                   ref={(node) => { sectionContainerRefs.current[el.id] = node; }}
                                   className="flex flex-wrap md:flex-nowrap gap-0 items-stretch w-full relative flex-1 h-full"
                                 >
                                   {childrenList.map((child: CanvasElement, cIdx: number) => (
                                     <React.Fragment key={child.id || cIdx}>
                                       <div
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedElementId(el.id);
-                                          setSelectedChildIndex(cIdx);
-                                          setSelectedSubItem(null);
-                                        }}
                                         style={{
                                           flex: `0 0 ${colWidths[cIdx]}%`,
                                           minWidth: '120px',
-                                          minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
-                                          paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
-                                          paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
                                           marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
-                                          ...renderBorderStyles(child.data),
                                         }}
-                                        className={`relative group/child overflow-hidden border transition-all flex flex-col flex-1 h-full ${
-                                        selectedChildIndex === cIdx
-                                            ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
-                                            : 'border-white/10 hover:border-amber-500/60'
-                                        }`}
+                                        className="relative group/child flex flex-col flex-1 h-full overflow-visible z-10"
                                       >
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
-                                        className="absolute -top-3.5 left-3 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
+                                        className="absolute -top-3.5 left-3 z-50 transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
@@ -4380,13 +4366,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         marginTop: imgMarginTop,
                                                         marginBottom: imgMarginBottom,
                                                       }}
-                                                      className={`relative group/subimg w-full cursor-pointer transition-all ${
+                                                      className={`relative group/subimg w-full cursor-pointer transition-all overflow-visible z-20 ${
                                                         isSubSel ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900' : 'hover:ring-1 hover:ring-amber-400/60'
                                                       }`}
                                                     >
                                                       {/* FLOATING HOVER TOOLBAR BADGE (SYSTEME.IO STYLE SCREEN 2) */}
                                                       <div
-                                                        className={`absolute -top-3.5 left-2 z-30 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                                        className={`absolute -top-3.5 left-2 z-50 transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
                                                           isSubSel ? 'opacity-100' : 'opacity-0 group-hover/subimg:opacity-100'
                                                         }`}
                                                       >
