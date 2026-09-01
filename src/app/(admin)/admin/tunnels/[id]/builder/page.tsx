@@ -1548,12 +1548,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : (targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal);
             const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
             const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : (targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24));
-            const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : 0;
-            const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : 0;
+            const marginTop = targetData.marginTop !== undefined ? targetData.marginTop : (targetData.marginY !== undefined ? targetData.marginY : 0);
+            const marginBottom = targetData.marginBottom !== undefined ? targetData.marginBottom : (targetData.marginY !== undefined ? targetData.marginY : 0);
+            const marginLeft = targetData.marginLeft !== undefined ? targetData.marginLeft : (targetData.marginX !== undefined ? targetData.marginX : 0);
+            const marginRight = targetData.marginRight !== undefined ? targetData.marginRight : (targetData.marginX !== undefined ? targetData.marginX : 0);
 
             const isSyncY = targetData.syncPaddingY !== false;
             const isSyncX = targetData.syncPaddingX !== false;
             const isSyncMargin = targetData.syncMarginY !== false;
+            const isSyncMarginX = targetData.syncMarginX !== false;
 
             return (
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
@@ -1847,6 +1850,104 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             updateMarginData({ marginTop: val, marginBottom: val });
                           } else {
                             updateMarginData({ marginBottom: val });
+                          }
+                        }}
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* MARGES EXTERNES HORIZONTALES (MARGIN X - GAUCHE / DROITE) */}
+                <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+                  <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    Marge Externe Horizontale (Margin X)
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* MARGIN GAUCHE */}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-slate-400 font-bold truncate font-mono">Margin Left</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
+                          <input
+                            type="number"
+                            value={marginLeft}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (isSyncMarginX) {
+                                updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
+                              } else {
+                                updateMarginData({ marginLeft: val });
+                              }
+                            }}
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          />
+                          <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min={-50}
+                        max={150}
+                        value={marginLeft}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (isSyncMarginX) {
+                            updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
+                          } else {
+                            updateMarginData({ marginLeft: val });
+                          }
+                        }}
+                        className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* LINK / UNLINK ICON IN THE CENTER */}
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ syncMarginX: !isSyncMarginX })}
+                      className={`p-2 rounded-lg border transition-all shrink-0 mt-3 ${
+                        isSyncMarginX
+                          ? 'bg-[#00A0FF]/20 text-[#00A0FF] border-[#00A0FF]/50 shadow-md ring-2 ring-[#00A0FF]/30'
+                          : 'bg-slate-800 text-slate-500 border-slate-700 hover:text-white'
+                      }`}
+                      title={isSyncMarginX ? 'Margin Left & Right Liés (Cliquer pour séparer)' : 'Margin Left & Right Séparés (Cliquer pour lier)'}
+                    >
+                      {isSyncMarginX ? <Link2 className="w-4 h-4 text-[#00A0FF]" /> : <Unlink className="w-4 h-4 text-slate-400" />}
+                    </button>
+
+                    {/* MARGIN DROITE */}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-slate-400 font-bold truncate font-mono">Margin Right</span>
+                        <div className="flex items-center gap-0.5 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
+                          <input
+                            type="number"
+                            value={marginRight}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (isSyncMarginX) {
+                                updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
+                              } else {
+                                updateMarginData({ marginRight: val });
+                              }
+                            }}
+                            className="w-9 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"
+                          />
+                          <span className="text-[9px] text-slate-400 font-mono">px</span>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min={-50}
+                        max={150}
+                        value={marginRight}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (isSyncMarginX) {
+                            updateMarginData({ marginLeft: val, marginRight: val, marginX: val });
+                          } else {
+                            updateMarginData({ marginRight: val });
                           }
                         }}
                         className="w-full min-w-0 accent-[#00A0FF] h-1.5 cursor-pointer"
@@ -3375,8 +3476,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                             paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
                             paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
                             paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
-                            marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
-                            marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
+                            marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
+                            marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
+                            marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
+                            marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                           }}
                           className={`relative w-full shadow-none transition-all my-0 group/section border border-dashed border-purple-500/60 hover:border-purple-400 flex flex-col justify-between p-0`}
                         >

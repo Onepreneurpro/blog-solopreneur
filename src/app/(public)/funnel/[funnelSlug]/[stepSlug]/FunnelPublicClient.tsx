@@ -343,8 +343,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
                       paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
                       paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
-                      marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
-                      marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
+                      marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
+                      marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
+                      marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
+                      marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                     }}
                     className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
@@ -377,6 +379,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               flex: `0 0 ${colWidths[cIdx]}%`,
                               width: `${colWidths[cIdx]}%`,
                               minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
+                              backgroundColor: child.data?.bgColor || child.data?.cardBgColor,
+                              color: child.data?.textColor,
+                              paddingTop: child.data?.paddingTop !== undefined ? `${child.data.paddingTop}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                              paddingBottom: child.data?.paddingBottom !== undefined ? `${child.data.paddingBottom}px` : (child.data?.paddingY !== undefined ? `${child.data.paddingY}px` : undefined),
+                              paddingLeft: child.data?.paddingLeft !== undefined ? `${child.data.paddingLeft}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                              paddingRight: child.data?.paddingRight !== undefined ? `${child.data.paddingRight}px` : (child.data?.paddingX !== undefined ? `${child.data.paddingX}px` : undefined),
+                              marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
+                              marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
+                              marginLeft: child.data?.marginLeft !== undefined ? `${child.data.marginLeft}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
+                              marginRight: child.data?.marginRight !== undefined ? `${child.data.marginRight}px` : (child.data?.marginX !== undefined ? `${child.data.marginX}px` : undefined),
                             };
 
                             let renderedChild = null;
