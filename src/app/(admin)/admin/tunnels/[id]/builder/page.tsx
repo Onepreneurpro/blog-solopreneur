@@ -59,6 +59,58 @@ interface CanvasElement {
   styles?: any;
 }
 
+function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls = [], customJs = '' }: any) {
+  const [frameHeight, setFrameHeight] = useState<number>(800);
+
+  const srcDoc = `
+    <!DOCTYPE html>
+    <html lang="fr">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        ${stylesheetUrls.map((url: string) => `<link rel="stylesheet" href="${url}">`).join('\n')}
+        <style>
+          html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+          ${customCss || ''}
+        </style>
+      </head>
+      <body>
+        ${rawHtml || ''}
+        ${scriptUrls.map((url: string) => `<script src="${url}"><\/script>`).join('\n')}
+        <script>
+          ${customJs || ''}
+          function sendHeight() {
+            var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, 600);
+            window.parent.postMessage({ type: 'CLONED_IFRAME_HEIGHT', height: h }, '*');
+          }
+          window.addEventListener('load', sendHeight);
+          window.addEventListener('resize', sendHeight);
+          setInterval(sendHeight, 1000);
+        <\/script>
+      </body>
+    </html>
+  `;
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'CLONED_IFRAME_HEIGHT' && e.data.height) {
+        setFrameHeight(e.data.height);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  return (
+    <iframe
+      srcDoc={srcDoc}
+      title="Cloned Page Sandbox"
+      className="w-full border-0 transition-all overflow-hidden"
+      style={{ height: `${frameHeight}px`, minHeight: '600px' }}
+    />
+  );
+}
+
 export default function VisualPageBuilderPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -3281,13 +3333,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <span>⚡ PAGE HTML/CSS CLONÉE (PIXEL PERFECT)</span>
                           <span className="text-[10px] text-slate-400">Sélectionnez pour utiliser la Recherche & Remplacement dans le panneau gauche</span>
                         </div>
-                        {el.data?.stylesheetUrls && el.data.stylesheetUrls.map((url: string, uIdx: number) => (
-                          <link key={`canvascss-${uIdx}`} rel="stylesheet" href={url} />
-                        ))}
-                        {el.data?.customCss && (
-                          <style dangerouslySetInnerHTML={{ __html: el.data.customCss }} />
-                        )}
-                        <div dangerouslySetInnerHTML={{ __html: el.data?.rawHtml || el.content }} />
+                        <ClonedPageFrame
+                          rawHtml={el.data?.rawHtml || el.content}
+                          customCss={el.data?.customCss}
+                          stylesheetUrls={el.data?.stylesheetUrls}
+                          scriptUrls={el.data?.scriptUrls}
+                          customJs={el.data?.customJs}
+                        />
                       </div>
                     )}
 

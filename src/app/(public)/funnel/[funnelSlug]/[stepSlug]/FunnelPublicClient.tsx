@@ -5,6 +5,60 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle2, ArrowRight, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import { useEffect, useRef } from 'react';
+
+function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls = [], customJs = '' }: any) {
+  const [frameHeight, setFrameHeight] = useState<number>(800);
+
+  const srcDoc = `
+    <!DOCTYPE html>
+    <html lang="fr">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        ${stylesheetUrls.map((url: string) => `<link rel="stylesheet" href="${url}">`).join('\n')}
+        <style>
+          html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+          ${customCss || ''}
+        </style>
+      </head>
+      <body>
+        ${rawHtml || ''}
+        ${scriptUrls.map((url: string) => `<script src="${url}"><\/script>`).join('\n')}
+        <script>
+          ${customJs || ''}
+          function sendHeight() {
+            var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, 600);
+            window.parent.postMessage({ type: 'CLONED_IFRAME_HEIGHT', height: h }, '*');
+          }
+          window.addEventListener('load', sendHeight);
+          window.addEventListener('resize', sendHeight);
+          setInterval(sendHeight, 1000);
+        <\/script>
+      </body>
+    </html>
+  `;
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'CLONED_IFRAME_HEIGHT' && e.data.height) {
+        setFrameHeight(e.data.height);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  return (
+    <iframe
+      srcDoc={srcDoc}
+      title="Cloned Page Sandbox"
+      className="w-full border-0 transition-all overflow-hidden"
+      style={{ height: `${frameHeight}px`, minHeight: '600px' }}
+    />
+  );
+}
+
 interface FunnelPublicClientProps {
   funnel: any;
   step: any;
@@ -225,27 +279,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             if (el.type === 'RawHTML' || el.type === 'CustomHtmlSection' || el.data?.rawHtml) {
-              const stylesheetUrls = el.data?.stylesheetUrls || [];
-              const customCss = el.data?.customCss || '';
-              const scriptUrls = el.data?.scriptUrls || [];
-              const customJs = el.data?.customJs || '';
-
               return (
-                <React.Fragment key={el.id}>
-                  {stylesheetUrls.map((url: string, uIdx: number) => (
-                    <link key={`rawcss-${uIdx}`} rel="stylesheet" href={url} />
-                  ))}
-                  {customCss && (
-                    <style dangerouslySetInnerHTML={{ __html: customCss }} />
-                  )}
-                  <div className="w-full relative overflow-hidden" dangerouslySetInnerHTML={{ __html: el.data?.rawHtml || el.content }} />
-                  {scriptUrls.map((url: string, uIdx: number) => (
-                    <script key={`rawjs-${uIdx}`} src={url} defer />
-                  ))}
-                  {customJs && (
-                    <script dangerouslySetInnerHTML={{ __html: customJs }} />
-                  )}
-                </React.Fragment>
+                <div key={el.id} className="w-full relative overflow-hidden">
+                  <ClonedPageFrame
+                    rawHtml={el.data?.rawHtml || el.content}
+                    customCss={el.data?.customCss}
+                    stylesheetUrls={el.data?.stylesheetUrls}
+                    scriptUrls={el.data?.scriptUrls}
+                    customJs={el.data?.customJs}
+                  />
+                </div>
               );
             }
 
