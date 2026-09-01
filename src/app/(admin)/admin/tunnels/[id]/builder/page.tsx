@@ -5274,6 +5274,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         <input
                                           type="text"
                                           value={child.content}
+                                          onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setSelectedElementId(el.id);
+                                            setSelectedChildIndex(cIdx);
+                                            const selection = window.getSelection();
+                                            const selText = selection ? selection.toString() : '';
+                                            setFloatingTextMenu({
+                                              visible: true,
+                                              x: Math.max(16, Math.min(window.innerWidth - 650, e.clientX - 250)),
+                                              y: Math.max(80, e.clientY - 70),
+                                              selectedText: selText || child.content,
+                                              targetElId: el.id,
+                                              childIdx: cIdx,
+                                            });
+                                          }}
                                           onChange={(e) => {
                                             const updated = el.data.children.map((ch: any, i: number) =>
                                               i === cIdx ? { ...ch, content: e.target.value } : ch
@@ -5291,6 +5307,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         <textarea
                                           rows={2}
                                           value={child.content}
+                                          onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setSelectedElementId(el.id);
+                                            setSelectedChildIndex(cIdx);
+                                            const selection = window.getSelection();
+                                            const selText = selection ? selection.toString() : '';
+                                            setFloatingTextMenu({
+                                              visible: true,
+                                              x: Math.max(16, Math.min(window.innerWidth - 650, e.clientX - 250)),
+                                              y: Math.max(80, e.clientY - 70),
+                                              selectedText: selText || child.content,
+                                              targetElId: el.id,
+                                              childIdx: cIdx,
+                                            });
+                                          }}
                                           onChange={(e) => {
                                             const updated = el.data.children.map((ch: any, i: number) =>
                                               i === cIdx ? { ...ch, content: e.target.value } : ch
