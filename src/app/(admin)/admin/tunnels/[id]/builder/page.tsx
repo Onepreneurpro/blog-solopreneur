@@ -673,7 +673,30 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         children: [],
       };
     }
-    if (type === 'Section' || type === 'BlockSectionFull') {
+    if (type === 'Section3Col') {
+      return {
+        title: '',
+        isFullWidth: true,
+        bgColor: '#ffffff',
+        bgImage: '',
+        bgOverlay: 0,
+        bgSize: 'cover',
+        bgPosition: 'center',
+        textColor: '#ffffff',
+        paddingTop: 40,
+        paddingBottom: 40,
+        paddingLeft: 40,
+        paddingRight: 40,
+        paddingY: 40,
+        paddingX: 40,
+        children: [
+          { id: `child-${Date.now()}-1`, type: 'ContentBox', category: 'Disposition', content: 'Conteneur DIV 1', data: { children: [], paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 } },
+          { id: `child-${Date.now()}-2`, type: 'ContentBox', category: 'Disposition', content: 'Conteneur DIV 2', data: { children: [], paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 } },
+          { id: `child-${Date.now()}-3`, type: 'ContentBox', category: 'Disposition', content: 'Conteneur DIV 3', data: { children: [], paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 } },
+        ],
+      };
+    }
+    if (type === 'Section' || type === 'BlockSectionFull' || type === 'Section3Col') {
       return {
         title: '',
         isFullWidth: true,
@@ -985,7 +1008,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     // If a container block is selected on the canvas, insert element directly into the container!
     if (selectedElementId) {
       const selectedEl = elements.find((e) => e.id === selectedElementId);
-      if (selectedEl && (selectedEl.type === 'ContentBox' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull')) {
+      if (selectedEl && (selectedEl.type === 'ContentBox' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull' || type === 'Section3Col')) {
         const newChild: CanvasElement = {
           id: `child-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
           type,
@@ -1482,7 +1505,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           )}
 
           {/* 1. TITRE / CONTENU DU COMPOSANT */}
-          {(selectedEl.type === 'Heading' || selectedEl.type === 'Text' || selectedEl.type === 'ButtonCTA' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull') && (
+          {(selectedEl.type === 'Heading' || selectedEl.type === 'Text' || selectedEl.type === 'ButtonCTA' || selectedEl.type === 'Section' || selectedEl.type === 'BlockSectionFull' || selectedEl.type === 'Section3Col') && (
             <div className="space-y-2">
               <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
                 Contenu principal / Titre
@@ -2981,7 +3004,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <div className="font-heading font-black text-slate-400 uppercase tracking-wider text-[10px]">
                         Disposition &amp; Sections Full-Width
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           draggable
                           onDragStart={(e) => handlePaletteDragStart(e, 'Section', 'Disposition', 'SECTION PRINCIPALE (PLEIN ÉCRAN 100%)')}
@@ -3000,6 +3023,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         >
                           <Box className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
                           <span className="text-[10px] font-bold text-slate-300">Div</span>
+                        </button>
+
+                        <button
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, 'Section3Col', 'Disposition', 'SECTION 3 DIVS (CÔTE À CÔTE)')}
+                          onClick={() => handleAddElement('Section3Col', 'Disposition', 'SECTION 3 DIVS (CÔTE À CÔTE)')}
+                          className="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 text-center transition-all group cursor-grab active:cursor-grabbing"
+                        >
+                          <Columns className="w-5 h-5 text-slate-400 group-hover:text-[#00A0FF]" />
+                          <span className="text-[10px] font-bold text-slate-300">Section (3 Divs)</span>
                         </button>
                       </div>
                     </div>
@@ -3902,7 +3935,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             <div className="space-y-0 min-h-[400px]">
               {elements.map((el, idx) => {
                 const isSelected = el.id === selectedElementId;
-                const isSection = el.type === 'Section' || el.type === 'BlockSectionFull';
+                const isSection = el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col';
 
                 return (
                   <React.Fragment key={el.id}>
@@ -3956,7 +3989,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         }`}
                       >
                         <span className="!text-white font-black" style={{ color: '#ffffff' }}>
-                          {el.type === 'Section' || el.type === 'BlockSectionFull' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}
+                          {el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}
                         </span>
                         <span className="p-0.5 rounded border border-white/80 bg-white/20 flex items-center justify-center shrink-0">
                           <ChevronDown className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
@@ -4635,7 +4668,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     })()}
 
                     {/* SECTION PRINCIPALE (PLEIN ÉCRAN 100%) RENDERER */}
-                    {(el.type === 'Section' || el.type === 'BlockSectionFull') && (() => {
+                    {(el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col') && (() => {
                       const isMobMode = previewMode === 'MOBILE';
                       const mainBg = isMobMode
                         ? (el.data?.mobileBgColor !== undefined ? el.data.mobileBgColor : (el.data?.mobileBgImage ? 'transparent' : (el.data?.bgColor || '#0F172A')))

@@ -329,7 +329,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               );
             }
 
-            if (el.type === 'Section' || el.type === 'BlockSectionFull') {
+            if (el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col') {
               const stylesheetUrls = el.data?.stylesheetUrls || [];
               const customCss = el.data?.customCss || '';
               const scriptUrls = el.data?.scriptUrls || [];
