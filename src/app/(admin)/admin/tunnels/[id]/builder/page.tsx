@@ -1,6 +1,39 @@
 'use client';
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+
+// Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
+function RichTextElement({ content, onChange, onContextMenu, style, className }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== (content || '')) {
+      ref.current.innerHTML = content || '';
+    }
+  }, [content]);
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={() => {
+        if (ref.current) onChange(ref.current.innerHTML);
+      }}
+      onBlur={() => {
+        if (ref.current) onChange(ref.current.innerHTML);
+      }}
+      onContextMenu={onContextMenu}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+      style={style}
+      className={className}
+    />
+  );
+}
+
+
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
@@ -171,7 +204,39 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     childIdx?: number | null;
     subChildIdx?: number | null;
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
-  const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
+  const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'underline' | 'fontSize' | null>(null);
+  const [underlineThickness, setUnderlineThickness] = useState<string>('3px');
+  const [underlineOffset, setUnderlineOffset] = useState<string>('3px');
+
+  const neonColors = [
+    { color: '#a3e635', label: 'Lime Fluo' },
+    { color: '#facc15', label: 'Jaune Fluo' },
+    { color: '#38bdf8', label: 'Cyan Fluo' },
+    { color: '#f472b6', label: 'Rose Fluo' },
+    { color: '#fb923c', label: 'Orange Fluo' },
+    { color: '#c084fc', label: 'Violet Fluo' },
+    { color: '#86efac', label: 'Vert Clair' },
+    { color: '#22c55e', label: 'Vert Fluo' },
+    { color: '#3b82f6', label: 'Bleu Fluo' },
+    { color: '#d97706', label: 'Ambre' },
+    { color: '#e2e8f0', label: 'Gris Doux' },
+    { color: '#ffffff', label: 'Blanc' },
+  ];
+
+  const textColors = [
+    { color: '#000000', label: 'Noir' },
+    { color: '#ffffff', label: 'Blanc' },
+    { color: '#ef4444', label: 'Rouge' },
+    { color: '#00a0ff', label: 'Bleu SPC' },
+    { color: '#10b981', label: 'Émeraude' },
+    { color: '#f59e0b', label: 'Ambre' },
+    { color: '#8b5cf6', label: 'Violet' },
+    { color: '#ec4899', label: 'Rose' },
+    { color: '#64748b', label: 'Ardoise' },
+    { color: '#0f172a', label: 'Sombre' },
+    { color: '#a3e635', label: 'Lime' },
+    { color: '#facc15', label: 'Jaune' },
+  ];
   const savedRangeRef = useRef<Range | null>(null);
   const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
@@ -530,23 +595,58 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </button>
 
           {openFloatingPopover === 'color' && (
-            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-64 space-y-3 animate-in fade-in zoom-in-95">
-              <div className="text-xs font-black uppercase text-slate-900 border-b pb-1">Couleur du texte</div>
-              <div className="grid grid-cols-5 gap-2">
-                {['#000000', '#ffffff', '#EF4444', '#00A0FF', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#64748B', '#0F172A'].map(color => (
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                  <Palette className="w-4 h-4 text-emerald-600" />
+                  <span>Couleur du Texte</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-6 gap-1.5">
+                {textColors.map((c) => (
                   <button
-                    key={color}
+                    key={c.color}
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
-                    style={{ backgroundColor: color }}
                     onClick={() => {
                       restoreSelection();
-                      executeRichCommand('foreColor', color);
+                      executeRichCommand('foreColor', c.color);
                       setOpenFloatingPopover(null);
                     }}
-                    className="w-8 h-8 rounded-xl border border-slate-300 hover:scale-110 transition-transform shadow-xs cursor-pointer"
+                    style={{ backgroundColor: c.color }}
+                    className="w-7 h-7 rounded-xl border border-slate-300 hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                    title={c.label}
                   />
                 ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-600">Glisser couleur :</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    defaultValue="#a3e635"
+                    onInput={(e) => {
+                      restoreSelection();
+                      executeRichCommand('foreColor', (e.target as HTMLInputElement).value);
+                    }}
+                    onChange={(e) => {
+                      restoreSelection();
+                      executeRichCommand('foreColor', e.target.value);
+                    }}
+                    className="w-8 h-8 bg-white cursor-pointer rounded-xl border border-slate-300 p-0.5"
+                    title="Glissez le curseur pour explorer toutes les nuances"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setOpenFloatingPopover(null)}
+                    className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs rounded-xl cursor-pointer shadow-xs"
+                  >
+                    OK
+                  </button>
+                </div>
               </div>
             </div>
           )}
