@@ -334,6 +334,44 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [historyIndex, history]);
 
+  const handleImageMouseDown = (
+    e: React.MouseEvent<HTMLImageElement>,
+    currentXVal: number,
+    currentYVal: number,
+    updatePosition: (posX: number, posY: number) => void
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const imgEl = e.currentTarget;
+    const rect = imgEl.getBoundingClientRect();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initialX = currentXVal;
+    const initialY = currentYVal;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaXPixels = moveEvent.clientX - startX;
+      const deltaYPixels = moveEvent.clientY - startY;
+
+      const percentDeltaX = (deltaXPixels / (rect.width || 300)) * 100;
+      const percentDeltaY = (deltaYPixels / (rect.height || 200)) * 100;
+
+      const newX = Math.max(0, Math.min(100, Math.round(initialX - percentDeltaX)));
+      const newY = Math.max(0, Math.min(100, Math.round(initialY - percentDeltaY)));
+
+      updatePosition(newX, newY);
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -1322,30 +1360,48 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   />
                 </div>
 
-                {/* OBJECT FIT & DIMENSIONS */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-wider block">
-                    Ajustement d Image (Object Fit)
-                  </label>
-                  <select
-                    value={currentSubItem.imgObjectFit || 'cover'}
-                    onChange={(e) => updateSubItemProperty({ imgObjectFit: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-400 outline-none"
-                  >
-                    <option value="cover">Remplir / Découpe propre (Cover)</option>
-                    <option value="contain">Ajuster sans couper (Contain)</option>
-                    <option value="fill">Étirer (Fill)</option>
-                  </select>
-                </div>
-
-                {/* POSITION X / Y & ZOOM D'IMAGE */}
+                {/* CADRAGE À LA SOURIS & ZOOM D'IMAGE */}
                 <div className="pt-2 border-t border-slate-800 space-y-3">
-                  <div className="text-[10px] font-black text-amber-400 uppercase tracking-wider">
-                    🖼️ Position & Zoom de l Image dans le Cadre
+                  <div className="flex items-center justify-between text-[10px] font-black text-amber-400 uppercase tracking-wider">
+                    <span>🖼️ Cadrage à la Souris & Zoom</span>
+                    <button
+                      type="button"
+                      onClick={() => updateSubItemProperty({ posX: 50, posY: 50, imgZoom: 100 })}
+                      className="text-[9px] text-slate-400 hover:text-white underline normal-case"
+                      title="Réinitialiser au centre"
+                    >
+                      🔄 Centrer (50%/50%)
+                    </button>
+                  </div>
+
+                  <div className="p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-[10px] text-slate-300 space-y-1">
+                    <div className="font-bold text-amber-300 flex items-center gap-1">
+                      <span>✋ Cadrage direct :</span>
+                    </div>
+                    <p className="text-[9px] text-slate-400 leading-snug">
+                      Cliquez et <strong>glissez votre souris directement sur l&apos;image</strong> dans la page pour la déplacer librement et choisir le cadrage souhaité.
+                    </p>
+                  </div>
+
+                  {/* ZOOM / ÉCHELLE */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
+                      <span>🔍 Zoom / Échelle d&apos;Image</span>
+                      <span className="font-mono text-amber-400 font-bold">{currentSubItem.imgZoom || 100}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={100}
+                      max={300}
+                      value={currentSubItem.imgZoom || 100}
+                      onChange={(e) => updateSubItemProperty({ imgZoom: Number(e.target.value) })}
+                      className="w-full accent-amber-400 h-1.5 cursor-pointer"
+                    />
+                    <span className="text-[8px] text-slate-400 block">Conseil : vous pouvez aussi utiliser la molette de la souris sur l&apos;image pour zoomer.</span>
                   </div>
 
                   {/* POSITION HORIZONTALE (X) */}
-                  <div className="space-y-1">
+                  <div className="space-y-1 pt-1">
                     <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
                       <span>Position Horizontale (X)</span>
                       <span className="font-mono text-white">{currentSubItem.posX !== undefined ? currentSubItem.posX : 50}%</span>
@@ -1372,22 +1428,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       max={100}
                       value={currentSubItem.posY !== undefined ? currentSubItem.posY : 50}
                       onChange={(e) => updateSubItemProperty({ posY: Number(e.target.value) })}
-                      className="w-full accent-amber-400 h-1 cursor-pointer"
-                    />
-                  </div>
-
-                  {/* ZOOM / ÉCHELLE */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-300">
-                      <span>Zoom / Échelle</span>
-                      <span className="font-mono text-white">{currentSubItem.imgZoom || 100}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={100}
-                      max={300}
-                      value={currentSubItem.imgZoom || 100}
-                      onChange={(e) => updateSubItemProperty({ imgZoom: Number(e.target.value) })}
                       className="w-full accent-amber-400 h-1 cursor-pointer"
                     />
                   </div>
@@ -4348,18 +4388,38 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         </div>
                                                       </div>
 
-                                                      {/* RAW IMAGE - ZERO WHITE FRAME, ZERO PADDING, ZERO INPUT BOX */}
-                                                      <img
-                                                        src={subChild.data?.img || subChild.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80'}
-                                                        alt="SubImage"
-                                                        style={{
-                                                          objectFit: subChild.data?.imgObjectFit || 'cover',
-                                                          objectPosition: `${subChild.data?.posX !== undefined ? subChild.data.posX : 50}% ${subChild.data?.posY !== undefined ? subChild.data.posY : 50}%`,
-                                                          transform: `scale(${(subChild.data?.imgZoom || 100) / 100})`,
-                                                          ...renderBorderStyles(subChild.data),
-                                                        }}
-                                                        className="w-full h-full min-h-[140px] block rounded-none"
-                                                      />
+                                                      {/* RAW IMAGE WITH MOUSE DRAG-TO-PAN & SCROLL-ZOOM */}
+                                                      <div className="relative w-full h-full min-h-[140px] group/imgbox overflow-hidden">
+                                                        <img
+                                                          src={subChild.data?.img || subChild.content || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80'}
+                                                          alt="SubImage"
+                                                          onMouseDown={(e) => {
+                                                            const currentX = subChild.data?.posX !== undefined ? subChild.data.posX : 50;
+                                                            const currentY = subChild.data?.posY !== undefined ? subChild.data.posY : 50;
+                                                            handleImageMouseDown(e, currentX, currentY, (newX, newY) => {
+                                                              updateSubChildData({ posX: newX, posY: newY });
+                                                            });
+                                                          }}
+                                                          onWheel={(e) => {
+                                                            e.preventDefault();
+                                                            const currZoom = subChild.data?.imgZoom || 100;
+                                                            const nextZoom = Math.max(100, Math.min(300, currZoom + (e.deltaY < 0 ? 10 : -10)));
+                                                            updateSubChildData({ imgZoom: nextZoom });
+                                                          }}
+                                                          style={{
+                                                            objectFit: 'cover',
+                                                            objectPosition: `${subChild.data?.posX !== undefined ? subChild.data.posX : 50}% ${subChild.data?.posY !== undefined ? subChild.data.posY : 50}%`,
+                                                            transform: `scale(${(subChild.data?.imgZoom || 100) / 100})`,
+                                                            ...renderBorderStyles(subChild.data),
+                                                          }}
+                                                          className="w-full h-full min-h-[140px] block cursor-grab active:cursor-grabbing select-none transition-transform duration-75"
+                                                        />
+                                                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-black/80 backdrop-blur text-white text-[9px] font-bold rounded-full opacity-0 group-hover/imgbox:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg border border-white/20 whitespace-nowrap">
+                                                          <span>✋ Glissez la souris pour cadrer</span>
+                                                          <span>•</span>
+                                                          <span>🔍 Molette zoom ({subChild.data?.imgZoom || 100}%)</span>
+                                                        </div>
+                                                      </div>
                                                     </div>
                                                   );
                                                 }
