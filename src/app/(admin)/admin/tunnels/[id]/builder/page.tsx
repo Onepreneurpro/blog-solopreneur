@@ -2292,26 +2292,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
+                      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+                        targetDomRef.current = (window as any).__activeRichTextDom;
+                      }
                       if (targetDomRef.current) targetDomRef.current.focus();
                       restoreSelection();
                       const sel = window.getSelection();
+                      const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
                       const markHtml = (txt: string) =>
                         `<mark color="${c.color}" style="background-color: ${c.color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
 
-                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-                        document.execCommand('insertHTML', false, markHtml(sel.toString()));
-                        saveSelection();
-                      } else if (lastSelectedTextRef.current) {
-                        document.execCommand('insertHTML', false, markHtml(lastSelectedTextRef.current));
+                      if (selTxt && targetDomRef.current) {
+                        const curContent = targetDomRef.current.innerHTML;
+                        if (curContent.includes(selTxt)) {
+                          const updatedContent = curContent.replace(selTxt, markHtml(selTxt));
+                          targetDomRef.current.innerHTML = updatedContent;
+                        } else {
+                          try { document.execCommand('insertHTML', false, markHtml(selTxt)); } catch(e) {}
+                        }
+                      } else {
+                        try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
                       }
+
                       if (targetDomRef.current) {
+                        const finalHtml = targetDomRef.current.innerHTML;
                         if (selectedChildIndex !== null && selectedEl.data?.children?.[selectedChildIndex]) {
                           const updated = selectedEl.data.children.map((ch: any, i: number) =>
-                            i === selectedChildIndex ? { ...ch, content: targetDomRef.current!.innerHTML } : ch
+                            i === selectedChildIndex ? { ...ch, content: finalHtml } : ch
                           );
                           handleUpdateElementData(selectedEl.id, { children: updated });
                         } else {
-                          handleUpdateElementData(selectedEl.id, { content: targetDomRef.current.innerHTML });
+                          handleUpdateElementData(selectedEl.id, { content: finalHtml });
                         }
                       }
                     }}
@@ -2329,24 +2340,35 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   type="color"
                   defaultValue="#a3e635"
                   onChange={(e) => {
+                    const val = e.target.value;
+                    if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+                      targetDomRef.current = (window as any).__activeRichTextDom;
+                    }
                     if (targetDomRef.current) targetDomRef.current.focus();
                     restoreSelection();
-                    const val = e.target.value;
                     const sel = window.getSelection();
+                    const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
                     const markHtml = (txt: string) =>
                       `<mark color="${val}" style="background-color: ${val} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
-                    if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-                      document.execCommand('insertHTML', false, markHtml(sel.toString()));
-                      saveSelection();
+
+                    if (selTxt && targetDomRef.current) {
+                      const curContent = targetDomRef.current.innerHTML;
+                      if (curContent.includes(selTxt)) {
+                        targetDomRef.current.innerHTML = curContent.replace(selTxt, markHtml(selTxt));
+                      } else {
+                        try { document.execCommand('insertHTML', false, markHtml(selTxt)); } catch(err) {}
+                      }
                     }
+
                     if (targetDomRef.current) {
+                      const finalHtml = targetDomRef.current.innerHTML;
                       if (selectedChildIndex !== null && selectedEl.data?.children?.[selectedChildIndex]) {
                         const updated = selectedEl.data.children.map((ch: any, i: number) =>
-                          i === selectedChildIndex ? { ...ch, content: targetDomRef.current!.innerHTML } : ch
+                          i === selectedChildIndex ? { ...ch, content: finalHtml } : ch
                         );
                         handleUpdateElementData(selectedEl.id, { children: updated });
                       } else {
-                        handleUpdateElementData(selectedEl.id, { content: targetDomRef.current.innerHTML });
+                        handleUpdateElementData(selectedEl.id, { content: finalHtml });
                       }
                     }
                   }}
