@@ -5056,7 +5056,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         {/* ACTIONS BADGE */}
                                         <div
                                           style={{ color: '#ffffff' }}
-                                          className="!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-emerald-400 bg-[#10B981]"
+                                          className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md ${
+                                            ['Heading', 'Text', 'Image', 'ButtonCTA', 'OptinForm'].includes(child.type)
+                                              ? 'border-l border-orange-400 bg-[#FF7A00]'
+                                              : 'border-l border-emerald-400 bg-[#10B981]'
+                                          }`}
                                         >
                                           {/* ⬆️ PLACER EN HAUT (AU-DESSUS DES DIVS) */}
                                            <button
