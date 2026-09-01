@@ -225,6 +225,12 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             if (el.type === 'Section' || el.type === 'BlockSectionFull') {
+              const stylesheetUrls = el.data?.stylesheetUrls || [];
+              const customCss = el.data?.customCss || '';
+              const scriptUrls = el.data?.scriptUrls || [];
+              const customJs = el.data?.customJs || '';
+              const sectionClassName = el.data?.className || '';
+
               const mainBg = el.data?.bgColor || '#0F172A';
               const bgImage = el.data?.bgImage || '';
               const bgOverlay = el.data?.bgOverlay !== undefined ? el.data.bgOverlay : 0;
@@ -241,24 +247,39 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                   : 'max-w-4xl mx-auto';
 
               return (
-                <section
-                  key={el.id}
-                  style={{
-                    backgroundColor: mainBg,
-                    backgroundImage: bgImage ? `url(${bgImage})` : undefined,
-                    backgroundSize: bgSize,
-                    backgroundPosition: bgPos,
-                    color: textColor,
-                    minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
-                    paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
-                    paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
-                    paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
-                    paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
-                    marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
-                    marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
-                  }}
-                  className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-none transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
-                >
+                <React.Fragment key={el.id}>
+                  {/* CLONED CSS STYLESHEETS & CUSTOM STYLES */}
+                  {stylesheetUrls.map((url: string, uIdx: number) => (
+                    <link key={`css-${uIdx}`} rel="stylesheet" href={url} />
+                  ))}
+                  {customCss && (
+                    <style dangerouslySetInnerHTML={{ __html: customCss }} />
+                  )}
+                  {/* CLONED JS SCRIPTS */}
+                  {scriptUrls.map((url: string, uIdx: number) => (
+                    <script key={`js-${uIdx}`} src={url} defer />
+                  ))}
+                  {customJs && (
+                    <script dangerouslySetInnerHTML={{ __html: customJs }} />
+                  )}
+
+                  <section
+                    style={{
+                      backgroundColor: mainBg,
+                      backgroundImage: bgImage ? `url(${bgImage})` : undefined,
+                      backgroundSize: bgSize,
+                      backgroundPosition: bgPos,
+                      color: textColor,
+                      minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
+                      paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                      paddingBottom: el.data?.paddingBottom !== undefined ? `${el.data.paddingBottom}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
+                      paddingLeft: el.data?.paddingLeft !== undefined ? `${el.data.paddingLeft}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                      paddingRight: el.data?.paddingRight !== undefined ? `${el.data.paddingRight}px` : (el.data?.paddingX !== undefined ? `${el.data.paddingX}px` : undefined),
+                      marginTop: el.data?.marginTop !== undefined ? `${el.data.marginTop}px` : undefined,
+                      marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
+                    }}
+                    className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} ${el.data?.paddingY === undefined && el.data?.paddingTop === undefined ? 'p-8 sm:p-14' : ''} shadow-none transition-all ${index === 0 ? 'mt-0 mb-8' : 'my-8'} overflow-hidden flex flex-col justify-between`}
+                  >
                   {/* OVERLAY TINT FOR READABILITY */}
                   {bgOverlay > 0 && (
                     <div
@@ -489,6 +510,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     })()}
                   </div>
                 </section>
+              </React.Fragment>
               );
             }
 

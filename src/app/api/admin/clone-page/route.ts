@@ -34,9 +34,42 @@ export async function POST(req: Request) {
     const pageTitle = await page.title();
     const now = Date.now();
 
-    // Execute in-browser DOM parsing with computed styles
+    // Execute in-browser DOM parsing with full CSS & JS capture
     const extractedData = await page.evaluate((nowVal: any) => {
       const results: any[] = [];
+
+      // 1. Extract CSS Stylesheets & Inline <style>
+      const stylesheetUrls: string[] = [];
+      Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach((link: any) => {
+        if (link.href && !link.href.includes('google-analytics') && !link.href.includes('pixel')) {
+          stylesheetUrls.push(link.href);
+        }
+      });
+
+      let customCss = '';
+      Array.from(document.querySelectorAll('style')).forEach((styleEl: any) => {
+        const cssText = styleEl.textContent || '';
+        if (cssText.length > 5 && !cssText.includes('google-analytics')) {
+          customCss += cssText + '\n';
+        }
+      });
+
+      // 2. Extract JS Scripts & Inline <script>
+      const scriptUrls: string[] = [];
+      Array.from(document.querySelectorAll('script[src]')).forEach((scriptEl: any) => {
+        const src = scriptEl.src;
+        if (src && !src.includes('google-analytics') && !src.includes('facebook') && !src.includes('gtm') && !src.includes('pixel')) {
+          scriptUrls.push(src);
+        }
+      });
+
+      let customJs = '';
+      Array.from(document.querySelectorAll('script:not([src])')).forEach((scriptEl: any) => {
+        const jsText = scriptEl.textContent || '';
+        if (jsText.length > 5 && !jsText.includes('gtag') && !jsText.includes('fbq') && !jsText.includes('GoogleAnalytics')) {
+          customJs += jsText + '\n';
+        }
+      });
 
       // Helper to check if element is visible
       const isVisible = (el: Element) => {
@@ -90,6 +123,7 @@ export async function POST(req: Request) {
             const text = cleanTextStr(e.textContent || '');
             const bg = rgbToHex(style.backgroundColor);
             const fg = rgbToHex(style.color);
+            const className = e.className || '';
 
             // BUTTONS / CTAs
             const isBtn = tag === 'button' || tag === 'a' || e.classList.contains('btn') || e.classList.contains('button') || e.getAttribute('role') === 'button';
@@ -106,6 +140,7 @@ export async function POST(req: Request) {
                   btnColor,
                   textColor: fg !== 'transparent' ? fg : '#ffffff',
                   linkUrl,
+                  className,
                 },
               });
               return;
@@ -124,6 +159,7 @@ export async function POST(req: Request) {
                     fontSize: tag === 'h1' ? 'text-4xl' : tag === 'h2' ? 'text-3xl' : 'text-xl',
                     fontWeight: 'font-black',
                     textColor: fg !== 'transparent' ? fg : '#ffffff',
+                    className,
                   },
                 });
                 return;
@@ -143,6 +179,7 @@ export async function POST(req: Request) {
                   data: {
                     img: src,
                     imgObjectFit: 'cover',
+                    className,
                   },
                 });
                 return;
@@ -161,6 +198,7 @@ export async function POST(req: Request) {
                   data: {
                     fontSize: 'text-base',
                     textColor: fg !== 'transparent' ? fg : '#ffffff',
+                    className,
                   },
                 });
                 return;
@@ -185,6 +223,7 @@ export async function POST(req: Request) {
               cardBgColor: colBg !== 'transparent' ? colBg : 'transparent',
               cardTextColor: '#ffffff',
               children: colItems,
+              className: colEl ? colEl.className : '',
             },
           });
         }
@@ -201,6 +240,11 @@ export async function POST(req: Request) {
             children: childCols,
             paddingY: 48,
             paddingX: 24,
+            className: sec.className || '',
+            stylesheetUrls: sIdx === 0 ? stylesheetUrls : [],
+            customCss: sIdx === 0 ? customCss : '',
+            scriptUrls: sIdx === 0 ? scriptUrls : [],
+            customJs: sIdx === 0 ? customJs : '',
           },
         });
       });
