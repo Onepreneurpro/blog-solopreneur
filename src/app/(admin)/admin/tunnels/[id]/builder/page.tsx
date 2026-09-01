@@ -114,7 +114,6 @@ function ClonedPageFrame({ rawHtml, customCss, stylesheetUrls = [], scriptUrls =
 const renderBorderStyles = (data: any) => {
   if (!data) return {};
 
-  const bStyle = data.borderStyle || 'none';
   const bWidth = data.borderWidth !== undefined ? data.borderWidth : 2;
   const bColor = data.borderColor || '#00A0FF';
 
@@ -135,42 +134,7 @@ const renderBorderStyles = (data: any) => {
     };
   }
 
-  if (bStyle === 'glow') {
-    return {
-      borderStyle: 'solid',
-      borderWidth: `${Math.max(2, bWidth)}px`,
-      borderColor: bColor,
-      boxShadow: `0 0 18px ${bColor}, inset 0 0 15px ${bColor}22`,
-      borderRadius,
-      clipPath,
-      WebkitClipPath: clipPath,
-    };
-  }
 
-  if (bStyle === 'shadow3d') {
-    const offsetW = Math.max(4, bWidth + 2);
-    return {
-      borderStyle: 'solid',
-      borderWidth: `${Math.max(2, bWidth)}px`,
-      borderColor: bColor,
-      boxShadow: `${offsetW}px ${offsetW}px 0px ${bColor}`,
-      borderRadius,
-      clipPath,
-      WebkitClipPath: clipPath,
-    };
-  }
-
-  if (bStyle === 'softshadow') {
-    return {
-      borderStyle: 'solid',
-      borderWidth: `${Math.max(1, bWidth)}px`,
-      borderColor: bColor,
-      boxShadow: `0 10px 25px -5px ${bColor}66, 0 8px 10px -6px ${bColor}33`,
-      borderRadius,
-      clipPath,
-      WebkitClipPath: clipPath,
-    };
-  }
 
   return {
     borderStyle: data.borderStyle,
@@ -2273,9 +2237,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         { id: 'dashed', label: '╌╌ Tirets' },
                         { id: 'dotted', label: '┈ ┈ Pointillé' },
                         { id: 'double', label: '══ Double' },
-                        { id: 'glow', label: '🌟 Néon Lumineux' },
-                        { id: 'shadow3d', label: '🔳 Ombre 3D Pop' },
-                        { id: 'softshadow', label: '✨ Ombre Douce' },
                       ].map((styleOpt) => {
                         const isActive = (targetData.borderStyle || 'none') === styleOpt.id;
                         return (
