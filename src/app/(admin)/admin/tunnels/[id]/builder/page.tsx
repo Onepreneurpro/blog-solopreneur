@@ -563,6 +563,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         bgSize: 'cover',
         bgPosition: 'center',
         textColor: '#ffffff',
+        paddingTop: 40,
+        paddingBottom: 40,
+        paddingLeft: 40,
+        paddingRight: 40,
+        paddingY: 40,
+        paddingX: 40,
         children: [],
       };
     }
@@ -1548,14 +1554,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               }
             };
 
-            const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 48;
+            const defaultPaddingVal = (selectedChildIndex !== null || selectedSubItem) ? 0 : 40;
             
             // Computed values (Main Y/X values are strictly bound to paddingY/paddingX/marginY/marginX to avoid reacting when sub-sliders move)
             const padYVal = targetData.paddingY !== undefined ? targetData.paddingY : defaultPaddingVal;
             const padTop = targetData.paddingTop !== undefined ? targetData.paddingTop : padYVal;
             const padBottom = targetData.paddingBottom !== undefined ? targetData.paddingBottom : padYVal;
 
-            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 24);
+            const padXVal = targetData.paddingX !== undefined ? targetData.paddingX : (selectedSubItem ? 0 : 40);
             const padLeft = targetData.paddingLeft !== undefined ? targetData.paddingLeft : padXVal;
             const padRight = targetData.paddingRight !== undefined ? targetData.paddingRight : padXVal;
 
