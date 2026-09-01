@@ -4129,8 +4129,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   <React.Fragment key={el.id}>
                   <div
                     key={el.id}
-                    draggable
-                    onDragStart={(e) => handleCanvasElementDragStart(e, idx, el.id)}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.stopPropagation();
