@@ -381,6 +381,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : (el.data?.marginY !== undefined ? `${el.data.marginY}px` : undefined),
                       marginLeft: el.data?.marginLeft !== undefined ? `${el.data.marginLeft}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                       marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
+                      ...renderBorderStyles(el.data),
                     }}
                     className={`relative w-screen left-1/2 right-1/2 -mx-[50vw] ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
@@ -523,7 +524,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : undefined,
                                     marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                   }}
-                                  className={`w-full h-full flex-1 flex flex-col min-h-[160px] rounded-none transition-all space-y-4 ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-6' : ''}`}
+                                  className={`w-full h-full flex-1 flex flex-col min-h-[160px] overflow-hidden transition-all space-y-4 ${child.data?.paddingY === undefined && child.data?.paddingTop === undefined ? 'p-6' : ''}`}
                                 >
                                   {child.data?.title && (
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
@@ -551,16 +552,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                   marginTop: imgMarginTop,
                                                   marginBottom: imgMarginBottom,
                                                 }}
-                                                className="w-full rounded-none overflow-hidden"
+                                                className="w-full overflow-hidden"
                                               >
                                                 <img
                                                   src={sub.data?.img || sub.content}
                                                   alt="Child"
                                                   style={{
                                                     objectFit: sub.data?.imgObjectFit || 'cover',
-                                                    borderRadius: sub.data?.borderRadius ? `${sub.data.borderRadius}px` : 0,
+                                                    ...renderBorderStyles(sub.data),
                                                   }}
-                                                  className="w-full h-full object-cover"
+                                                  className="w-full h-full object-cover overflow-hidden"
                                                 />
                                               </div>
                                             ) : sub.type === 'Heading' ? (

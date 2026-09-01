@@ -3831,7 +3831,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                           marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : undefined,
                                           ...renderBorderStyles(child.data),
                                         }}
-                                        className={`relative group/child rounded-none border transition-all flex flex-col flex-1 h-full ${
+                                        className={`relative group/child overflow-hidden border transition-all flex flex-col flex-1 h-full ${
                                         selectedChildIndex === cIdx
                                             ? 'border-[#00A0FF] ring-2 ring-[#00A0FF]/40 shadow-lg'
                                             : 'border-white/10 hover:border-amber-500/60'
