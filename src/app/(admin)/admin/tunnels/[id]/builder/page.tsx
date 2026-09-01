@@ -169,8 +169,27 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     selectedText: string;
     targetElId?: string;
     childIdx?: number | null;
+    subChildIdx?: number | null;
   }>({ visible: false, x: 0, y: 0, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'fontSize' | null>(null);
+
+  const handleOpenFormattingToolbar = (e: React.MouseEvent, targetId: string, childIdx?: number | null, subChildIdx?: number | null, defaultContent?: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedElementId(targetId);
+    if (childIdx !== undefined && childIdx !== null) setSelectedChildIndex(childIdx);
+    const selection = window.getSelection();
+    const selText = selection ? selection.toString() : '';
+    setFloatingTextMenu({
+      visible: true,
+      x: Math.max(16, Math.min(window.innerWidth - 650, e.clientX - 250)),
+      y: Math.max(80, e.clientY - 70),
+      selectedText: selText || defaultContent || '',
+      targetElId: targetId,
+      childIdx: childIdx !== undefined ? childIdx : null,
+      subChildIdx: subChildIdx !== undefined ? subChildIdx : null,
+    });
+  };
 
   const renderFloatingToolbar = () => {
     if (!floatingTextMenu.visible) return null;
@@ -178,10 +197,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     const childIdx = (floatingTextMenu.childIdx !== undefined && floatingTextMenu.childIdx !== null)
       ? floatingTextMenu.childIdx
       : selectedChildIndex;
+    const subChildIdx = floatingTextMenu.subChildIdx;
 
     const updateTarget = (styleUpdates: Record<string, any>, extraProps?: Record<string, any>) => {
       if (!targetId) return;
-      if (childIdx !== null && childIdx !== undefined) {
+      if (childIdx !== null && childIdx !== undefined && subChildIdx !== null && subChildIdx !== undefined) {
+        // Sub-child inside ContentBox Div
+        const targetSection = elements.find(e => e.id === targetId);
+        if (targetSection && targetSection.data?.children?.[childIdx]?.data?.children) {
+          const children = [...targetSection.data.children];
+          const childDiv = { ...children[childIdx] };
+          const divChildren = [...(childDiv.data?.children || [])];
+          const subChild = divChildren[subChildIdx];
+          if (subChild) {
+            divChildren[subChildIdx] = {
+              ...subChild,
+              ...(extraProps || {}),
+              data: { ...(subChild.data || {}), ...styleUpdates }
+            };
+            childDiv.data = { ...(childDiv.data || {}), children: divChildren };
+            children[childIdx] = childDiv;
+            handleUpdateElementData(targetId, { children });
+          }
+        }
+      } else if (childIdx !== null && childIdx !== undefined) {
+        // Direct Section child
         const targetSection = elements.find(e => e.id === targetId);
         if (targetSection && targetSection.data?.children) {
           const children = [...targetSection.data.children];
@@ -196,7 +236,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           }
         }
       } else {
-        handleUpdateElementData(targetId, styleUpdates);
+        // Root element
+        const targetEl = elements.find(e => e.id === targetId);
+        if (targetEl) {
+          if (extraProps?.type) {
+            setElements(prev => prev.map(item => item.id === targetId ? { ...item, type: extraProps.type, data: { ...(item.data || {}), ...styleUpdates } } : item));
+          } else {
+            handleUpdateElementData(targetId, styleUpdates);
+          }
+        }
       }
     };
 
@@ -4622,11 +4670,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <input
                         type="text"
                         value={el.content}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         onChange={(e) => {
                           const val = e.target.value;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
                         }}
-                        className="w-full text-2xl sm:text-4xl font-heading font-black text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1 transition-all hover:bg-white/5 focus:bg-slate-900/80"
+                        style={{
+                          color: el.data?.textColor || '#ffffff',
+                          backgroundColor: el.data?.bgColor || 'transparent',
+                          fontSize: el.data?.fontSize,
+                          fontWeight: el.data?.fontWeight,
+                          fontStyle: el.data?.fontStyle,
+                          textDecoration: el.data?.textDecoration,
+                        }}
+                        className="w-full text-2xl sm:text-4xl font-heading font-black text-white bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none rounded-lg px-2 py-1 transition-all hover:bg-white/5 focus:bg-slate-900/80 select-text"
                         placeholder="Votre titre ici..."
                       />
                     )}
@@ -4634,12 +4694,24 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     {el.type === 'Text' && (
                       <textarea
                         value={el.content}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         onChange={(e) => {
                           const val = e.target.value;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: val } : item)));
                         }}
                         rows={2}
-                        className="w-full text-sm text-slate-300 leading-relaxed font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none rounded-lg p-2 transition-all hover:bg-white/5 focus:bg-slate-900/80"
+                        style={{
+                          color: el.data?.textColor || '#cbd5e1',
+                          backgroundColor: el.data?.bgColor || 'transparent',
+                          fontSize: el.data?.fontSize,
+                          fontWeight: el.data?.fontWeight,
+                          fontStyle: el.data?.fontStyle,
+                          textDecoration: el.data?.textDecoration,
+                        }}
+                        className="w-full text-sm text-slate-300 leading-relaxed font-medium bg-transparent border border-transparent focus:border-[#00A0FF] outline-none resize-none rounded-lg p-2 transition-all hover:bg-white/5 focus:bg-slate-900/80 select-text"
                         placeholder="Votre texte ici..."
                       />
                     )}
@@ -6017,8 +6089,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                       <input
                                                         type="text"
                                                         value={subChild.content}
+                                                        onMouseDown={(e) => e.stopPropagation()}
+                                                        onPointerDown={(e) => e.stopPropagation()}
+                                                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
                                                         onChange={(e) => updateSubChildData({ content: e.target.value })}
-                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none text-white"
+                                                        style={{
+                                                          color: subChild.data?.textColor || '#ffffff',
+                                                          backgroundColor: subChild.data?.bgColor || 'transparent',
+                                                          fontSize: subChild.data?.fontSize,
+                                                          fontWeight: subChild.data?.fontWeight,
+                                                          fontStyle: subChild.data?.fontStyle,
+                                                          textDecoration: subChild.data?.textDecoration,
+                                                        }}
+                                                        className="w-full text-lg font-heading font-black bg-transparent border-b border-transparent focus:border-[#00A0FF] outline-none text-white select-text"
                                                       />
                                                     ) : subChild.type === 'ButtonCTA' ? (
                                                       <div className="text-center py-1">
@@ -6040,8 +6124,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                       <textarea
                                                         rows={2}
                                                         value={subChild.content}
+                                                        onMouseDown={(e) => e.stopPropagation()}
+                                                        onPointerDown={(e) => e.stopPropagation()}
+                                                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
                                                         onChange={(e) => updateSubChildData({ content: e.target.value })}
-                                                        className="w-full text-xs leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none text-slate-200 resize-y"
+                                                        style={{
+                                                          color: subChild.data?.textColor || '#e2e8f0',
+                                                          backgroundColor: subChild.data?.bgColor || 'transparent',
+                                                          fontSize: subChild.data?.fontSize,
+                                                          fontWeight: subChild.data?.fontWeight,
+                                                          fontStyle: subChild.data?.fontStyle,
+                                                          textDecoration: subChild.data?.textDecoration,
+                                                        }}
+                                                        className="w-full text-xs leading-relaxed bg-transparent border border-transparent focus:border-[#00A0FF] outline-none text-slate-200 resize-none select-text"
                                                       />
                                                     )}
                                                   </div>

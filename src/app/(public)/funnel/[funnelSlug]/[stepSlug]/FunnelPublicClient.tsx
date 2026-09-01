@@ -660,6 +660,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                               const commonChildStyle: any = {
                                 backgroundColor: childBg,
                                 color: childTextColor,
+                                fontSize: child.data?.fontSize,
+                                fontWeight: child.data?.fontWeight,
+                                fontStyle: child.data?.fontStyle,
+                                textDecoration: child.data?.textDecoration,
                                 paddingTop: childPadTop,
                                 paddingBottom: childPadBottom,
                                 paddingLeft: childPadLeft,
