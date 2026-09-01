@@ -96,6 +96,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     }
   }
 
+  const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
@@ -187,6 +189,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     const pageBgPosX = parsedData?.pageBgPosX ?? step?.data?.pageBgPosX ?? 50;
     const pageBgPosY = parsedData?.pageBgPosY ?? step?.data?.pageBgPosY ?? 0;
     const pageDir = parsedData?.pageDir || step?.data?.pageDir || ((parsedData?.pageLang || step?.data?.pageLang) === 'ar' ? 'rtl' : 'ltr');
+    const pageCopyright = parsedData?.pageCopyright || step?.data?.pageCopyright || `© ${new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.`;
 
     return (
     <div
@@ -1082,7 +1085,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         </div>
 
         <div className="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
-          © {new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.
+          {pageCopyright}
         </div>
       </div>
     );
@@ -1200,7 +1203,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
       {/* FOOTER COPYRIGHT */}
       <div className="max-w-6xl mx-auto w-full text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
-        © {new Date().getFullYear()} Onepreneur&Co. Tous droits réservés.
+        {pageCopyright}
       </div>
     </div>
   );

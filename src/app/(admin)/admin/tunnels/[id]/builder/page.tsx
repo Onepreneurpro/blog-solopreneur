@@ -131,6 +131,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [pageLang, setPageLang] = useState<string>('fr');
   const [pageDir, setPageDir] = useState<'ltr' | 'rtl'>('ltr');
   const [pageFont, setPageFont] = useState<string>('Inter');
+  const [pageCopyright, setPageCopyright] = useState<string>('© 2026 Onepreneur&Co. Tous droits réservés.');
   const [pageBgColor, setPageBgColor] = useState<string>('#020617');
   const [pageBgImage, setPageBgImage] = useState<string>('');
   const [pageBgSize, setPageBgSize] = useState<string>('cover');
@@ -363,6 +364,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 if (parsed.pageLang) setPageLang(parsed.pageLang);
                 if (parsed.pageDir) setPageDir(parsed.pageDir);
                 if (parsed.pageFont) setPageFont(parsed.pageFont);
+                if (parsed.pageCopyright) setPageCopyright(parsed.pageCopyright);
               } else {
                 setElements([]);
               }
@@ -3710,6 +3712,23 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
                   </div>
                 </div>
+
+                {/* 5. PIED DE PAGE & DROITS D AUTEUR (COPYRIGHT) */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
+                    ©️ Pied de page & Copyright
+                  </label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 block">Texte du pied de page</label>
+                    <input
+                      type="text"
+                      placeholder="ex: © 2026 Mon Entreprise. Tous droits réservés."
+                      value={pageCopyright}
+                      onChange={(e) => setPageCopyright(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -5939,6 +5958,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </React.Fragment>
               );
             })}
+            {/* CANVAS BOTTOM FOOTER COPYRIGHT */}
+            <div className="w-full text-center text-xs text-slate-500 border-t border-slate-900/60 pt-6 mt-12 pb-12 font-medium">
+              {pageCopyright || '© 2026 Onepreneur&Co. Tous droits réservés.'}
+            </div>
           </div>
         </div>
       </div>
