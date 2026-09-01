@@ -47,6 +47,7 @@ import {
   Loader2,
   Link2,
   Unlink,
+  Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -131,6 +132,11 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const [pageDir, setPageDir] = useState<'ltr' | 'rtl'>('ltr');
   const [pageFont, setPageFont] = useState<string>('Inter');
   const [pageBgColor, setPageBgColor] = useState<string>('#020617');
+  const [pageBgImage, setPageBgImage] = useState<string>('');
+  const [pageBgSize, setPageBgSize] = useState<string>('cover');
+  const [pageBgZoom, setPageBgZoom] = useState<number>(100);
+  const [pageBgPosX, setPageBgPosX] = useState<number>(50);
+  const [pageBgPosY, setPageBgPosY] = useState<number>(0);
   const [activeBlockSubCategory, setActiveBlockSubCategory] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
@@ -3506,18 +3512,142 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                 </div>
 
                 {/* 4. ARRIÈRE-PLAN GLOBAL DE LA PAGE */}
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
                   <label className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider block">
                     🎨 Arrière-plan global de la page
                   </label>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Couleur d arrière-plan</span>
+                  
+                  {/* COULEUR DE FOND */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400 font-bold">Couleur de fond</span>
+                      <input
+                        type="color"
+                        value={pageBgColor || '#020617'}
+                        onChange={(e) => setPageBgColor(e.target.value)}
+                        className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                      />
+                    </div>
+                    {/* PRESETS DE COULEURS */}
+                    <div className="flex items-center gap-1.5 pt-1">
+                      {['#020617', '#ffffff', '#0f172a', '#1e1b4b', '#064e3b', '#78350f', '#881337', '#000000'].map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setPageBgColor(c)}
+                          className="w-5 h-5 rounded-full border border-slate-700 transition-transform hover:scale-110"
+                          style={{ backgroundColor: c }}
+                          title={c}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* IMAGE DE FOND GLOBALE */}
+                  <div className="space-y-2 pt-2 border-t border-slate-900">
+                    <label className="text-[10px] font-bold text-slate-400 block">🌄 Image de Fond Globale</label>
+                    
+                    <div className="flex gap-2">
+                      <label className="flex-1 px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-center text-xs font-bold text-slate-300 cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                        <Upload className="w-3.5 h-3.5 text-[#00A0FF]" />
+                        <span>Choisir photo PC</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                if (ev.target?.result) setPageBgImage(ev.target.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                      {pageBgImage && (
+                        <button
+                          type="button"
+                          onClick={() => setPageBgImage('')}
+                          className="px-2.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-colors"
+                          title="Supprimer l image de fond"
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+
                     <input
-                      type="color"
-                      value={pageBgColor}
-                      onChange={(e) => setPageBgColor(e.target.value)}
-                      className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                      type="text"
+                      placeholder="Ou coller une URL d image..."
+                      value={pageBgImage || ''}
+                      onChange={(e) => setPageBgImage(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-[#00A0FF]"
                     />
+
+                    {/* MODES D AFFICHAGE DE L IMAGE (PAGE BG SIZE) */}
+                    {pageBgImage && (
+                      <div className="space-y-3 pt-2">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-slate-400 block">Mode de remplissage</label>
+                          <select
+                            value={pageBgSize || 'cover'}
+                            onChange={(e) => setPageBgSize(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white font-bold outline-none focus:border-[#00A0FF] cursor-pointer"
+                          >
+                            <option value="cover">Couvrir tout l écran (Cover)</option>
+                            <option value="100% auto">Adapter à la largeur (100% Auto)</option>
+                            <option value="auto 100%">Adapter à la hauteur (Auto 100%)</option>
+                            <option value="100% 100%">Étirer sur toute la page (100% 100%)</option>
+                            <option value="contain">Ajuster sans couper (Contain)</option>
+                          </select>
+                        </div>
+
+                        {/* ZOOM SLIDER */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+                            <span>Zoom d image</span>
+                            <span>{pageBgZoom || 100}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="50"
+                            max="300"
+                            value={pageBgZoom || 100}
+                            onChange={(e) => setPageBgZoom(Number(e.target.value))}
+                            className="w-full accent-[#00A0FF] cursor-pointer"
+                          />
+                        </div>
+
+                        {/* POSITION X / Y SLIDERS */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <span className="text-[10px] text-slate-400 font-bold block">Position Horiz. (X)</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={pageBgPosX ?? 50}
+                              onChange={(e) => setPageBgPosX(Number(e.target.value))}
+                              className="w-full accent-[#00A0FF] cursor-pointer"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[10px] text-slate-400 font-bold block">Position Vert. (Y)</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={pageBgPosY ?? 0}
+                              onChange={(e) => setPageBgPosY(Number(e.target.value))}
+                              className="w-full accent-[#00A0FF] cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3540,7 +3670,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               setSelectedSubItem(null);
             }
           }}
-          className="flex-1 bg-slate-950 p-0 overflow-y-auto h-full flex justify-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900"
+          style={{
+            backgroundColor: pageBgColor || '#020617',
+            backgroundImage: pageBgImage ? `url(${pageBgImage})` : undefined,
+            backgroundSize: pageBgImage ? (pageBgSize === 'cover' ? `${pageBgZoom || 100}%` : pageBgSize) : undefined,
+            backgroundPosition: pageBgImage ? `${pageBgPosX ?? 50}% ${pageBgPosY ?? 0}%` : undefined,
+            backgroundRepeat: 'no-repeat'
+          }}
+          className="flex-1 p-0 overflow-y-auto h-full flex justify-center pb-52 relative scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-slate-900 transition-colors duration-300"
         >
           <div
             dir={pageDir}

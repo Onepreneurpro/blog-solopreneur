@@ -180,8 +180,25 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
         : 'max-w-4xl mx-auto w-full';
 
     const pageDir = step?.data?.pageDir || (step?.data?.pageLang === 'ar' ? 'rtl' : 'ltr');
+    const pageBgColor = step?.data?.pageBgColor || '#020617';
+    const pageBgImage = step?.data?.pageBgImage || '';
+    const pageBgSize = step?.data?.pageBgSize || 'cover';
+    const pageBgZoom = step?.data?.pageBgZoom || 100;
+    const pageBgPosX = step?.data?.pageBgPosX ?? 50;
+    const pageBgPosY = step?.data?.pageBgPosY ?? 0;
+
     return (
-      <div dir={pageDir} className="min-h-screen bg-slate-950 text-white flex flex-col justify-between overflow-x-hidden">
+    <div
+      dir={pageDir}
+      style={{
+        backgroundColor: pageBgColor,
+        backgroundImage: pageBgImage ? `url(${pageBgImage})` : undefined,
+        backgroundSize: pageBgImage ? (pageBgSize === 'cover' ? `${pageBgZoom}%` : pageBgSize) : undefined,
+        backgroundPosition: pageBgImage ? `${pageBgPosX}% ${pageBgPosY}%` : undefined,
+        backgroundRepeat: 'no-repeat'
+      }}
+      className="min-h-screen text-white flex flex-col justify-between overflow-x-hidden transition-colors duration-300"
+    >
         <div className={`${publicWidthClass} flex-1`}>
           {customElements.map((el: any, index: number) => {
             if (el.type === 'BlockNavArizona') {
