@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
-function RichTextElement({ content, onChange, onContextMenu, onSelectText, style, className }: any) {
+const RichTextElement = React.memo(function RichTextElement({ content, onChange, onContextMenu, onSelectText, style, className }: any) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,14 +15,12 @@ function RichTextElement({ content, onChange, onContextMenu, onSelectText, style
   const handleTriggerSelection = (e: any) => {
     if (typeof window !== 'undefined') {
       (window as any).__activeRichTextDom = ref.current;
-      setTimeout(() => {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-          (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
-          (window as any).__lastSelectedText = sel.toString();
-          if (onSelectText) onSelectText(e);
-        }
-      }, 10);
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+        (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
+        (window as any).__lastSelectedText = sel.toString();
+        if (onSelectText) onSelectText(e);
+      }
     }
   };
 
@@ -54,7 +52,13 @@ function RichTextElement({ content, onChange, onContextMenu, onSelectText, style
       className={className}
     />
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.content === nextProps.content &&
+    JSON.stringify(prevProps.style) === JSON.stringify(nextProps.style) &&
+    prevProps.className === nextProps.className
+  );
+});
 
 
 import Link from 'next/link';
