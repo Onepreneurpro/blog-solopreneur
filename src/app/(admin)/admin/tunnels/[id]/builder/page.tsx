@@ -614,7 +614,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </button>
 
           {openFloatingPopover === 'color' && (
-            <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                   <Palette className="w-4 h-4 text-emerald-600" />
@@ -629,55 +629,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
-                        targetDomRef.current = (window as any).__activeRichTextDom;
-                      }
-                      if (targetDomRef.current) {
-                        targetDomRef.current.focus();
-                      }
                       restoreSelection();
-                      const sel = window.getSelection();
-                      const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
-                      const spanHtml = (txt: string) =>
-                        `<span style="color: ${c.color} !important; font-weight: inherit;">${txt}</span>`;
-
-                      let applied = false;
-                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-                        try {
-                          document.execCommand('insertHTML', false, spanHtml(sel.toString()));
-                          applied = true;
-                          saveSelection();
-                        } catch(e) {}
-                      }
-
-                      if (!applied && selTxt && targetDomRef.current) {
-                        const curHtml = targetDomRef.current.innerHTML;
-                        if (curHtml.includes(selTxt)) {
-                          targetDomRef.current.innerHTML = curHtml.replace(selTxt, spanHtml(selTxt));
-                          applied = true;
-                        }
-                      }
-
-                      if (!applied) {
-                        try { document.execCommand('foreColor', false, c.color); } catch(e) {}
-                      }
-
-                      if (targetDomRef.current) {
-                        updateTargetContentOnly(targetDomRef.current.innerHTML);
-                        const lastMark = targetDomRef.current.querySelector('mark:last-of-type') || targetDomRef.current.querySelector('mark');
-                        if (lastMark && typeof window !== 'undefined') {
-                          const sel = window.getSelection();
-                          if (sel) {
-                            try {
-                              const markRange = document.createRange();
-                              markRange.selectNodeContents(lastMark);
-                              sel.removeAllRanges();
-                              sel.addRange(markRange);
-                              savedRangeRef.current = markRange.cloneRange();
-                            } catch(e) {}
-                          }
-                        }
-                      }
+                      executeRichCommand('foreColor', c.color);
                       setOpenFloatingPopover(null);
                     }}
                     style={{ backgroundColor: c.color }}
@@ -733,7 +686,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           </button>
 
           {openFloatingPopover === 'neon' && (
-            <div onMouseDown={(e) => e.preventDefault()} className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
+            <div className="absolute left-0 bottom-full mb-3 z-[1000000] bg-white text-slate-900 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 w-72 space-y-3 animate-in fade-in zoom-in-95">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
                   <Highlighter className="w-4 h-4 text-amber-600" />
