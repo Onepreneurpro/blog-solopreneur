@@ -73,8 +73,9 @@ interface FunnelPublicClientProps {
 
 
   const getVisibilityClass = (data: any) => {
-    const showDesktop = data?.showDesktop !== undefined ? Boolean(data.showDesktop) : true;
-    const showMobile = data?.showMobile !== undefined ? Boolean(data.showMobile) : true;
+    if (!data) return '';
+    const showDesktop = data.showDesktop !== undefined ? Boolean(data.showDesktop) : true;
+    const showMobile = data.showMobile !== undefined ? Boolean(data.showMobile) : true;
     if (!showDesktop && !showMobile) return 'hidden';
     if (!showDesktop) return 'md:hidden';
     if (!showMobile) return 'hidden md:block';
@@ -237,6 +238,8 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
     >
         <div className={`${publicWidthClass} flex-1`}>
           {customElements.map((el: any, index: number) => {
+            const elVisClass = getVisibilityClass(el.data || el);
+            if (elVisClass === 'hidden') return null;
             if (el.type === 'BlockNavArizona') {
               return (
                 <nav key={el.id} className="bg-[#40B5A6] text-white py-3.5 px-6 rounded-2xl shadow-sm my-4">
@@ -282,7 +285,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     marginBottom: el.data?.marginBottom !== undefined ? `${el.data.marginBottom}px` : undefined,
                     ...renderBorderStyles(el.data),
                   }}
-                  className="p-6 sm:p-8 overflow-hidden shadow-xl space-y-6 my-6"
+                  className={`p-6 sm:p-8 overflow-hidden shadow-xl space-y-6 my-6 ${elVisClass}`}
                 >
                   {el.data?.title && (
                     <h3 className="text-2xl font-heading font-black border-b border-slate-100/60 pb-3" style={{ color: textColor }}>
@@ -413,7 +416,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                       ...renderBorderStyles(el.data),
                     }}
-                    className={`relative w-full ${sectionClassName} ${getVisibilityClass(el.data)} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
+                    className={`relative w-full ${sectionClassName} ${elVisClass} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
                   {/* DESKTOP BACKGROUND IMAGE LAYER (PC ONLY) */}
                   {bgImage && (
@@ -616,7 +619,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                         const imgMarginBottom = subData.marginBottom !== undefined ? `${subData.marginBottom}px` : '0px';
 
                                         return (
-                                          <div key={sub.id || sIdx} className="w-full">
+                                          <div key={sub.id || sIdx} className={`w-full ${getVisibilityClass(sub.data || sub)}`}>
                                             {sub.type === 'Image' ? (
                                               <div
                                                 style={{
@@ -722,7 +725,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                             }
 
                             return (
-                              <div key={child.id || cIdx} style={colStyle} className="w-full md:w-[var(--col-w)] md:flex-[0_0_var(--col-w)] h-full flex flex-col overflow-hidden">
+                              <div key={child.id || cIdx} style={colStyle} className={`w-full md:w-[var(--col-w)] md:flex-[0_0_var(--col-w)] h-full flex flex-col overflow-hidden ${getVisibilityClass(child.data || child)}`}>
                                 {renderedChild}
                               </div>
                             );
@@ -738,7 +741,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
             if (el.type === 'BlockHeroArizona') {
               return (
-                <div key={el.id} className="bg-[#FEF5D7] p-6 sm:p-10 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800 my-6">
+                <div key={el.id} className={`bg-[#FEF5D7] p-6 sm:p-10 rounded-3xl border border-amber-100/60 shadow-xl space-y-6 text-slate-800 my-6 ${elVisClass}`}>
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <div className="md:col-span-6 aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-4 border-white">
                       <img
@@ -887,7 +890,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               const bg = el.data?.bgColor && el.data.bgColor !== 'transparent' ? el.data.bgColor : undefined;
               const color = el.data?.textColor || undefined;
               return (
-                <div key={el.id} className="text-center py-2" style={{ backgroundColor: bg }}>
+                <div key={el.id} className={`text-center py-2 ${elVisClass}`} style={{ backgroundColor: bg }}>
                   <h1 className="text-3xl sm:text-5xl font-heading font-black text-slate-900 leading-tight" style={{ color }} dangerouslySetInnerHTML={{ __html: el.content }} />
                 </div>
               );
@@ -899,7 +902,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               return (
                 <div
                   key={el.id}
-                  className="text-base text-slate-700 leading-relaxed font-medium text-center max-w-2xl mx-auto p-2 rounded-xl"
+                  className={`text-base text-slate-700 leading-relaxed font-medium text-center max-w-2xl mx-auto p-2 rounded-xl ${elVisClass}`}
                   style={{ backgroundColor: bg, color }}
                   dangerouslySetInnerHTML={{ __html: el.content }}
                 />
@@ -908,7 +911,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
             if (el.type === 'Countdown') {
               return (
-                <div key={el.id} className="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center max-w-sm mx-auto space-y-2">
+                <div key={el.id} className={`p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center max-w-sm mx-auto space-y-2 ${elVisClass}`}>
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">⏳ Temps Restant</span>
                   <div className="text-4xl font-mono font-black text-white tracking-widest">{el.content || '24:00:00'}</div>
                 </div>
