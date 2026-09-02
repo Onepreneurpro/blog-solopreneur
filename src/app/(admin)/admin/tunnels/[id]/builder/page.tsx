@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
-const RichTextElement = React.memo(function RichTextElement({ content, onChange, onContextMenu, onSelectText, style, className }: any) {
+function RichTextElement({ content, onChange, onContextMenu, style, className }: any) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -11,18 +11,6 @@ const RichTextElement = React.memo(function RichTextElement({ content, onChange,
       ref.current.innerHTML = content || '';
     }
   }, [content]);
-
-  const handleTriggerSelection = (e: any) => {
-    if (typeof window !== 'undefined') {
-      (window as any).__activeRichTextDom = ref.current;
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-        (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
-        (window as any).__lastSelectedText = sel.toString();
-        if (onSelectText) onSelectText(e);
-      }
-    }
-  };
 
   return (
     <div
@@ -35,30 +23,27 @@ const RichTextElement = React.memo(function RichTextElement({ content, onChange,
       onBlur={() => {
         if (ref.current) onChange(ref.current.innerHTML);
       }}
+      onMouseUp={() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
+          (window as any).__activeRichTextDom = ref.current;
+        }
+      }}
+      onKeyUp={() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
+          (window as any).__activeRichTextDom = ref.current;
+        }
+      }}
       onContextMenu={onContextMenu}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = e.currentTarget;
-      }}
-      onPointerDown={(e) => {
-        e.stopPropagation();
-        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = e.currentTarget;
-      }}
-      onMouseUp={handleTriggerSelection}
-      onDoubleClick={handleTriggerSelection}
-      onKeyUp={handleTriggerSelection}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
       onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
       style={style}
       className={className}
     />
   );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.content === nextProps.content &&
-    JSON.stringify(prevProps.style) === JSON.stringify(nextProps.style) &&
-    prevProps.className === nextProps.className
-  );
-});
+}
 
 
 import Link from 'next/link';
@@ -268,71 +253,33 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
 
-  // Automatically display floating text formatting toolbar on mouseup / keyup selection
+  // Continuously capture DOM selection & target element as the user selects text
   useEffect(() => {
-    const checkAndShowToolbar = () => {
+    const handleSelectionChange = () => {
       if (typeof window !== 'undefined') {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-          const range = sel.getRangeAt(0);
-          savedRangeRef.current = range.cloneRange();
+          savedRangeRef.current = sel.getRangeAt(0).cloneRange();
           lastSelectedTextRef.current = sel.toString();
-          (window as any).__savedRange = range.cloneRange();
-          (window as any).__lastSelectedText = sel.toString();
-
-          let node: Node | null = range.commonAncestorContainer;
+          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
           if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
           const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
-
-          if (editableEl) {
-            targetDomRef.current = editableEl as HTMLElement;
+          if (editableEl && typeof window !== 'undefined') {
             (window as any).__activeRichTextDom = editableEl as HTMLElement;
-
-            const rect = range.getBoundingClientRect();
-            if (rect && rect.width > 0 && rect.height > 0) {
-              try {
-                sel.removeAllRanges();
-                sel.addRange(range);
-              } catch(e) {}
-              setFloatingTextMenu({
-                visible: true,
-                x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
-                y: Math.max(10, rect.top - 60),
-                selectedText: sel.toString(),
-                targetElId: selectedElementId || '',
-                childIdx: selectedChildIndex ?? null,
-                subChildIdx: null,
-              });
-            }
           }
         }
       }
     };
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, []);
 
-    const handleMouseUpOrKeyUp = () => {
-      setTimeout(checkAndShowToolbar, 30);
-    };
-
-    document.addEventListener('mouseup', handleMouseUpOrKeyUp);
-    document.addEventListener('keyup', handleMouseUpOrKeyUp);
-    return () => {
-      document.removeEventListener('mouseup', handleMouseUpOrKeyUp);
-      document.removeEventListener('keyup', handleMouseUpOrKeyUp);
-    };
-  }, [selectedElementId, selectedChildIndex]);
-
-  // Click outside listener to dismiss floating text formatting toolbar only when clicking outside editable text
+  // Click outside listener to dismiss floating text formatting toolbar
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const toolbar = document.getElementById('floating-builder-text-toolbar');
-      const isInsideToolbar = toolbar && toolbar.contains(e.target as Node);
-      const isInsideEditable = (e.target as HTMLElement)?.closest?.('[contenteditable]');
-
-      if (!isInsideToolbar && !isInsideEditable) {
-        const sel = typeof window !== 'undefined' ? window.getSelection() : null;
-        if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-          setFloatingTextMenu((prev) => ({ ...prev, visible: false }));
-        }
+      if (toolbar && !toolbar.contains(e.target as Node)) {
+        setFloatingTextMenu((prev) => ({ ...prev, visible: false }));
       }
     };
     if (floatingTextMenu.visible) {
@@ -341,21 +288,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   }, [floatingTextMenu.visible]);
 
-  // Re-apply DOM selection whenever floating text toolbar mounts or popover opens so text stays highlighted in blue on screen
+  // Re-apply DOM selection when popover opens so text stays highlighted on screen
   useLayoutEffect(() => {
-    if ((floatingTextMenu.visible || openFloatingPopover) && typeof window !== 'undefined') {
-      const rng = savedRangeRef.current || (window as any).__savedRange;
-      if (rng) {
-        const sel = window.getSelection();
-        if (sel) {
-          try {
-            sel.removeAllRanges();
-            sel.addRange(rng);
-          } catch (e) {}
-        }
+    if (openFloatingPopover && savedRangeRef.current && typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (sel) {
+        try {
+          sel.removeAllRanges();
+          sel.addRange(savedRangeRef.current);
+        } catch (e) {}
       }
     }
-  }, [floatingTextMenu.visible, openFloatingPopover]);
+  }, [openFloatingPopover]);
 
   // Screen clamping so floating toolbar never exceeds PC viewport width
   useLayoutEffect(() => {
@@ -394,40 +338,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           sel.addRange(savedRangeRef.current);
         } catch (e) {}
       }
-    }
-  };
-
-  const handleTextSelection = (
-    e: any,
-    targetElId: string,
-    childIdx?: number | null,
-    subChildIdx?: number | null
-  ) => {
-    if (typeof window !== 'undefined') {
-      setTimeout(() => {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-          const range = sel.getRangeAt(0);
-          const rect = range.getBoundingClientRect();
-          savedRangeRef.current = range.cloneRange();
-          lastSelectedTextRef.current = sel.toString();
-          targetDomRef.current = (e?.currentTarget || e?.target || (window as any).__activeRichTextDom) as HTMLElement;
-          (window as any).__savedRange = range.cloneRange();
-          (window as any).__lastSelectedText = sel.toString();
-
-          if (rect && rect.width > 0) {
-            setFloatingTextMenu({
-              visible: true,
-              x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
-              y: Math.max(10, rect.top - 60),
-              selectedText: sel.toString(),
-              targetElId,
-              childIdx: childIdx ?? null,
-              subChildIdx: subChildIdx ?? null,
-            });
-          }
-        }
-      }, 20);
     }
   };
 
@@ -547,8 +457,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div
         id="floating-builder-text-toolbar"
         style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-        onMouseDown={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* ↶ ANNULER */}
@@ -633,14 +543,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full border border-slate-300">
           <Type className="w-4 h-4 text-slate-700 shrink-0" />
           <select
-            onMouseDown={() => saveSelection()}
+            onMouseDown={(e) => e.stopPropagation()}
             onChange={(e) => {
               const val = e.target.value;
-              if (val) {
-                restoreSelection();
-                executeRichCommand('fontSize', '4');
-                e.target.value = '';
-              }
+              if (val) updateTarget({ fontSize: val });
             }}
             className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer"
             title="Taille de la police"
@@ -5080,13 +4986,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <RichTextElement
-                        content={el.content}
-                        onChange={(html: string) => {
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onSelectText={(e: any) => handleTextSelection(e, el.id, null, null)}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -5100,13 +5015,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Text' && (
-                      <RichTextElement
-                        content={el.content}
-                        onChange={(html: string) => {
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onSelectText={(e: any) => handleTextSelection(e, el.id, null, null)}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
