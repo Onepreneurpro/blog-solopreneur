@@ -331,7 +331,46 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
+
+  const clearTempBlueSelections = (container?: HTMLElement | null) => {
+    const target = container || (typeof document !== 'undefined' ? document.body : null);
+    if (!target) return;
+    const tempSpans = target.querySelectorAll('span.temp-blue-selection');
+    tempSpans.forEach(span => {
+      const parent = span.parentNode;
+      while (span.firstChild) parent?.insertBefore(span.firstChild, span);
+      parent?.removeChild(span);
+    });
+  };
+
+  const applyTempBlueSelection = () => {
+    if (typeof window === 'undefined') return;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+      const selectedTxt = sel.toString();
+      let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+      if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+      const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
+
+      if (editableEl) {
+        clearTempBlueSelections(editableEl as HTMLElement);
+        try {
+          const range = sel.getRangeAt(0);
+          const span = document.createElement('span');
+          span.className = 'temp-blue-selection';
+          span.style.cssText = 'background-color: #00A0FF !important; color: #ffffff !important; border-radius: 2px; padding: 0 2px;';
+          range.surroundContents(span);
+          savedRangeRef.current = document.createRange();
+          savedRangeRef.current.selectNodeContents(span);
+          lastSelectedTextRef.current = selectedTxt;
+          targetDomRef.current = editableEl as HTMLElement;
+        } catch(e) {}
+      }
+    }
+  };
+
   const restoreSelection = () => {
+    clearTempBlueSelections(targetDomRef.current);
     if (savedRangeRef.current && typeof window !== 'undefined') {
       const sel = window.getSelection();
       if (sel) {
