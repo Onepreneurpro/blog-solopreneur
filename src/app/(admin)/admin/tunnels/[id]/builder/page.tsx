@@ -470,8 +470,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div
         id="floating-builder-text-toolbar"
         style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* ↶ ANNULER */}
@@ -556,10 +556,14 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full border border-slate-300">
           <Type className="w-4 h-4 text-slate-700 shrink-0" />
           <select
-            onMouseDown={(e) => e.stopPropagation()}
+            onMouseDown={() => saveSelection()}
             onChange={(e) => {
               const val = e.target.value;
-              if (val) updateTarget({ fontSize: val });
+              if (val) {
+                restoreSelection();
+                executeRichCommand('fontSize', '4');
+                e.target.value = '';
+              }
             }}
             className="bg-transparent text-slate-900 font-extrabold text-xs focus:outline-none cursor-pointer"
             title="Taille de la police"
