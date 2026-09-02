@@ -3595,37 +3595,34 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       />
                     </div>
 
-                    {/* 5. COULEUR DE L'OMBRE & TYPE D'OMBRE (EXTERNE / INTERNE) */}
+                    {/* 5. COULEUR DE L'OMBRE & TYPE D'OMBRE (EXTERNE / INTERNE ON SAME LINE) */}
                     <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-bold text-slate-300">Couleur de l ombre</label>
-                        <button
-                          type="button"
-                          onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
-                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase transition-all border cursor-pointer ${
-                            targetData.shadowInset
-                              ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
-                              : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
-                          }`}
-                        >
-                          {targetData.shadowInset ? '🔲 Interne (Inset)' : '🔳 Externe (Normal)'}
-                        </button>
-                      </div>
+                      <label className="text-[10px] font-bold text-slate-300 block">Couleur de l ombre</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
                           value={targetData.shadowColor || '#000000'}
                           onChange={(e) => updateMarginData({ shadowColor: e.target.value })}
-                          className="w-8 h-8 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer p-0.5"
+                          className="w-7 h-7 shrink-0 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer p-0.5"
                         />
                         <input
                           type="text"
                           value={targetData.shadowColor || '#000000'}
                           onChange={(e) => updateMarginData({ shadowColor: e.target.value })}
-                          className="flex-1 px-2.5 py-1 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-[#00A0FF]"
+                          className="w-24 shrink-0 px-2 py-1 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-[#00A0FF]"
                         />
+                        <button
+                          type="button"
+                          onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
+                          className={`flex-1 py-1 px-2 rounded-xl text-[9px] font-black uppercase transition-all border cursor-pointer text-center truncate ${
+                            targetData.shadowInset
+                              ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
+                              : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
+                          }`}
+                        >
+                          {targetData.shadowInset ? '🔲 Interne' : '🔳 Externe'}
+                        </button>
                       </div>
-
                     </div>
 
                   </div>
