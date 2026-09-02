@@ -3641,60 +3641,73 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     </div>
 
-                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) */}
-                    <div className="pt-4 border-t border-slate-800 space-y-3">
-                      <div className="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wider">
-                        <Smartphone className="w-4 h-4 text-amber-400" />
-                        <span>Disponibilité Écran (PC & Mobile)</span>
+                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - COMPACT DESIGN WITH TOOLTIPS */}
+                    <div className="pt-4 border-t border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wider">
+                          <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Disponibilité Écran</span>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-                        Choisissez sur quels types d appareils cet objet est activé ou désactivé.
-                      </p>
 
-                      <div className="space-y-2 pt-1">
-                        {/* AFFICHER SUR ORDINATEUR (PC) */}
-                        <div className="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
-                          <div className="flex items-center gap-2">
-                            <Monitor className="w-4 h-4 text-sky-400" />
-                            <span className="text-xs font-extrabold text-slate-200">Afficher sur PC / Ordinateur</span>
+                      <div className="grid grid-cols-2 gap-2 pt-0.5">
+                        {/* BOUTON PC */}
+                        <button
+                          type="button"
+                          title={(targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'Affichage actuellement ACTIVÉ sur PC (cliquez pour Désactiver)' : 'Affichage actuellement DÉSACTIVÉ sur PC (cliquez pour Activer)'}
+                          onClick={() => {
+                            const currentVal = targetData.showDesktop !== undefined ? targetData.showDesktop : true;
+                            updateMarginData({ showDesktop: !currentVal });
+                          }}
+                          className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
+                            (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
+                              ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
+                              : 'bg-rose-950/40 border-rose-900/60 hover:border-rose-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <Monitor className={`w-3.5 h-3.5 shrink-0 ${
+                              (targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'text-sky-400' : 'text-slate-500'
+                            }`} />
+                            <span className="text-[11px] font-bold text-slate-300">PC</span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentVal = targetData.showDesktop !== undefined ? targetData.showDesktop : true;
-                              updateMarginData({ showDesktop: !currentVal });
-                            }}
-                            className={`px-3 py-1 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                              (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                                : 'bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800'
-                            }`}
-                          >
-                            {(targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? '✅ Activé' : '❌ Désactivé'}
-                          </button>
-                        </div>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
+                            (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-rose-900/90 text-rose-200'
+                          }`}>
+                            {(targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'Activer' : 'Désactivé'}
+                          </span>
+                        </button>
 
-                        {/* AFFICHER SUR MOBILE */}
-                        <div className="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
-                          <div className="flex items-center gap-2">
-                            <Smartphone className="w-4 h-4 text-amber-400" />
-                            <span className="text-xs font-extrabold text-slate-200">Afficher sur Mobile</span>
+                        {/* BOUTON MOBILE */}
+                        <button
+                          type="button"
+                          title={(targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'Affichage actuellement ACTIVÉ sur Mobile (cliquez pour Désactiver)' : 'Affichage actuellement DÉSACTIVÉ sur Mobile (cliquez pour Activer)'}
+                          onClick={() => {
+                            const currentVal = targetData.showMobile !== undefined ? targetData.showMobile : true;
+                            updateMarginData({ showMobile: !currentVal });
+                          }}
+                          className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
+                            (targetData.showMobile !== undefined ? targetData.showMobile : true)
+                              ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
+                              : 'bg-rose-950/40 border-rose-900/60 hover:border-rose-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <Smartphone className={`w-3.5 h-3.5 shrink-0 ${
+                              (targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'text-amber-400' : 'text-slate-500'
+                            }`} />
+                            <span className="text-[11px] font-bold text-slate-300">Mobile</span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentVal = targetData.showMobile !== undefined ? targetData.showMobile : true;
-                              updateMarginData({ showMobile: !currentVal });
-                            }}
-                            className={`px-3 py-1 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                              (targetData.showMobile !== undefined ? targetData.showMobile : true)
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                                : 'bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800'
-                            }`}
-                          >
-                            {(targetData.showMobile !== undefined ? targetData.showMobile : true) ? '✅ Activé' : '❌ Désactivé'}
-                          </button>
-                        </div>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
+                            (targetData.showMobile !== undefined ? targetData.showMobile : true)
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-rose-900/90 text-rose-200'
+                          }`}>
+                            {(targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'Activer' : 'Désactivé'}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   </div>
