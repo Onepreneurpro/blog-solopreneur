@@ -3466,6 +3466,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     </div>
                   )}
+                </div>
 
               {/* CARD 3: ✨ OMBRAGE & OMBRE PORTÉE */}
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
@@ -3703,7 +3704,6 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   </div>
                 </div>
-              </div>
             );
           })()}
         </div>
