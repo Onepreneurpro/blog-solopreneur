@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
-function RichTextElement({ content, onChange, onContextMenu, style, className }: any) {
+function RichTextElement({ content, onChange, onContextMenu, onSelectText, style, className }: any) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,18 +36,20 @@ function RichTextElement({ content, onChange, onContextMenu, style, className }:
         if (typeof window !== 'undefined') {
           (window as any).__activeRichTextDom = e.currentTarget;
           const sel = window.getSelection();
-          if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+          if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
             (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
             (window as any).__lastSelectedText = sel.toString();
+            if (onSelectText) onSelectText(e);
           }
         }
       }}
-      onKeyUp={() => {
+      onKeyUp={(e) => {
         if (typeof window !== 'undefined') {
           const sel = window.getSelection();
-          if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+          if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
             (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
             (window as any).__lastSelectedText = sel.toString();
+            if (onSelectText) onSelectText(e);
           }
         }
       }}
@@ -350,6 +352,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           sel.removeAllRanges();
           sel.addRange(savedRangeRef.current);
         } catch (e) {}
+      }
+    }
+  };
+
+  const handleTextSelection = (
+    e: React.MouseEvent | React.KeyboardEvent,
+    targetElId: string,
+    childIdx?: number | null,
+    subChildIdx?: number | null
+  ) => {
+    if (typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+        const range = sel.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        savedRangeRef.current = range.cloneRange();
+        lastSelectedTextRef.current = sel.toString();
+        targetDomRef.current = e.currentTarget as HTMLElement;
+        (window as any).__activeRichTextDom = e.currentTarget as HTMLElement;
+        (window as any).__savedRange = range.cloneRange();
+        (window as any).__lastSelectedText = sel.toString();
+
+        setFloatingTextMenu({
+          visible: true,
+          x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
+          y: Math.max(10, rect.top - 60),
+          selectedText: sel.toString(),
+          targetElId,
+          childIdx: childIdx ?? null,
+          subChildIdx: subChildIdx ?? null,
+        });
       }
     }
   };
@@ -5009,6 +5042,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
                         onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onSelectText={(e: any) => handleTextSelection(e, el.id, null, null)}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -5028,6 +5062,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
                         onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onSelectText={(e: any) => handleTextSelection(e, el.id, null, null)}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
