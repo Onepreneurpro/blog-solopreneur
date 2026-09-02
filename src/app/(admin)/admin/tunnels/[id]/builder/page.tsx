@@ -3438,10 +3438,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <button
                         type="button"
                         onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
-                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase transition-all border ${
+                        className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase transition-all border cursor-pointer ${
                           targetData.shadowInset
-                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                            ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
+                            : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
                         }`}
                       >
                         {targetData.shadowInset ? '🔲 Interne (Inset)' : '🔳 Externe (Normal)'}
@@ -3462,7 +3462,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           key={preset.label}
                           type="button"
                           onClick={() => updateMarginData(preset.data)}
-                          className="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 rounded-lg text-[10px] font-bold text-slate-300 transition-all text-center"
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 transition-all text-center cursor-pointer hover:border-slate-400"
                         >
                           {preset.label}
                         </button>
@@ -3576,7 +3576,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     </div>
 
-                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - GREY DISABLED STATE, NO RED */}
+                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - BRIGHT HIGH CONTRAST LIGHT STYLING */}
                     <div className="pt-4 border-t border-slate-800 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wider">
@@ -3596,20 +3596,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           }}
                           className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
                             (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
-                              ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
-                              : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                              ? 'bg-slate-100 border-slate-300 hover:border-emerald-500'
+                              : 'bg-slate-100 border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Monitor className={`w-3.5 h-3.5 shrink-0 ${
-                              (targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'text-sky-400' : 'text-slate-500'
+                              (targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'text-sky-600' : 'text-slate-400'
                             }`} />
-                            <span className="text-[11px] font-bold text-slate-300">PC</span>
+                            <span className="text-[11px] font-bold text-slate-800">PC</span>
                           </div>
                           <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
                             (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-slate-700 text-slate-300'
+                              : 'bg-slate-300 text-slate-700'
                           }`}>
                             {(targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'Activer' : 'Désactivé'}
                           </span>
@@ -3625,20 +3625,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           }}
                           className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
                             (targetData.showMobile !== undefined ? targetData.showMobile : true)
-                              ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
-                              : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                              ? 'bg-slate-100 border-slate-300 hover:border-emerald-500'
+                              : 'bg-slate-100 border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <div className="flex items-center gap-1.5 min-w-0">
                             <Smartphone className={`w-3.5 h-3.5 shrink-0 ${
-                              (targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'text-amber-400' : 'text-slate-500'
+                              (targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'text-amber-600' : 'text-slate-400'
                             }`} />
-                            <span className="text-[11px] font-bold text-slate-300">Mobile</span>
+                            <span className="text-[11px] font-bold text-slate-800">Mobile</span>
                           </div>
                           <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
                             (targetData.showMobile !== undefined ? targetData.showMobile : true)
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-slate-700 text-slate-300'
+                              : 'bg-slate-300 text-slate-700'
                           }`}>
                             {(targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'Activer' : 'Désactivé'}
                           </span>
