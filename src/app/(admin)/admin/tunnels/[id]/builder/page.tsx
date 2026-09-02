@@ -484,27 +484,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div
         id="floating-builder-text-toolbar"
         style={{ top: `${toolbarPos.y}px`, left: `${toolbarPos.x}px` }}
-        onMouseDown={(e) => {
-          if ((e.target as HTMLElement)?.tagName !== 'SELECT' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
-            e.preventDefault();
-          }
-          e.stopPropagation();
-        }}
-        onPointerDown={(e) => {
-          if ((e.target as HTMLElement)?.tagName !== 'SELECT' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
-            e.preventDefault();
-          }
-          e.stopPropagation();
-        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* 🖐️ POIGNÉE DE DÉPLACEMENT */}
         <div
           onMouseDown={handleStartDragToolbar}
-          className="p-1 hover:bg-slate-100 rounded-full cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 transition-colors shrink-0 flex items-center justify-center"
+          onPointerDown={handleStartDragToolbar}
+          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-900 transition-colors shrink-0 flex items-center justify-center shadow-xs border border-slate-300"
           title="Cliquez et glissez pour déplacer la barre où vous voulez sur l écran"
         >
-          <GripHorizontal className="w-4 h-4 text-slate-500" />
+          <GripHorizontal className="w-4 h-4 text-slate-700 pointer-events-none" />
         </div>
 
         <div className="h-4 w-[1px] bg-slate-300 mx-0.5" />
