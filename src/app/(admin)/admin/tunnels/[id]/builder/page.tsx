@@ -3470,32 +3470,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
               {/* CARD 3: ✨ OMBRAGE & OMBRE PORTÉE */}
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                <div className="flex items-center justify-between">
-                  <button
-                    type="button"
-                    title={isOmbrageSectionOpen ? "Cliquer pour réduire la section Ombrage & Ombre Portée" : "Cliquer pour étendre et afficher les réglages d'Ombrage & Ombre Portée"}
-                    onClick={() => setIsOmbrageSectionOpen((prev) => !prev)}
-                    className="flex-1 text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity pr-2"
-                  >
-                    <span>✨ Ombrage & Ombre Portée</span>
-                    {isOmbrageSectionOpen ? (
-                      <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
-                    className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase transition-all border cursor-pointer ${
-                      targetData.shadowInset
-                        ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
-                        : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
-                    }`}
-                  >
-                    {targetData.shadowInset ? '🔲 Interne' : '🔳 Externe'}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  title={isOmbrageSectionOpen ? "Cliquer pour réduire la section Ombrage & Ombre Portée" : "Cliquer pour étendre et afficher les réglages d'Ombrage & Ombre Portée"}
+                  onClick={() => setIsOmbrageSectionOpen((prev) => !prev)}
+                  className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
+                >
+                  <span>✨ Ombrage & Ombre Portée</span>
+                  {isOmbrageSectionOpen ? (
+                    <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  )}
+                </button>
 
                 {isOmbrageSectionOpen && (
                   <div className="space-y-3 pt-2 border-t border-slate-800/80">
@@ -3608,9 +3595,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       />
                     </div>
 
-                    {/* 5. COULEUR DE L'OMBRE */}
+                    {/* 5. COULEUR DE L'OMBRE & TYPE D'OMBRE (EXTERNE / INTERNE) */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-slate-300 block">Couleur de l ombre</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold text-slate-300">Couleur de l ombre</label>
+                        <button
+                          type="button"
+                          onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase transition-all border cursor-pointer ${
+                            targetData.shadowInset
+                              ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
+                              : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
+                          }`}
+                        >
+                          {targetData.shadowInset ? '🔲 Interne (Inset)' : '🔳 Externe (Normal)'}
+                        </button>
+                      </div>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
