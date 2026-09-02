@@ -331,46 +331,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-
-  const clearTempBlueSelections = (container?: HTMLElement | null) => {
-    const target = container || (typeof document !== 'undefined' ? document.body : null);
-    if (!target) return;
-    const tempSpans = target.querySelectorAll('span.temp-blue-selection');
-    tempSpans.forEach(span => {
-      const parent = span.parentNode;
-      while (span.firstChild) parent?.insertBefore(span.firstChild, span);
-      parent?.removeChild(span);
-    });
-  };
-
-  const applyTempBlueSelection = () => {
-    if (typeof window === 'undefined') return;
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-      const selectedTxt = sel.toString();
-      let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
-      if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
-      const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
-
-      if (editableEl) {
-        clearTempBlueSelections(editableEl as HTMLElement);
-        try {
-          const range = sel.getRangeAt(0);
-          const span = document.createElement('span');
-          span.className = 'temp-blue-selection';
-          span.style.cssText = 'background-color: #00A0FF !important; color: #ffffff !important; border-radius: 2px; padding: 0 2px;';
-          range.surroundContents(span);
-          savedRangeRef.current = document.createRange();
-          savedRangeRef.current.selectNodeContents(span);
-          lastSelectedTextRef.current = selectedTxt;
-          targetDomRef.current = editableEl as HTMLElement;
-        } catch(e) {}
-      }
-    }
-  };
-
   const restoreSelection = () => {
-    clearTempBlueSelections(targetDomRef.current);
     if (savedRangeRef.current && typeof window !== 'undefined') {
       const sel = window.getSelection();
       if (sel) {
@@ -382,32 +343,29 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  const handleStartDragToolbar = (e: React.PointerEvent) => {
+  const handleStartDragToolbar = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const handleEl = e.currentTarget;
-    try { handleEl.setPointerCapture(e.pointerId); } catch(err) {}
     const startX = e.clientX;
     const startY = e.clientY;
     const initialX = toolbarPos.x;
     const initialY = toolbarPos.y;
 
-    const onPointerMove = (moveEvent: PointerEvent) => {
+    const onMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
-      const newX = Math.max(10, Math.min(window.innerWidth - 320, initialX + deltaX));
+      const newX = Math.max(10, Math.min(window.innerWidth - 300, initialX + deltaX));
       const newY = Math.max(10, Math.min(window.innerHeight - 80, initialY + deltaY));
       setToolbarPos({ x: newX, y: newY });
     };
 
-    const onPointerUp = (upEvent: PointerEvent) => {
-      try { handleEl.releasePointerCapture(upEvent.pointerId); } catch(err) {}
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
 
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   };
 
   const handleOpenFormattingToolbar = (e: React.MouseEvent, targetId: string, childIdx?: number | null, subChildIdx?: number | null, defaultContent?: string) => {
@@ -528,12 +486,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         style={{ top: `${toolbarPos.y}px`, left: `${toolbarPos.x}px` }}
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
-        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible select-none"
+        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* 🖐️ POIGNÉE DE DÉPLACEMENT */}
         <div
+          onMouseDown={handleStartDragToolbar}
           onPointerDown={handleStartDragToolbar}
-          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-900 shrink-0 flex items-center justify-center shadow-xs border border-slate-300 touch-none"
+          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-900 transition-colors shrink-0 flex items-center justify-center shadow-xs border border-slate-300"
           title="Cliquez et glissez pour déplacer la barre où vous voulez sur l écran"
         >
           <GripHorizontal className="w-4 h-4 text-slate-700 pointer-events-none" />
