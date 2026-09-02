@@ -664,6 +664,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                       if (targetDomRef.current) {
                         updateTargetContentOnly(targetDomRef.current.innerHTML);
+                        const lastMark = targetDomRef.current.querySelector('mark:last-of-type') || targetDomRef.current.querySelector('mark');
+                        if (lastMark && typeof window !== 'undefined') {
+                          const sel = window.getSelection();
+                          if (sel) {
+                            try {
+                              const markRange = document.createRange();
+                              markRange.selectNodeContents(lastMark);
+                              sel.removeAllRanges();
+                              sel.addRange(markRange);
+                              savedRangeRef.current = markRange.cloneRange();
+                            } catch(e) {}
+                          }
+                        }
                       }
                       setOpenFloatingPopover(null);
                     }}
