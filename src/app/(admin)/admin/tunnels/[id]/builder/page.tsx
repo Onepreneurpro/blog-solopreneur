@@ -845,6 +845,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   }>({});
   const [isMargesSectionOpen, setIsMargesSectionOpen] = useState<boolean>(false);
   const [isCadreSectionOpen, setIsCadreSectionOpen] = useState<boolean>(false);
+  const [isOmbrageSectionOpen, setIsOmbrageSectionOpen] = useState<boolean>(false);
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -3466,24 +3467,37 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   )}
 
-                  {/* E. OMBRAGE & OMBRE PORTÉE (BOX SHADOW) */}
-                  <div className="space-y-3 pt-3 border-t border-slate-800">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                        ✨ Ombrage & Ombre Portée
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
-                        className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase transition-all border cursor-pointer ${
-                          targetData.shadowInset
-                            ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
-                            : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
-                        }`}
-                      >
-                        {targetData.shadowInset ? '🔲 Interne (Inset)' : '🔳 Externe (Normal)'}
-                      </button>
-                    </div>
+              {/* CARD 3: ✨ OMBRAGE & OMBRE PORTÉE */}
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    title={isOmbrageSectionOpen ? "Cliquer pour réduire la section Ombrage & Ombre Portée" : "Cliquer pour étendre et afficher les réglages d'Ombrage & Ombre Portée"}
+                    onClick={() => setIsOmbrageSectionOpen((prev) => !prev)}
+                    className="flex-1 text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity pr-2"
+                  >
+                    <span>✨ Ombrage & Ombre Portée</span>
+                    {isOmbrageSectionOpen ? (
+                      <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateMarginData({ shadowInset: !targetData.shadowInset })}
+                    className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase transition-all border cursor-pointer ${
+                      targetData.shadowInset
+                        ? 'bg-purple-500/20 text-purple-700 border-purple-400 font-black shadow-xs'
+                        : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
+                    }`}
+                  >
+                    {targetData.shadowInset ? '🔲 Interne' : '🔳 Externe'}
+                  </button>
+                </div>
+
+                {isOmbrageSectionOpen && (
+                  <div className="space-y-3 pt-2 border-t border-slate-800/80">
 
                     {/* PRESETS RAPIDES */}
                     <div className="grid grid-cols-3 gap-1.5">
@@ -3613,8 +3627,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     </div>
 
-                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - BRIGHT HIGH CONTRAST LIGHT STYLING */}
-                    <div className="pt-4 border-t border-slate-800 space-y-2">
+                  </div>
+                )}
+              </div>
+
+              {/* CARD 4: 📱 DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) */}
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wider">
                           <Smartphone className="w-3.5 h-3.5 text-amber-400" />
