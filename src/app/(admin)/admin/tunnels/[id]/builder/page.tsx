@@ -268,26 +268,45 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
 
-  // Continuously capture DOM selection & target element as the user selects text
+  // Continuously capture DOM selection & automatically display floating toolbar on ANY text selection
   useEffect(() => {
     const handleSelectionChange = () => {
       if (typeof window !== 'undefined') {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-          savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+          const range = sel.getRangeAt(0);
+          savedRangeRef.current = range.cloneRange();
           lastSelectedTextRef.current = sel.toString();
-          let node: Node | null = sel.getRangeAt(0).commonAncestorContainer;
+          (window as any).__savedRange = range.cloneRange();
+          (window as any).__lastSelectedText = sel.toString();
+
+          let node: Node | null = range.commonAncestorContainer;
           if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
           const editableEl = (node as HTMLElement)?.closest?.('[contenteditable]');
-          if (editableEl && typeof window !== 'undefined') {
+
+          if (editableEl) {
+            targetDomRef.current = editableEl as HTMLElement;
             (window as any).__activeRichTextDom = editableEl as HTMLElement;
+
+            const rect = range.getBoundingClientRect();
+            if (rect && rect.width > 0 && rect.height > 0) {
+              setFloatingTextMenu({
+                visible: true,
+                x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
+                y: Math.max(10, rect.top - 60),
+                selectedText: sel.toString(),
+                targetElId: selectedElementId || '',
+                childIdx: selectedChildIndex ?? null,
+                subChildIdx: null,
+              });
+            }
           }
         }
       }
     };
     document.addEventListener('selectionchange', handleSelectionChange);
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
-  }, []);
+  }, [selectedElementId, selectedChildIndex]);
 
   // Click outside listener to dismiss floating text formatting toolbar
   useEffect(() => {
