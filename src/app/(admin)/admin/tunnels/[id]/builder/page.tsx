@@ -663,12 +663,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
-                        targetDomRef.current = (window as any).__activeRichTextDom;
+                      let activeDom: HTMLElement | null = targetDomRef.current;
+                      if (!activeDom && typeof window !== 'undefined') {
+                        activeDom = (window as any).__activeRichTextDom || (document.activeElement as HTMLElement);
                       }
-                      if (targetDomRef.current) {
-                        targetDomRef.current.focus();
+                      if (!activeDom || !activeDom.getAttribute || !activeDom.getAttribute('contenteditable')) {
+                        const selNode = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
+                        const editableParent = (selNode as HTMLElement)?.closest?.('[contenteditable]');
+                        if (editableParent) activeDom = editableParent as HTMLElement;
                       }
+
+                      if (activeDom) {
+                        activeDom.focus();
+                        targetDomRef.current = activeDom;
+                      }
+
                       restoreSelection();
                       const sel = window.getSelection();
                       const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
@@ -684,10 +693,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         } catch(e) {}
                       }
 
-                      if (!applied && selTxt && targetDomRef.current) {
-                        const curHtml = targetDomRef.current.innerHTML;
+                      if (!applied && selTxt && activeDom) {
+                        const curHtml = activeDom.innerHTML;
                         if (curHtml.includes(selTxt)) {
-                          targetDomRef.current.innerHTML = curHtml.replace(selTxt, markHtml(selTxt));
+                          activeDom.innerHTML = curHtml.replace(selTxt, markHtml(selTxt));
                           applied = true;
                         }
                       }
@@ -696,8 +705,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
                       }
 
-                      if (targetDomRef.current) {
-                        updateTargetContentOnly(targetDomRef.current.innerHTML);
+                      if (activeDom) {
+                        updateTargetContentOnly(activeDom.innerHTML);
                       }
                       setOpenFloatingPopover(null);
                     }}
