@@ -286,6 +286,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
             const rect = range.getBoundingClientRect();
             if (rect && rect.width > 0 && rect.height > 0) {
+              try {
+                sel.removeAllRanges();
+                sel.addRange(range);
+              } catch(e) {}
               setFloatingTextMenu({
                 visible: true,
                 x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
@@ -333,18 +337,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   }, [floatingTextMenu.visible]);
 
-  // Re-apply DOM selection when popover opens so text stays highlighted on screen
+  // Re-apply DOM selection whenever floating text toolbar mounts or popover opens so text stays highlighted in blue on screen
   useLayoutEffect(() => {
-    if (openFloatingPopover && savedRangeRef.current && typeof window !== 'undefined') {
-      const sel = window.getSelection();
-      if (sel) {
-        try {
-          sel.removeAllRanges();
-          sel.addRange(savedRangeRef.current);
-        } catch (e) {}
+    if ((floatingTextMenu.visible || openFloatingPopover) && typeof window !== 'undefined') {
+      const rng = savedRangeRef.current || (window as any).__savedRange;
+      if (rng) {
+        const sel = window.getSelection();
+        if (sel) {
+          try {
+            sel.removeAllRanges();
+            sel.addRange(rng);
+          } catch (e) {}
+        }
       }
     }
-  }, [openFloatingPopover]);
+  }, [floatingTextMenu.visible, openFloatingPopover]);
 
   // Screen clamping so floating toolbar never exceeds PC viewport width
   useLayoutEffect(() => {
