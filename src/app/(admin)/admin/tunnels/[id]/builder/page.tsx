@@ -484,8 +484,18 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
       <div
         id="floating-builder-text-toolbar"
         style={{ top: `${toolbarPos.y}px`, left: `${toolbarPos.x}px` }}
-        onMouseDown={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => {
+          if ((e.target as HTMLElement)?.tagName !== 'SELECT' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
+            e.preventDefault();
+          }
+          e.stopPropagation();
+        }}
+        onPointerDown={(e) => {
+          if ((e.target as HTMLElement)?.tagName !== 'SELECT' && (e.target as HTMLElement)?.tagName !== 'INPUT') {
+            e.preventDefault();
+          }
+          e.stopPropagation();
+        }}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
         {/* 🖐️ POIGNÉE DE DÉPLACEMENT */}
