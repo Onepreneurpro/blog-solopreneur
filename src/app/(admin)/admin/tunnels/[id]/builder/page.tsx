@@ -663,21 +663,39 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
+                      if (!targetDomRef.current && typeof window !== 'undefined' && (window as any).__activeRichTextDom) {
+                        targetDomRef.current = (window as any).__activeRichTextDom;
+                      }
                       if (targetDomRef.current) {
                         targetDomRef.current.focus();
                       }
                       restoreSelection();
                       const sel = window.getSelection();
+                      const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
                       const markHtml = (txt: string) =>
                         `<mark color="${c.color}" style="background-color: ${c.color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
 
+                      let applied = false;
                       if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-                        const selectedText = sel.toString();
-                        document.execCommand('insertHTML', false, markHtml(selectedText));
-                        saveSelection();
-                      } else if (lastSelectedTextRef.current) {
-                        document.execCommand('insertHTML', false, markHtml(lastSelectedTextRef.current));
+                        try {
+                          document.execCommand('insertHTML', false, markHtml(sel.toString()));
+                          applied = true;
+                          saveSelection();
+                        } catch(e) {}
                       }
+
+                      if (!applied && selTxt && targetDomRef.current) {
+                        const curHtml = targetDomRef.current.innerHTML;
+                        if (curHtml.includes(selTxt)) {
+                          targetDomRef.current.innerHTML = curHtml.replace(selTxt, markHtml(selTxt));
+                          applied = true;
+                        }
+                      }
+
+                      if (!applied) {
+                        try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
+                      }
+
                       if (targetDomRef.current) {
                         updateTargetContentOnly(targetDomRef.current.innerHTML);
                       }
