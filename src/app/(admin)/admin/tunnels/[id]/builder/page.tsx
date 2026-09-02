@@ -4970,22 +4970,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <div
-                        contentEditable
-                        suppressContentEditableWarning
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onBlur={(e) => {
-                          const html = e.currentTarget.innerHTML;
+                      <TiptapRichTextElement
+                        content={el.content}
+                        onChange={(html: string) => {
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onInput={(e) => {
-                          const html = e.currentTarget.innerHTML;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
-                        }}
-                        dangerouslySetInnerHTML={{ __html: el.content }}
+                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -4999,22 +4989,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Text' && (
-                      <div
-                        contentEditable
-                        suppressContentEditableWarning
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onBlur={(e) => {
-                          const html = e.currentTarget.innerHTML;
+                      <TiptapRichTextElement
+                        content={el.content}
+                        onChange={(html: string) => {
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onInput={(e) => {
-                          const html = e.currentTarget.innerHTML;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
-                        }}
-                        dangerouslySetInnerHTML={{ __html: el.content }}
+                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
