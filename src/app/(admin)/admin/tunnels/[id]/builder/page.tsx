@@ -1115,9 +1115,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               id: `child-${timestamp}-${i + 1}`,
               type: 'ContentBox',
               category: 'Disposition',
-              content: `Conteneur DIV ${i + 1}`,
+              content: '',
               data: {
-                ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+                ...getDefaultBlockData('ContentBox', ''),
                 newRow: i === 0 && hasExisting,
               },
             }));
@@ -1227,9 +1227,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               id: `child-${timestamp}-${i + 1}`,
               type: 'ContentBox',
               category: 'Disposition',
-              content: `Conteneur DIV ${i + 1}`,
+              content: '',
               data: {
-                ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+                ...getDefaultBlockData('ContentBox', ''),
                 newRow: i === 0 && hasExisting,
               },
             }));
@@ -1871,9 +1871,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           id: `child-${timestamp}-${i + 1}`,
           type: 'ContentBox',
           category: 'Disposition',
-          content: `Conteneur DIV ${i + 1}`,
+          content: '',
           data: {
-            ...getDefaultBlockData('ContentBox', `Conteneur DIV ${i + 1}`),
+            ...getDefaultBlockData('ContentBox', ''),
             newRow: i === 0 && hasExistingChildren, // 1st Div starts a new row if section already has children
           },
         });
@@ -4884,7 +4884,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         id: `child-${Date.now()}-${i + 1}`,
                         type: 'ContentBox',
                         category: 'Disposition',
-                        content: `Conteneur DIV ${i + 1}`,
+                        content: '',
                         data: getDefaultBlockData('ContentBox', 'Conteneur DIV'),
                       })),
                     },
