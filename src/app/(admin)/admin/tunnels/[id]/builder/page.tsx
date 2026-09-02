@@ -456,10 +456,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return (
       <div
         id="floating-builder-text-toolbar"
-        style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999999] bg-white text-slate-900 rounded-full shadow-2xl px-4 py-2 flex items-center gap-2 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in slide-in-from-bottom-5 duration-200 select-none"
       >
         {/* ↶ ANNULER */}
         <button
@@ -527,16 +526,15 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
           <Italic className="w-4 h-4 text-slate-900" />
         </button>
 
-        {/* ∪ SOULIGNÉ */}
+        {/* U SOULIGNÉ */}
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => executeRichCommand('underline')}
-          className="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-          title="Souligner le texte sélectionné"
+          className="w-8 h-8 hover:bg-slate-100 rounded-full transition-colors text-slate-900 underline font-black text-sm flex items-center justify-center cursor-pointer"
+          title="Souligner (U)"
         >
-          <Underline className="w-4 h-4 text-sky-600" />
-          <span>Souligné</span>
+          U
         </button>
 
         {/* T TAILLE DROPDOWN */}
@@ -567,12 +565,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setOpenFloatingPopover(prev => prev === 'color' ? null : 'color')}
-            className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            className="p-2 hover:bg-emerald-50 rounded-full transition-colors text-emerald-600 flex items-center justify-center cursor-pointer"
             title="Couleur du texte"
           >
-            <Palette className="w-4 h-4 text-emerald-600" />
-            <span>Couleur</span>
-            <span className="text-[10px] text-emerald-700">▾</span>
+            <Palette className="w-4.5 h-4.5 text-emerald-600" />
           </button>
 
           {openFloatingPopover === 'color' && (
@@ -639,12 +635,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setOpenFloatingPopover(prev => prev === 'neon' ? null : 'neon')}
-            className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-950 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+            className="p-2 hover:bg-amber-50 rounded-full transition-colors text-amber-600 flex items-center justify-center cursor-pointer"
             title="Surlignage Néon Fluo"
           >
-            <Highlighter className="w-4 h-4 text-amber-600" />
-            <span>Néon</span>
-            <span className="text-[10px] text-amber-700">▾</span>
+            <Highlighter className="w-4.5 h-4.5 text-amber-500" />
           </button>
 
           {openFloatingPopover === 'neon' && (
@@ -783,11 +777,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               });
             }
           }}
-          className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-800 font-black rounded-full text-xs flex items-center gap-1 cursor-pointer shadow-xs"
+          className="p-2 hover:bg-rose-50 rounded-full transition-colors text-rose-600 flex items-center justify-center cursor-pointer"
           title="Effacer les couleurs et le style"
         >
-          <Eraser className="w-4 h-4 text-rose-600" />
-          <span>Effacer</span>
+          <Eraser className="w-4 h-4 text-rose-500" />
         </button>
 
         {/* ✕ FERMER */}
