@@ -4898,7 +4898,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         }`}
                       >
                         <span className="!text-white font-black" style={{ color: '#ffffff' }}>
-                          {el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col' ? 'SECTION' : el.type === 'ContentBox' ? 'RANGÉE / DIV' : el.type}
+                          {el.type === 'Section' || el.type === 'BlockSectionFull' || el.type === 'Section3Col' ? 'SECTION' : el.type === 'ContentBox' ? 'ROW' : el.type}
                         </span>
                         <span className="p-0.5 rounded border border-white/80 bg-white/20 flex items-center justify-center shrink-0">
                           <ChevronDown className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
@@ -5799,7 +5799,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         >
                                           <span className="text-xs font-black text-white/90">⋮⋮</span>
                                           <span className="!text-white font-black" style={{ color: '#ffffff' }}>
-                                            {child.type === 'ContentBox' ? 'RANGÉE / DIV' : child.type}
+                                            {child.type === 'ContentBox' ? 'ROW' : child.type}
                                           </span>
                                           <span className="p-0.5 rounded border border-white/80 bg-white/20 flex items-center justify-center shrink-0">
                                             <ChevronDown className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
