@@ -3433,7 +3433,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   <div className="space-y-3 pt-3 border-t border-slate-800">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
-                        ✨ Ombrage & Ombre Portée (Box Shadow)
+                        ✨ Ombrage & Ombre Portée
                       </span>
                       <button
                         type="button"
