@@ -5815,23 +5815,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                               : 'border-l border-emerald-400 bg-[#10B981]'
                                           }`}
                                         >
-                                          {/* ⬆️ PLACER EN HAUT (AU-DESSUS DES DIVS) */}
-                                           <button
-                                             type="button"
-                                             onClick={(e) => {
-                                               e.stopPropagation();
-                                               const currentChildren = [...(el.data?.children || [])];
-                                               const [moved] = currentChildren.splice(cIdx, 1);
-                                               currentChildren.unshift(moved);
-                                               handleUpdateElementData(el.id, { children: currentChildren });
-                                               setSelectedChildIndex(0);
-                                             }}
-                                             className="px-1 py-0.2 h-4 bg-blue-600 hover:bg-blue-700 font-extrabold text-[8px] rounded text-white flex items-center gap-0.5 transition-colors shadow-xs"
-                                             style={{ color: '#ffffff' }}
-                                             title="⬆️ Déplacer cet élément tout en haut de la Section (au-dessus de tous les Divs)"
-                                           >
-                                             <span>⬆️ En haut</span>
-                                           </button>
+                                          
 
                                            {/* ⚙️ CONTROLLER / INSPECTER */}
                                           <button
