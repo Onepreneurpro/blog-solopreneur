@@ -78,6 +78,16 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isMobileScreen, setIsMobileScreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileScreen(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Check if content is saved Maison Builder customElements array & page metadata
   let customElements: any[] | null = null;
@@ -380,7 +390,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
 
                   <section
                     style={{
-                      backgroundColor: mainBg,
+                      backgroundColor: isMobileScreen ? mobileBgColor : mainBg,
                       color: textColor,
                       minHeight: el.data?.minHeight ? `${el.data.minHeight}px` : undefined,
                       paddingTop: el.data?.paddingTop !== undefined ? `${el.data.paddingTop}px` : (el.data?.paddingY !== undefined ? `${el.data.paddingY}px` : undefined),
@@ -470,11 +480,12 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       });
 
                       return (
-                        <div className="flex flex-wrap gap-0 items-stretch w-full flex-1 h-full">
+                        <div className={`flex ${isMobileScreen ? 'flex-col space-y-6' : 'flex-wrap gap-0'} items-stretch w-full flex-1 h-full`}>
                           {childrenList.map((child: any, cIdx: number) => {
                             const colStyle = {
-                              flex: `0 0 ${colWidths[cIdx]}%`,
-                              width: `${colWidths[cIdx]}%`,
+                              flex: isMobileScreen ? '1 1 100%' : `0 0 ${colWidths[cIdx]}%`,
+                              width: isMobileScreen ? '100%' : `${colWidths[cIdx]}%`,
+                              minWidth: isMobileScreen ? '100%' : '120px',
                               minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                               marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
                               marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
