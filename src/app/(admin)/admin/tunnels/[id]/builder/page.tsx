@@ -264,9 +264,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   const lastSelectedTextRef = useRef<string>('');
   const targetDomRef = useRef<HTMLElement | null>(null);
 
-  // Continuously capture DOM selection & automatically display floating toolbar on ANY text selection
+  // Automatically display floating text formatting toolbar on mouseup / keyup selection
   useEffect(() => {
-    const handleSelectionChange = () => {
+    const checkAndShowToolbar = () => {
       if (typeof window !== 'undefined') {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
@@ -300,16 +300,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         }
       }
     };
-    document.addEventListener('selectionchange', handleSelectionChange);
-    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+
+    const handleMouseUpOrKeyUp = () => {
+      setTimeout(checkAndShowToolbar, 30);
+    };
+
+    document.addEventListener('mouseup', handleMouseUpOrKeyUp);
+    document.addEventListener('keyup', handleMouseUpOrKeyUp);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUpOrKeyUp);
+      document.removeEventListener('keyup', handleMouseUpOrKeyUp);
+    };
   }, [selectedElementId, selectedChildIndex]);
 
-  // Click outside listener to dismiss floating text formatting toolbar
+  // Click outside listener to dismiss floating text formatting toolbar only when clicking outside editable text
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const toolbar = document.getElementById('floating-builder-text-toolbar');
-      if (toolbar && !toolbar.contains(e.target as Node)) {
-        setFloatingTextMenu((prev) => ({ ...prev, visible: false }));
+      const isInsideToolbar = toolbar && toolbar.contains(e.target as Node);
+      const isInsideEditable = (e.target as HTMLElement)?.closest?.('[contenteditable]');
+
+      if (!isInsideToolbar && !isInsideEditable) {
+        const sel = typeof window !== 'undefined' ? window.getSelection() : null;
+        if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+          setFloatingTextMenu((prev) => ({ ...prev, visible: false }));
+        }
       }
     };
     if (floatingTextMenu.visible) {
