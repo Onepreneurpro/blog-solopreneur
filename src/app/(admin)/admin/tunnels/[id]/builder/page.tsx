@@ -843,7 +843,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     marginX?: boolean;
     borderRadius?: boolean;
   }>({});
-  const [isMargesSectionOpen, setIsMargesSectionOpen] = useState<boolean>(true);
+  const [isMargesSectionOpen, setIsMargesSectionOpen] = useState<boolean>(false);
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -2761,6 +2761,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                 <button
                   type="button"
+                  title={isMargesSectionOpen ? "Cliquer pour réduire la section Marges & Espacements" : "Cliquer pour étendre et afficher les réglages de Marges & Espacements"}
                   onClick={() => setIsMargesSectionOpen((prev) => !prev)}
                   className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
                 >
