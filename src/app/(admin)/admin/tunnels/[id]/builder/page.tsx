@@ -23,21 +23,34 @@ function RichTextElement({ content, onChange, onContextMenu, style, className }:
       onBlur={() => {
         if (ref.current) onChange(ref.current.innerHTML);
       }}
-      onMouseUp={() => {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
-          (window as any).__activeRichTextDom = ref.current;
+      onContextMenu={onContextMenu}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = e.currentTarget;
+      }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = e.currentTarget;
+      }}
+      onMouseUp={(e) => {
+        if (typeof window !== 'undefined') {
+          (window as any).__activeRichTextDom = e.currentTarget;
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+            (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
+            (window as any).__lastSelectedText = sel.toString();
+          }
         }
       }}
       onKeyUp={() => {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && ref.current) {
-          (window as any).__activeRichTextDom = ref.current;
+        if (typeof window !== 'undefined') {
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+            (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
+            (window as any).__lastSelectedText = sel.toString();
+          }
         }
       }}
-      onContextMenu={onContextMenu}
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
       onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
       style={style}
       className={className}
@@ -4986,22 +4999,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <div
-                        contentEditable
-                        suppressContentEditableWarning
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onBlur={(e) => {
-                          const html = e.currentTarget.innerHTML;
+                      <RichTextElement
+                        content={el.content}
+                        onChange={(html: string) => {
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onInput={(e) => {
-                          const html = e.currentTarget.innerHTML;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
-                        }}
-                        dangerouslySetInnerHTML={{ __html: el.content }}
+                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -5015,22 +5018,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Text' && (
-                      <div
-                        contentEditable
-                        suppressContentEditableWarning
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
-                        onBlur={(e) => {
-                          const html = e.currentTarget.innerHTML;
+                      <RichTextElement
+                        content={el.content}
+                        onChange={(html: string) => {
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onInput={(e) => {
-                          const html = e.currentTarget.innerHTML;
-                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
-                        }}
-                        dangerouslySetInnerHTML={{ __html: el.content }}
+                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
