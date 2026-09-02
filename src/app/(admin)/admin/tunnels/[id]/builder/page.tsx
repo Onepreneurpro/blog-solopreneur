@@ -844,6 +844,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     borderRadius?: boolean;
   }>({});
   const [isMargesSectionOpen, setIsMargesSectionOpen] = useState<boolean>(false);
+  const [isCadreSectionOpen, setIsCadreSectionOpen] = useState<boolean>(false);
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -2758,20 +2759,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             const rBR = targetData.borderBottomRightRadius !== undefined ? targetData.borderBottomRightRadius : radiusVal;
 
             return (
-              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                <button
-                  type="button"
-                  title={isMargesSectionOpen ? "Cliquer pour réduire la section Marges & Espacements" : "Cliquer pour étendre et afficher les réglages de Marges & Espacements"}
-                  onClick={() => setIsMargesSectionOpen((prev) => !prev)}
-                  className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
-                >
-                  <span>📍 Marges & Espacements</span>
-                  {isMargesSectionOpen ? (
-                    <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
-                  )}
-                </button>
+              <div className="space-y-3">
+                {/* CARD 1: 📍 MARGES & ESPACEMENTS */}
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <button
+                    type="button"
+                    title={isMargesSectionOpen ? "Cliquer pour réduire la section Marges & Espacements" : "Cliquer pour étendre et afficher les réglages de Marges & Espacements"}
+                    onClick={() => setIsMargesSectionOpen((prev) => !prev)}
+                    className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
+                  >
+                    <span>📍 Marges & Espacements</span>
+                    {isMargesSectionOpen ? (
+                      <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    )}
+                  </button>
 
                 {isMargesSectionOpen && (
                   <React.Fragment>
@@ -3150,12 +3153,26 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                 </React.Fragment>
                 )}
+              </div>
 
-                {/* 7. CADRE & BORDURE (BORDER STYLE, WIDTH IN PX, COLOR, RADIUS) */}
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
-                  <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                    <span>🖼️ Cadre & Bordure {selectedSubItem ? '(Élément)' : selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
-                  </div>
+              {/* CARD 2: 🖼️ CADRE & BORDURE */}
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                <button
+                  type="button"
+                  title={isCadreSectionOpen ? "Cliquer pour réduire la section Cadre & Bordure" : "Cliquer pour étendre et afficher les réglages de Cadre & Bordure"}
+                  onClick={() => setIsCadreSectionOpen((prev) => !prev)}
+                  className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
+                >
+                  <span>🖼️ Cadre & Bordure</span>
+                  {isCadreSectionOpen ? (
+                    <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  )}
+                </button>
+
+                {isCadreSectionOpen && (
+                  <div className="space-y-4">
 
                   {/* A. STYLE DU CADRE (CONTINU, TIRETS, POINTILLÉ, DOUBLE, AUCUN) */}
                   <div className="space-y-1.5">
@@ -3445,6 +3462,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </div>
                     )}
                   </div>
+
+                    </div>
+                  )}
 
                   {/* E. OMBRAGE & OMBRE PORTÉE (BOX SHADOW) */}
                   <div className="space-y-3 pt-3 border-t border-slate-800">
