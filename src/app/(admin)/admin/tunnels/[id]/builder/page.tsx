@@ -1,5 +1,7 @@
 'use client';
 
+import { TiptapRichTextElement } from '@/components/editor/TiptapRichTextElement';
+
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
