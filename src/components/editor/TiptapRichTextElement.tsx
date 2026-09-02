@@ -56,7 +56,6 @@ export function TiptapRichTextElement({
 }: TiptapRichTextElementProps) {
   const [openPopover, setOpenPopover] = useState<'neon' | 'color' | null>(null);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -80,13 +79,12 @@ export function TiptapRichTextElement({
 
     const updateMenu = () => {
       const { selection } = editor.state;
-      if (selection && !selection.empty && containerRef.current) {
+      if (selection && !selection.empty) {
         const { from, to } = selection;
         const start = editor.view.coordsAtPos(from);
         const end = editor.view.coordsAtPos(to);
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const top = Math.max(-50, start.top - containerRect.top - 55);
-        const left = (start.left + end.left) / 2 - containerRect.left;
+        const top = Math.max(10, start.top - 60);
+        const left = Math.max(100, (start.left + end.left) / 2);
         setMenuPos({ top, left });
       } else {
         if (!openPopover) {
@@ -97,9 +95,11 @@ export function TiptapRichTextElement({
 
     editor.on('selectionUpdate', updateMenu);
     editor.on('transaction', updateMenu);
+    document.addEventListener('selectionchange', updateMenu);
     return () => {
       editor.off('selectionUpdate', updateMenu);
       editor.off('transaction', updateMenu);
+      document.removeEventListener('selectionchange', updateMenu);
     };
   }, [editor, openPopover]);
 
@@ -115,23 +115,21 @@ export function TiptapRichTextElement({
 
   return (
     <div
-      ref={containerRef}
       onContextMenu={onContextMenu}
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
       style={style}
-      className={`relative w-full ${className || ''}`}
+      className={`w-full ${className || ''}`}
     >
-      {/* TIPTAP PROSEMIRROR FLOATING BUBBLE MENU */}
+      {/* TIPTAP PROSEMIRROR VIEWPORT FIXED BUBBLE MENU */}
       {menuPos && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             top: `${menuPos.top}px`,
             left: `${menuPos.left}px`,
             transform: 'translateX(-50%)',
+            zIndex: 9999999,
           }}
-          className="z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1 border-2 border-slate-200 select-none animate-in fade-in zoom-in-95"
+          className="bg-white text-slate-900 rounded-full shadow-2xl p-1.5 flex items-center gap-1 border-2 border-slate-200 select-none animate-in fade-in zoom-in-95"
         >
           {/* B GRAS */}
           <button
