@@ -2456,10 +2456,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       <button
                         type="button"
                         onClick={() => applyBgChange(bgVal === 'transparent' ? '#0F172A' : 'transparent')}
-                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase transition-all border ${
+                        className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase transition-all border cursor-pointer ${
                           bgVal === 'transparent'
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                            ? 'bg-amber-500/20 text-amber-700 border-amber-400 shadow-xs'
+                            : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
                         }`}
                       >
                         {bgVal === 'transparent' ? '✓ Transparent' : '🚫 Transparent'}
@@ -2512,10 +2512,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         <button
                           type="button"
                           onClick={() => applyCardBgChange(cardBgVal === 'transparent' ? '#2759ce' : 'transparent')}
-                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase transition-all border ${
+                          className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase transition-all border cursor-pointer ${
                             cardBgVal === 'transparent'
-                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                              : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                              ? 'bg-amber-500/20 text-amber-700 border-amber-400 shadow-xs'
+                              : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
                           }`}
                         >
                           {cardBgVal === 'transparent' ? '✓ Transp.' : '🚫 Transp.'}
@@ -3782,10 +3782,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
             }
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-[#00A0FF] hover:text-white font-heading font-black text-xs rounded-xl border border-slate-700 transition-colors shadow-xs"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-100 text-[#00A0FF] hover:text-[#0080FF] font-heading font-black text-xs rounded-xl border border-slate-200 transition-all shadow-sm cursor-pointer"
             title="Ouvrir la page publique du tunnel dans un nouvel onglet"
           >
-            <Eye className="w-4 h-4 text-[#00A0FF]" />
+            <Eye className="w-4 h-4 text-[#00A0FF] stroke-[2.5]" />
             <span>Voir la page</span>
           </a>
 
