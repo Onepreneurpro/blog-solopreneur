@@ -589,6 +589,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                 </div>
                               );
                             } else if (child.type === 'ContentBox') {
+                              const boxContent = child.content || child.data?.content;
+                              const hasValidContent = boxContent && typeof boxContent === 'string' && boxContent.trim() !== '' && !boxContent.includes('Glissez-déposez');
+
                               renderedChild = (
                                 <div
                                   style={{
@@ -607,6 +610,15 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                   {child.data?.title && (
                                     <h3 className="text-lg font-heading font-black">{child.data.title}</h3>
                                   )}
+
+                                  {hasValidContent && (
+                                    <div
+                                      style={{ color: child.data?.textColor || 'inherit' }}
+                                      className="w-full text-base leading-relaxed"
+                                      dangerouslySetInnerHTML={{ __html: boxContent }}
+                                    />
+                                  )}
+
                                   {(child.data?.children && child.data.children.length > 0) && (
                                     <div className="space-y-4 w-full">
                                       {(child.data.children || []).map((sub: any, sIdx: number) => {
@@ -644,7 +656,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 />
                                               </div>
                                             ) : sub.type === 'Heading' ? (
-                                              <h3 style={{ color: sub.data?.textColor || '#ffffff' }} className="text-xl font-heading font-black my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
+                                              <h3 style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-xl font-heading font-black my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
                                             ) : sub.type === 'ButtonCTA' ? (
                                               <div className="py-2 text-center">
                                                 <button type="button" className="px-8 py-3 bg-[#00A0FF] text-[#ffffff] font-bold text-sm rounded-xl shadow-lg">
@@ -660,7 +672,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 />
                                               </div>
                                             ) : (
-                                              <p style={{ color: sub.data?.textColor || '#ffffff' }} className="text-sm leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
+                                              <div style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-sm leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
                                             )}
                                           </div>
                                         );
