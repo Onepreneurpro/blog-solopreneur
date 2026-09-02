@@ -843,6 +843,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     marginX?: boolean;
     borderRadius?: boolean;
   }>({});
+  const [isMargesSectionOpen, setIsMargesSectionOpen] = useState<boolean>(true);
 
   const handleSetPageWidthMode = (mode: 'standard' | 'wide' | 'full') => {
     setPageWidthMode(mode);
@@ -2758,9 +2759,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
             return (
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                <div className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between">
-                  <span>📐 Marges & Espacements (px) {selectedSubItem ? '(Image)' : selectedChildIndex !== null ? `(Bloc #${selectedChildIndex + 1})` : '(Section)'}</span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMargesSectionOpen((prev) => !prev)}
+                  className="w-full text-[10px] font-black text-[#00A0FF] uppercase tracking-wider flex items-center justify-between cursor-pointer py-0.5 hover:opacity-80 transition-opacity"
+                >
+                  <span>📍 Marges & Espacements</span>
+                  {isMargesSectionOpen ? (
+                    <ChevronUp className="w-4 h-4 text-[#00A0FF]" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  )}
+                </button>
+
+                {isMargesSectionOpen && (
+                  <React.Fragment>
 
                 {/* 1. MARGE INTERNE VERTICALE (PADDING Y) */}
                 <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800 transition-all">
@@ -3133,6 +3146,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     </div>
                   )}
                 </div>
+
+                </React.Fragment>
+                )}
 
                 {/* 7. CADRE & BORDURE (BORDER STYLE, WIDTH IN PX, COLOR, RADIUS) */}
                 <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
