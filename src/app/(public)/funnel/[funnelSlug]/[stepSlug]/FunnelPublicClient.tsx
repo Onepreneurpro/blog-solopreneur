@@ -71,6 +71,16 @@ interface FunnelPublicClientProps {
   step: any;
 }
 
+
+  const getVisibilityClass = (data: any) => {
+    const showDesktop = data?.showDesktop !== undefined ? Boolean(data.showDesktop) : true;
+    const showMobile = data?.showMobile !== undefined ? Boolean(data.showMobile) : true;
+    if (!showDesktop && !showMobile) return 'hidden';
+    if (!showDesktop) return 'md:hidden';
+    if (!showMobile) return 'hidden md:block';
+    return '';
+  };
+
 export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -403,7 +413,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       marginRight: el.data?.marginRight !== undefined ? `${el.data.marginRight}px` : (el.data?.marginX !== undefined ? `${el.data.marginX}px` : undefined),
                       ...renderBorderStyles(el.data),
                     }}
-                    className={`relative w-full ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
+                    className={`relative w-full ${sectionClassName} ${getVisibilityClass(el.data)} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
                   {/* DESKTOP BACKGROUND IMAGE LAYER (PC ONLY) */}
                   {bgImage && (
