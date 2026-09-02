@@ -12,6 +12,20 @@ function RichTextElement({ content, onChange, onContextMenu, onSelectText, style
     }
   }, [content]);
 
+  const handleTriggerSelection = (e: any) => {
+    if (typeof window !== 'undefined') {
+      (window as any).__activeRichTextDom = ref.current;
+      setTimeout(() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+          (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
+          (window as any).__lastSelectedText = sel.toString();
+          if (onSelectText) onSelectText(e);
+        }
+      }, 10);
+    }
+  };
+
   return (
     <div
       ref={ref}
@@ -32,27 +46,9 @@ function RichTextElement({ content, onChange, onContextMenu, onSelectText, style
         e.stopPropagation();
         if (typeof window !== 'undefined') (window as any).__activeRichTextDom = e.currentTarget;
       }}
-      onMouseUp={(e) => {
-        if (typeof window !== 'undefined') {
-          (window as any).__activeRichTextDom = e.currentTarget;
-          const sel = window.getSelection();
-          if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-            (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
-            (window as any).__lastSelectedText = sel.toString();
-            if (onSelectText) onSelectText(e);
-          }
-        }
-      }}
-      onKeyUp={(e) => {
-        if (typeof window !== 'undefined') {
-          const sel = window.getSelection();
-          if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-            (window as any).__savedRange = sel.getRangeAt(0).cloneRange();
-            (window as any).__lastSelectedText = sel.toString();
-            if (onSelectText) onSelectText(e);
-          }
-        }
-      }}
+      onMouseUp={handleTriggerSelection}
+      onDoubleClick={handleTriggerSelection}
+      onKeyUp={handleTriggerSelection}
       onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
       style={style}
       className={className}
@@ -376,33 +372,36 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
   };
 
   const handleTextSelection = (
-    e: React.MouseEvent | React.KeyboardEvent,
+    e: any,
     targetElId: string,
     childIdx?: number | null,
     subChildIdx?: number | null
   ) => {
     if (typeof window !== 'undefined') {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
-        const range = sel.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        savedRangeRef.current = range.cloneRange();
-        lastSelectedTextRef.current = sel.toString();
-        targetDomRef.current = e.currentTarget as HTMLElement;
-        (window as any).__activeRichTextDom = e.currentTarget as HTMLElement;
-        (window as any).__savedRange = range.cloneRange();
-        (window as any).__lastSelectedText = sel.toString();
+      setTimeout(() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim().length > 0) {
+          const range = sel.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          savedRangeRef.current = range.cloneRange();
+          lastSelectedTextRef.current = sel.toString();
+          targetDomRef.current = (e?.currentTarget || e?.target || (window as any).__activeRichTextDom) as HTMLElement;
+          (window as any).__savedRange = range.cloneRange();
+          (window as any).__lastSelectedText = sel.toString();
 
-        setFloatingTextMenu({
-          visible: true,
-          x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
-          y: Math.max(10, rect.top - 60),
-          selectedText: sel.toString(),
-          targetElId,
-          childIdx: childIdx ?? null,
-          subChildIdx: subChildIdx ?? null,
-        });
-      }
+          if (rect && rect.width > 0) {
+            setFloatingTextMenu({
+              visible: true,
+              x: Math.max(20, Math.min(window.innerWidth - 320, rect.left + rect.width / 2 - 160)),
+              y: Math.max(10, rect.top - 60),
+              selectedText: sel.toString(),
+              targetElId,
+              childIdx: childIdx ?? null,
+              subChildIdx: subChildIdx ?? null,
+            });
+          }
+        }
+      }, 20);
     }
   };
 
