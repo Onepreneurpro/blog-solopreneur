@@ -382,29 +382,32 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
-  const handleStartDragToolbar = (e: React.MouseEvent) => {
+  const handleStartDragToolbar = (e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const handleEl = e.currentTarget;
+    try { handleEl.setPointerCapture(e.pointerId); } catch(err) {}
     const startX = e.clientX;
     const startY = e.clientY;
     const initialX = toolbarPos.x;
     const initialY = toolbarPos.y;
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
+    const onPointerMove = (moveEvent: PointerEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
-      const newX = Math.max(10, Math.min(window.innerWidth - 300, initialX + deltaX));
+      const newX = Math.max(10, Math.min(window.innerWidth - 320, initialX + deltaX));
       const newY = Math.max(10, Math.min(window.innerHeight - 80, initialY + deltaY));
       setToolbarPos({ x: newX, y: newY });
     };
 
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+    const onPointerUp = (upEvent: PointerEvent) => {
+      try { handleEl.releasePointerCapture(upEvent.pointerId); } catch(err) {}
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
   };
 
   const handleOpenFormattingToolbar = (e: React.MouseEvent, targetId: string, childIdx?: number | null, subChildIdx?: number | null, defaultContent?: string) => {
@@ -525,13 +528,12 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         style={{ top: `${toolbarPos.y}px`, left: `${toolbarPos.x}px` }}
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
-        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
+        className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible select-none"
       >
         {/* 🖐️ POIGNÉE DE DÉPLACEMENT */}
         <div
-          onMouseDown={handleStartDragToolbar}
           onPointerDown={handleStartDragToolbar}
-          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-900 transition-colors shrink-0 flex items-center justify-center shadow-xs border border-slate-300"
+          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-900 shrink-0 flex items-center justify-center shadow-xs border border-slate-300 touch-none"
           title="Cliquez et glissez pour déplacer la barre où vous voulez sur l écran"
         >
           <GripHorizontal className="w-4 h-4 text-slate-700 pointer-events-none" />
