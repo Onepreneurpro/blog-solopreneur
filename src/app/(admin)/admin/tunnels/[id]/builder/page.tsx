@@ -663,6 +663,45 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
+                      restoreSelection();
+                      const sel = window.getSelection();
+                      if (sel && savedRangeRef.current) {
+                        try {
+                          sel.removeAllRanges();
+                          sel.addRange(savedRangeRef.current);
+                        } catch(e) {}
+                      }
+
+                      const color = c.color;
+                      let applied = false;
+
+                      // Attempt 1: hiliteColor
+                      try {
+                        applied = document.execCommand('hiliteColor', false, color);
+                      } catch(e) {}
+
+                      // Attempt 2: backColor
+                      if (!applied) {
+                        try {
+                          applied = document.execCommand('backColor', false, color);
+                        } catch(e) {}
+                      }
+
+                      // Attempt 3: Range surroundContents
+                      if (!applied && savedRangeRef.current) {
+                        try {
+                          const mark = document.createElement('mark');
+                          mark.style.backgroundColor = color;
+                          mark.style.color = '#0f172a';
+                          mark.style.padding = '0.15rem 0.4rem';
+                          mark.style.borderRadius = '4px';
+                          mark.style.fontWeight = '800';
+                          mark.style.display = 'inline-block';
+                          savedRangeRef.current.surroundContents(mark);
+                          applied = true;
+                        } catch(e) {}
+                      }
+
                       let activeDom: HTMLElement | null = (typeof window !== 'undefined' ? (window as any).__activeRichTextDom : null) || targetDomRef.current;
                       if (!activeDom && typeof document !== 'undefined') {
                         const selNode = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
@@ -674,41 +713,9 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       }
 
                       if (activeDom) {
-                        activeDom.focus();
-                        targetDomRef.current = activeDom;
-                        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = activeDom;
-                      }
-
-                      restoreSelection();
-                      const sel = window.getSelection();
-                      const selTxt = (sel && !sel.isCollapsed && sel.toString().trim()) || lastSelectedTextRef.current || '';
-                      const markHtml = (txt: string) =>
-                        `<mark color="${c.color}" style="background-color: ${c.color} !important; color: #0f172a !important; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 800; display: inline-block;">${txt}</mark>`;
-
-                      let applied = false;
-                      if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-                        try {
-                          document.execCommand('insertHTML', false, markHtml(sel.toString()));
-                          applied = true;
-                          saveSelection();
-                        } catch(e) {}
-                      }
-
-                      if (!applied && selTxt && activeDom) {
-                        const curHtml = activeDom.innerHTML;
-                        if (curHtml.includes(selTxt)) {
-                          activeDom.innerHTML = curHtml.replace(selTxt, markHtml(selTxt));
-                          applied = true;
-                        }
-                      }
-
-                      if (!applied && c.color) {
-                        try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
-                      }
-
-                      if (activeDom) {
                         updateTargetContentOnly(activeDom.innerHTML);
                       }
+
                       setOpenFloatingPopover(null);
                     }}
                     style={{ backgroundColor: c.color }}
