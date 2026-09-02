@@ -480,12 +480,10 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       });
 
                       return (
-                        <div className={`flex ${isMobileScreen ? 'flex-col space-y-6' : 'flex-wrap gap-0'} items-stretch w-full flex-1 h-full`}>
+                        <div className="flex flex-col md:flex-row md:flex-wrap space-y-6 md:space-y-0 gap-0 items-stretch w-full flex-1 h-full">
                           {childrenList.map((child: any, cIdx: number) => {
-                            const colStyle = {
-                              flex: isMobileScreen ? '1 1 100%' : `0 0 ${colWidths[cIdx]}%`,
-                              width: isMobileScreen ? '100%' : `${colWidths[cIdx]}%`,
-                              minWidth: isMobileScreen ? '100%' : '120px',
+                            const colStyle: any = {
+                              '--col-w': `${colWidths[cIdx]}%`,
                               minHeight: child.data?.minHeight ? `${child.data.minHeight}px` : undefined,
                               marginTop: child.data?.marginTop !== undefined ? `${child.data.marginTop}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
                               marginBottom: child.data?.marginBottom !== undefined ? `${child.data.marginBottom}px` : (child.data?.marginY !== undefined ? `${child.data.marginY}px` : undefined),
@@ -714,7 +712,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                             }
 
                             return (
-                              <div key={child.id || cIdx} style={colStyle} className="h-full flex flex-col overflow-hidden">
+                              <div key={child.id || cIdx} style={colStyle} className="w-full md:w-[var(--col-w)] md:flex-[0_0_var(--col-w)] h-full flex flex-col overflow-hidden">
                                 {renderedChild}
                               </div>
                             );
