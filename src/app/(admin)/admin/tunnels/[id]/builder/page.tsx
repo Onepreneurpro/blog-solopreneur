@@ -292,16 +292,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
   // Re-apply DOM selection when popover opens so text stays highlighted on screen
   useLayoutEffect(() => {
-    if (openFloatingPopover && savedRangeRef.current && typeof window !== 'undefined') {
+    if (savedRangeRef.current && typeof window !== 'undefined') {
       const sel = window.getSelection();
-      if (sel) {
+      if (sel && (!sel.rangeCount || sel.isCollapsed || sel.toString().trim() === '')) {
         try {
           sel.removeAllRanges();
           sel.addRange(savedRangeRef.current);
         } catch (e) {}
       }
     }
-  }, [openFloatingPopover]);
+  }, [openFloatingPopover, floatingTextMenu, toolbarPos]);
 
   // Screen clamping so floating toolbar never exceeds PC viewport width
   useLayoutEffect(() => {
@@ -705,16 +705,16 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                       if (targetDomRef.current) {
                         updateTargetContentOnly(targetDomRef.current.innerHTML);
-                        const lastMark = targetDomRef.current.querySelector('mark:last-of-type') || targetDomRef.current.querySelector('mark');
-                        if (lastMark && typeof window !== 'undefined') {
+                        const newlyStyledNode = targetDomRef.current.querySelector('span[style*="color"]:last-of-type') || targetDomRef.current.querySelector('mark:last-of-type') || targetDomRef.current;
+                        if (newlyStyledNode && typeof window !== 'undefined') {
                           const sel = window.getSelection();
                           if (sel) {
                             try {
-                              const markRange = document.createRange();
-                              markRange.selectNodeContents(lastMark);
+                              const styledRange = document.createRange();
+                              styledRange.selectNodeContents(newlyStyledNode);
                               sel.removeAllRanges();
-                              sel.addRange(markRange);
-                              savedRangeRef.current = markRange.cloneRange();
+                              sel.addRange(styledRange);
+                              savedRangeRef.current = styledRange.cloneRange();
                             } catch(e) {}
                           }
                         }
