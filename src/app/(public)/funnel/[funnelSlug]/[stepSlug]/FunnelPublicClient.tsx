@@ -83,6 +83,16 @@ interface FunnelPublicClientProps {
     return '';
   };
 
+const isContainerLabel = (text: string) => {
+  if (!text) return true;
+  const trimmed = text.trim();
+  return /^Rangée \/ Div$/i.test(trimmed) ||
+    /^Conteneur DIV \d+$/i.test(trimmed) ||
+    /^Conteneur d'éléments/i.test(trimmed) ||
+    /^ROW$/i.test(trimmed) ||
+    /^COL$/i.test(trimmed);
+};
+
 export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
