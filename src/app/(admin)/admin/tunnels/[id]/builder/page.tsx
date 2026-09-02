@@ -2126,6 +2126,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   : selectedSubItem.subType === 'title'
                   ? `Titre (#${selectedSubItem.itemIndex + 1})`
                   : `Paragraphe (#${selectedSubItem.itemIndex + 1})`
+                : selectedChildIndex !== null && selectedEl.data?.children?.[selectedChildIndex]?.type === 'ContentBox'
+                ? `COLONNE (COL)`
+                : selectedEl.type === 'ContentBox'
+                ? `RANGÉE (ROW)`
                 : selectedEl.type}
             </span>
           </div>
