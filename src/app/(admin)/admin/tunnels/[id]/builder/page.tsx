@@ -1,7 +1,5 @@
 'use client';
 
-import { TiptapRichTextElement } from '@/components/editor/TiptapRichTextElement';
-
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Dedicated RichTextElement component to prevent React VDOM from destroying contentEditable text selections during popover state changes
@@ -4970,12 +4968,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                     {/* ELEMENT TYPE CONTENT RENDERERS WITH DYNAMIC CUSTOMIZABLE DATA */}
                     {el.type === 'Heading' && (
-                      <TiptapRichTextElement
-                        content={el.content}
-                        onChange={(html: string) => {
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#ffffff',
                           backgroundColor: el.data?.bgColor || 'transparent',
@@ -4989,12 +4997,22 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     )}
 
                     {el.type === 'Text' && (
-                      <TiptapRichTextElement
-                        content={el.content}
-                        onChange={(html: string) => {
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onBlur={(e) => {
+                          const html = e.currentTarget.innerHTML;
                           setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
                         }}
-                        onContextMenu={(e: React.MouseEvent) => handleOpenFormattingToolbar(e, el.id, null, null, el.content)}
+                        onInput={(e) => {
+                          const html = e.currentTarget.innerHTML;
+                          setElements((prev) => prev.map((item) => (item.id === el.id ? { ...item, content: html } : item)));
+                        }}
+                        dangerouslySetInnerHTML={{ __html: el.content }}
                         style={{
                           color: el.data?.textColor || '#cbd5e1',
                           backgroundColor: el.data?.bgColor || 'transparent',
