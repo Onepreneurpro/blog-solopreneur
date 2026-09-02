@@ -1,5 +1,5 @@
-import { sanitizeContentEditableHtml, validateRowGroupComposition } from '@/lib/htmlSanitizer';
 'use client';
+import { sanitizeContentEditableHtml, validateRowGroupComposition } from '@/lib/htmlSanitizer';
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
