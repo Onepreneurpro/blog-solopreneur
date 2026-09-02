@@ -2469,7 +2469,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                       <div className="relative w-7 h-7 shrink-0 rounded-lg overflow-hidden border border-slate-700">
                         {bgVal === 'transparent' ? (
-                          <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-rose-400">
+                          <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-slate-300 border border-slate-700 font-extrabold text-[9px]">
                             🚫
                           </div>
                         ) : (
@@ -2486,23 +2486,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       </span>
                     </div>
 
-                    {/* PALETTE PALETTE PRESETS FOND DU BLOC */}
-                    <div className="flex items-center gap-1.5 pt-0.5 overflow-x-auto no-scrollbar">
-                      {presets.map((c) => (
-                        <button
-                          key={c}
-                          type="button"
-                          onClick={() => applyBgChange(c)}
-                          style={c !== 'transparent' ? { backgroundColor: c } : {}}
-                          className={`w-5 h-5 rounded-md border shrink-0 transition-transform hover:scale-110 flex items-center justify-center ${
-                            c === bgVal ? 'ring-2 ring-[#00A0FF] ring-offset-1 ring-offset-slate-950 border-white' : 'border-white/20'
-                          } ${c === 'transparent' ? 'bg-slate-800' : ''}`}
-                          title={c === 'transparent' ? 'Transparent' : c}
-                        >
-                          {c === 'transparent' && <span className="text-[8px] leading-none font-bold text-rose-400">🚫</span>}
-                        </button>
-                      ))}
-                    </div>
+
                   </div>
 
                   {/* GRID COULEUR DU TEXTE & FOND DES CARTES */}
@@ -3627,21 +3611,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           className="flex-1 px-2.5 py-1 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:outline-none focus:border-[#00A0FF]"
                         />
                       </div>
-                      <div className="flex items-center gap-1.5 pt-1">
-                        {['#000000', '#00A0FF', '#10B981', '#FF7A00', '#EF4444', '#8B5CF6', '#ffffff'].map((c) => (
-                          <button
-                            key={c}
-                            type="button"
-                            onClick={() => updateMarginData({ shadowColor: c })}
-                            className="w-5 h-5 rounded-full border border-slate-700 cursor-pointer hover:scale-110 transition-transform shadow-sm"
-                            style={{ backgroundColor: c }}
-                            title={c}
-                          />
-                        ))}
-                      </div>
+
                     </div>
 
-                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - COMPACT DESIGN WITH TOOLTIPS */}
+                    {/* 6. DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) - GREY DISABLED STATE, NO RED */}
                     <div className="pt-4 border-t border-slate-800 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wider">
@@ -3662,7 +3635,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
                             (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
                               ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
-                              : 'bg-rose-950/40 border-rose-900/60 hover:border-rose-700'
+                              : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
                           }`}
                         >
                           <div className="flex items-center gap-1.5 min-w-0">
@@ -3674,7 +3647,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
                             (targetData.showDesktop !== undefined ? targetData.showDesktop : true)
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-rose-900/90 text-rose-200'
+                              : 'bg-slate-700 text-slate-300'
                           }`}>
                             {(targetData.showDesktop !== undefined ? targetData.showDesktop : true) ? 'Activer' : 'Désactivé'}
                           </span>
@@ -3691,7 +3664,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           className={`p-2 rounded-xl border flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
                             (targetData.showMobile !== undefined ? targetData.showMobile : true)
                               ? 'bg-slate-900 border-slate-700 hover:border-emerald-500'
-                              : 'bg-rose-950/40 border-rose-900/60 hover:border-rose-700'
+                              : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
                           }`}
                         >
                           <div className="flex items-center gap-1.5 min-w-0">
@@ -3703,7 +3676,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
                             (targetData.showMobile !== undefined ? targetData.showMobile : true)
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-rose-900/90 text-rose-200'
+                              : 'bg-slate-700 text-slate-300'
                           }`}>
                             {(targetData.showMobile !== undefined ? targetData.showMobile : true) ? 'Activer' : 'Désactivé'}
                           </span>
