@@ -1,3 +1,4 @@
+import { sanitizeContentEditableHtml, validateRowGroupComposition } from '@/lib/htmlSanitizer';
 'use client';
 
 import React, { useState } from 'react';
@@ -300,14 +301,14 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                       if (child.type === 'Heading') {
                         return (
                           <div key={child.id || cIdx} className="p-4 rounded-2xl border border-slate-100" style={{ backgroundColor: childCardBg }}>
-                            <h4 className="text-xl font-heading font-bold" style={{ color: childTextColor }} dangerouslySetInnerHTML={{ __html: child.content }} />
+                            <h4 className="text-xl font-heading font-bold" style={{ color: childTextColor }} dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(child.content) }} />
                           </div>
                         );
                       }
                       if (child.type === 'Text') {
                         return (
                           <div key={child.id || cIdx} className="p-4 rounded-2xl border border-slate-100" style={{ backgroundColor: childCardBg }}>
-                            <p className="text-sm font-medium leading-relaxed" style={{ color: childTextColor }} dangerouslySetInnerHTML={{ __html: child.content }} />
+                            <p className="text-sm font-medium leading-relaxed" style={{ color: childTextColor }} dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(child.content) }} />
                           </div>
                         );
                       }
@@ -345,7 +346,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                           </div>
                         );
                       }
-                      return <div key={child.id || cIdx} className="text-sm text-slate-700" dangerouslySetInnerHTML={{ __html: child.content }} />;
+                      return <div key={child.id || cIdx} className="text-sm text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(child.content) }} />;
                     })}
                   </div>
                 </div>
@@ -615,7 +616,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                     <div
                                       style={{ color: child.data?.textColor || 'inherit' }}
                                       className="w-full text-base leading-relaxed"
-                                      dangerouslySetInnerHTML={{ __html: boxContent }}
+                                      dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(boxContent) }}
                                     />
                                   )}
 
@@ -656,7 +657,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 />
                                               </div>
                                             ) : sub.type === 'Heading' ? (
-                                              <h3 style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-xl font-heading font-black my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
+                                              <h3 style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-xl font-heading font-black my-2" dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(sub.content) }} />
                                             ) : sub.type === 'ButtonCTA' ? (
                                               <div className="py-2 text-center">
                                                 <button type="button" className="px-8 py-3 bg-[#00A0FF] text-[#ffffff] font-bold text-sm rounded-xl shadow-lg">
@@ -672,7 +673,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                                                 />
                                               </div>
                                             ) : (
-                                              <div style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-sm leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: sub.content }} />
+                                              <div style={{ color: sub.data?.textColor || child.data?.textColor || 'inherit' }} className="text-sm leading-relaxed my-2" dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(sub.content) }} />
                                             )}
                                           </div>
                                         );
@@ -903,7 +904,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
               const color = el.data?.textColor || undefined;
               return (
                 <div key={el.id} className={`text-center py-2 ${elVisClass}`} style={{ backgroundColor: bg }}>
-                  <h1 className="text-3xl sm:text-5xl font-heading font-black text-slate-900 leading-tight" style={{ color }} dangerouslySetInnerHTML={{ __html: el.content }} />
+                  <h1 className="text-3xl sm:text-5xl font-heading font-black text-slate-900 leading-tight" style={{ color }} dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(el.content) }} />
                 </div>
               );
             }
@@ -916,7 +917,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                   key={el.id}
                   className={`text-base text-slate-700 leading-relaxed font-medium text-center max-w-2xl mx-auto p-2 rounded-xl ${elVisClass}`}
                   style={{ backgroundColor: bg, color }}
-                  dangerouslySetInnerHTML={{ __html: el.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(el.content) }}
                 />
               );
             }
@@ -1172,7 +1173,7 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
             }
 
             return (
-              <div key={el.id} className="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-slate-200 font-bold text-xs" dangerouslySetInnerHTML={{ __html: el.content }} />
+              <div key={el.id} className="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-slate-200 font-bold text-xs" dangerouslySetInnerHTML={{ __html: sanitizeContentEditableHtml(el.content) }} />
             );
           })}
         </div>

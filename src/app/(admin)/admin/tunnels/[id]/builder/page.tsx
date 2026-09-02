@@ -1,3 +1,4 @@
+import { sanitizeContentEditableHtml, validateRowGroupComposition } from '@/lib/htmlSanitizer';
 'use client';
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
@@ -6440,8 +6441,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         onPointerDown={(e) => e.stopPropagation()}
                                                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
-                                                        onBlur={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
-                                                        onInput={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        onBlur={(e) => updateSubChildData({ content: sanitizeContentEditableHtml(e.currentTarget.innerHTML) })}
+                                                        onInput={(e) => updateSubChildData({ content: sanitizeContentEditableHtml(e.currentTarget.innerHTML) })}
                                                         dangerouslySetInnerHTML={{ __html: subChild.content }}
                                                         style={{
                                                           color: subChild.data?.textColor || '#ffffff',
@@ -6477,8 +6478,8 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                         onPointerDown={(e) => e.stopPropagation()}
                                                         onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                         onContextMenu={(e) => handleOpenFormattingToolbar(e, el.id, cIdx, sIdx, subChild.content)}
-                                                        onBlur={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
-                                                        onInput={(e) => updateSubChildData({ content: e.currentTarget.innerHTML })}
+                                                        onBlur={(e) => updateSubChildData({ content: sanitizeContentEditableHtml(e.currentTarget.innerHTML) })}
+                                                        onInput={(e) => updateSubChildData({ content: sanitizeContentEditableHtml(e.currentTarget.innerHTML) })}
                                                         dangerouslySetInnerHTML={{ __html: subChild.content }}
                                                         style={{
                                                           color: subChild.data?.textColor || '#e2e8f0',
