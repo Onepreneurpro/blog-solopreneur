@@ -4882,7 +4882,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   >
                     {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR ROOT ELEMENTS */}
                     <div
-                      className="absolute -top-3.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+                      className="absolute -top-5.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-md font-sans text-[9px] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
                     >
                       {/* TYPE NAME BADGE */}
                       <div
@@ -4893,7 +4893,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           setSelectedSubItem(null);
                         }}
                         style={{ color: '#ffffff' }}
-                        className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer hover:opacity-90 transition-opacity ${
+                        className={`!text-white px-2 py-0.5 h-5 rounded-l-md font-black text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-sm cursor-pointer hover:opacity-90 transition-opacity ${
                           el.type === 'ContentBox' ? 'bg-[#10B981]' : el.type === 'Image' ? 'bg-[#FF7A00]' : 'bg-[#00A0FF]'
                         }`}
                       >
@@ -4908,7 +4908,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                       {/* ACTIONS BADGE */}
                       <div
                         style={{ color: '#ffffff' }}
-                        className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l ${
+                        className={`!text-white px-1 py-0.5 h-5 rounded-r-md flex items-center gap-0.5 shadow-sm border-l ${
                           el.type === 'ContentBox' ? 'border-emerald-400 bg-[#10B981]' : el.type === 'Image' ? 'border-orange-300 bg-[#FF7A00]' : 'border-blue-400 bg-[#00A0FF]'
                         }`}
                       >
@@ -4925,7 +4925,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ color: '#ffffff' }}
                           title="⚙️ Paramètres du bloc"
                         >
-                          <Settings className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                          <Settings className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                         </button>
 
                         {/* 📋 DUPLIQUER */}
@@ -4936,7 +4936,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ color: '#ffffff' }}
                           title="📋 Dupliquer le bloc"
                         >
-                          <Copy className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                          <Copy className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                         </button>
 
                         {/* ▲ MONTER */}
@@ -4948,7 +4948,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ color: '#ffffff' }}
                           title="▲ Monter le bloc"
                         >
-                          <ChevronUp className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                          <ChevronUp className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                         </button>
 
                         {/* ▼ DESCENDRE */}
@@ -4960,7 +4960,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ color: '#ffffff' }}
                           title="▼ Descendre le bloc"
                         >
-                          <ChevronDown className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                          <ChevronDown className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                         </button>
 
                         {/* 🗑️ SUPPRIMER */}
@@ -4971,7 +4971,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                           style={{ color: '#ffffff' }}
                           title="🗑️ Supprimer le bloc"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                          <Trash2 className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                         </button>
                       </div>
                     </div>
@@ -5775,7 +5775,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         className={`relative group/child ${child.type === 'ContentBox' ? 'flex flex-col flex-1 h-full' : 'h-auto flex-none my-0'} overflow-visible z-40`}>
                                       {/* SYSTEME.IO STYLE FLOATING HOVER TOOLBAR BADGE FOR CHILD ELEMENTS */}
                                       <div
-                                        className="absolute -top-3.5 left-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
+                                        className="absolute -top-5.5 left-3 z-[999] transition-all duration-200 flex items-center shadow-md font-sans text-[9px] opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto"
                                       >
                                         {/* TYPE NAME BADGE */}
                                         <div
@@ -5790,7 +5790,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             e.dataTransfer.effectAllowed = 'move';
                                           }}
                                           style={{ color: '#ffffff' }}
-                                          className={`!text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md ${
+                                          className={`!text-white px-2 py-0.5 h-5 rounded-l-md font-black text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-sm ${
                                              ['Heading', 'Text', 'Image', 'ButtonCTA', 'OptinForm'].includes(child.type)
                                                ? 'bg-[#FF7A00] hover:bg-orange-600'
                                                : 'bg-[#10B981] hover:bg-emerald-600'
@@ -5809,7 +5809,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                         {/* ACTIONS BADGE */}
                                         <div
                                           style={{ color: '#ffffff' }}
-                                          className={`!text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md ${
+                                          className={`!text-white px-1 py-0.5 h-5 rounded-r-md flex items-center gap-0.5 shadow-sm ${
                                             ['Heading', 'Text', 'Image', 'ButtonCTA', 'OptinForm'].includes(child.type)
                                               ? 'border-l border-orange-400 bg-[#FF7A00]'
                                               : 'border-l border-emerald-400 bg-[#10B981]'
@@ -5826,7 +5826,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                handleUpdateElementData(el.id, { children: currentChildren });
                                                setSelectedChildIndex(0);
                                              }}
-                                             className="px-1.5 py-0.5 bg-blue-600 hover:bg-blue-700 font-extrabold text-[10px] rounded text-white flex items-center gap-1 transition-colors shadow-sm"
+                                             className="px-1 py-0.2 h-4 bg-blue-600 hover:bg-blue-700 font-extrabold text-[8px] rounded text-white flex items-center gap-0.5 transition-colors shadow-xs"
                                              style={{ color: '#ffffff' }}
                                              title="⬆️ Déplacer cet élément tout en haut de la Section (au-dessus de tous les Divs)"
                                            >
@@ -5846,7 +5846,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             style={{ color: '#ffffff' }}
                                             title="⚙️ Contrôler le bloc / Paramètres"
                                           >
-                                            <Settings className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                            <Settings className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
 
                                           {/* 📋 DUPLIQUER */}
@@ -5864,7 +5864,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             style={{ color: '#ffffff' }}
                                             title="📋 Dupliquer le bloc"
                                           >
-                                            <Copy className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                            <Copy className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
 
                                           {/* ▲ MONTER */}
@@ -5885,7 +5885,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             style={{ color: '#ffffff' }}
                                             title="▲ Monter"
                                           >
-                                            <ChevronUp className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                            <ChevronUp className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
 
                                           {/* ▼ DESCENDRE */}
@@ -5906,7 +5906,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             style={{ color: '#ffffff' }}
                                             title="▼ Descendre"
                                           >
-                                            <ChevronDown className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                            <ChevronDown className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
 
                                           {/* 🗑️ SUPPRIMER */}
@@ -5922,7 +5922,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                             style={{ color: '#ffffff' }}
                                             title="🗑️ Supprimer le bloc"
                                           >
-                                            <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                            <Trash2 className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                           </button>
                                         </div>
                                       </div>
@@ -5937,13 +5937,13 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                                          return (
                                            <div
-                                             className={`absolute -top-3.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-xl font-sans text-xs ${
+                                             className={`absolute -top-5.5 right-3 z-[999] transition-all duration-200 flex items-center shadow-md font-sans text-[9px] ${
                                                isImgSel ? 'opacity-100' : 'opacity-0 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto'
                                              }`}
                                            >
                                              <div
                                                style={{ color: '#ffffff' }}
-                                               className="bg-[#FF7A00] !text-white px-2.5 py-1 rounded-l-lg font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer"
+                                               className="bg-[#FF7A00] !text-white px-2 py-0.5 h-5 rounded-l-md font-black text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-sm cursor-pointer"
                                                onClick={(e) => {
                                                  e.stopPropagation();
                                                  setSelectedElementId(el.id);
@@ -5964,7 +5964,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                              </div>
                                              <div
                                                style={{ color: '#ffffff' }}
-                                               className="bg-[#FF7A00] !text-white px-1.5 py-1 rounded-r-lg flex items-center gap-1 shadow-md border-l border-orange-300"
+                                               className="bg-[#FF7A00] !text-white px-1 py-0.5 h-5 rounded-r-md flex items-center gap-0.5 shadow-sm border-l border-orange-300"
                                              >
                                                <button
                                                  type="button"
@@ -5984,7 +5984,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                  className="p-1 hover:bg-white/20 rounded transition-colors !text-white"
                                                  title="Supprimer l image"
                                                >
-                                                 <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                                 <Trash2 className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                                </button>
                                              </div>
                                            </div>
@@ -6339,7 +6339,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                                                             className="p-0.5 hover:bg-black/20 rounded transition-colors"
                                                             title="Supprimer l image"
                                                           >
-                                                            <Trash2 className="w-3.5 h-3.5 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
+                                                            <Trash2 className="w-3 h-3 text-white" color="#ffffff" stroke="#ffffff" style={{ color: '#ffffff', stroke: '#ffffff' }} />
                                                           </button>
                                                         </div>
                                                       </div>
