@@ -663,19 +663,20 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      let activeDom: HTMLElement | null = targetDomRef.current;
-                      if (!activeDom && typeof window !== 'undefined') {
-                        activeDom = (window as any).__activeRichTextDom || (document.activeElement as HTMLElement);
-                      }
-                      if (!activeDom || !activeDom.getAttribute || !activeDom.getAttribute('contenteditable')) {
+                      let activeDom: HTMLElement | null = (typeof window !== 'undefined' ? (window as any).__activeRichTextDom : null) || targetDomRef.current;
+                      if (!activeDom && typeof document !== 'undefined') {
                         const selNode = window.getSelection()?.getRangeAt(0)?.commonAncestorContainer;
-                        const editableParent = (selNode as HTMLElement)?.closest?.('[contenteditable]');
-                        if (editableParent) activeDom = editableParent as HTMLElement;
+                        if (selNode) {
+                          let parent: Node | null = selNode.nodeType === Node.TEXT_NODE ? selNode.parentNode : selNode;
+                          const editableParent = (parent as HTMLElement)?.closest?.('[contenteditable]');
+                          if (editableParent) activeDom = editableParent as HTMLElement;
+                        }
                       }
 
                       if (activeDom) {
                         activeDom.focus();
                         targetDomRef.current = activeDom;
+                        if (typeof window !== 'undefined') (window as any).__activeRichTextDom = activeDom;
                       }
 
                       restoreSelection();
@@ -701,7 +702,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                         }
                       }
 
-                      if (!applied) {
+                      if (!applied && c.color) {
                         try { document.execCommand('hiliteColor', false, c.color); } catch(e) {}
                       }
 
