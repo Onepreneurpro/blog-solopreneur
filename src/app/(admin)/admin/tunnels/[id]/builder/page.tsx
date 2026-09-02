@@ -1248,7 +1248,10 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
         type: data.type || (data.category === 'Média' ? 'Image' : 'Text'),
         category: data.category || 'Texte',
         content: data.defaultContent || data.content || (data.type === 'Image' ? 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80' : 'Nouveau texte inséré...'),
-        data: getDefaultBlockData(data.type, data.defaultContent),
+        data: {
+          ...getDefaultBlockData(data.type, data.defaultContent),
+          newRow: data.type === 'ContentBox' ? true : undefined,
+        },
       };
 
       // 1. Root-level container drop (Section, ContentBox, etc.)
@@ -3628,6 +3631,43 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                   </div>
                 )}
               </div>
+
+              {/* CARD: 📍 ALIGNEMENT / POSITION DE LA RANGÉE (ROW) */}
+              {(selectedEl?.type === 'ContentBox' || (selectedChildIndex !== null && selectedEl?.data?.children?.[selectedChildIndex]?.type === 'ContentBox')) && (
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black text-[#00A0FF] uppercase tracking-wider">
+                      📍 Alignement / Position de la Rangée
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ newRow: true })}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 text-center cursor-pointer transition-all ${
+                        targetData.newRow
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-400 font-bold shadow-xs'
+                          : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500'
+                      }`}
+                    >
+                      <span className="text-xs font-black">⏎ Nouvelle Ligne</span>
+                      <span className="text-[9px] opacity-80">Placer en bas de la précédente</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateMarginData({ newRow: false })}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 text-center cursor-pointer transition-all ${
+                        !targetData.newRow
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400 font-bold shadow-xs'
+                          : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500'
+                      }`}
+                    >
+                      <span className="text-xs font-black">➡️ Côte à côte</span>
+                      <span className="text-[9px] opacity-80">Aligner sur la même ligne</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* CARD 4: 📱 DISPONIBILITÉ / VISIBILITÉ (PC & MOBILE) */}
               <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
