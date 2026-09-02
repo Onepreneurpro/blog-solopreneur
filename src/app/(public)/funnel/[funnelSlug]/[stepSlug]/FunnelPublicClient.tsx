@@ -405,9 +405,9 @@ export default function FunnelPublicClient({ funnel, step }: FunnelPublicClientP
                     }}
                     className={`relative w-full ${sectionClassName} shadow-none transition-all my-0 m-0 p-0 overflow-hidden flex flex-col justify-between`}
                   >
-                  {/* DESKTOP BACKGROUND IMAGE LAYER */}
+                  {/* DESKTOP BACKGROUND IMAGE LAYER (PC ONLY) */}
                   {bgImage && (
-                    <div className={`absolute inset-0 overflow-hidden pointer-events-none z-0 ${mobileBgImage ? 'hidden md:block' : ''}`}>
+                    <div className="hidden md:block absolute inset-0 overflow-hidden pointer-events-none z-0">
                       <div
                         className="absolute inset-0 w-full h-full"
                         style={{
