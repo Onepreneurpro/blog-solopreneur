@@ -2469,7 +2469,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
                     <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                       <div className="relative w-7 h-7 shrink-0 rounded-lg overflow-hidden border border-slate-700">
                         {bgVal === 'transparent' ? (
-                          <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-slate-300 border border-slate-700 font-extrabold text-[9px]">
+                          <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-100 text-amber-600 border border-slate-300 font-extrabold text-[9px]">
                             🚫
                           </div>
                         ) : (
@@ -2489,57 +2489,19 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
 
                   </div>
 
-                  {/* GRID COULEUR DU TEXTE & FOND DES CARTES */}
-                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Couleur du Texte</label>
-                      <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                        <input
-                          type="color"
-                          value={textVal.startsWith('#') ? textVal : '#FFFFFF'}
-                          onChange={(e) => applyTextChange(e.target.value)}
-                          className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
-                        />
-                        <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
-                          {textVal}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 truncate">Fond Cartes</label>
-                        <button
-                          type="button"
-                          onClick={() => applyCardBgChange(cardBgVal === 'transparent' ? '#2759ce' : 'transparent')}
-                          className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase transition-all border cursor-pointer ${
-                            cardBgVal === 'transparent'
-                              ? 'bg-amber-500/20 text-amber-700 border-amber-400 shadow-xs'
-                              : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 hover:text-slate-900'
-                          }`}
-                        >
-                          {cardBgVal === 'transparent' ? '✓ Transp.' : '🚫 Transp.'}
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                        <div className="relative w-7 h-7 shrink-0 rounded-lg overflow-hidden border border-slate-700">
-                          {cardBgVal === 'transparent' ? (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-slate-800 text-rose-400">
-                              🚫
-                            </div>
-                          ) : (
-                            <input
-                              type="color"
-                              value={cardBgVal.startsWith('#') ? cardBgVal : '#2759ce'}
-                              onChange={(e) => applyCardBgChange(e.target.value)}
-                              className="w-full h-full cursor-pointer border-none bg-transparent"
-                            />
-                          )}
-                        </div>
-                        <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate flex-1">
-                          {cardBgVal === 'transparent' ? 'TRANSPARENT' : cardBgVal}
-                        </span>
-                      </div>
+                  {/* COULEUR DU TEXTE */}
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <label className="text-[10px] font-bold text-slate-400 block mb-1.5">Couleur du Texte</label>
+                    <div className="flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                      <input
+                        type="color"
+                        value={textVal.startsWith('#') ? textVal : '#FFFFFF'}
+                        onChange={(e) => applyTextChange(e.target.value)}
+                        className="w-7 h-7 rounded-lg cursor-pointer border-none bg-transparent"
+                      />
+                      <span className="font-mono text-[10px] text-slate-300 uppercase font-bold truncate">
+                        {textVal}
+                      </span>
                     </div>
                   </div>
 
