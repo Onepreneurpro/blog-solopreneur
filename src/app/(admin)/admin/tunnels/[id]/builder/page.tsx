@@ -81,6 +81,7 @@ import {
   ChevronDown,
   ChevronRight,
   GripVertical,
+  GripHorizontal,
   Plus,
   Sparkles,
   ArrowLeft,
@@ -207,6 +208,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     childIndex?: number;
   } | null>(null);
   const [selectedChildIndex, setSelectedChildIndex] = useState<number | null>(null);
+  const [toolbarPos, setToolbarPos] = useState<{ x: number; y: number }>({ x: 340, y: 85 });
   const [floatingTextMenu, setFloatingTextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -215,7 +217,7 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     targetElId?: string;
     childIdx?: number | null;
     subChildIdx?: number | null;
-  }>({ visible: false, x: 0, y: 0, selectedText: '' });
+  }>({ visible: true, x: 340, y: 85, selectedText: '' });
   const [openFloatingPopover, setOpenFloatingPopover] = useState<'color' | 'neon' | 'underline' | 'fontSize' | null>(null);
   const [underlineThickness, setUnderlineThickness] = useState<string>('3px');
   const [underlineOffset, setUnderlineOffset] = useState<string>('3px');
@@ -341,6 +343,31 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     }
   };
 
+  const handleStartDragToolbar = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initialX = toolbarPos.x;
+    const initialY = toolbarPos.y;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      const newX = Math.max(10, Math.min(window.innerWidth - 300, initialX + deltaX));
+      const newY = Math.max(10, Math.min(window.innerHeight - 80, initialY + deltaY));
+      setToolbarPos({ x: newX, y: newY });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   const handleOpenFormattingToolbar = (e: React.MouseEvent, targetId: string, childIdx?: number | null, subChildIdx?: number | null, defaultContent?: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -456,11 +483,21 @@ export default function VisualPageBuilderPage({ params }: { params: { id: string
     return (
       <div
         id="floating-builder-text-toolbar"
-        style={{ top: `${floatingTextMenu.y}px`, left: `${floatingTextMenu.x}px` }}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-        onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        style={{ top: `${toolbarPos.y}px`, left: `${toolbarPos.x}px` }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         className="fixed z-[999999] bg-white text-slate-900 rounded-full shadow-2xl p-2 flex items-center gap-1.5 border-2 border-slate-300 max-w-[calc(100vw-32px)] overflow-visible animate-in fade-in zoom-in-95 select-none"
       >
+        {/* 🖐️ POIGNÉE DE DÉPLACEMENT */}
+        <div
+          onMouseDown={handleStartDragToolbar}
+          className="p-1 hover:bg-slate-100 rounded-full cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 transition-colors shrink-0 flex items-center justify-center"
+          title="Cliquez et glissez pour déplacer la barre où vous voulez sur l écran"
+        >
+          <GripHorizontal className="w-4 h-4 text-slate-500" />
+        </div>
+
+        <div className="h-4 w-[1px] bg-slate-300 mx-0.5" />
         {/* ↶ ANNULER */}
         <button
           type="button"
